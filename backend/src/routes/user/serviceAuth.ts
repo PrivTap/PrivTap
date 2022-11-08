@@ -1,4 +1,4 @@
-const express = require('express');
+import express from "express"
 const router = express.Router();
 
 /* GET endpoint for the Service Authorization operation */
@@ -25,4 +25,4 @@ router.delete("/", (request, response) => {
 	response.send("Service Authorization DELETE: 200 OK"); //ONLY FOR TESTING PURPOSES
 });
 
-module.exports = router;
+export default router

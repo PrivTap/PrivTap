@@ -1,4 +1,5 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+
 const service = new mongoose.Schema({
     description: {
         type: String,
@@ -13,7 +14,7 @@ const service = new mongoose.Schema({
     },
     authServer: {
         type: String,
-    
+
     },
     clientId: {
         type: String
@@ -24,4 +25,5 @@ const service = new mongoose.Schema({
 },
     { collection: 'Service' }
 )
-module.exports = mongoose.model('Service', service);
+
+export default mongoose.model('Service', service);

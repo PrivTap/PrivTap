@@ -1,5 +1,6 @@
-const mongoose = require('mongoose');
-const Operation = require('./Operation');
+import mongoose from 'mongoose';
+import Operation from './Operation';
+
 const action = new mongoose.Schema({
     data:{
         //TODO: change this type
@@ -12,4 +13,5 @@ const action = new mongoose.Schema({
 },
     { collection: 'action' }
 )
-module.exports = mongoose.model('Action', action);
+
+export default mongoose.model('Action', action);

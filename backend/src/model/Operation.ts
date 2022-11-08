@@ -1,4 +1,5 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+
 const operation = new mongoose.Schema({
     description: {
         type: String,
@@ -22,4 +23,5 @@ const operation = new mongoose.Schema({
 },
     { collection: 'Operation' }
 )
-module.exports = mongoose.model('Operation', operation);
+
+export default mongoose.model('Operation', operation);

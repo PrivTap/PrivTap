@@ -1,4 +1,4 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
 /* GET endpoint for the OAuth Redirect operation */
@@ -7,4 +7,4 @@ router.get("/", (request, response) => {
 	response.send("Login: 200 OK"); //ONLY FOR TESTING PURPOSES
 });
 
-module.exports = router;
+export default router;

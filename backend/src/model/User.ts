@@ -1,6 +1,8 @@
 //Check how to hashify the password
+// We can use bcrypt JS library
 //https://www.mongodb.com/blog/post/password-authentication-with-mongoose-part-1
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+
 const user = new mongoose.Schema({
     username: {
         type: String,
@@ -23,5 +25,6 @@ const user = new mongoose.Schema({
 },
     { collection: 'User' }
 )
-module.exports = mongoose.model('User', user);
+
+export default mongoose.model('User', user);
 

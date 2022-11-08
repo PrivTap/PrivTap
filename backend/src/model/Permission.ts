@@ -1,5 +1,6 @@
 //define what is scope
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+
 const permission = new mongoose.Schema({
     scope: {
         type: String,
@@ -9,4 +10,5 @@ const permission = new mongoose.Schema({
 },
     { collection: 'Permission' }
 )
-module.exports = mongoose.model('Permission', permission);
+
+export default mongoose.model('Permission', permission);

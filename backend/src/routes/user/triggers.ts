@@ -1,12 +1,12 @@
-const express = require('express');
+import express from "express"
 const router = express.Router();
 
-/* GET endpoint for the Get Services operation */
+/* GET endpoint for the Get Triggers operation */
 router.get("/", (request, response) => {
-	let dummyObject = [{id: "SomeServiceID", authorized: true}];
+	let dummyObject = [{id: "SomeTriggerID"}];
 	response.status(200);
 	response.contentType("application/json");
 	response.send(JSON.stringify(dummyObject)); //ONLY FOR TESTING PURPOSES
 });
 
-module.exports = router;
+export default router

@@ -1,4 +1,4 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
 /* POST endpoint for the OSP sending Trigger Data operation */
@@ -9,4 +9,4 @@ router.post("/", (request, response) => {
 	response.send("Trigger Data: 200 OK"); //ONLY FOR TESTING PURPOSES
 });
 
-module.exports = router;
+export default router;

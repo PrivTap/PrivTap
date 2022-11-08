@@ -1,4 +1,4 @@
-const express = require('express');
+import express from "express"
 const router = express.Router();
 
 /* GET endpoint for the User Actions operation */
@@ -9,4 +9,4 @@ router.get("/", (request, response) => {
 	response.send(JSON.stringify(dummyObject)); //ONLY FOR TESTING PURPOSES
 });
 
-module.exports = router;
+export default router

@@ -1,4 +1,4 @@
-const express = require('express');
+import express from "express"
 const router = express.Router();
 
 /* POST endpoint for the Register operation */
@@ -7,4 +7,4 @@ router.post("/", (request, response) => {
     response.send("Register: 200 OK"); //ONLY FOR TESTING PURPOSES
 });
 
-module.exports = router;
+export default router;
