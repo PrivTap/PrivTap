@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const service = new mongoose.Schema({
     description: {
@@ -23,7 +23,7 @@ const service = new mongoose.Schema({
         type: String
     }
 },
-    { collection: 'Service' }
-)
+{ collection: "Service" }
+);
 
-export default mongoose.model('Service', service);
+export default mongoose.model("Service", service);

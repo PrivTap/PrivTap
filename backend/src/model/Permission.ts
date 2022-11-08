@@ -1,5 +1,5 @@
 //define what is scope
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const permission = new mongoose.Schema({
     scope: {
@@ -8,7 +8,7 @@ const permission = new mongoose.Schema({
     },
 
 },
-    { collection: 'Permission' }
-)
+{ collection: "Permission" }
+);
 
-export default mongoose.model('Permission', permission);
+export default mongoose.model("Permission", permission);

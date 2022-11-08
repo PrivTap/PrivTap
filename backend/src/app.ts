@@ -1,7 +1,7 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import {getFilesInDir} from './helper';
-import logger from 'morgan';
+import express from "express";
+import dotenv from "dotenv";
+import {getFilesInDir} from "./helper";
+import logger from "morgan";
 
 // Read environment variables from a .env file
 dotenv.config();
@@ -11,13 +11,13 @@ const port = process.env.PORT || 3000;
 
 // Create and configure Express app
 const app = express();
-app.use(logger('dev'));
+app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(express.static('public'));
+app.use(express.static("public"));
 
 // Register routes to our Express app
-getFilesInDir('src/routes')
+getFilesInDir("src/routes")
     .map(filePath => filePath.slice(0,-3))  // Remove file extension
     .forEach(async filePath => {            // For each file, register the route to our express app
         filePath = "." + filePath.replace("src", ""); // Remove '/src' from file path to avoid errors when this gets compiled
@@ -29,5 +29,5 @@ getFilesInDir('src/routes')
 
 // Start the app server
 app.listen(port, () => {
-    console.log(`Server listening on port: ${port}`)
-})
+    console.log(`Server listening on port: ${port}`);
+});

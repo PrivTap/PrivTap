@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const operation = new mongoose.Schema({
     description: {
@@ -21,7 +21,7 @@ const operation = new mongoose.Schema({
     }
 
 },
-    { collection: 'Operation' }
-)
+{ collection: "Operation" }
+);
 
-export default mongoose.model('Operation', operation);
+export default mongoose.model("Operation", operation);

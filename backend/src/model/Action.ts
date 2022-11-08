@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
-import Operation from './Operation';
+import mongoose from "mongoose";
+import Operation from "./Operation";
 
 const action = new mongoose.Schema({
     data:{
@@ -11,7 +11,7 @@ const action = new mongoose.Schema({
     }
 
 },
-    { collection: 'action' }
-)
+{ collection: "action" }
+);
 
-export default mongoose.model('Action', action);
+export default mongoose.model("Action", action);

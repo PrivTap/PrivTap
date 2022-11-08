@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
-import Operation from './Operation';
+import mongoose from "mongoose";
+import Operation from "./Operation";
 
 const trigger = new mongoose.Schema({
     data:{
@@ -11,7 +11,7 @@ const trigger = new mongoose.Schema({
     }
 
 },
-    { collection: 'trigger' }
-)
+{ collection: "trigger" }
+);
 
-export default mongoose.model('Trigger', trigger);
+export default mongoose.model("Trigger", trigger);
