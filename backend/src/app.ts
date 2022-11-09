@@ -17,8 +17,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static("public"));
 
 // Connect to db cluster
-const dbUri = "mongodb+srv://testUsername:testPassword@testcluster.r0idyk9.mongodb.net/testDB?retryWrites=true&w=majority";
-connectDB(dbUri).then(() => {
+connectDB(process.env.DB_STRING!).then(() => {
     //testNewUser("someUsername", "somePassword", "someEmail");
     //testNewAction("someData");
     //testNewService("someDescription", "someName", "someAuthServer", "someClientId", "someSecret");

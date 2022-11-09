@@ -2,6 +2,7 @@ import express from "express";
 import bcrypt from "bcrypt";
 import {randomBytes} from "crypto";
 import {insertNewUser} from "../../helper";
+import {sendRegistrationEmail} from "../../mailer";
 
 const router = express.Router();
 
@@ -20,11 +21,16 @@ router.post("/", (request, response) => {
 
     if (checkValidInput(username, email, password)){
         const hash = bcrypt.hashSync(password, saltRounds);
-        const token = randomBytes(64).toString("hex");
-        insertNewUser(username, hash, email, token);
+        const accessToken = randomBytes(64).toString("hex");
+        insertNewUser(username, hash, email, accessToken);
 
         response.status(200);
         response.send("Register: 200 OK");
+        if (process.env.NODE_ENV == "development"){
+            console.log(accessToken);
+        } else {
+            sendRegistrationEmail(email, accessToken).then(() => console.log(`An email has been sent to ${email}`));
+        }
     } else {
         response.status(400);
         response.send(errorMessage);
@@ -92,7 +98,7 @@ function checkLength(username: string, email: string, password: string): boolean
     const passwordConstraint =  password?.length > 8 && username?.length < 20;
     const lengthCheck = usernameConstraint && emailConstraint && passwordConstraint;
     if (!lengthCheck){
-        errorMessage[key].push("Length error")
+        errorMessage[key].push("Length error");
     }
     return lengthCheck;
 }
