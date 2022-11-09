@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-import {getFilesInDir} from "./helper";
+import {connectDB, getFilesInDir} from "./helper";
 import logger from "morgan";
 
 // Read environment variables from a .env file
@@ -15,6 +15,14 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static("public"));
+
+// Connect to db cluster
+const dbUri = "mongodb+srv://testUsername:testPassword@testcluster.r0idyk9.mongodb.net/testDB?retryWrites=true&w=majority";
+connectDB(dbUri).then(() => {
+    //testNewUser("someUsername", "somePassword", "someEmail");
+    //testNewAction("someData");
+    //testNewService("someDescription", "someName", "someAuthServer", "someClientId", "someSecret");
+});
 
 // Register routes to our Express app
 getFilesInDir("src/routes")

@@ -1,17 +1,22 @@
-import mongoose from "mongoose";
-import Operation from "./Operation";
+import {Schema, model, Document} from "mongoose";
+import {IOperation} from "./Operation";
 
-const action = new mongoose.Schema({
+export interface IAction extends Document {
+    data: string;
+    operation: IOperation;
+}
+
+const actionSchema = new Schema<IAction>({
     data:{
         //TODO: change this type
         type: String,
     },
     operation: {
-        type: Operation
+        type: Schema.Types.ObjectId
     }
 
 },
-{ collection: "action" }
+{ collection: "Action" }
 );
 
-export default mongoose.model("Action", action);
+export default model<IAction>("Action", actionSchema);

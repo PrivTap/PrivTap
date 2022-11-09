@@ -1,17 +1,22 @@
-import mongoose from "mongoose";
-import Operation from "./Operation";
+import {Schema, model, Document} from "mongoose";
+import {IOperation} from "./Operation";
 
-const trigger = new mongoose.Schema({
+export interface ITrigger extends Document {
+    data: string;
+    operation: IOperation;
+}
+
+const triggerSchema = new Schema<ITrigger>({
     data:{
         //TODO: change this type
         type: String,
     },
     operation: {
-        type: Operation
+        type: Schema.Types.ObjectId,
     }
 
 },
 { collection: "trigger" }
 );
 
-export default mongoose.model("Trigger", trigger);
+export default model<ITrigger>("Trigger", triggerSchema);

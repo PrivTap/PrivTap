@@ -1,7 +1,11 @@
 //define what is scope
-import mongoose from "mongoose";
+import {Schema, model, Document} from "mongoose";
 
-const permission = new mongoose.Schema({
+export interface IPermission extends Document {
+    scope: string;
+}
+
+const permissionSchema = new Schema<IPermission>({
     scope: {
         type: String,
         required: true,
@@ -11,4 +15,4 @@ const permission = new mongoose.Schema({
 { collection: "Permission" }
 );
 
-export default mongoose.model("Permission", permission);
+export default model<IPermission>("Permission", permissionSchema);
