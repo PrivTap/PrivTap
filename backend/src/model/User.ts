@@ -7,7 +7,7 @@ export interface IUser extends Document {
     username: string;
     password: string;
     email: string;
-    owner: IUser['_id'];
+    owner: IUser["_id"];
 }
 
 const userSchema = new Schema<IUser>({
