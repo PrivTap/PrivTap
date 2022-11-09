@@ -47,7 +47,7 @@ export async function sendRegistrationEmail(userEmailAddress: string, activation
         subject: "PrivTAP - Activate your account",
         text: `
         Welcome to PrivTAP!\n
-        We just need to validate your email address to activate your PrivTAP account. Simply click the following link: ${activationToken}\n
+        We just need to validate your email address to activate your PrivTAP account. Simply click the following link: ${activationUrl}\n
         Welcome aboard!\n
         The PrivTAP Team`,
         html: `
