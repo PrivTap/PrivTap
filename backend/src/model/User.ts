@@ -1,13 +1,12 @@
-//Check how to hashify the password
-// We can use bcrypt JS library
-//https://www.mongodb.com/blog/post/password-authentication-with-mongoose-part-1
 import {Schema, model, Document} from "mongoose";
 
 export interface IUser extends Document {
     username: string;
     password: string;
     email: string;
-    owner: IUser["_id"];
+    registrationDate: Date;
+    isConfirmed: boolean;
+    activationToken: string;
 }
 
 const userSchema = new Schema<IUser>({
@@ -25,6 +24,18 @@ const userSchema = new Schema<IUser>({
         index: {
             unique: true
         }
+    },
+    registrationDate: {
+        type: Date,
+        required: true
+    },
+    isConfirmed: {
+        type: Boolean,
+        required: true
+    },
+    activationToken: {
+        type: String,
+        required: true
     }
     //TODO
     //array of all service for relation "manages" ?

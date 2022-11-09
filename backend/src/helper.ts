@@ -1,5 +1,6 @@
 import { readdirSync, statSync } from "fs";
 import mongoose, {ConnectOptions} from "mongoose";
+import User from "./model/User";
 
 /**
  * Gets all files recursively from a directory.
@@ -43,12 +44,15 @@ export async function connectDB(uri: string){
 // The methods below will be deleted soon, are here just to test if the database interaction goes as planned
 // Proper tests will be written soon
 
-/*
-export function testNewUser(username: string, password: string, email: string){
+
+export function insertNewUser(username: string, password: string, email: string, token: string){
     const user = new User({
         username: username,
         password: password,
-        email: email
+        email: email,
+        registrationDate: Date(),
+        isConfirmed: false,
+        activationToken: token
     });
     try {
         user.save();
@@ -57,6 +61,8 @@ export function testNewUser(username: string, password: string, email: string){
         console.log("Error inserting new user");
     }
 }
+
+/*
 
 export function testNewAction(data: string){
     const op = new Operation({

@@ -6,9 +6,11 @@
     "build": "npx tsc",
     "start": "node dist/app.js",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/app.js\"",
-    "lint": "eslint **/*.ts --fix"
+    "lint": "eslint **/*.ts --fix",
+    "run": "npx tsc && node dist/app.js"
   },
   "dependencies": {
+    "bcrypt": "^5.1.0",
     "dotenv": "^16.0.3",
     "express": "~4.16.1",
     "mongoose": "^6.7.2",
@@ -20,6 +22,7 @@
     "@types/morgan": "^1.9.3",
     "@types/node": "^18.11.9",
     "@types/nodemailer": "^6.4.6",
+    "@types/bcrypt": "^5.0.0",
     "@typescript-eslint/eslint-plugin": "^5.42.1",
     "@typescript-eslint/parser": "^5.42.1",
     "concurrently": "^7.5.0",
