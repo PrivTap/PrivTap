@@ -1,5 +1,13 @@
-const mongoose = require('mongoose');
-const operation = new mongoose.Schema({
+import {Schema, model, Document} from "mongoose";
+
+export interface IOperation extends Document {
+    description: string;
+    name: string;
+    service: string;
+    permission: [string];
+}
+
+const operationSchema = new Schema<IOperation>({
     description: {
         type: String,
         required: true,
@@ -16,10 +24,11 @@ const operation = new mongoose.Schema({
         type: String
     },
     permission: {
-        type: Array
+        type: [String]
     }
 
 },
-    { collection: 'Operation' }
-)
-module.exports = mongoose.model('Operation', operation);
+{ collection: "Operation" }
+);
+
+export default model<IOperation>("Operation", operationSchema);

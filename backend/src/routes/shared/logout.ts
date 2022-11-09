@@ -1,10 +1,10 @@
-const express = require('express');
+import express from "express";
 const router = express.Router();
 
 /* GET endpoint for the Logout operation */
-router.get('/', (request, response) => {
+router.get("/", (request, response) => {
     response.status(200);
     response.send("Logout: 200 OK"); //ONLY FOR TESTING PURPOSES
 });
 
-module.exports = router;
+export default router;
