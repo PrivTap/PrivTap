@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import {connectDB, getFilesInDir} from "./helper";
+import {join} from "path";
 import logger from "morgan";
 
 // Read environment variables from a .env file
@@ -11,10 +12,10 @@ const port = process.env.PORT || 3000;
 
 // Create and configure Express app
 const app = express();
-app.use(logger("dev"));
+if (process.env.NODE_ENV == "development") app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(express.static("public"));
+// app.use(express.static("public"));
 
 // Connect to db cluster
 connectDB(process.env.DB_STRING!).then(() => {
@@ -24,10 +25,10 @@ connectDB(process.env.DB_STRING!).then(() => {
 });
 
 // Register routes to our Express app
-getFilesInDir("src/routes")
+getFilesInDir(join(__dirname, "routes"))
     .map(filePath => filePath.slice(0,-3))  // Remove file extension
     .forEach(async filePath => {            // For each file, register the route to our express app
-        filePath = "." + filePath.replace("src", ""); // Remove '/src' from file path to avoid errors when this gets compiled
+        // filePath = "." + filePath.replace("src", ""); // Remove '/src' from file path to avoid errors when this gets compiled
         const endpoint = (await import(filePath)).default;
         const filePathArray = filePath.split("/");
         const endpointName = filePathArray[filePathArray.length - 1];
