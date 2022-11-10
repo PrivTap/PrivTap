@@ -1,8 +1,10 @@
 import express from "express";
 import dotenv from "dotenv";
-import {connectDB, getFilesInDir} from "./helper";
+import {connectDB, getFilesInDir} from "./helper/helper";
 import {join} from "path";
 import logger from "morgan";
+import cookieParser from "cookie-parser";
+
 
 // Read environment variables from a ..env file
 dotenv.config();
@@ -15,8 +17,8 @@ const app = express();
 if (process.env.NODE_ENV == "development") app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-// app.use(express.static("public"));
-
+//app.use(express.static("public"));
+app.use(cookieParser());
 
 // Connect to db cluster
 connectDB(process.env.DB_STRING!).then(() => {
