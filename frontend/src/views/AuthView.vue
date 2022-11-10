@@ -15,7 +15,6 @@
         <form @submit="onSubmitted" class="mt-8 space-y-6">
           <input type="hidden" name="remember" value="true" />
           <div class="-space-y-px rounded-md shadow-sm relative">
-            <!-- <Transition name="slide-fade"> -->
             <div
               v-if="!showLogin"
               class="relative animate-fade-in placeholder-gray-500"
@@ -30,8 +29,6 @@
                 placeholder="Username"
               />
             </div>
-            <!-- </Transition> -->
-
             <div class="placeholder-gray-500">
               <label for="email-address" class="sr-only">Email address</label>
               <input
