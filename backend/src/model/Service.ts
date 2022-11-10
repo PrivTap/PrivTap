@@ -1,4 +1,4 @@
-import {Schema, model, Document} from "mongoose";
+import {Schema, model, Document, Error, CallbackError} from "mongoose";
 
 export interface IService extends Document {
     description: string;
@@ -8,29 +8,69 @@ export interface IService extends Document {
     secret: string;
 }
 
-const serviceSchema = new Schema<IService>({
-    description: {
-        type: String,
-        required: true,
-    },
-    name: {
-        type: String,
-        required: true,
-        index: {
-            unique: true
-        }
-    },
-    authServer: {
-        type: String,
-    },
-    clientId: {
-        type: String
-    },
-    secret: {
-        type: String
-    }
-},
-{ collection: "Service" }
-);
+/**
+ * The entrypoint class to handle all Database access operations related to services.
+ */
+export default class Services {
 
-export default model<IService>("Service", serviceSchema);
+    /**
+     * The MongoDB model and schema definition for the Service document
+     * @private
+     */
+    private static serviceModel = model<IService>("Service", new Schema<IService>({
+            description: {
+                type: String,
+                required: true,
+            },
+            name: {
+                type: String,
+                required: true,
+                index: {
+                    unique: true
+                }
+            },
+            authServer: {
+                type: String,
+            },
+            clientId: {
+                type: String
+            },
+            secret: {
+                type: String
+            }
+        },
+        { collection: "Service" }
+    ));
+
+    /**
+     * Asynchronously adds a new service to the database
+     * @param name The name of the new service
+     * @param description The description of the service
+     * @param authenticationServer The API endpoint of the server used to authenticate the PrivTAP platform with the Service
+     * @param completionHandler The asynchronous callback used to continue the computation after the operation has either succeeded or failed with an error
+     * @throws {Error} An error representing what went wrong when attempting to create the Service
+     */
+    static insert(name: String, description: String, authenticationServer: String, completionHandler: (error?: Error | CallbackError) => void) {
+        let newService = new Services.serviceModel({
+            description: description,
+            name: name,
+            authServer: authenticationServer
+        });
+        // Do we already have a service with the same identifier in the database?
+        Services.serviceModel.exists({name: name}, (error, res) => {
+            if (res == null) {
+                //Proceed with the save operation
+                newService.save((error) => {
+                    if (error == null) {
+                        console.log("Service Added!");
+                    }
+                    completionHandler(error);
+                });
+            } else if (error == null) {
+                completionHandler(new Error("Model.Services ERROR: Attempting to insert a duplicate item"));
+            } else {
+                completionHandler(error);
+            }
+        });
+    }
+}

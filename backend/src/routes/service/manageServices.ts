@@ -1,4 +1,5 @@
 import express from "express";
+import Services from "../../model/Service";
 const router = express.Router();
 
 /* GET endpoint for the Manage Services OSP operation */
@@ -11,10 +12,32 @@ router.get("/", (request, response) => {
 
 /* POST endpoint for the Manage Services OSP operation */
 router.post("/", (request, response) => {
-    const requestJSON = JSON.parse(request.body);
-    console.log("Manage Services POST: received " + requestJSON);
-    response.status(200);
-    response.send("Manage Services OSP POST: 200 OK"); //ONLY FOR TESTING PURPOSES
+    const serviceName = request.body.name;
+    const serviceDesc = request.body.description;
+    const serviceAuthURL = request.body.authURL;
+
+    if (serviceName == null || serviceDesc == null || serviceAuthURL == null) {
+        response.status(400);
+        response.send("400: Bad Request. The parameters you sent were invalid.");
+    } else {
+        // Validate the authentication url
+        let authURLValid = /^(http|https):\/\/[^ "]+$/.test(serviceAuthURL);
+        if (!authURLValid) {
+            response.status(400);
+            response.send("400: Bad Request. The parameters you sent were invalid.");
+        } else {
+            // Carry on with service creation
+            Services.insert(serviceName, serviceDesc, serviceAuthURL, (error) => {
+                if (error == null) {
+                    response.status(200);
+                    response.send("200 OK");
+                } else {
+                    response.status(500);
+                    response.send("500: Internal Server Error. The server encountered the following error:\n" + error.message);
+                }
+            });
+        }
+    }
 });
 
 /* DELETE endpoint for the Manage Services OSP operation */
