@@ -86,8 +86,7 @@ export async function queryUser(attribute: string, value: string | boolean | Dat
 }
 
 /**
- * Starts a query looking for the specified attribute (e.g. username) and value (e.g. "John71")
- * @result Returns a Promise<IUser> which can be null if the query is empty
+ * Modifies the document specified by the parameters queryAttribute (e.g. username) and queryValue (e.g. "John71") accordingly to modifyAttribute (e.g. email) and modifyValue (e.g. "newEmail@gmail.com")
  * @param queryAttribute The queried attribute
  * @param queryValue The queried value associated to the specified attribute. IUser expects string, boolean and Date types depending on the attribute
  * @param modifyAttribute The attribute to modify
