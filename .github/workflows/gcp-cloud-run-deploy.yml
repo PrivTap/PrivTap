@@ -15,7 +15,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: PrivTAP-REST-API
+  IMAGE_NAME: privtap/backend:latest
 
 jobs:
   build-and-push-image:
