@@ -13,10 +13,6 @@ on:
     branches:
       - production
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: privtap/backend
-
 jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
@@ -38,4 +34,5 @@ jobs:
         uses: 'google-github-actions/deploy-cloudrun@v0'
         with:
           service: 'privtap-backend'
+          region: europe-west8
           source: ./backend
