@@ -44,5 +44,37 @@ const userSchema = new Schema<IUser>({
 { collection: "User" }
 );
 
+export function insertNewUser(username: string, password: string, email: string, token: string) {
+    const User = model("User", userSchema);
+    const user = new User({
+        username: username,
+        password: password,
+        email: email,
+        registrationDate: Date(),
+        isConfirmed: false,
+        activationToken: token
+    });
+    try {
+        user.save();
+        console.log("User added");
+    } catch (e) {
+        console.log("Error inserting new user");
+    }
+}
+
+/**
+ * Starts a query looking for the specified attribute (e.g. username) and value (e.g. "John71")
+ * @param attribute The queried attribute
+ * @param value The queried value associated to the specified attribute
+ * @result Returns a Promise<IUser> which can be null if the query is empty
+ */
+export async function queryUser(attribute: string, value: string): Promise<IUser> {
+    const User = model("User", userSchema);
+    const idk: {[index: string] : string} = {};
+    idk[attribute] = value;
+    console.log(idk);
+    return await User.findOne(idk) as IUser;
+}
+
 export default model<IUser>("User", userSchema);
 

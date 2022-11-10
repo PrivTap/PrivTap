@@ -49,65 +49,6 @@ export async function connectDB(uri: string) {
     }
 }
 
-// The methods below will be deleted soon, are here just to test if the database interaction goes as planned
-// Proper tests will be written soon
-
-
-export function insertNewUser(username: string, password: string, email: string, token: string) {
-    const user = new User({
-        username: username,
-        password: password,
-        email: email,
-        registrationDate: Date(),
-        isConfirmed: false,
-        activationToken: token
-    });
-    try {
-        user.save();
-        console.log("User added");
-    } catch (e) {
-        console.log("Error inserting new user");
-    }
-}
-
-/*
-
-export function testNewAction(data: string){
-    const op = new Operation({
-        description: "someDescription",
-        name: "someOperationName",
-        service: "someService",
-        permission: "somePermission"
-    });
-    const action = new Action({
-        data: data,
-        operation: op
-    });
-    try {
-        action.save();
-        console.log("Action added");
-    } catch (e) {
-        console.log("Error inserting new action");
-    }
-}
-
-export function testNewService(description: string, name: string, authServer: string, clientId: string, secret: string){
-    const service = new Service({
-        description: description,
-        name: name,
-        authServer: authServer,
-        clientId: clientId,
-        secret: secret
-    });
-    try {
-        service.save();
-        console.log("Service added");
-    } catch (e) {
-        console.log("Error inserting new service");
-    }
-}
-*/
-
 /**
  * Checks if a jwt is valid and if it exists a user associated in the database.<p>
  * The jwt should be stored in the cookie with parameter "_jwt".<p>

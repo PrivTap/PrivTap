@@ -1,13 +1,13 @@
 import express from "express";
 import bcrypt from "bcrypt";
 import {randomBytes} from "crypto";
-import {insertNewUser} from "../../helper";
+import {insertNewUser, queryUser} from "../../model/User";
 import {sendRegistrationEmail} from "../../mailer";
 
 const router = express.Router();
 
 // The error message will be filled during the checks
-const errorMessage: { [index: string]: string[] } = {};
+const errorMessage: {[index: string] : string[]} = {};
 const key = "error";
 errorMessage[key] = [];
 
@@ -18,24 +18,24 @@ router.post("/", (request, response) => {
     const username = request.body.username;
     const email = request.body.email;
     const password = request.body.password;
-
-    if (checkValidInput(username, email, password)) {
-        const hash = bcrypt.hashSync(password, saltRounds);
-        const accessToken = randomBytes(64).toString("hex");
-        insertNewUser(username, hash, email, accessToken);
-
-        response.status(200);
-        response.send("Register: 200 OK");
-        if (process.env.NODE_ENV == "development") {
-            console.log(accessToken);
+    checkValidInput(username, email, password).then(check => {
+        if (check){
+            const hash = bcrypt.hashSync(password, saltRounds);
+            const accessToken = randomBytes(64).toString("hex");
+            insertNewUser(username, hash, email, accessToken);
+            response.status(200);
+            response.send("Register: 200 OK");
+            if (process.env.NODE_ENV == "development"){
+                console.log(accessToken);
+            } else {
+                sendRegistrationEmail(email, accessToken).then(() => console.log(`An email has been sent to ${email}`));
+            }
         } else {
-            sendRegistrationEmail(email, accessToken).then(() => console.log(`An email has been sent to ${email}`));
+            response.status(400);
+            response.send(errorMessage);
+            errorMessage[key] = [];
         }
-    } else {
-        response.status(400);
-        response.send(errorMessage);
-        errorMessage[key] = [];
-    }
+    });
 });
 
 /**
@@ -45,9 +45,9 @@ router.post("/", (request, response) => {
  * @result True if the email is valid. False otherwise
  */
 function checkEmail(email: string): boolean {
-    const regex = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
+    const regex = /^[-!#$%&'*+/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
     const emailCheck = regex.test(email);
-    if (!emailCheck) {
+    if (!emailCheck){
         errorMessage[key].push("Email error");
     }
     return emailCheck;
@@ -63,7 +63,7 @@ function checkEmail(email: string): boolean {
  */
 function checkUndefined(username: string, email: string, password: string): boolean {
     const undefinedCheck = !(typeof username == "undefined" || typeof email == "undefined" || typeof password == "undefined");
-    if (!undefinedCheck) {
+    if (!undefinedCheck){
         errorMessage[key].push("Undefined parameters error");
     }
     return undefinedCheck;
@@ -78,10 +78,10 @@ function checkUndefined(username: string, email: string, password: string): bool
 function checkInvalidChar(username: string): boolean {
     const regex = /[^a-zA-Z0-9]/;
     const invalidCharCheck = !regex.test(username);
-    if (!invalidCharCheck) {
+    if (!invalidCharCheck){
         errorMessage[key].push("Username error, special characters");
     }
-    return invalidCharCheck;
+    return  invalidCharCheck;
 }
 
 /**
@@ -93,14 +93,42 @@ function checkInvalidChar(username: string): boolean {
  * @result True if all the parameters satisfy the length constraints. False otherwise
  */
 function checkLength(username: string, email: string, password: string): boolean {
-    const usernameConstraint = username?.length > 3 && username?.length < 15;
-    const emailConstraint = email?.length > 3 && email?.length < 255;
-    const passwordConstraint = password?.length > 8 && username?.length < 20;
+    const usernameConstraint=  username?.length > 3 && username?.length < 15;
+    const emailConstraint =  email?.length > 3 && email?.length < 255;
+    const passwordConstraint =  password?.length > 8 && username?.length < 20;
     const lengthCheck = usernameConstraint && emailConstraint && passwordConstraint;
-    if (!lengthCheck) {
+    if (!lengthCheck){
         errorMessage[key].push("Length error");
     }
     return lengthCheck;
+}
+
+/**
+ * Checks if the username is already taken
+ * @param username The username found in the request body
+ * @result True if the username is not taken. False otherwise
+ */
+async function checkUserTaken(username: string): Promise<boolean> {
+    const query = await queryUser("username", username);
+    if (query == null) {
+        return true;
+    }
+    errorMessage[key].push("Username taken");
+    return false;
+}
+
+/**
+ * Checks if the email is already associated to another account
+ * @param email The email found in the request body
+ * @result True if the email is not associated to another account. False otherwise
+ */
+async function checkEmailTaken(email: string): Promise<boolean> {
+    const query = await queryUser("email", email);
+    if (query == null) {
+        return true;
+    }
+    errorMessage[key].push("Email taken");
+    return false;
 }
 
 /**
@@ -110,13 +138,15 @@ function checkLength(username: string, email: string, password: string): boolean
  * @param password The password found in the request body
  * @result True if all the parameters satisfy the called checks. False otherwise
  */
-function checkValidInput(username: string, email: string, password: string): boolean {
+async function checkValidInput(username: string, email: string, password: string): Promise<boolean> {
     const emailCheck = checkEmail(email);
     const undefinedCheck = checkUndefined(username, email, password);
     const usernameCheck = checkInvalidChar(username);
     const lengthCheck = checkLength(username, email, password);
+    const usernameTakenCheck = checkUserTaken(username);
+    const emailTakenCheck = checkEmailTaken(email);
 
-    return emailCheck && undefinedCheck && usernameCheck && lengthCheck;
+    return emailCheck && undefinedCheck && usernameCheck && lengthCheck && await usernameTakenCheck && await emailTakenCheck;
 }
 
 export default router;

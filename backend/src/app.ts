@@ -33,7 +33,6 @@ getFilesInDir(join(__dirname, "routes"))
         const endpoint = (await import(filePath)).default;
         const filePathArray = filePath.split("/");
         const endpointName = filePathArray[filePathArray.length - 1];
-        console.log(endpointName);
         app.use("/" + endpointName, endpoint);
     });
 
