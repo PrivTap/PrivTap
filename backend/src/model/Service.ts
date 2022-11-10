@@ -22,7 +22,6 @@ const serviceSchema = new Schema<IService>({
     },
     authServer: {
         type: String,
-
     },
     clientId: {
         type: String
