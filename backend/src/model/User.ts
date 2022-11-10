@@ -47,6 +47,13 @@ const userSchema = new Schema<IUser>({
 { collection: "User" }
 );
 
+/**
+ * Inserts a new user in the database
+ * @param username The new user's username to be inserted
+ * @param password The new user's password to be inserted
+ * @param email The new user's email to be inserted
+ * @param token The new user's activation token to be inserted
+ */
 export function insertNewUser(username: string, password: string, email: string, token: string) {
     const User = model("User", userSchema);
     const user = new User({
@@ -68,14 +75,36 @@ export function insertNewUser(username: string, password: string, email: string,
 /**
  * Starts a query looking for the specified attribute (e.g. username) and value (e.g. "John71")
  * @param attribute The queried attribute
- * @param value The queried value associated to the specified attribute
+ * @param value The queried value associated to the specified attribute. IUser expects string, boolean and Date types depending on the attribute
  * @result Returns a Promise<IUser> which can be null if the query is empty
  */
-export async function queryUser(attribute: string, value: string): Promise<IUser> {
+export async function queryUser(attribute: string, value: string | boolean | Date): Promise<IUser> {
     const User = model("User", userSchema);
-    const queryObject: {[index: string] : string} = {};
+    const queryObject: {[index: typeof attribute] : typeof value} = {};
     queryObject[attribute] = value;
     return await User.findOne(queryObject) as IUser;
+}
+
+/**
+ * Starts a query looking for the specified attribute (e.g. username) and value (e.g. "John71")
+ * @result Returns a Promise<IUser> which can be null if the query is empty
+ * @param queryAttribute The queried attribute
+ * @param queryValue The queried value associated to the specified attribute. IUser expects string, boolean and Date types depending on the attribute
+ * @param modifyAttribute The attribute to modify
+ * @param modifyValue The new value associated to the specified attribute. IUser expects string, boolean and Date types depending on the attribute
+ * @result Returns a dictionary containing the fields modifiedCount, equal to the number of modified documents and matchedCount, equal to the number of documents matching the query
+ */
+export async function modifyUser(queryAttribute: string, queryValue: string | boolean | Date, modifyAttribute: string, modifyValue: string | boolean | Date): Promise<{[index: string] : number}> {
+    const User = model("User", userSchema);
+    const queryObject: {[index: typeof queryAttribute] : typeof queryValue} = {};
+    queryObject[queryAttribute] = queryValue;
+    const modifyObject: {[index: typeof modifyAttribute] : typeof modifyValue} = {};
+    modifyObject[modifyAttribute] = modifyValue;
+    const result = await User.updateOne(queryObject, modifyObject);
+    const resultObject: {[index: string] : number} = {};
+    resultObject["modifiedCount"] = result.modifiedCount;
+    resultObject["matchedCount"] = result.matchedCount;
+    return resultObject;
 }
 
 export default model<IUser>("User", userSchema);
