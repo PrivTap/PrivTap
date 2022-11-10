@@ -13,11 +13,11 @@ errorMessage[key] = [];
 
 /* POST endpoint for the Register operation */
 router.post("/", (request, response) => {
-    console.log("Received post");
-    const saltRounds = 8;
     const username = request.body.username;
     const email = request.body.email;
     const password = request.body.password;
+    const saltRounds = 8;
+
     checkValidInput(username, email, password).then(check => {
         if (check){
             const hash = bcrypt.hashSync(password, saltRounds);

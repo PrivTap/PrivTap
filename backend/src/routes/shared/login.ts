@@ -1,10 +1,41 @@
 import express from "express";
+import bcrypt from "bcrypt";
+import {queryUser} from "../../model/User";
+import {createJWT} from "../../helper/login&jwt";
 const router = express.Router();
 
 /* POST endpoint for the Login operation */
 router.post("/", (request, response) => {
-    response.status(200);
-    response.send("Login: 200 OK"); //ONLY FOR TESTING PURPOSES
+    const username = request.body.username;
+    const password = request.body.password;
+    if (typeof username == "undefined" || typeof password == "undefined"){
+        response.status(400);
+        response.send("400: Undefined parameters");
+        return;
+    }
+
+    queryUser("username", username).then((user) => {
+        if (user == null){
+            response.status(400);
+            response.send("400: User not found");
+            return;
+        }
+        const passwordValid = bcrypt.compareSync(password, user.password);
+        if (!passwordValid){
+            response.status(400);
+            response.send("400: Wrong Password");
+            return;
+        }
+        const jwt = createJWT(user);
+        if (typeof jwt == "undefined"){
+            response.status(500);
+            response.send("500: Internal Error");
+            return;
+        }
+        response.cookie("_jwt", jwt);
+        response.status(200);
+        response.send("Login: 200 OK");
+    });
 });
 
 export default router;

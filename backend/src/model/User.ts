@@ -13,6 +13,9 @@ const userSchema = new Schema<IUser>({
     username: {
         type: String,
         required: true,
+        index: {
+            unique: true
+        }
     },
     password: {
         type: String,
@@ -70,10 +73,9 @@ export function insertNewUser(username: string, password: string, email: string,
  */
 export async function queryUser(attribute: string, value: string): Promise<IUser> {
     const User = model("User", userSchema);
-    const idk: {[index: string] : string} = {};
-    idk[attribute] = value;
-    console.log(idk);
-    return await User.findOne(idk) as IUser;
+    const queryObject: {[index: string] : string} = {};
+    queryObject[attribute] = value;
+    return await User.findOne(queryObject) as IUser;
 }
 
 export default model<IUser>("User", userSchema);
