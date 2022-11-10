@@ -7,8 +7,8 @@ import {sendRegistrationEmail} from "../../mailer";
 const router = express.Router();
 
 // The error message will be filled during the checks
-let errorMessage: {[index: string] : string[]} = {};
-let key = "error";
+const errorMessage: { [index: string]: string[] } = {};
+const key = "error";
 errorMessage[key] = [];
 
 /* POST endpoint for the Register operation */
@@ -19,14 +19,14 @@ router.post("/", (request, response) => {
     const email = request.body.email;
     const password = request.body.password;
 
-    if (checkValidInput(username, email, password)){
+    if (checkValidInput(username, email, password)) {
         const hash = bcrypt.hashSync(password, saltRounds);
         const accessToken = randomBytes(64).toString("hex");
         insertNewUser(username, hash, email, accessToken);
 
         response.status(200);
         response.send("Register: 200 OK");
-        if (process.env.NODE_ENV == "development"){
+        if (process.env.NODE_ENV == "development") {
             console.log(accessToken);
         } else {
             sendRegistrationEmail(email, accessToken).then(() => console.log(`An email has been sent to ${email}`));
@@ -47,7 +47,7 @@ router.post("/", (request, response) => {
 function checkEmail(email: string): boolean {
     const regex = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
     const emailCheck = regex.test(email);
-    if (!emailCheck){
+    if (!emailCheck) {
         errorMessage[key].push("Email error");
     }
     return emailCheck;
@@ -63,7 +63,7 @@ function checkEmail(email: string): boolean {
  */
 function checkUndefined(username: string, email: string, password: string): boolean {
     const undefinedCheck = !(typeof username == "undefined" || typeof email == "undefined" || typeof password == "undefined");
-    if (!undefinedCheck){
+    if (!undefinedCheck) {
         errorMessage[key].push("Undefined parameters error");
     }
     return undefinedCheck;
@@ -78,10 +78,10 @@ function checkUndefined(username: string, email: string, password: string): bool
 function checkInvalidChar(username: string): boolean {
     const regex = /[^a-zA-Z0-9]/;
     const invalidCharCheck = !regex.test(username);
-    if (!invalidCharCheck){
+    if (!invalidCharCheck) {
         errorMessage[key].push("Username error, special characters");
     }
-    return  invalidCharCheck;
+    return invalidCharCheck;
 }
 
 /**
@@ -93,11 +93,11 @@ function checkInvalidChar(username: string): boolean {
  * @result True if all the parameters satisfy the length constraints. False otherwise
  */
 function checkLength(username: string, email: string, password: string): boolean {
-    const usernameConstraint=  username?.length > 3 && username?.length < 15;
-    const emailConstraint =  email?.length > 3 && email?.length < 255;
-    const passwordConstraint =  password?.length > 8 && username?.length < 20;
+    const usernameConstraint = username?.length > 3 && username?.length < 15;
+    const emailConstraint = email?.length > 3 && email?.length < 255;
+    const passwordConstraint = password?.length > 8 && username?.length < 20;
     const lengthCheck = usernameConstraint && emailConstraint && passwordConstraint;
-    if (!lengthCheck){
+    if (!lengthCheck) {
         errorMessage[key].push("Length error");
     }
     return lengthCheck;
@@ -111,10 +111,10 @@ function checkLength(username: string, email: string, password: string): boolean
  * @result True if all the parameters satisfy the called checks. False otherwise
  */
 function checkValidInput(username: string, email: string, password: string): boolean {
-    let emailCheck = checkEmail(email);
-    let undefinedCheck = checkUndefined(username, email, password);
-    let usernameCheck =checkInvalidChar(username);
-    let lengthCheck = checkLength(username, email, password);
+    const emailCheck = checkEmail(email);
+    const undefinedCheck = checkUndefined(username, email, password);
+    const usernameCheck = checkInvalidChar(username);
+    const lengthCheck = checkLength(username, email, password);
 
     return emailCheck && undefinedCheck && usernameCheck && lengthCheck;
 }

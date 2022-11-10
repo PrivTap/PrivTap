@@ -4,7 +4,7 @@ import {connectDB, getFilesInDir} from "./helper";
 import {join} from "path";
 import logger from "morgan";
 
-// Read environment variables from a .env file
+// Read environment variables from a ..env file
 dotenv.config();
 
 // Get AppServer port from environment variables
@@ -16,6 +16,7 @@ if (process.env.NODE_ENV == "development") app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 // app.use(express.static("public"));
+
 
 // Connect to db cluster
 connectDB(process.env.DB_STRING!).then(() => {
@@ -32,6 +33,7 @@ getFilesInDir(join(__dirname, "routes"))
         const endpoint = (await import(filePath)).default;
         const filePathArray = filePath.split("/");
         const endpointName = filePathArray[filePathArray.length - 1];
+        console.log(endpointName);
         app.use("/" + endpointName, endpoint);
     });
 
