@@ -1,7 +1,4 @@
-import { useAuthStore } from "@/stores/auth_store";
 import { createRouter, createWebHistory } from "vue-router";
-
-const authStore = useAuthStore();
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -9,7 +6,7 @@ const router = createRouter({
     {
       path: "/",
       name: "base",
-      redirect: authStore ? "/home" : "/auth",
+      redirect: "/auth",
     },
     {
       path: "/home",
