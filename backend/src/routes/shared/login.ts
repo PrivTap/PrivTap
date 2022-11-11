@@ -1,6 +1,6 @@
 import express from "express";
 import bcrypt from "bcrypt";
-import {queryUser} from "../../model/User";
+import User from "../../model/User";
 import {createJWT} from "../../helper/login&jwt";
 const router = express.Router();
 
@@ -14,16 +14,18 @@ router.post("/", (request, response) => {
         return;
     }
 
-    queryUser("username", username).then((user) => {
+    User.queryUser("username", username).then((user) => {
         if (user == null){
             response.status(400);
-            response.send("400: User not found");
+            // Username not found
+            response.send("400: Wrong credentials");
             return;
         }
         const passwordValid = bcrypt.compareSync(password, user.password);
         if (!passwordValid){
             response.status(400);
-            response.send("400: Wrong Password");
+            // Wrong password
+            response.send("400: Wrong credentials");
             return;
         }
         const jwt = createJWT(user);

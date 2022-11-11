@@ -21,7 +21,7 @@ router.post("/", (request, response) => {
         response.send("400: Bad Request. The parameters you sent were invalid.");
     } else {
         // Validate the authentication url
-        let authURLValid = /^(http|https):\/\/[^ "]+$/.test(serviceAuthURL);
+        const authURLValid = /^(http|https):\/\/[^ "]+$/.test(serviceAuthURL);
         if (!authURLValid) {
             response.status(400);
             response.send("400: Bad Request. The parameters you sent were invalid.");

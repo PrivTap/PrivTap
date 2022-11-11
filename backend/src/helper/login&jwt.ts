@@ -41,7 +41,7 @@ async function checkJWT(request: express.Request): Promise<IUser> {
                     // TODO: Create token interface (?)
                     const user_id = (<any>decoded).user_id;
                     console.log(user_id);
-                    const user = await User.findById(user_id).exec();
+                    const user = await User.findById(user_id);
                     if (user != null) {
                         request.user = user;
                         return user;

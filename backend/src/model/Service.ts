@@ -8,6 +8,31 @@ export interface IService extends Document {
     secret: string;
 }
 
+const serviceSchema = new Schema<IService>({
+    description: {
+        type: String,
+        required: true,
+    },
+    name: {
+        type: String,
+        required: true,
+        index: {
+            unique: true
+        }
+    },
+    authServer: {
+        type: String,
+    },
+    clientId: {
+        type: String
+    },
+    secret: {
+        type: String
+    }
+},
+{collection: "Service"}
+);
+
 /**
  * The entrypoint class to handle all Database access operations related to services.
  */
@@ -17,30 +42,7 @@ export default class Services {
      * The MongoDB model and schema definition for the Service document
      * @private
      */
-    private static serviceModel = model<IService>("Service", new Schema<IService>({
-            description: {
-                type: String,
-                required: true,
-            },
-            name: {
-                type: String,
-                required: true,
-                index: {
-                    unique: true
-                }
-            },
-            authServer: {
-                type: String,
-            },
-            clientId: {
-                type: String
-            },
-            secret: {
-                type: String
-            }
-        },
-        { collection: "Service" }
-    ));
+    private static serviceModel = model<IService>("Service", serviceSchema);
 
     /**
      * Asynchronously adds a new service to the database
@@ -50,8 +52,8 @@ export default class Services {
      * @param completionHandler The asynchronous callback used to continue the computation after the operation has either succeeded or failed with an error
      * @throws {Error} An error representing what went wrong when attempting to create the Service
      */
-    static insert(name: String, description: String, authenticationServer: String, completionHandler: (error?: Error | CallbackError) => void) {
-        let newService = new Services.serviceModel({
+    static insert(name: string, description: string, authenticationServer: string, completionHandler: (error?: Error | CallbackError) => void) {
+        const newService = new Services.serviceModel({
             description: description,
             name: name,
             authServer: authenticationServer

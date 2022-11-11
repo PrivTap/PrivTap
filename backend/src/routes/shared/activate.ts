@@ -1,5 +1,5 @@
 import express from "express";
-import {modifyUser} from "../../model/User";
+import User from "../../model/User";
 const router = express.Router();
 
 router.post("/", (request, response) => {
@@ -9,7 +9,7 @@ router.post("/", (request, response) => {
         response.send("400: Undefined parameters");
         return;
     }
-    modifyUser("activationToken", activationToken, "isConfirmed", true).then(result => {
+    User.modifyUser("activationToken", activationToken, "isConfirmed", true).then(result => {
         const modifiedCount = result["modifiedCount"];
         const matchedCount = result["matchedCount"];
         if (matchedCount == 0){
@@ -20,8 +20,8 @@ router.post("/", (request, response) => {
         }
         if (modifiedCount == 0){
             // User has already confirmed its account
-            response.status(400);
-            response.send("400: Account already activated");
+            response.status(200);
+            response.send("200: Account already activated");
             return;
         }
         response.status(200);

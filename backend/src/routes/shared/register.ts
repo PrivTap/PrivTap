@@ -1,7 +1,7 @@
 import express from "express";
 import bcrypt from "bcrypt";
 import {randomBytes} from "crypto";
-import {insertNewUser, queryUser} from "../../model/User";
+import User from "../../model/User";
 import {sendRegistrationEmail} from "../../mailer";
 
 const router = express.Router();
@@ -19,21 +19,21 @@ router.post("/", (request, response) => {
     const saltRounds = 8;
 
     checkValidInput(username, email, password).then(check => {
-        if (check){
-            const hash = bcrypt.hashSync(password, saltRounds);
-            const accessToken = randomBytes(64).toString("hex");
-            insertNewUser(username, hash, email, accessToken);
-            response.status(200);
-            response.send("Register: 200 OK");
-            if (process.env.NODE_ENV == "development"){
-                console.log(accessToken);
-            } else {
-                sendRegistrationEmail(email, accessToken).then(() => console.log(`An email has been sent to ${email}`));
-            }
-        } else {
+        if(!check){
             response.status(400);
             response.send(errorMessage);
             errorMessage[key] = [];
+            return;
+        }
+        const hash = bcrypt.hashSync(password, saltRounds);
+        const accessToken = randomBytes(64).toString("hex");
+        User.insertNewUser(username, hash, email, accessToken);
+        response.status(200);
+        response.send("Register: 200 OK");
+        if (process.env.NODE_ENV == "development"){
+            console.log(accessToken);
+        } else {
+            sendRegistrationEmail(email, accessToken).then(() => console.log(`An email has been sent to ${email}`));
         }
     });
 });
@@ -109,12 +109,13 @@ function checkLength(username: string, email: string, password: string): boolean
  * @result True if the username is not taken. False otherwise
  */
 async function checkUserTaken(username: string): Promise<boolean> {
-    const query = await queryUser("username", username);
-    if (query == null) {
-        return true;
-    }
-    errorMessage[key].push("Username taken");
-    return false;
+    return User.queryUser("username", username).then(query => {
+        if (query == null) {
+            return true;
+        }
+        errorMessage[key].push("Username taken");
+        return false;
+    });
 }
 
 /**
@@ -123,12 +124,13 @@ async function checkUserTaken(username: string): Promise<boolean> {
  * @result True if the email is not associated to another account. False otherwise
  */
 async function checkEmailTaken(email: string): Promise<boolean> {
-    const query = await queryUser("email", email);
-    if (query == null) {
-        return true;
-    }
-    errorMessage[key].push("Email taken");
-    return false;
+    return User.queryUser("email", email).then(query => {
+        if (query == null) {
+            return true;
+        }
+        errorMessage[key].push("Email taken");
+        return false;
+    });
 }
 
 /**
