@@ -19,25 +19,27 @@ router.post("/", (request, response) => {
     if (serviceName == null || serviceDesc == null || serviceAuthURL == null) {
         response.status(400);
         response.send("400: Bad Request. The parameters you sent were invalid.");
-    } else {
-        // Validate the authentication url
-        const authURLValid = /^(http|https):\/\/[^ "]+$/.test(serviceAuthURL);
-        if (!authURLValid) {
-            response.status(400);
-            response.send("400: Bad Request. The parameters you sent were invalid.");
-        } else {
-            // Carry on with service creation
-            Services.insert(serviceName, serviceDesc, serviceAuthURL, (error) => {
-                if (error == null) {
-                    response.status(200);
-                    response.send("200 OK");
-                } else {
-                    response.status(500);
-                    response.send("500: Internal Server Error. The server encountered the following error:\n" + error.message);
-                }
-            });
-        }
+        return;
     }
+
+    // Validate the authentication url
+    const authURLValid = /^(http|https):\/\/[^ "]+$/.test(serviceAuthURL);
+    if (!authURLValid) {
+        response.status(400);
+        response.send("400: Bad Request. The parameters you sent were invalid.");
+        return;
+    }
+
+    // Carry on with service creation
+    Services.insert(serviceName, serviceDesc, serviceAuthURL, (error) => {
+        if (error == null) {
+            response.status(200);
+            response.send("200 OK");
+        } else {
+            response.status(500);
+            response.send("500: Internal Server Error. The server encountered the following error:\n" + error.message);
+        }
+    });
 });
 
 /* DELETE endpoint for the Manage Services OSP operation */
