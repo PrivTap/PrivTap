@@ -1,5 +1,7 @@
 #NODE GITIGNORE
 
+.firebase
+
 # Logs
 logs
 *.log
