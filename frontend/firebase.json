@@ -8,6 +8,13 @@
     ],
     "rewrites": [
       {
+        "source": "/api/**",
+        "run": {
+          "serviceId": "privtap-backend",
+          "region": "europe-west8"
+        }
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

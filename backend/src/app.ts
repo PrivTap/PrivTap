@@ -1,22 +1,25 @@
 import express from "express";
 import dotenv from "dotenv";
-import {connectDB, getFilesInDir} from "./helper";
+import {connectDB, getFilesInDir} from "./helper/helper";
 import {join} from "path";
 import logger from "morgan";
+import cookieParser from "cookie-parser";
+
 
 // Read environment variables from a ..env file
 dotenv.config();
 
 // Get AppServer port from environment variables
 const port = process.env.PORT || 3000;
+const baseUrl = process.env.BASE_URL || "/";
 
 // Create and configure Express app
 const app = express();
 if (process.env.NODE_ENV == "development") app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-// app.use(express.static("public"));
-
+//app.use(express.static("public"));
+app.use(cookieParser());
 
 // Connect to db cluster
 connectDB(process.env.DB_STRING!).then(() => {
@@ -33,8 +36,7 @@ getFilesInDir(join(__dirname, "routes"))
         const endpoint = (await import(filePath)).default;
         const filePathArray = filePath.split("/");
         const endpointName = filePathArray[filePathArray.length - 1];
-        console.log(endpointName);
-        app.use("/" + endpointName, endpoint);
+        app.use(baseUrl + endpointName, endpoint);
     });
 
 // Start the app server
