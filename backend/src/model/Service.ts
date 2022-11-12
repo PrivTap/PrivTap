@@ -1,11 +1,9 @@
 import {Schema, model, Document, Error, CallbackError} from "mongoose";
-import ObjectId = module
-import module from "node:module";
 
 export interface IService extends Document {
     description: string;
     name: string;
-    creator: ObjectId;
+    creator: string;
     authServer: string;
     clientId: string;
     secret: string;
@@ -24,7 +22,7 @@ const serviceSchema = new Schema<IService>({
         }
     },
     creator: {
-        type: ObjectId,
+        type: String,
         required: true,
     },
     authServer: {
@@ -60,7 +58,7 @@ export default class Services {
      * @param completionHandler The asynchronous callback used to continue the computation after the operation has either succeeded or failed with an error
      * @throws {Error} An error representing what went wrong when attempting to create the Service
      */
-    static insert(name: string, description: string, creatorID: ObjectId, authenticationServer: string, completionHandler: (error?: Error | CallbackError) => void) {
+    static insert(name: string, description: string, creatorID: string, authenticationServer: string, completionHandler: (error?: Error | CallbackError) => void) {
         const newService = new Services.serviceModel({
             description: description,
             name: name,
@@ -83,5 +81,11 @@ export default class Services {
                 completionHandler(error);
             }
         });
+    }
+
+    static findServicesCreatedByUser(userID: string, successHandler: (services: IService[]) => void, errorHandler: (error: any) => void) {
+        Services.serviceModel.find({creator: userID}).then((result) => {
+            successHandler(result.map(doc => doc as IService));
+        }, errorHandler);
     }
 }

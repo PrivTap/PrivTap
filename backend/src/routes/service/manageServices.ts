@@ -5,10 +5,15 @@ const router = express.Router();
 
 /* GET endpoint for the Manage Services OSP operation */
 router.get("/", (request, response) => {
-    const dummyObject = [{id: "SomeServiceID"}];
-    response.status(200);
-    response.contentType("application/json");
-    response.send(JSON.stringify(dummyObject)); //ONLY FOR TESTING PURPOSES
+    checkLogin(request, response, (user) => {
+        Services.findServicesCreatedByUser(user._id.toString(), (services) => {
+            response.status(200);
+            response.send(JSON.stringify(services));
+        }, (error) => {
+            response.status(500);
+            response.send("500 Internal Server Error: The server encountered the following error while processing the request.\n" + error);
+        });
+    });
 });
 
 /* POST endpoint for the Manage Services OSP operation */
@@ -34,7 +39,7 @@ router.post("/", (request, response) => {
     // Carry on with service creation if the user is logged in
     checkLogin(request, response, (user) => {
         // Insert the service
-        Services.insert(serviceName, serviceDesc, user._id, serviceAuthURL, (error) => {
+        Services.insert(serviceName, serviceDesc, user._id.toString(), serviceAuthURL, (error) => {
             if (error == null) {
                 response.status(200);
                 response.send("200 OK");
