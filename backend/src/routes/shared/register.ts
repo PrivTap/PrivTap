@@ -30,11 +30,8 @@ router.post("/", (request, response) => {
         User.insertNewUser(username, hash, email, accessToken);
         response.status(200);
         response.send("Register: 200 OK");
-        if (process.env.NODE_ENV == "development"){
-            console.log(accessToken);
-        } else {
-            sendRegistrationEmail(email, accessToken).then(() => console.log(`An email has been sent to ${email}`));
-        }
+
+        sendRegistrationEmail(email, accessToken).then(() => console.log(`An email has been sent to ${email}`));
     });
 });
 

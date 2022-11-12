@@ -15,11 +15,19 @@ const baseUrl = process.env.BASE_URL || "/";
 
 // Create and configure Express app
 const app = express();
-if (process.env.NODE_ENV == "development") app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-//app.use(express.static("public"));
 app.use(cookieParser());
+
+// Log all requests to console if we are in a development environment
+if (process.env.NODE_ENV == "development")
+    app.use(logger("dev"));
+
+// Set up Express to serve static files from the path in the environment variable.
+// This is used to test backend and frontend locally: we can make Express serve the generated static files
+// of our frontend.
+if (process.env.EXPRESS_STATIC_FILES)
+    app.use(express.static(process.env.EXPRESS_STATIC_FILES));
 
 // Connect to db cluster
 connectDB(process.env.DB_STRING!).then(() => {
