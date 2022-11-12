@@ -27,14 +27,18 @@ router.post("/", (request, response) => {
         }
         const hash = bcrypt.hashSync(password, saltRounds);
         const accessToken = randomBytes(64).toString("hex");
-        User.insertNewUser(username, hash, email, accessToken);
-        response.status(200);
-        response.send("Register: 200 OK");
-        if (process.env.NODE_ENV == "development"){
-            console.log(accessToken);
-        } else {
-            sendRegistrationEmail(email, accessToken).then(() => console.log(`An email has been sent to ${email}`));
-        }
+        User.insertNewUser(username, hash, email, accessToken, () => {
+            response.status(200);
+            response.send("Register: 200 OK");
+            if (process.env.NODE_ENV == "development"){
+                console.log(accessToken);
+            } else {
+                sendRegistrationEmail(email, accessToken).then(() => console.log(`An email has been sent to ${email}`));
+            }
+        }, (error) => {
+            response.status(500);
+            response.send("500 Internal Server Error: The server encountered the following error while creating the user.\n" + error);
+        });
     });
 });
 
