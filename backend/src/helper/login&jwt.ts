@@ -9,17 +9,36 @@ import jwt from "jsonwebtoken";
  * checkLogin(request, response).then(function (user) {
  *      response.status(200);
  *      response.send(user.toJSON());})<pre>
+ * </code>
+ * The promise rejection must be caught with a rejection handler
  * @return If it's logged then return a promise with the user inside otherwise it fails. Also, the user is inserted inside the request as an attribute
  * @param request Http request
  * @param response Http response
  */
-export async function checkLogin(request: express.Request, response: express.Response): Promise<IUser> {
+export async function checkLogin_promise(request: express.Request, response: express.Response): Promise<IUser> {
     return checkJWT(request).then((user) => {
         return user;
     }, (reason) => {
         response.status(401);
         response.send(reason);
-        return Promise.reject();
+        return Promise.reject(reason);
+    });
+}
+
+/**
+ * Asynchronously checks that the user is logged in
+ *
+ * If the user is logged in, then the lambda passed as successHandler will be executed, otherwise the method internally handles any errors and the rejection of the user with HTTP status codes.
+ * @param request The HTTP request coming from the user
+ * @param response The HTTP response
+ * @param successHandler The callback executed when the user is logged in
+ */
+export function checkLogin(request: express.Request, response: express.Response, successHandler: (user: IUser) => void) {
+    checkJWT(request).then((user) => {
+        successHandler(user);
+    }, (reason) => {
+        response.status(401);
+        response.send(reason);
     });
 }
 
