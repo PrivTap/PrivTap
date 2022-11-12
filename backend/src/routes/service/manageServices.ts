@@ -1,5 +1,6 @@
 import express from "express";
 import Services from "../../model/Service";
+import {checkLogin} from "../../helper/login&jwt";
 const router = express.Router();
 
 /* GET endpoint for the Manage Services OSP operation */
@@ -30,15 +31,18 @@ router.post("/", (request, response) => {
         return;
     }
 
-    // Carry on with service creation
-    Services.insert(serviceName, serviceDesc, serviceAuthURL, (error) => {
-        if (error == null) {
-            response.status(200);
-            response.send("200 OK");
-        } else {
-            response.status(500);
-            response.send("500: Internal Server Error. The server encountered the following error:\n" + error.message);
-        }
+    // Carry on with service creation if the user is logged in
+    checkLogin(request, response, () => {
+        // Insert the service
+        Services.insert(serviceName, serviceDesc, serviceAuthURL, (error) => {
+            if (error == null) {
+                response.status(200);
+                response.send("200 OK");
+            } else {
+                response.status(500);
+                response.send("500: Internal Server Error. The server encountered the following error:\n" + error.message);
+            }
+        });
     });
 });
 
