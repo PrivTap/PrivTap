@@ -11,6 +11,7 @@ dotenv.config();
 
 // Get AppServer port from environment variables
 const port = process.env.PORT || 3000;
+const baseUrl = process.env.BASE_URL || "/";
 
 // Create and configure Express app
 const app = express();
@@ -35,7 +36,7 @@ getFilesInDir(join(__dirname, "routes"))
         const endpoint = (await import(filePath)).default;
         const filePathArray = filePath.split("/");
         const endpointName = filePathArray[filePathArray.length - 1];
-        app.use("/" + endpointName, endpoint);
+        app.use(baseUrl + endpointName, endpoint);
     });
 
 // Start the app server
