@@ -1,8 +1,11 @@
 import {Schema, model, Document, Error, CallbackError} from "mongoose";
+import ObjectId = module
+import module from "node:module";
 
 export interface IService extends Document {
     description: string;
     name: string;
+    creator: ObjectId;
     authServer: string;
     clientId: string;
     secret: string;
@@ -19,6 +22,10 @@ const serviceSchema = new Schema<IService>({
         index: {
             unique: true
         }
+    },
+    creator: {
+        type: ObjectId,
+        required: true,
     },
     authServer: {
         type: String,
@@ -48,14 +55,16 @@ export default class Services {
      * Asynchronously adds a new service to the database
      * @param name The name of the new service
      * @param description The description of the service
+     * @param creatorID The ID of the user that created this service
      * @param authenticationServer The API endpoint of the server used to authenticate the PrivTAP platform with the Service
      * @param completionHandler The asynchronous callback used to continue the computation after the operation has either succeeded or failed with an error
      * @throws {Error} An error representing what went wrong when attempting to create the Service
      */
-    static insert(name: string, description: string, authenticationServer: string, completionHandler: (error?: Error | CallbackError) => void) {
+    static insert(name: string, description: string, creatorID: ObjectId, authenticationServer: string, completionHandler: (error?: Error | CallbackError) => void) {
         const newService = new Services.serviceModel({
             description: description,
             name: name,
+            creator: creatorID,
             authServer: authenticationServer
         });
         // Do we already have a service with the same identifier in the database?

@@ -32,9 +32,9 @@ router.post("/", (request, response) => {
     }
 
     // Carry on with service creation if the user is logged in
-    checkLogin(request, response, () => {
+    checkLogin(request, response, (user) => {
         // Insert the service
-        Services.insert(serviceName, serviceDesc, serviceAuthURL, (error) => {
+        Services.insert(serviceName, serviceDesc, user._id, serviceAuthURL, (error) => {
             if (error == null) {
                 response.status(200);
                 response.send("200 OK");
