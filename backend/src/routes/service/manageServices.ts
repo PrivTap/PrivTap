@@ -53,10 +53,28 @@ router.post("/", (request, response) => {
 
 /* DELETE endpoint for the Manage Services OSP operation */
 router.delete("/", (request, response) => {
-    const requestJSON = JSON.parse(request.body);
-    console.log("Manage Services DELETE: received " + requestJSON);
-    response.status(200);
-    response.send("Manage Services OSP DELETE: 200 OK"); //ONLY FOR TESTING PURPOSES
+    const serviceID = request.body.serviceID;
+
+    if (serviceID == null) {
+        response.status(400);
+        response.send("400 Bad Request. Could not find the service ID to delete");
+        return;
+    }
+
+    checkLogin(request, response, (user) => {
+        Services.findServiceCreatedByUser(user._id.toString(), serviceID, () => {
+            Services.deleteService(user._id.toString(), serviceID, () => {
+                response.status(200);
+                response.send("Delete service: 200 OK");
+            }, (error) => {
+                response.status(500);
+                response.send("500 Internal Server Error: The server encountered the following error while processing the request.\n" + error);
+            });
+        }, (error) => {
+            response.status(500);
+            response.send("500 Internal Server Error: The server encountered the following error while processing the request.\n" + error);
+        });
+    });
 });
 
 export default router;

@@ -88,4 +88,16 @@ export default class Services {
             successHandler(result.map(doc => doc as IService));
         }, errorHandler);
     }
+
+    static findServiceCreatedByUser(userID: string, serviceID: string, successHandler: (services: IService[]) => void, errorHandler: (error: any) => void) {
+        Services.serviceModel.find({creator: userID, _id: serviceID}).then((result) => {
+            successHandler(result.map(doc => doc as IService));
+        }, errorHandler);
+    }
+
+    static deleteService(userID: string, serviceID: string, successHandler: () => void, errorHandler: (error: any) => void) {
+        Services.serviceModel.deleteOne({creator: userID, _id: serviceID}).then(() => {
+            successHandler();
+        }, errorHandler);
+    }
 }
