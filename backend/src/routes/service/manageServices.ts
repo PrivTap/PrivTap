@@ -1,17 +1,18 @@
 import express from "express";
-import Services from "../../model/Service";
+import Service from "../../model/Service";
 import {checkLogin} from "../../helper/login&jwt";
+import {checkURL, internalServerError} from "../../helper/helper";
+
 const router = express.Router();
 
 /* GET endpoint for the Manage Services OSP operation */
 router.get("/", (request, response) => {
     checkLogin(request, response, (user) => {
-        Services.findServicesCreatedByUser(user._id.toString(), (services) => {
+        Service.findServicesCreatedByUser(user._id.toString(), (services) => {
             response.status(200);
             response.send(JSON.stringify(services));
         }, (error) => {
-            response.status(500);
-            response.send("500 Internal Server Error: The server encountered the following error while processing the request.\n" + error);
+            internalServerError(error, response)
         });
     });
 });
@@ -20,34 +21,45 @@ router.get("/", (request, response) => {
 router.post("/", (request, response) => {
     const serviceName = request.body.name;
     const serviceDesc = request.body.description;
+    //not mandatory parameters
     const serviceAuthURL = request.body.authURL;
+    const clientId = request.body.clientId;
+    const clientSecret = request.body.clientSecret;
 
-    if (serviceName == null || serviceDesc == null || serviceAuthURL == null) {
+    if (serviceName == null || serviceDesc == null) {
         response.status(400);
         response.send("400: Bad Request. The parameters you sent were invalid.");
         return;
     }
-
-    // Validate the authentication url
-    const authURLValid = /^(http|https):\/\/[^ "]+$/.test(serviceAuthURL);
-    if (!authURLValid) {
-        response.status(400);
-        response.send("400: Bad Request. The parameters you sent were invalid.");
-        return;
+    //if one of the three camp is present then all three of them should be present
+    let optionalParameter: Boolean = false;
+    const clientIdValid = clientId != null;
+    const clientSecretValid = clientSecret != null;
+    let authURLValid = serviceAuthURL != null;
+    if (authURLValid || clientIdValid || clientSecretValid) {
+        authURLValid = authURLValid && checkURL(serviceAuthURL);
+        optionalParameter = true;
+        // Validate the authentication url
+        if (!authURLValid || !clientIdValid || !clientSecretValid) {
+            response.status(400);
+            response.send("400: Bad Request. The parameters you sent were invalid.");
+            return;
+        }
     }
 
     // Carry on with service creation if the user is logged in
     checkLogin(request, response, (user) => {
         // Insert the service
-        Services.insert(serviceName, serviceDesc, user._id.toString(), serviceAuthURL, (error) => {
+        Service.insert(serviceName, serviceDesc, user._id.toString(), (error) => {
             if (error == null) {
                 response.status(200);
                 response.send("200 OK");
             } else {
-                response.status(500);
-                response.send("500: Internal Server Error. The server encountered the following error:\n" + error.message);
+                //this is for duplicated data
+                response.status(400);
+                response.send(error.message);
             }
-        });
+        }, optionalParameter ? serviceAuthURL : undefined, optionalParameter ? clientId : undefined, optionalParameter ? clientSecret : undefined);
     });
 });
 
@@ -62,17 +74,15 @@ router.delete("/", (request, response) => {
     }
 
     checkLogin(request, response, (user) => {
-        Services.findServiceCreatedByUser(user._id.toString(), serviceID, () => {
-            Services.deleteService(user._id.toString(), serviceID, () => {
+        Service.findServiceCreatedByUser(user._id.toString(), serviceID, () => {
+            Service.deleteService(user._id.toString(), serviceID, () => {
                 response.status(200);
                 response.send("Delete service: 200 OK");
             }, (error) => {
-                response.status(500);
-                response.send("500 Internal Server Error: The server encountered the following error while processing the request.\n" + error);
+                internalServerError(error, response)
             });
         }, (error) => {
-            response.status(500);
-            response.send("500 Internal Server Error: The server encountered the following error while processing the request.\n" + error);
+            internalServerError(error, response)
         });
     });
 });

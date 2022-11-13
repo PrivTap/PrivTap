@@ -1,6 +1,7 @@
 import {readdirSync, statSync} from "fs";
 import mongoose, {ConnectOptions} from "mongoose";
 import dotenv from "dotenv";
+import express from "express";
 
 
 // Read environment variables from a ..env file
@@ -43,5 +44,20 @@ export async function connectDB(uri: string) {
     } catch (e) {
         console.log("Error connecting to MongoDB");
     }
+}
+
+/**
+ * Check if an url is valid or not through a regex
+ */
+export function checkURL(url: string) {
+    return /^(http|https):\/\/[^ "]+$/.test(url);
+}
+
+/**
+ *
+ */
+export function internalServerError(error: any, response: express.Response) {
+    response.status(500);
+    response.send("Internal Server Error: The server encountered the following error while creating the user.\n" + error);
 }
 

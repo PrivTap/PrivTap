@@ -3,11 +3,12 @@ import bcrypt from "bcrypt";
 import {randomBytes} from "crypto";
 import User from "../../model/User";
 import {sendRegistrationEmail} from "../../mailer";
+import {internalServerError} from "../../helper/helper";
 
 const router = express.Router();
 
 // The error message will be filled during the checks
-const errorMessage: {[index: string] : string[]} = {};
+const errorMessage: { [index: string]: string[] } = {};
 const key = "error";
 errorMessage[key] = [];
 
@@ -19,7 +20,7 @@ router.post("/", (request, response) => {
     const saltRounds = 8;
 
     checkValidInput(username, email, password).then(check => {
-        if(!check){
+        if (!check) {
             response.status(400);
             response.send(errorMessage);
             errorMessage[key] = [];
@@ -31,10 +32,7 @@ router.post("/", (request, response) => {
             response.status(200);
             response.send("Register: 200 OK");
             sendRegistrationEmail(email, accessToken).then(() => console.log(`An email has been sent to ${email}`));
-        }, (error) => {
-            response.status(500);
-            response.send("500 Internal Server Error: The server encountered the following error while creating the user.\n" + error);
-        });
+        }, (error) => internalServerError(error, response))
     });
 });
 
@@ -47,7 +45,7 @@ router.post("/", (request, response) => {
 function checkEmail(email: string): boolean {
     const regex = /^[-!#$%&'*+/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
     const emailCheck = regex.test(email);
-    if (!emailCheck){
+    if (!emailCheck) {
         errorMessage[key].push("Email error");
     }
     return emailCheck;
@@ -63,7 +61,7 @@ function checkEmail(email: string): boolean {
  */
 function checkUndefined(username: string, email: string, password: string): boolean {
     const undefinedCheck = !(typeof username == "undefined" || typeof email == "undefined" || typeof password == "undefined");
-    if (!undefinedCheck){
+    if (!undefinedCheck) {
         errorMessage[key].push("Undefined parameters error");
     }
     return undefinedCheck;
@@ -78,10 +76,10 @@ function checkUndefined(username: string, email: string, password: string): bool
 function checkInvalidChar(username: string): boolean {
     const regex = /[^a-zA-Z0-9]/;
     const invalidCharCheck = !regex.test(username);
-    if (!invalidCharCheck){
+    if (!invalidCharCheck) {
         errorMessage[key].push("Username error, special characters");
     }
-    return  invalidCharCheck;
+    return invalidCharCheck;
 }
 
 /**
@@ -93,11 +91,11 @@ function checkInvalidChar(username: string): boolean {
  * @result True if all the parameters satisfy the length constraints. False otherwise
  */
 function checkLength(username: string, email: string, password: string): boolean {
-    const usernameConstraint=  username?.length > 3 && username?.length < 15;
-    const emailConstraint =  email?.length > 3 && email?.length < 255;
-    const passwordConstraint =  password?.length > 8 && username?.length < 20;
+    const usernameConstraint = username?.length > 3 && username?.length < 15;
+    const emailConstraint = email?.length > 3 && email?.length < 255;
+    const passwordConstraint = password?.length > 8 && username?.length < 20;
     const lengthCheck = usernameConstraint && emailConstraint && passwordConstraint;
-    if (!lengthCheck){
+    if (!lengthCheck) {
         errorMessage[key].push("Length error");
     }
     return lengthCheck;

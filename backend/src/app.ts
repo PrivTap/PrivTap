@@ -16,9 +16,9 @@ const baseUrl = process.env.BASE_URL || "/";
 
 // Create and configure Express app
 const app = express();
-app.use(cors({ origin: '*'}));
+app.use(cors({origin: '*'}));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 
 // Log all requests to console if we are in a development environment
@@ -40,7 +40,7 @@ connectDB(process.env.DB_STRING!).then(() => {
 
 // Register routes to our Express app
 getFilesInDir(join(__dirname, "routes"))
-    .map(filePath => filePath.slice(0,-3))  // Remove file extension
+    .map(filePath => filePath.slice(0, -3))  // Remove file extension
     .forEach(async filePath => {            // For each file, register the route to our express app
         // filePath = "." + filePath.replace("src", ""); // Remove '/src' from file path to avoid errors when this gets compiled
         const endpoint = (await import(filePath)).default;
