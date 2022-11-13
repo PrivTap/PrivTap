@@ -4,6 +4,7 @@ import {connectDB, getFilesInDir} from "./helper/helper";
 import {join} from "path";
 import logger from "morgan";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 
 
 // Read environment variables from a ..env file
@@ -15,6 +16,7 @@ const baseUrl = process.env.BASE_URL || "/";
 
 // Create and configure Express app
 const app = express();
+app.use(cors({ origin: '*'}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());

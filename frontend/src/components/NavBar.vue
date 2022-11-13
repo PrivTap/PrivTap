@@ -2,8 +2,8 @@
 <template>
 <nav class="flex justify-between pt-5 pl-6">
     <img
-            class="h-12"
-            src="https://tailwindui.com/img/logos/mark.svg?color=white"
+            class="h-24"
+            :src="logo"
           />
     <div class="flex pr-10 space-x-5 text-center items-center">
       <button
@@ -26,6 +26,7 @@
 
 <script setup lang="ts">
 import router from '@/router/router';
+import logo from '@/assets/images/logo_light.svg';
 
 function logout() {
   router.push('/auth');

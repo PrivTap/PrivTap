@@ -56,8 +56,10 @@ export default class User {
      * @param password The new user's password to be inserted
      * @param email The new user's email to be inserted
      * @param token The new user's activation token to be inserted
+     * @param successHandler The callback invoked when the DB has successfully created the user
+     * @param errorHandler The callback invoked when the DB encountered an error while creating the user
      */
-    static insertNewUser(username: string, password: string, email: string, token: string) {
+    static insertNewUser(username: string, password: string, email: string, token: string, successHandler: () => void, errorHandler: (error: any) => void) {
         const user = new User.userModel({
             username: username,
             password: password,
@@ -66,8 +68,7 @@ export default class User {
             isConfirmed: false,
             activationToken: token
         });
-        user.save().then(() => console.log("User added"))
-            .catch(e => console.log("Error inserting a new user: ", e));
+        user.save().then(successHandler, errorHandler);
     }
 
     /**
