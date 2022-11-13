@@ -77,7 +77,7 @@ On this platform users can configure **automation rules** in the format: IF &lt;
 Triggers and actions are provided by third-party services, that can offer personalized operations to users thanks to OAuth2 authorization.
 Users have **granular control** on what personal data the platform can access.
 
-<p style="text-align: right">(<a href="#readme-top">back to top</a>)</p>
+<p align="center">(<a href="#readme-top">back to top</a>)</p>
 
 ### Built With
 * [![Node][Node]][Node-url]
@@ -87,7 +87,7 @@ Users have **granular control** on what personal data the platform can access.
 * [![Express][Express]][Express-url]
 * [![MongoDB][MongoDB]][MongoDB-url]
 
-<p style="text-align: right">(<a href="#readme-top">back to top</a>)</p>
+<p align="center">(<a href="#readme-top">back to top</a>)</p>
 
 
 
@@ -122,7 +122,7 @@ Users have **granular control** on what personal data the platform can access.
      docker build . -t privtap/backend
      ```
 
-<p style="text-align: right">(<a href="#readme-top">back to top</a>)</p>
+<p align="center">(<a href="#readme-top">back to top</a>)</p>
 
 
 
@@ -150,7 +150,7 @@ This will start a local Express appserver that serves both the REST API (at `htt
 backend and the Single Page Application of the frontend (at `http://localhost:<PORT>/`).
 Otherwise, you can build the frontend and the backend separately and deploy them as you like.
 
-<p style="text-align: right">(<a href="#readme-top">back to top</a>)</p>
+<p align="center">(<a href="#readme-top">back to top</a>)</p>
 
 
 
@@ -164,7 +164,7 @@ Otherwise, you can build the frontend and the backend separately and deploy them
 
 See the [open issues](https://github.com/privtap/privtap/issues) for a full list of proposed features (and known issues).
 
-<p style="text-align: right">(<a href="#readme-top">back to top</a>)</p> -->
+<p align="center">(<a href="#readme-top">back to top</a>)</p> -->
 
 
 
@@ -182,7 +182,7 @@ Don't forget to give the project a star! Thanks again!
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-<p style="text-align: right">(<a href="#readme-top">back to top</a>)</p> -->
+<p align="center">(<a href="#readme-top">back to top</a>)</p> -->
 
 
 
@@ -191,7 +191,7 @@ Don't forget to give the project a star! Thanks again!
 
 Distributed under the GPL-2.0 License. See `LICENSE.txt` for more information.
 
-<p style="text-align: right">(<a href="#readme-top">back to top</a>)</p>
+<p align="center">(<a href="#readme-top">back to top</a>)</p>
 
 
 
@@ -202,7 +202,7 @@ Email: [contact@privtap.it](mailto:contact@privtap.it)
 
 GitHub: [https://github.com/privtap/privtap](https://github.com/privtap/privtap)
 
-<p style="text-align: right">(<a href="#readme-top">back to top</a>)</p>
+<p align="center">(<a href="#readme-top">back to top</a>)</p>
 
 
 
@@ -217,7 +217,7 @@ Thanks to all team members that have worked on this project:
 * [Leonardo Panseri](https://github.com/leonardo-panseri)
 * [Lorenzo Vaccarini](https://github.com/Vaccarini-Lorenzo)
 
-<p style="text-align: right">(<a href="#readme-top">back to top</a>)</p>
+<p align="center">(<a href="#readme-top">back to top</a>)</p>
 
 
 
