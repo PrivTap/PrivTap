@@ -10,32 +10,32 @@ export interface IService extends Document {
 }
 
 const serviceSchema = new Schema<IService>({
-        description: {
-            type: String,
-            required: true,
-        },
-        name: {
-            type: String,
-            required: true,
-            index: {
-                unique: true
-            }
-        },
-        creator: {
-            type: String,
-            required: true,
-        },
-        authServer: {
-            type: String,
-        },
-        clientId: {
-            type: String
-        },
-        clientSecret: {
-            type: String
+    description: {
+        type: String,
+        required: true,
+    },
+    name: {
+        type: String,
+        required: true,
+        index: {
+            unique: true
         }
     },
-    {collection: "Service"}
+    creator: {
+        type: String,
+        required: true,
+    },
+    authServer: {
+        type: String,
+    },
+    clientId: {
+        type: String
+    },
+    clientSecret: {
+        type: String
+    }
+},
+{collection: "Service"}
 );
 
 /**
@@ -110,7 +110,7 @@ export default class Service {
         service.clientId = clientId;
         service.clientSecret = clientSecret;
         service.save().then(() => {
-            successHandler()
+            successHandler();
         }, errorHandler);
     }
 }
