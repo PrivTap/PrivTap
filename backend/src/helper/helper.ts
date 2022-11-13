@@ -2,6 +2,7 @@ import {readdirSync, statSync} from "fs";
 import mongoose, {ConnectOptions} from "mongoose";
 import dotenv from "dotenv";
 import express from "express";
+import Response from "../model/Response";
 
 
 // Read environment variables from a ..env file
@@ -58,6 +59,10 @@ export function checkURL(url: string) {
  */
 export function internalServerError(error: any, response: express.Response) {
     response.status(500);
-    response.send("Internal Server Error: The server encountered the following error while creating the user.\n" + error);
+    let responseContent = new Response();
+    responseContent.status = false;
+    responseContent.message = "Internal Server Error";
+    responseContent.data = error.message;
+    response.send(responseContent);
 }
 

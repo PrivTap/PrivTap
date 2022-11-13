@@ -2,6 +2,7 @@ import express from "express";
 import Service from "../../model/documents/Service";
 import {checkLogin} from "../../helper/login&jwt";
 import {checkURL, internalServerError} from "../../helper/helper";
+import Response from "../../model/Response";
 
 const router = express.Router();
 
@@ -25,10 +26,13 @@ router.post("/", (request, response) => {
     const serviceAuthURL = request.body.authURL;
     const clientId = request.body.clientId;
     const clientSecret = request.body.clientSecret;
+    let responseContent = new Response();
 
     if (serviceName == null || serviceDesc == null) {
         response.status(400);
-        response.send("400: Bad Request. The parameters you sent were invalid.");
+        responseContent.status = false;
+        responseContent.message = "Invalid Parameters";
+        response.send(responseContent);
         return;
     }
     //if one of the three camp is present then all three of them should be present
@@ -42,7 +46,9 @@ router.post("/", (request, response) => {
         // Validate the authentication url
         if (!authURLValid || !clientIdValid || !clientSecretValid) {
             response.status(400);
-            response.send("400: Bad Request. The parameters you sent were invalid.");
+            responseContent.status = false;
+            responseContent.message = "Invalid Parameters";
+            response.send(responseContent);
             return;
         }
     }
@@ -57,7 +63,10 @@ router.post("/", (request, response) => {
             } else {
                 //this is for duplicated data
                 response.status(400);
-                response.send(error.message);
+                responseContent.status = false;
+                responseContent.message = "Invalid Parameters";
+                responseContent.data = error.message;
+                response.send(responseContent);
             }
         }, optionalParameter ? serviceAuthURL : undefined, optionalParameter ? clientId : undefined, optionalParameter ? clientSecret : undefined);
     });
@@ -66,10 +75,13 @@ router.post("/", (request, response) => {
 /* DELETE endpoint for the Manage Services OSP operation */
 router.delete("/", (request, response) => {
     const serviceID = request.body.serviceID;
+    let responseContent = new Response();
 
     if (serviceID == null) {
         response.status(400);
-        response.send("400 Bad Request. Could not find the service ID to delete");
+        responseContent.status = false;
+        responseContent.message = "Invalid Parameters";
+        response.send(responseContent);
         return;
     }
 
