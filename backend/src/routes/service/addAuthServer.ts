@@ -1,7 +1,7 @@
 import express from "express";
 import {checkURL, internalServerError} from "../../helper/helper";
 import {checkLogin} from "../../helper/login&jwt";
-import Service from "../../model/Service";
+import Service from "../../model/documents/Service";
 
 const router = express.Router();
 
@@ -30,15 +30,15 @@ router.post("/", (request, response) => {
                 return;
             }
             Service.addAuthServer(service, serviceAuthURL, clientId, clientSecret, function () {
-                    response.status(200);
-                    response.send("AddAuthenticationServerToAService: OK");
-                }
-                , function (error) {
-                    internalServerError(error, response);
-                });
+                response.status(200);
+                response.send("AddAuthenticationServerToAService: OK");
+            }
+            , function (error) {
+                internalServerError(error, response);
+            });
         }, function (error) {
             internalServerError(error, response);
-        })
+        });
     });
 });
 

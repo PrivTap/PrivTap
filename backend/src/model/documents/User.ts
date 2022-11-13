@@ -56,10 +56,8 @@ export default class User {
      * @param password The new user's password to be inserted
      * @param email The new user's email to be inserted
      * @param token The new user's activation token to be inserted
-     * @param successHandler The callback invoked when the DB has successfully created the user
-     * @param errorHandler The callback invoked when the DB encountered an error while creating the user
      */
-    static insertNewUser(username: string, password: string, email: string, token: string, successHandler: () => void, errorHandler: (error: any) => void) {
+    static async insertNewUser(username: string, password: string, email: string, token: string) {
         const user = new User.userModel({
             username: username,
             password: password,
@@ -68,7 +66,7 @@ export default class User {
             isConfirmed: false,
             activationToken: token
         });
-        user.save().then(successHandler, errorHandler);
+        await user.save();
     }
 
     /**
@@ -77,12 +75,11 @@ export default class User {
      * @param value The queried value associated to the specified attribute. IUser expects string, boolean and Date types depending on the attribute
      * @result Returns a Promise<IUser> which can be null if the query is empty
      */
-    static queryUser(attribute: string, value: string | boolean | Date): Promise<IUser> {
+    static async queryUser(attribute: string, value: string | boolean | Date): Promise<IUser> {
         const queryObject: {[index: typeof attribute] : typeof value} = {};
         queryObject[attribute] = value;
-        return User.userModel.findOne(queryObject).then(result => {
-            return result as IUser;
-        });
+        const queryResult = await User.userModel.findOne(queryObject);
+        return queryResult as IUser;
     }
 
     /**
@@ -93,18 +90,17 @@ export default class User {
      * @param modifyValue The new value associated to the specified attribute. IUser expects string, boolean and Date types depending on the attribute
      * @result Returns a dictionary containing the fields modifiedCount, equal to the number of modified documents and matchedCount, equal to the number of documents matching the query
      */
-    static modifyUser(queryAttribute: string, queryValue: string | boolean | Date, modifyAttribute: string, modifyValue: string | boolean | Date): Promise<{[index: string] : number}> {
+    static async modifyUser(queryAttribute: string, queryValue: string | boolean | Date, modifyAttribute: string, modifyValue: string | boolean | Date): Promise<{[index: string] : number}> {
         const User = model("User", userSchema);
         const queryObject: {[index: typeof queryAttribute] : typeof queryValue} = {};
         queryObject[queryAttribute] = queryValue;
         const modifyObject: {[index: typeof modifyAttribute] : typeof modifyValue} = {};
         modifyObject[modifyAttribute] = modifyValue;
-        return User.updateOne(queryObject, modifyObject).then(result => {
-            const resultObject: {[index: string] : number} = {};
-            resultObject["modifiedCount"] = result.modifiedCount;
-            resultObject["matchedCount"] = result.matchedCount;
-            return resultObject;
-        });
+        const queryResult = await User.updateOne(queryObject, modifyObject);
+        const resultObject: {[index: string] : number} = {};
+        resultObject["modifiedCount"] = queryResult.modifiedCount;
+        resultObject["matchedCount"] = queryResult.matchedCount;
+        return resultObject;
     }
 
     static async findById(userId: string): Promise<IUser>{

@@ -16,7 +16,7 @@ const baseUrl = process.env.BASE_URL || "/";
 
 // Create and configure Express app
 const app = express();
-app.use(cors({origin: '*'}));
+app.use(cors({origin: "*"}));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());

@@ -1,16 +1,14 @@
 import express from "express";
 import bcrypt from "bcrypt";
 import {randomBytes} from "crypto";
-import User from "../../model/User";
+import User from "../../model/documents/User";
+import Response from "../../model/Response";
 import {sendRegistrationEmail} from "../../mailer";
-import {internalServerError} from "../../helper/helper";
 
 const router = express.Router();
 
 // The error message will be filled during the checks
-const errorMessage: { [index: string]: string[] } = {};
-const key = "error";
-errorMessage[key] = [];
+let responseMessage: Response = new Response();
 
 /* POST endpoint for the Register operation */
 router.post("/", (request, response) => {
@@ -22,17 +20,31 @@ router.post("/", (request, response) => {
     checkValidInput(username, email, password).then(check => {
         if (!check) {
             response.status(400);
-            response.send(errorMessage);
-            errorMessage[key] = [];
+            response.send(responseMessage);
+            responseMessage = new Response();
             return;
         }
         const hash = bcrypt.hashSync(password, saltRounds);
         const accessToken = randomBytes(64).toString("hex");
-        User.insertNewUser(username, hash, email, accessToken, () => {
-            response.status(200);
-            response.send("Register: 200 OK");
-            sendRegistrationEmail(email, accessToken).then(() => console.log(`An email has been sent to ${email}`));
-        }, (error) => internalServerError(error, response))
+        try {
+            User.insertNewUser(username, hash, email, accessToken).then(() => {
+                console.log("User correctly inserted in the DB");
+                response.status(200);
+                responseMessage.message = "Register: 200 OK";
+                responseMessage.data = {"username": username, "email": email, "isConfirmed": false};
+                response.send(responseMessage);
+                responseMessage = new Response();
+
+                sendRegistrationEmail(email, accessToken).then(() => console.log(""));
+            });
+        } catch (e) {
+            console.log("Error");
+            response.status(500);
+            responseMessage.status = false;
+            responseMessage.message = "500: Internal Error";
+            response.send(responseMessage);
+            responseMessage = new Response();
+        }
     });
 });
 
@@ -45,8 +57,12 @@ router.post("/", (request, response) => {
 function checkEmail(email: string): boolean {
     const regex = /^[-!#$%&'*+/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
     const emailCheck = regex.test(email);
-    if (!emailCheck) {
-        errorMessage[key].push("Email error");
+    console.log("emailCheck", emailCheck);
+    console.log("status", responseMessage.status);
+    if (!emailCheck && responseMessage.status) {
+        console.log("error mail");
+        responseMessage.status = false;
+        responseMessage.message = "Error: Email not valid";
     }
     return emailCheck;
 }
@@ -61,8 +77,9 @@ function checkEmail(email: string): boolean {
  */
 function checkUndefined(username: string, email: string, password: string): boolean {
     const undefinedCheck = !(typeof username == "undefined" || typeof email == "undefined" || typeof password == "undefined");
-    if (!undefinedCheck) {
-        errorMessage[key].push("Undefined parameters error");
+    if (!undefinedCheck && responseMessage.status) {
+        responseMessage.status = false;
+        responseMessage.message = "Error: Undefined parameters";
     }
     return undefinedCheck;
 }
@@ -76,8 +93,9 @@ function checkUndefined(username: string, email: string, password: string): bool
 function checkInvalidChar(username: string): boolean {
     const regex = /[^a-zA-Z0-9]/;
     const invalidCharCheck = !regex.test(username);
-    if (!invalidCharCheck) {
-        errorMessage[key].push("Username error, special characters");
+    if (!invalidCharCheck && responseMessage.status) {
+        responseMessage.status = false;
+        responseMessage.message = "Error: Username contains special characters";
     }
     return invalidCharCheck;
 }
@@ -95,8 +113,9 @@ function checkLength(username: string, email: string, password: string): boolean
     const emailConstraint = email?.length > 3 && email?.length < 255;
     const passwordConstraint = password?.length > 8 && username?.length < 20;
     const lengthCheck = usernameConstraint && emailConstraint && passwordConstraint;
-    if (!lengthCheck) {
-        errorMessage[key].push("Length error");
+    if (!lengthCheck && responseMessage.status) {
+        responseMessage.status = false;
+        responseMessage.message = "Error: Length error";
     }
     return lengthCheck;
 }
@@ -107,13 +126,13 @@ function checkLength(username: string, email: string, password: string): boolean
  * @result True if the username is not taken. False otherwise
  */
 async function checkUserTaken(username: string): Promise<boolean> {
-    return User.queryUser("username", username).then(query => {
-        if (query == null) {
-            return true;
-        }
-        errorMessage[key].push("Username taken");
-        return false;
-    });
+    const queryResult = await User.queryUser("username", username);
+    if (queryResult == null) {
+        return true;
+    }
+    responseMessage.status = false;
+    responseMessage.message = "Error: Username taken";
+    return false;
 }
 
 /**
@@ -122,13 +141,13 @@ async function checkUserTaken(username: string): Promise<boolean> {
  * @result True if the email is not associated to another account. False otherwise
  */
 async function checkEmailTaken(email: string): Promise<boolean> {
-    return User.queryUser("email", email).then(query => {
-        if (query == null) {
-            return true;
-        }
-        errorMessage[key].push("Email taken");
-        return false;
-    });
+    const queryResult = await User.queryUser("email", email);
+    if (queryResult == null) {
+        return true;
+    }
+    responseMessage.status = false;
+    responseMessage.message = "Error: Email taken";
+    return false;
 }
 
 /**

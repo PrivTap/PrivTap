@@ -1,5 +1,5 @@
 import express from "express";
-import Service from "../../model/Service";
+import Service from "../../model/documents/Service";
 import {checkLogin} from "../../helper/login&jwt";
 import {checkURL, internalServerError} from "../../helper/helper";
 
@@ -12,7 +12,7 @@ router.get("/", (request, response) => {
             response.status(200);
             response.send(JSON.stringify(services));
         }, (error) => {
-            internalServerError(error, response)
+            internalServerError(error, response);
         });
     });
 });
@@ -32,7 +32,7 @@ router.post("/", (request, response) => {
         return;
     }
     //if one of the three camp is present then all three of them should be present
-    let optionalParameter: Boolean = false;
+    let optionalParameter = false;
     const clientIdValid = clientId != null;
     const clientSecretValid = clientSecret != null;
     let authURLValid = serviceAuthURL != null;
@@ -79,10 +79,10 @@ router.delete("/", (request, response) => {
                 response.status(200);
                 response.send("Delete service: 200 OK");
             }, (error) => {
-                internalServerError(error, response)
+                internalServerError(error, response);
             });
         }, (error) => {
-            internalServerError(error, response)
+            internalServerError(error, response);
         });
     });
 });
