@@ -4,8 +4,8 @@
       <div class="rounded-3xl shadow-2xl p-10 bg-blue-600 shadow-blue-500">
         <div>
           <img
-            class="mx-auto h-12 w-auto"
-            src="https://tailwindui.com/img/logos/mark.svg?color=white"
+            class="mx-auto h-24 w-auto"
+            :src= "logo"
           />
           <h1 class="mt-6 text-center tracking-tight text-white">
             {{ showLogin ? "Login into your" : "SignUp a new " }} PrivTAP
@@ -137,18 +137,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { useRouter } from "vue-router";
+import { ref, computed, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { EyeSlashIcon, EyeIcon } from "@heroicons/vue/24/solid";
+import http from "@/http-common";
+import logo_light from "@/assets/images/logo_light.svg";
 
-const props = defineProps<{
-  msg: {
-    type: String;
-    default: "Login into your";
-  };
-}>();
+const logo = logo_light;
 
 const router = useRouter();
+const route = useRoute();
+
+onMounted( async () => {
+  if (route.query.activate) {
+    console.log(route.query.activate);
+    try {
+      const res = await http.post("/activate", { token: route.query.activate });
+      console.log(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+});
 
 const showPass = ref(false);
 
@@ -190,11 +200,16 @@ const isButtonEnable = computed(() => {
 });
 
 //TODO: (ADD LOGIC TO LOGIN AND SIGNUP)
-function onSubmitted() {
+async function onSubmitted() {
   if (showLogin.value) {
-    router.push("/home");
+    const res = await http.post("/login", {
+      email: email.value,
+      password: password.value,
+    });
+    res.status == 200 ? router.push("/home") : alert(res.data);
   } else {
-    changeView();
+    const res = await http.post("/register", { email, password, username });
+    res.status === 200 ? changeView() : alert(res.data);
   }
 }
 </script>
