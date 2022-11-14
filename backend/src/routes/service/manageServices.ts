@@ -3,19 +3,26 @@ import Service from "../../model/documents/Service";
 import {checkLogin} from "../../helper/login&jwt";
 import {checkURL, internalServerError} from "../../helper/helper";
 import Response from "../../model/Response";
+import mongoose from "mongoose";
 
 const router = express.Router();
 
 /* GET endpoint for the Manage Services OSP operation */
 router.get("/", (request, response) => {
-    checkLogin(request, response, (user) => {
-        Service.findServicesCreatedByUser(user._id.toString(), (services) => {
-            response.status(200);
-            response.send(JSON.stringify(services));
-        }, (error) => {
-            internalServerError(error, response);
-        });
-    });
+    checkLogin(request, response).then(
+        async function (user) {
+            try {
+                const services = await Service.findServicesCreatedByUser(user._id.toString());
+                response.status(200);
+                response.send(JSON.stringify(services));
+            } catch (error) {
+                internalServerError(error, response);
+            }
+        }
+    ).catch((reason) => {
+        console.log(reason);
+    }
+    );
 });
 
 /* POST endpoint for the Manage Services OSP operation */
@@ -26,7 +33,7 @@ router.post("/", (request, response) => {
     const serviceAuthURL = request.body.authURL;
     const clientId = request.body.clientId;
     const clientSecret = request.body.clientSecret;
-    let responseContent = new Response();
+    const responseContent = new Response();
 
     if (serviceName == null || serviceDesc == null) {
         response.status(400);
@@ -52,32 +59,35 @@ router.post("/", (request, response) => {
             return;
         }
     }
-
-    // Carry on with service creation if the user is logged in
-    checkLogin(request, response, (user) => {
-        // Insert the service
-        Service.insert(serviceName, serviceDesc, user._id.toString(), (error) => {
-            if (error == null) {
+    checkLogin(request, response).then(
+        async function (user)
+        // Carry on with service creation if the user is logged in
+        {
+            try {
+                // Insert the service
+                await Service.insert(serviceName, serviceDesc, user._id.toString(),
+                    optionalParameter ? serviceAuthURL : undefined, optionalParameter ? clientId : undefined, optionalParameter ? clientSecret : undefined);
                 response.status(200);
                 response.send("200 OK");
-            } else {
+            } catch (error) {
                 //this is for duplicated data
                 response.status(400);
                 responseContent.status = false;
-                responseContent.message = "Invalid Parameters";
-                responseContent.data = error.message;
+                responseContent.message = "Can't create this service" + (error instanceof Error ? (" because " + error.message) : "");
                 response.send(responseContent);
             }
-        }, optionalParameter ? serviceAuthURL : undefined, optionalParameter ? clientId : undefined, optionalParameter ? clientSecret : undefined);
-    });
+        }).catch((reason) => {
+        console.log(reason);
+    }
+    );
 });
 
 /* DELETE endpoint for the Manage Services OSP operation */
 router.delete("/", (request, response) => {
     const serviceID = request.body.serviceID;
-    let responseContent = new Response();
+    const responseContent = new Response();
 
-    if (serviceID == null) {
+    if (serviceID == null || !mongoose.isValidObjectId(serviceID)) {
         response.status(400);
         responseContent.status = false;
         responseContent.message = "Invalid Parameters";
@@ -85,17 +95,25 @@ router.delete("/", (request, response) => {
         return;
     }
 
-    checkLogin(request, response, (user) => {
-        Service.findServiceCreatedByUser(user._id.toString(), serviceID, () => {
-            Service.deleteService(user._id.toString(), serviceID, () => {
-                response.status(200);
-                response.send("Delete service: 200 OK");
-            }, (error) => {
+    checkLogin(request, response).then(
+        async function (user) {
+            try {
+                const service = await Service.findServiceCreatedByUser(user._id.toString(), serviceID.toString());
+                if (service != null) {
+                    await Service.deleteService(user._id.toString(), serviceID);
+                    response.status(200);
+                    response.send("Delete service: 200 OK");
+                } else {
+                    response.status(403);
+                    responseContent.status = false;
+                    responseContent.message = "You don't have the permit to delete this service";
+                    response.send(responseContent);
+                }
+            } catch (error) {
                 internalServerError(error, response);
-            });
-        }, (error) => {
-            internalServerError(error, response);
-        });
+            }
+        }).catch((reason) => {
+        console.log(reason);
     });
 });
 

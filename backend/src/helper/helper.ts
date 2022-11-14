@@ -57,12 +57,11 @@ export function checkURL(url: string) {
 /**
  *
  */
-export function internalServerError(error: any, response: express.Response) {
+export function internalServerError(error: unknown, response: express.Response) {
     response.status(500);
-    let responseContent = new Response();
+    const responseContent = new Response();
     responseContent.status = false;
-    responseContent.message = "Internal Server Error";
-    responseContent.data = error.message;
+    responseContent.message = "Internal Server Error: " + (error instanceof Error ? error.message : "Generic error");
     response.send(responseContent);
 }
 
