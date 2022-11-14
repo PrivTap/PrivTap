@@ -33,10 +33,10 @@ export function getFilesInDir(dirPath: string, arrayOfFiles: string[] = []) {
  * @param uri: the uri specifying the db user credential cluster and db identifier
  */
 
-export async function connectDB(uri: string) {
+export function connectDB(uri: string) {
     try {
         // Connect to the MongoDB cluster
-        await mongoose.connect(uri,
+        mongoose.connect(uri,
             {useNewUrlParser: true, useUnifiedTopology: true} as ConnectOptions,
             () => {
                 console.log("Correctly connected to MongoDB");
@@ -48,20 +48,36 @@ export async function connectDB(uri: string) {
 }
 
 /**
- * Check if an url is valid or not through a regex
+ * Checks if an url is valid or not through a regex
+ * @param url The URL to validate
  */
-export function checkURL(url: string) {
+export function checkURL(url: string): boolean {
     return /^(http|https):\/\/[^ "]+$/.test(url);
 }
 
 /**
- *
+ * Sends to the client a response signalling a generic "501 Internal Server Error"
+ * @param error The generic error that the server encountered while processing the request
+ * @param response The Express response used to send the error to
  */
 export function internalServerError(error: unknown, response: express.Response) {
     response.status(500);
     const responseContent = new Response();
     responseContent.status = false;
     responseContent.message = "Internal Server Error: " + (error instanceof Error ? error.message : "Generic error");
+    response.send(responseContent);
+}
+
+/**
+ * Sends to the client a response signalling "401 Unauthenticated"
+ * @param response The Express response used to send the error to
+ */
+export function unauthenticatedUserError(response: express.Response) {
+    const responseContent = new Response();
+
+    response.status(401);
+    responseContent.status = false;
+    responseContent.message = "401: User not authenticated";
     response.send(responseContent);
 }
 

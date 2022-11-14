@@ -32,11 +32,7 @@ if (process.env.EXPRESS_STATIC_FILES)
     app.use(express.static(process.env.EXPRESS_STATIC_FILES));
 
 // Connect to db cluster
-connectDB(process.env.DB_STRING!).then(() => {
-    //testNewUser("someUsername", "somePassword", "someEmail");
-    //testNewAction("someData");
-    //testNewService("someDescription", "someName", "someAuthServer", "someClientId", "someSecret");
-});
+connectDB(process.env.DB_STRING!);
 
 // Register routes to our Express app
 getFilesInDir(join(__dirname, "routes"))

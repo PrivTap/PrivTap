@@ -1,4 +1,4 @@
-import {Schema, model, Document, Error} from "mongoose";
+import {Document, Error, model, Schema} from "mongoose";
 
 export interface IService extends Document {
     description: string;
@@ -77,8 +77,7 @@ export default class Service {
     }
 
     static async findServicesCreatedByUser(userID: string): Promise<IService[]> {
-        const result = await Service.serviceModel.find({creator: userID});
-        return result.map(doc => doc as IService);
+        return Service.serviceModel.find({creator: userID});
     }
 
     static async findServiceCreatedByUser(userID: string, serviceID: string): Promise<IService> {

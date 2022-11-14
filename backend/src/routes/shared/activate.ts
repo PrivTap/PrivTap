@@ -38,8 +38,7 @@ router.post("/", (request, response) => {
         response.send(responseMessage);
     }).catch((error) => {
         internalServerError(error, response);
-    }
-    );
+    });
 });
 
 export default router;
