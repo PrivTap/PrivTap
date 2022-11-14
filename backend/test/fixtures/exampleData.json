@@ -1,0 +1,12 @@
+{
+  "User": [
+    {
+      "username": "example",
+      "password": "passwordHash",
+      "email": "email@example.com",
+      "registrationDate": "11-14-22",
+      "isConfirmed": false,
+      "activationToken": "token"
+    }
+  ]
+}

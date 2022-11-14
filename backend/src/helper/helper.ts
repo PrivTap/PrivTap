@@ -1,5 +1,4 @@
 import {readdirSync, statSync} from "fs";
-import mongoose, {ConnectOptions} from "mongoose";
 import dotenv from "dotenv";
 import express from "express";
 
@@ -25,25 +24,6 @@ export function getFilesInDir(dirPath: string, arrayOfFiles: string[] = []) {
     });
 
     return arrayOfFiles;
-}
-
-/**
- * Connects to MongoDB database using the mongoose library
- * @param uri: the uri specifying the db user credential cluster and db identifier
- */
-
-export async function connectDB(uri: string) {
-    try {
-        // Connect to the MongoDB cluster
-        await mongoose.connect(uri,
-            {useNewUrlParser: true, useUnifiedTopology: true} as ConnectOptions,
-            () => {
-                console.log("Correctly connected to MongoDB");
-            }
-        );
-    } catch (e) {
-        console.log("Error connecting to MongoDB");
-    }
 }
 
 /**
