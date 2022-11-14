@@ -32,20 +32,25 @@ if (process.env.EXPRESS_STATIC_FILES)
     app.use(express.static(process.env.EXPRESS_STATIC_FILES));
 
 // Connect to db cluster
-connectDB(process.env.DB_STRING!);
+const dbString = process.env.DB_STRING;
 
-// Register routes to our Express app
-getFilesInDir(join(__dirname, "routes"))
-    .map(filePath => filePath.slice(0, -3))  // Remove file extension
-    .forEach(async filePath => {            // For each file, register the route to our express app
-        // filePath = "." + filePath.replace("src", ""); // Remove '/src' from file path to avoid errors when this gets compiled
-        const endpoint = (await import(filePath)).default;
-        const filePathArray = filePath.split("/");
-        const endpointName = filePathArray[filePathArray.length - 1];
-        app.use(baseUrl + endpointName, endpoint);
+if (dbString != null) {
+    connectDB(dbString ?? "");
+    // Register routes to our Express app
+    getFilesInDir(join(__dirname, "routes"))
+        .map(filePath => filePath.slice(0, -3))  // Remove file extension
+        .forEach(async filePath => {            // For each file, register the route to our express app
+            // filePath = "." + filePath.replace("src", ""); // Remove '/src' from file path to avoid errors when this gets compiled
+            const endpoint = (await import(filePath)).default;
+            const filePathArray = filePath.split("/");
+            const endpointName = filePathArray[filePathArray.length - 1];
+            app.use(baseUrl + endpointName, endpoint);
+        });
+
+    // Start the app server
+    app.listen(port, () => {
+        console.log(`Server listening on port: ${port}`);
     });
-
-// Start the app server
-app.listen(port, () => {
-    console.log(`Server listening on port: ${port}`);
-});
+} else {
+    console.log("ERROR: Could not connect to the DB, since no DB_STRING field was found!");
+}
