@@ -1,0 +1,31 @@
+name: Build and run tests on the whole project
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-frontend:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+      - run: cd frontend
+      - run: npm ci
+      - run: npm run test
+  
+  test-backend:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+      - run: cd backend
+      - run: npm ci
+      - run: npm run test

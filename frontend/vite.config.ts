@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { fileURLToPath, URL } from "node:url";
 
 import { defineConfig } from "vite";
@@ -11,4 +12,11 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
+  test: {
+    globals: true,
+    include: ["test/**/*.ts"],
+    environment: "jsdom",
+    root: "src/",
+    watch: false
+  }
 });
