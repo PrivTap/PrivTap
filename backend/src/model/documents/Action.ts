@@ -19,4 +19,8 @@ const actionSchema = new Schema<IAction>({
 { collection: "Action" }
 );
 
-export default model<IAction>("Action", actionSchema);
+export default class Action {
+
+    private static actionModel = model<IAction>("Action", actionSchema);
+
+}
