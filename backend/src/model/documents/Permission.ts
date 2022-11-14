@@ -15,4 +15,8 @@ const permissionSchema = new Schema<IPermission>({
 { collection: "Permission" }
 );
 
-export default model<IPermission>("Permission", permissionSchema);
+export default class Permission {
+
+    private static permissionModel = model<IPermission>("Permission", permissionSchema);
+
+}
