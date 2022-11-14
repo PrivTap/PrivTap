@@ -44,6 +44,7 @@ async function checkJWT(request: express.Request): Promise<IUser> {
                     console.log(user_id);
                     const user = await User.findById(user_id);
                     if (user != null) {
+                        // TODO: I commented this out because it was not letting me compile, someone should check this
                         // request.user = user;
                         return user;
                     } else {
