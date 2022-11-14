@@ -62,7 +62,7 @@ async function checkJWT(request: express.Request): Promise<IUser> {
                     console.log(user_id);
                     const user = await User.findById(user_id);
                     if (user != null) {
-                        request.user = user;
+                        // request.user = user;
                         return user;
                     } else {
                         return Promise.reject("User not found in database");
