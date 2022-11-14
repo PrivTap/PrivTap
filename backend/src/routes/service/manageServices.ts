@@ -38,7 +38,7 @@ router.post("/", (request, response) => {
     if (serviceName == null || serviceDesc == null) {
         response.status(400);
         responseContent.status = false;
-        responseContent.message = "Invalid Parameters";
+        responseContent.message = "400: Invalid Parameters";
         response.send(responseContent);
         return;
     }
@@ -54,7 +54,7 @@ router.post("/", (request, response) => {
         if (!authURLValid || !clientIdValid || !clientSecretValid) {
             response.status(400);
             responseContent.status = false;
-            responseContent.message = "Invalid Parameters";
+            responseContent.message = "400: Invalid Parameters";
             response.send(responseContent);
             return;
         }
@@ -68,12 +68,14 @@ router.post("/", (request, response) => {
                 await Service.insert(serviceName, serviceDesc, user._id.toString(),
                     optionalParameter ? serviceAuthURL : undefined, optionalParameter ? clientId : undefined, optionalParameter ? clientSecret : undefined);
                 response.status(200);
-                response.send("200 OK");
+                responseContent.status = true;
+                responseContent.message = "200: Service Creation OK";
+                response.send(responseContent);
             } catch (error) {
                 //this is for duplicated data
                 response.status(400);
                 responseContent.status = false;
-                responseContent.message = "Can't create this service" + (error instanceof Error ? (" because " + error.message) : "");
+                responseContent.message = "400: Can't create this service" + (error instanceof Error ? (" because " + error.message) : "");
                 response.send(responseContent);
             }
         }).catch((reason) => {
@@ -90,7 +92,7 @@ router.delete("/", (request, response) => {
     if (serviceID == null || !mongoose.isValidObjectId(serviceID)) {
         response.status(400);
         responseContent.status = false;
-        responseContent.message = "Invalid Parameters";
+        responseContent.message = "400: Invalid Parameters";
         response.send(responseContent);
         return;
     }
@@ -102,11 +104,11 @@ router.delete("/", (request, response) => {
                 if (service != null) {
                     await Service.deleteService(user._id.toString(), serviceID);
                     response.status(200);
-                    response.send("Delete service: 200 OK");
+                    response.send("200: Delete service OK");
                 } else {
                     response.status(403);
                     responseContent.status = false;
-                    responseContent.message = "You don't have the permit to delete this service";
+                    responseContent.message = "400: You cannot delete this service";
                     response.send(responseContent);
                 }
             } catch (error) {
