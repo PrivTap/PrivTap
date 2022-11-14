@@ -9,23 +9,29 @@ jobs:
   test-frontend:
     runs-on: ubuntu-latest
     
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '16.x'
-      - run: cd frontend
-      - run: npm ci
-      - run: npm run test
-  
-  test-backend:
-    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
     
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: '16.x'
-      - run: cd backend
+      - run: npm ci
+      - run: npm run test
+  
+  test-backend:
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./backend
+    
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
       - run: npm ci
       - run: npm run test
