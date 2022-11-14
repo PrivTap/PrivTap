@@ -1,19 +1,25 @@
 import express from "express";
 import Service from "../../model/documents/Service";
 import {checkLogin} from "../../helper/login&jwt";
-import {checkURL, internalServerError} from "../../helper/helper";
+import {checkURL, internalServerError, unauthenticatedUserError} from "../../helper/helper";
+import Response from "../../model/Response";
+import mongoose from "mongoose";
 
 const router = express.Router();
 
 /* GET endpoint for the Manage Services OSP operation */
 router.get("/", (request, response) => {
-    checkLogin(request, response, (user) => {
-        Service.findServicesCreatedByUser(user._id.toString(), (services) => {
+    checkLogin(request, response).then(async (user) => {
+        try {
+            const services = await Service.findServicesCreatedByUser(user._id.toString());
             response.status(200);
             response.send(JSON.stringify(services));
-        }, (error) => {
+        } catch (error) {
             internalServerError(error, response);
-        });
+        }
+    }).catch((error) => {
+        console.log(error);
+        unauthenticatedUserError(response);
     });
 });
 
@@ -21,69 +27,94 @@ router.get("/", (request, response) => {
 router.post("/", (request, response) => {
     const serviceName = request.body.name;
     const serviceDesc = request.body.description;
-    //not mandatory parameters
+
+    // Optional Parameters
     const serviceAuthURL = request.body.authURL;
     const clientId = request.body.clientId;
     const clientSecret = request.body.clientSecret;
+    const responseContent = new Response();
 
     if (serviceName == null || serviceDesc == null) {
         response.status(400);
-        response.send("400: Bad Request. The parameters you sent were invalid.");
+        responseContent.status = false;
+        responseContent.message = "400: Invalid Parameters";
+        response.send(responseContent);
         return;
     }
-    //if one of the three camp is present then all three of them should be present
-    let optionalParameter = false;
+
+    // If one of the three optional params is present then we need all three of them
+    let hasOptionalParameters = false;
     const clientIdValid = clientId != null;
     const clientSecretValid = clientSecret != null;
     let authURLValid = serviceAuthURL != null;
     if (authURLValid || clientIdValid || clientSecretValid) {
         authURLValid = authURLValid && checkURL(serviceAuthURL);
-        optionalParameter = true;
-        // Validate the authentication url
-        if (!authURLValid || !clientIdValid || !clientSecretValid) {
+        hasOptionalParameters = true;
+
+        if (!(authURLValid && clientIdValid && clientSecretValid)) {
             response.status(400);
-            response.send("400: Bad Request. The parameters you sent were invalid.");
+            responseContent.status = false;
+            responseContent.message = "400: Invalid Parameters";
+            response.send(responseContent);
             return;
         }
     }
 
-    // Carry on with service creation if the user is logged in
-    checkLogin(request, response, (user) => {
-        // Insert the service
-        Service.insert(serviceName, serviceDesc, user._id.toString(), (error) => {
-            if (error == null) {
-                response.status(200);
-                response.send("200 OK");
-            } else {
-                //this is for duplicated data
-                response.status(400);
-                response.send(error.message);
-            }
-        }, optionalParameter ? serviceAuthURL : undefined, optionalParameter ? clientId : undefined, optionalParameter ? clientSecret : undefined);
+    checkLogin(request, response).then(async (user) => {
+        // Carry on with service creation if the user is logged in
+        try {
+            // Insert the service
+            await Service.insert(serviceName, serviceDesc, user._id.toString(),
+                hasOptionalParameters ? serviceAuthURL : undefined, hasOptionalParameters ? clientId : undefined, hasOptionalParameters ? clientSecret : undefined);
+            response.status(200);
+            responseContent.status = true;
+            responseContent.message = "200: Service Creation OK";
+            response.send(responseContent);
+        } catch (error) {
+            //this is for duplicated data
+            response.status(400);
+            responseContent.status = false;
+            responseContent.message = "400: Can't create this service" + (error instanceof Error ? (" because " + error.message) : "");
+            response.send(responseContent);
+        }
+    }).catch((error) => {
+        console.log(error);
+        unauthenticatedUserError(response);
     });
 });
 
 /* DELETE endpoint for the Manage Services OSP operation */
 router.delete("/", (request, response) => {
     const serviceID = request.body.serviceID;
+    const responseContent = new Response();
 
-    if (serviceID == null) {
+    if (serviceID == null || !mongoose.isValidObjectId(serviceID)) {
         response.status(400);
-        response.send("400 Bad Request. Could not find the service ID to delete");
+        responseContent.status = false;
+        responseContent.message = "400: Invalid Parameters";
+        response.send(responseContent);
         return;
     }
 
-    checkLogin(request, response, (user) => {
-        Service.findServiceCreatedByUser(user._id.toString(), serviceID, () => {
-            Service.deleteService(user._id.toString(), serviceID, () => {
+    checkLogin(request, response).then(async (user) => {
+        try {
+            const service = await Service.findServiceCreatedByUser(user._id.toString(), serviceID.toString());
+            if (service != null) {
+                await Service.deleteService(user._id.toString(), serviceID);
                 response.status(200);
-                response.send("Delete service: 200 OK");
-            }, (error) => {
-                internalServerError(error, response);
-            });
-        }, (error) => {
+                response.send("200: Delete service OK");
+            } else {
+                response.status(403);
+                responseContent.status = false;
+                responseContent.message = "400: You cannot delete this service";
+                response.send(responseContent);
+            }
+        } catch (error) {
             internalServerError(error, response);
-        });
+        }
+    }).catch((error) => {
+        console.log(error);
+        unauthenticatedUserError(response);
     });
 });
 

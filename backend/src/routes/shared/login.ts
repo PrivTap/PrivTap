@@ -48,6 +48,8 @@ router.post("/", (request, response) => {
         responseMessage.message = "Login: 200 OK";
         responseMessage.data = {"username": username, "email": user.email, "isConfirmed": user.isConfirmed};
         response.send(responseMessage);
+    }).catch((error) => {
+        internalServerError(error, response);
     });
 });
 

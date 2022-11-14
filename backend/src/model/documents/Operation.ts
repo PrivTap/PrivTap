@@ -31,4 +31,8 @@ const operationSchema = new Schema<IOperation>({
 { collection: "Operation" }
 );
 
-export default model<IOperation>("Operation", operationSchema);
+export default class Operation {
+
+    private static operationModel = model<IOperation>("Operation", operationSchema);
+
+}

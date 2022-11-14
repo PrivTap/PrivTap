@@ -1,10 +1,6 @@
 import {readdirSync, statSync} from "fs";
-import dotenv from "dotenv";
 import express from "express";
-
-
-// Read environment variables from a ..env file
-dotenv.config();
+import Response from "../model/Response";
 
 /**
  * Gets all files recursively from a directory.
@@ -27,17 +23,36 @@ export function getFilesInDir(dirPath: string, arrayOfFiles: string[] = []) {
 }
 
 /**
- * Check if an url is valid or not through a regex
+ * Checks if an url is valid or not through a regex
+ * @param url The URL to validate
  */
-export function checkURL(url: string) {
+export function checkURL(url: string): boolean {
     return /^(http|https):\/\/[^ "]+$/.test(url);
 }
 
 /**
- *
+ * Sends to the client a response signalling a generic "501 Internal Server Error"
+ * @param error The generic error that the server encountered while processing the request
+ * @param response The Express response used to send the error to
  */
-export function internalServerError(error: any, response: express.Response) {
+export function internalServerError(error: unknown, response: express.Response) {
     response.status(500);
-    response.send("Internal Server Error: The server encountered the following error while creating the user.\n" + error);
+    const responseContent = new Response();
+    responseContent.status = false;
+    responseContent.message = "Internal Server Error: " + (error instanceof Error ? error.message : "Generic error");
+    response.send(responseContent);
+}
+
+/**
+ * Sends to the client a response signalling "401 Unauthenticated"
+ * @param response The Express response used to send the error to
+ */
+export function unauthenticatedUserError(response: express.Response) {
+    const responseContent = new Response();
+
+    response.status(401);
+    responseContent.status = false;
+    responseContent.message = "401: User not authenticated";
+    response.send(responseContent);
 }
 

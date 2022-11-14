@@ -1,18 +1,19 @@
 import express from "express";
-import {checkURL, internalServerError} from "../../helper/helper";
+import {checkURL, internalServerError, unauthenticatedUserError} from "../../helper/helper";
 import {checkLogin} from "../../helper/login&jwt";
 import Service from "../../model/documents/Service";
+import mongoose from "mongoose";
 
 const router = express.Router();
 
 /* POST endpoint for adding an authorization server to a service */
 router.post("/", (request, response) => {
-    checkLogin(request, response, function (user) {
+    checkLogin(request, response).then(async (user) => {
         const serviceID = request.body.serviceID;
         const serviceAuthURL = request.body.authURL;
         const clientId = request.body.clientId;
         const clientSecret = request.body.clientSecret;
-        if (serviceAuthURL == null || serviceID == null || clientId == null || clientSecret == null) {
+        if (serviceAuthURL == null || serviceID == null || clientId == null || clientSecret == null || !mongoose.isValidObjectId(serviceID)) {
             console.log("url+ ", serviceAuthURL, " clientId+ ", clientId, "clientSecret+ ", clientSecret);
             response.status(400);
             response.send("400: Bad Request. The parameters you sent were invalid.");
@@ -23,22 +24,22 @@ router.post("/", (request, response) => {
             response.send("400: Bad Request. The parameters you sent were invalid.");
             return;
         }
-        Service.findServiceCreatedByUser(user._id, serviceID, function (service) {
+        try {
+            const service = await Service.findServiceCreatedByUser(user._id, serviceID);
             if (service == null) {
                 response.status(403);
-                response.send("You are not authorized to check this resource");
+                response.send("403: You are not authorized to check this resource");
                 return;
             }
-            Service.addAuthServer(service, serviceAuthURL, clientId, clientSecret, function () {
-                response.status(200);
-                response.send("AddAuthenticationServerToAService: OK");
-            }
-            , function (error) {
-                internalServerError(error, response);
-            });
-        }, function (error) {
+            await Service.addAuthServer(service, serviceAuthURL, clientId, clientSecret);
+            response.status(200);
+            response.send("200: Add Authentication Server OK");
+        } catch (error) {
             internalServerError(error, response);
-        });
+        }
+    }).catch(function (reason) {
+        console.log(reason);
+        unauthenticatedUserError(response);
     });
 });
 

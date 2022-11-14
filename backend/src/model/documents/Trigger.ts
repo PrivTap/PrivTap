@@ -19,4 +19,8 @@ const triggerSchema = new Schema<ITrigger>({
 { collection: "trigger" }
 );
 
-export default model<ITrigger>("Trigger", triggerSchema);
+export default class Trigger {
+
+    private static triggerModel = model<ITrigger>("Trigger", triggerSchema);
+
+}

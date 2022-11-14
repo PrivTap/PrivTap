@@ -1,4 +1,4 @@
-import {Schema, model, Document, Error, CallbackError} from "mongoose";
+import {Document, Error, model, Schema} from "mongoose";
 
 export interface IService extends Document {
     description: string;
@@ -57,10 +57,9 @@ export default class Service {
      * @param authenticationServer The API endpoint of the server used to authenticate the PrivTAP platform with the Service
      * @param clientId The ID of our platform on the authorization server
      * @param clientSecret The secret of our platform on the authorization server
-     * @param completionHandler The asynchronous callback used to continue the computation after the operation has either succeeded or failed with an error
      * @throws {Error} An error representing what went wrong when attempting to create the Service
      */
-    static insert(name: string, description: string, creatorID: string, completionHandler: (error?: Error | CallbackError) => void, authenticationServer?: string, clientId?: string, clientSecret?: string,) {
+    static async insert(name: string, description: string, creatorID: string, authenticationServer?: string, clientId?: string, clientSecret?: string) {
         const newService = new Service.serviceModel({
             description: description,
             name: name,
@@ -70,47 +69,30 @@ export default class Service {
             clientSecret: clientSecret
         });
         // Do we already have a service with the same identifier in the database?
-        Service.serviceModel.exists({name: name}, (error, res) => {
-            if (res == null) {
-                //Proceed with the save operation
-                newService.save((error) => {
-                    if (error == null) {
-                        console.log("Service Added!");
-                    }
-                    completionHandler(error);
-                });
-            } else if (error == null) {
-                completionHandler(new Error("ERROR: Attempting to insert a duplicate item"));
-            } else {
-                completionHandler(error);
-            }
-        });
+        const res = await Service.serviceModel.exists({name: name});
+        if (res == null) {
+            //Proceed with the save operation
+            await newService.save();
+        } else throw (new Error("attempting to insert a duplicate item"));
     }
 
-    static findServicesCreatedByUser(userID: string, successHandler: (services: IService[]) => void, errorHandler: (error: any) => void) {
-        Service.serviceModel.find({creator: userID}).then((result) => {
-            successHandler(result.map(doc => doc as IService));
-        }, errorHandler);
+    static async findServicesCreatedByUser(userID: string): Promise<IService[]> {
+        return Service.serviceModel.find({creator: userID});
     }
 
-    static findServiceCreatedByUser(userID: string, serviceID: string, successHandler: (service: IService) => void, errorHandler: (error: any) => void) {
-        Service.serviceModel.findOne({creator: userID, _id: serviceID}).then((result) => {
-            successHandler(result as IService);
-        }, errorHandler);
+    static async findServiceCreatedByUser(userID: string, serviceID: string): Promise<IService> {
+        const result = await Service.serviceModel.findOne({creator: userID, _id: serviceID});
+        return result as IService;
     }
 
-    static deleteService(userID: string, serviceID: string, successHandler: () => void, errorHandler: (error: any) => void) {
-        Service.serviceModel.deleteOne({creator: userID, _id: serviceID}).then(() => {
-            successHandler();
-        }, errorHandler);
+    static async deleteService(userID: string, serviceID: string) {
+        await Service.serviceModel.deleteOne({creator: userID, _id: serviceID});
     }
 
-    static addAuthServer(service: IService, authServer: string, clientId: string, clientSecret: string, successHandler: () => void, errorHandler: (error: any) => void) {
+    static async addAuthServer(service: IService, authServer: string, clientId: string, clientSecret: string) {
         service.authServer = authServer;
         service.clientId = clientId;
         service.clientSecret = clientSecret;
-        service.save().then(() => {
-            successHandler();
-        }, errorHandler);
+        await service.save();
     }
 }
