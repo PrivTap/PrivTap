@@ -59,7 +59,7 @@ export default class Service {
      * @param clientSecret The secret of our platform on the authorization server
      * @throws {Error} An error representing what went wrong when attempting to create the Service
      */
-    static async insert(name: string, description: string, creatorID: string, authenticationServer?: string, clientId?: string, clientSecret?: string,) {
+    static async insert(name: string, description: string, creatorID: string, authenticationServer?: string, clientId?: string, clientSecret?: string) {
         const newService = new Service.serviceModel({
             description: description,
             name: name,

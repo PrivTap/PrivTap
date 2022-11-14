@@ -48,7 +48,7 @@ const userSchema = new Schema<IUser>({
 );
 
 export default class User {
-    public static userModel = model<IUser>("User", userSchema);
+    private static userModel = model<IUser>("User", userSchema);
 
     /**
      * Inserts a new user in the database
@@ -103,6 +103,10 @@ export default class User {
         return resultObject;
     }
 
+    /**
+     * Finds an existing user given its user ID
+     * @param userId The ID of the user to find in the database
+     */
     static async findById(userId: string): Promise<IUser>{
         const query = await User.userModel.findById(userId);
         return query as IUser;
