@@ -14,18 +14,19 @@ const accountActivationBaseURL = (process.env.DEPLOYMENT_URL || "") + "/?activat
 
 // Create the transport layer that will forward the emails to the SMTP server
 let transporter: Transporter|undefined = undefined;
-if (process.env.NODE_ENV == "production")
-    transporter = createTransport(
-        {
-            host: smtpServerAddress,
-            port: smtpServerPort,
-            secure: useSSL,
-            auth: {
-                user: adminEmail,
-                pass: adminPassword,
-            },
+//if (process.env.NODE_ENV == "production") {
+    const t = {
+        host: smtpServerAddress,
+        port: smtpServerPort,
+        secure: useSSL,
+        auth: {
+            user: adminEmail,
+            pass: adminPassword
         }
-    );
+    };
+    console.log(t);
+    transporter = createTransport(t);
+//}
 
 /**
  * Sends the account activation email to a newly registered user.

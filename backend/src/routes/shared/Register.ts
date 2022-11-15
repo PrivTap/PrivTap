@@ -32,6 +32,15 @@ export default class RegisterRoute extends Route {
 
         const hash = hashSync(password, Number.parseInt(process.env.SALT_ROUND || "1"));
         const activateToken = randomBytes(64).toString("hex");
+
+        try {
+            await sendRegistrationEmail(email, activateToken);
+        } catch (e) {
+            console.log("Unexpected error while sending email: ", e);
+            internalServerError(response);
+            return;
+        }
+
         try {
             await User.insertNewUser(username, hash, email, activateToken);
         } catch (e) {
@@ -41,7 +50,6 @@ export default class RegisterRoute extends Route {
         }
 
         success(response);
-        await sendRegistrationEmail(email, activateToken);
     }
 
     /**
