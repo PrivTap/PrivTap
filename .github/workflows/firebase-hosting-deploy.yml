@@ -9,7 +9,6 @@ name: Deploy frontend to Firebase Hosting
 
 env:
   VITE_BACKEND_URL: /api
-  NODE_ENV: production
 
 jobs:
   build_and_deploy:
