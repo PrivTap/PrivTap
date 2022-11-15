@@ -1,12 +1,12 @@
 import express from "express";
-import User from "../../model/documents/User";
-import Response from "../../model/Response";
+import User from "../../model/User";
+import APIResponse from "../../APIResponse";
 import {internalServerError} from "../../helper/helper";
 
 const router = express.Router();
 
 router.post("/", (request, response) => {
-    const responseMessage: Response = new Response();
+    const responseMessage: APIResponse = new APIResponse();
     const activationToken = request.body.token;
     if (typeof activationToken == "undefined") {
         response.status(400);

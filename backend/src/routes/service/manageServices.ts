@@ -1,11 +1,12 @@
 import express from "express";
-import Service from "../../model/documents/Service";
-import {checkLogin} from "../../helper/login&jwt";
+import Service from "../../model/Service";
+import {checkLogin} from "../../helper/authentication";
 import {checkURL, internalServerError, unauthenticatedUserError} from "../../helper/helper";
-import Response from "../../model/Response";
+import APIResponse from "../../APIResponse";
 import mongoose from "mongoose";
 
 const router = express.Router();
+
 
 /* GET endpoint for the Manage Services OSP operation */
 router.get("/", (request, response) => {
@@ -32,7 +33,7 @@ router.post("/", (request, response) => {
     const serviceAuthURL = request.body.authURL;
     const clientId = request.body.clientId;
     const clientSecret = request.body.clientSecret;
-    const responseContent = new Response();
+    const responseContent = new APIResponse();
 
     if (serviceName == null || serviceDesc == null) {
         response.status(400);
@@ -86,7 +87,7 @@ router.post("/", (request, response) => {
 /* DELETE endpoint for the Manage Services OSP operation */
 router.delete("/", (request, response) => {
     const serviceID = request.body.serviceID;
-    const responseContent = new Response();
+    const responseContent = new APIResponse();
 
     if (serviceID == null || !mongoose.isValidObjectId(serviceID)) {
         response.status(400);

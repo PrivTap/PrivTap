@@ -1,7 +1,7 @@
 import express from "express";
 import {checkURL, internalServerError, unauthenticatedUserError} from "../../helper/helper";
-import {checkLogin} from "../../helper/login&jwt";
-import Service from "../../model/documents/Service";
+import {checkLogin} from "../../helper/authentication";
+import Service from "../../model/Service";
 import mongoose from "mongoose";
 
 const router = express.Router();
