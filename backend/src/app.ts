@@ -57,7 +57,7 @@ class BackendApp {
         this.express = this.createExpressApp();
 
         // Register routes defined in /routes
-        this.registerRoutes();
+        this.registerAllRoutes();
     }
 
     /**
@@ -65,7 +65,7 @@ class BackendApp {
      * @private
      * @return the newly created application server
      */
-    private createExpressApp() {
+    protected createExpressApp() {
         const app = express();
 
         app.use(cors({origin: "*"}));
@@ -87,20 +87,28 @@ class BackendApp {
     }
 
     /**
+     * Registers a new route from a TypeScript file. The file should export as default a class declaration
+     * that extends Route.
+     * @param filePath the path from where to import the route class
+     * @protected
+     */
+    protected async registerRoute(filePath: string) {
+        const routeClass = (await import(filePath)).default as typeof Route;
+        const routeInstance = new routeClass();
+
+        this.express.use(this.baseURL + routeInstance.endpointName, routeInstance.router);
+    }
+
+    /**
      * Registers all the routes defines in the 'routes/' directory to the Express app server.
      * @private
      */
-    private registerRoutes() {
-        getFilesInDir(join(__dirname, "routes"))
-            .map(filePath => filePath.slice(0, -3))  // Remove file extension
-            .forEach(async filePath => {            // For each file, register the route to our express app
-                // filePath = "." + filePath.replace("src", ""); // Remove '/src' from file path to avoid errors when this gets compiled
-                const routeClass = (await import(filePath)).default as typeof Route;
-                const routeInstance = new routeClass();
-                console.log(routeInstance.endpointName, routeInstance.requiresAuth);
-
-                this.express.use(this.baseURL + routeInstance.endpointName, routeInstance.router);
-            });
+    protected registerAllRoutes() {
+        const routeFiles = getFilesInDir(join(__dirname, "routes"))
+                            .map(filePath => filePath.slice(0, -3))  // Remove file extension
+        for (const filePath of routeFiles) {
+            this.registerRoute(filePath).then();
+        }
     }
 
     /**
