@@ -1,11 +1,12 @@
-import {Schema, model, Document, Error, CallbackError} from "mongoose";
+import {Document, Error, model, Schema} from "mongoose";
 
 export interface IService extends Document {
     description: string;
     name: string;
+    creator: string;
     authServer: string;
     clientId: string;
-    secret: string;
+    clientSecret: string;
 }
 
 const serviceSchema = new Schema<IService>({
@@ -20,13 +21,17 @@ const serviceSchema = new Schema<IService>({
             unique: true
         }
     },
+    creator: {
+        type: String,
+        required: true,
+    },
     authServer: {
         type: String,
     },
     clientId: {
         type: String
     },
-    secret: {
+    clientSecret: {
         type: String
     }
 },
@@ -36,7 +41,7 @@ const serviceSchema = new Schema<IService>({
 /**
  * The entrypoint class to handle all Database access operations related to services.
  */
-export default class Services {
+export default class Service {
 
     /**
      * The MongoDB model and schema definition for the Service document
@@ -48,31 +53,46 @@ export default class Services {
      * Asynchronously adds a new service to the database
      * @param name The name of the new service
      * @param description The description of the service
+     * @param creatorID The ID of the user that created this service
      * @param authenticationServer The API endpoint of the server used to authenticate the PrivTAP platform with the Service
-     * @param completionHandler The asynchronous callback used to continue the computation after the operation has either succeeded or failed with an error
+     * @param clientId The ID of our platform on the authorization server
+     * @param clientSecret The secret of our platform on the authorization server
      * @throws {Error} An error representing what went wrong when attempting to create the Service
      */
-    static insert(name: string, description: string, authenticationServer: string, completionHandler: (error?: Error | CallbackError) => void) {
-        const newService = new Services.serviceModel({
+    static async insert(name: string, description: string, creatorID: string, authenticationServer?: string, clientId?: string, clientSecret?: string) {
+        const newService = new Service.serviceModel({
             description: description,
             name: name,
-            authServer: authenticationServer
+            creator: creatorID,
+            authServer: authenticationServer,
+            clientId: clientId,
+            clientSecret: clientSecret
         });
         // Do we already have a service with the same identifier in the database?
-        Services.serviceModel.exists({name: name}, (error, res) => {
-            if (res == null) {
-                //Proceed with the save operation
-                newService.save((error) => {
-                    if (error == null) {
-                        console.log("Service Added!");
-                    }
-                    completionHandler(error);
-                });
-            } else if (error == null) {
-                completionHandler(new Error("Model.Services ERROR: Attempting to insert a duplicate item"));
-            } else {
-                completionHandler(error);
-            }
-        });
+        const res = await Service.serviceModel.exists({name: name});
+        if (res == null) {
+            //Proceed with the save operation
+            await newService.save();
+        } else throw (new Error("attempting to insert a duplicate item"));
+    }
+
+    static async findServicesCreatedByUser(userID: string): Promise<IService[]> {
+        return Service.serviceModel.find({creator: userID});
+    }
+
+    static async findServiceCreatedByUser(userID: string, serviceID: string): Promise<IService> {
+        const result = await Service.serviceModel.findOne({creator: userID, _id: serviceID});
+        return result as IService;
+    }
+
+    static async deleteService(userID: string, serviceID: string) {
+        await Service.serviceModel.deleteOne({creator: userID, _id: serviceID});
+    }
+
+    static async addAuthServer(service: IService, authServer: string, clientId: string, clientSecret: string) {
+        service.authServer = authServer;
+        service.clientId = clientId;
+        service.clientSecret = clientSecret;
+        await service.save();
     }
 }

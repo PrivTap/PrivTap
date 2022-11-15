@@ -2,8 +2,8 @@
 <template>
 <nav class="flex justify-between pt-5 pl-6">
     <img
-            class="h-12"
-            src="https://tailwindui.com/img/logos/mark.svg?color=white"
+            class="h-24"
+            :src="logo"
           />
     <div class="flex pr-10 space-x-5 text-center items-center">
       <button
@@ -13,7 +13,7 @@
       </button>
       <button
         class="rounded-lg py-2 px-8 font-semibold text-blue-500 ring-blue-500 ring-[3px] hover:text-blue-400 hover:ring-blue-400"
-        @click="logout"
+        @click="authStore.logout()"
       >
       Logout
       </button>
@@ -25,10 +25,8 @@
 </template>
 
 <script setup lang="ts">
-import router from '@/router/router';
-
-function logout() {
-  router.push('/auth');
-}
+import logo from '@/assets/images/logo_light.svg';
+import { useAuthStore } from '@/stores/auth_store';
+const authStore = useAuthStore();
 
 </script>

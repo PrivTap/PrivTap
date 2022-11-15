@@ -1,10 +1,4 @@
 import {readdirSync, statSync} from "fs";
-import mongoose, {ConnectOptions} from "mongoose";
-import dotenv from "dotenv";
-
-
-// Read environment variables from a ..env file
-dotenv.config();
 
 /**
  * Gets all files recursively from a directory.
@@ -27,21 +21,12 @@ export function getFilesInDir(dirPath: string, arrayOfFiles: string[] = []) {
 }
 
 /**
- * Connects to MongoDB database using the mongoose library
- * @param uri: the uri specifying the db user credential cluster and db identifier
+ * Checks if an url is valid or not through a regex.
+ * @param url The URL to validate
  */
-
-export async function connectDB(uri: string) {
-    try {
-        // Connect to the MongoDB cluster
-        await mongoose.connect(uri,
-            {useNewUrlParser: true, useUnifiedTopology: true} as ConnectOptions,
-            () => {
-                console.log("Correctly connected to MongoDB");
-            }
-        );
-    } catch (e) {
-        console.log("Error connecting to MongoDB");
-    }
+export function checkURL(url: string): boolean {
+    return /^(http|https):\/\/[^ "]+$/.test(url);
 }
+
+
 
