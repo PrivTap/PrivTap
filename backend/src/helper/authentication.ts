@@ -1,7 +1,7 @@
-import { NextFunction, Request, Response } from "express";
+import {NextFunction, Request, Response} from "express";
 import {IUser} from "../model/User";
-import { verify, sign, JwtPayload } from "jsonwebtoken";
-import { internalServerError, unauthorizedUserError } from "./http";
+import {verify, sign, JwtPayload} from "jsonwebtoken";
+import {internalServerError, unauthorizedUserError} from "./http";
 
 class AuthError extends Error {
     constructor(message?: string) {
@@ -19,7 +19,7 @@ class AuthError extends Error {
 export function checkAuthentication(request: Request, response: Response, next: NextFunction) {
     let userId;
     try {
-        userId =  checkJWT(request);
+        userId = checkJWT(request);
     } catch (e) {
         if (e instanceof AuthError) {
             unauthorizedUserError(response);
@@ -60,7 +60,7 @@ function checkJWT(request: Request): string {
     } catch (e) {
         let errMessage = "JWT Cookie can't be verified";
 
-        if(e instanceof Error) {
+        if (e instanceof Error) {
             errMessage += ": " + e.message;
         }
 

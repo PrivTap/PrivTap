@@ -41,6 +41,14 @@ export function success(response: Response, data?: {[p: string]: string | boolea
 export function internalServerError(response: Response) {
     response.status(500).json(new APIResponse(false, "Internal server error"));
 }
+/**
+ * Sends to the client a response signalling "403 Forbidden".
+ * @param response The Express response used to send the error to
+ * @param message The message to send to the client along with the error
+ */
+export function forbiddenUserError(response: Response, message : string = "Forbidden") {
+    response.status(403).json(new APIResponse(false, message));
+}
 
 /**
  * Sends to the client a response signalling "401 Unauthorized".
