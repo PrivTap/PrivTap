@@ -3,22 +3,16 @@
     <div class="max-w-xl space-y-8">
       <div class="rounded-3xl shadow-2xl p-10 bg-blue-600 shadow-blue-500">
         <div>
-          <img
-            class="mx-auto h-24 w-auto"
-            :src= "logo"
-          />
+          <img class="mx-auto h-24 w-auto" :src="logo" />
           <h1 class="mt-6 text-center tracking-tight text-white">
             {{ showLogin ? "Login into your" : "SignUp a new " }} PrivTAP
             account
           </h1>
         </div>
-        <form @submit="onSubmitted" class="mt-8 space-y-6">
-          <input type="hidden" name="remember" value="true" />
+
+        <form @submit.prevent="onSubmitted" class="mt-8 space-y-6">
           <div class="-space-y-px rounded-md shadow-sm relative">
-            <div
-              v-if="!showLogin"
-              class="relative animate-fade-in placeholder-gray-500"
-            >
+            <div class="placeholder-gray-500">
               <label for="username-id" class="sr-only">Username</label>
               <input
                 id="username-id"
@@ -29,7 +23,10 @@
                 placeholder="Username"
               />
             </div>
-            <div class="placeholder-gray-500">
+            <div
+              v-if="!showLogin"
+              class="relative animate-slide-in placeholder-gray-500"
+            >
               <label for="email-address" class="sr-only">Email address</label>
               <input
                 id="email-address"
@@ -41,8 +38,8 @@
                   'rounded-t-md': showLogin,
                 }"
                 v-model="email"
-                class="relative w-full appearance-none rounded-none border border-gray-300 px-3 py-2 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-base"
                 placeholder="Email address"
+                class="relative w-full appearance-none rounded-none border border-gray-300 px-3 py-2 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-base"
               />
             </div>
 
@@ -52,6 +49,7 @@
                 class="flex relative justify-between items-center bg-white rounded-none rounded-b-md border border-gray-300 px-3 py-2 placeholder-gray-500 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-base"
               >
                 <input
+                  @focus="() => showHintPassword = true" 
                   id="password"
                   name="password"
                   :type="showPass ? 'text' : 'password'"
@@ -77,6 +75,50 @@
                 </button>
               </div>
             </div>
+          </div>
+
+          <div class="flex justify-start" >
+            <ul>
+              <li v-show="showHintPassword" class="flex items-center animate-fade-in">
+              <div
+                :class="{
+                  'bg-green-200 text-green-700': isValidPassword,
+                  'bg-red-200 text-red-700': !isValidPassword,
+                }"
+                class="rounded-full p-1 fill-current"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    v-show="isValidPassword"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                  <path
+                    v-show="!isValidPassword"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </div>
+              <span
+                :class="{
+                  'text-green-400': isValidPassword,
+                  'text-red-200': !isValidPassword,
+                }"
+                class="font-medium text-sm ml-3"
+                v-text="isValidPassword ? 'The minimum length is reached' : 'At least 9 characters required' "
+              ></span>
+              </li>
+            </ul>
           </div>
 
           <div
@@ -106,7 +148,6 @@
 
           <div>
             <button
-              type="submit"
               :class="isButtonEnable ? 'hover:bg-blue-900' : 'bg-blue-300'"
               :disabled="!isButtonEnable"
               class="w-full rounded-md bg-blue-800 py-2 px-4 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-900 focus:ring-offset-2"
@@ -140,104 +181,92 @@
 import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { EyeSlashIcon, EyeIcon } from "@heroicons/vue/24/solid";
-import http from "@/http-common";
 import logo_light from "@/assets/images/logo_light.svg";
+import AuthService from "@/services/auth_service";
+import { useToast } from "vue-toastification";
 
 const logo = logo_light;
-
 const router = useRouter();
 const route = useRoute();
-
-onMounted( async () => {
-  if (route.query.activate) {
-    console.log(route.query.activate);
-    try {
-      const res = await http.post("/activate", { token: route.query.activate });
-      console.log(res.data);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-});
+const toast = useToast();
 
 const showPass = ref(false);
-
 const remindMeChecked = ref<boolean>();
-const showLogin = ref<boolean>(true);
+const showLogin = ref<boolean>(false);
 const username = ref<String>("");
 const email = ref<String>("");
 const password = ref<String>("");
-const passwordError = ref<String>("");
-const emailError = ref<String>("");
+const isLoading = ref<boolean>(false);
+const showHintPassword = ref<boolean>(false);
 
 const isValidEmail = computed(() => {
   if (email.value.length) return true;
-  emailError.value = "Enter a valid email";
   return false;
 });
 
 const isValidPassword = computed(() => {
-  if (password.value.length < 8) {
-    passwordError.value = "Password must be at least 8 characters long";
+  if (password.value.length < 9) {
     return false;
   } else {
-    passwordError.value = "";
     return true;
   }
 });
 
-function changeView() {
-  showLogin.value = !showLogin.value;
-}
-
 const isButtonEnable = computed(() => {
+  if (isLoading.value) return false;
   if (showLogin.value) {
-    return isValidEmail.value && isValidPassword.value;
+    return username.value.length > 0 && isValidPassword.value;
   }
   return (
     isValidEmail.value && isValidPassword.value && username.value.length > 0
   );
 });
 
-//TODO: (ADD LOGIC TO LOGIN AND SIGNUP)
-async function onSubmitted() {
-  if (showLogin.value) {
-    const res = await http.post("/login", {
-      email: email.value,
-      password: password.value,
-    });
-    res.status == 200 ? router.push("/home") : alert(res.data);
-  } else {
-    const res = await http.post("/register", { email, password, username });
-    res.status === 200 ? changeView() : alert(res.data);
-  }
+function changeView() {
+  showLogin.value = !showLogin.value;
 }
+
+async function onSubmitted() {
+  isLoading.value = true;
+  if (showLogin.value) {
+    await _loginIn();
+  } else {
+    await _signUp();
+  }
+  isLoading.value = false;
+}
+
+async function _loginIn() {
+  const res = await AuthService.login(username.value, password.value);
+  if (!res._status) return toast.error(res._message);
+  toast.success("Login Success!");
+  router.push("/home");
+}
+
+async function _signUp() {
+  const res = await AuthService.register(
+    username.value,
+    email.value,
+    password.value
+  );
+  console.log(res);
+  if (!res._status) return toast.error(res._message);
+  toast.success(res._message);
+  changeView();
+}
+
+onMounted(async () => {
+  if (route.query.activate) {
+    console.log(route.query.activate);
+    try {
+      const token = route.query.activate as String;
+      const res = await AuthService.activate(token);
+      console.log(res.data);
+    } catch (error) {
+      toast.warning("Code activation error, please retry");
+    }
+  }
+});
 </script>
 
-<style scoped>
-/* .slide-fade-enter-active {
-  transition: all 0.7s ease-out;
-}
-
-.slide-fade-leave-active {
-  transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
-}
-
-.slide-fade-enter-from,
-.slide-fade-leave-to {
-  position: absolute;
-  width: 100%;
-  transform: translateY(-20px);
-  opacity: 0;
-}
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s ease;
-  position: absolute;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-} */
-</style>
+<style scoped></style>

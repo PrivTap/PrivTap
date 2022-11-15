@@ -1,3 +1,5 @@
+import { useAuthStore } from "@/stores/auth_store";
+import { storeToRefs } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
 
 const router = createRouter({
@@ -12,6 +14,9 @@ const router = createRouter({
       path: "/home",
       name: "home",
       component: () => import("../views/HomeView.vue"),
+      meta: {
+        requireAuth: true,
+      }
     },
     {
       path: "/auth",
@@ -19,6 +24,13 @@ const router = createRouter({
       component: () => import("../views/AuthView.vue"),
     },
   ],
+});
+
+/// Router guard to check if user is authenticated
+router.beforeEach((to, from, next) => {
+  const isAutheticated: boolean = useAuthStore().isAutheticated;
+  if (to.meta.requireAuth && !isAutheticated) return next("/auth");
+  return next();
 });
 
 export default router;
