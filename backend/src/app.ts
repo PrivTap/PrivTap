@@ -68,7 +68,16 @@ class BackendApp {
     protected createExpressApp() {
         const app = express();
 
-        app.use(cors({origin: "*"}));
+        // app.use(cors({origin: "*"}));
+        if (process.env.NODE_ENV != "production") {
+
+            app.options('*', cors({
+                origin: "http://127.0.0.1:5173",
+                credentials: true,
+                allowedHeaders: ["Set-Cookie", "Content-Type"]
+            }));
+        }
+
         app.use(express.json());
         app.use(express.urlencoded({extended: false}));
         app.use(cookieParser());

@@ -49,7 +49,7 @@
                 class="flex relative justify-between items-center bg-white rounded-none rounded-b-md border border-gray-300 px-3 py-2 placeholder-gray-500 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-base"
               >
                 <input
-                  @focus="() => showHintPassword = true" 
+                  @focus="() => showHintPassword = true"
                   id="password"
                   name="password"
                   :type="showPass ? 'text' : 'password'"
@@ -238,7 +238,7 @@ async function onSubmitted() {
 
 async function _loginIn() {
   const res = await AuthService.login(username.value, password.value);
-  if (!res._status) return toast.error(res._message);
+  if (!res.status) return toast.error(res.message);
   toast.success("Login Success!");
   router.push("/home");
 }
@@ -250,8 +250,8 @@ async function _signUp() {
     password.value
   );
   console.log(res);
-  if (!res._status) return toast.error(res._message);
-  toast.success(res._message);
+  if (!res.status) return toast.error(res.message);
+  toast.success(res.message);
   changeView();
 }
 

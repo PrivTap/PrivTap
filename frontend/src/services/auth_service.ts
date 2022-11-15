@@ -5,9 +5,9 @@ import { useToast } from "vue-toastification";
 import http from "../http-common";
 
 type AuthResponse = {
-  _status: boolean;
-  _message: String;
-  _data?: {};
+  status: boolean;
+  message: String;
+  data?: {};
 };
 
 class AuthService {
@@ -30,8 +30,8 @@ class AuthService {
         return err.response?.data as AuthResponse;
       }
       return {
-        _status: false,
-        _message: "Somenthing went wrong..",
+        status: false,
+        message: "Somenthing went wrong..",
       } as AuthResponse;
     }
   }
@@ -43,8 +43,8 @@ class AuthService {
     };
     try {
       const res = await http.post<AuthResponse>("/login", body);
-      if (res.status === 200 && res.data._data) {
-        useAuthStore().setUser(res.data._data as UserModel);
+      if (res.status === 200 && res.data.data) {
+        useAuthStore().setUser(res.data.data as UserModel);
       }
       return res.data;
     } catch (error) {
@@ -53,8 +53,8 @@ class AuthService {
         return err.response?.data as AuthResponse;
       }
       return {
-        _status: false,
-        _message: "Somenthing went wrong..",
+        status: false,
+        message: "Somenthing went wrong..",
       } as AuthResponse;
     }
   }

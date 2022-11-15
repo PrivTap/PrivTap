@@ -3,7 +3,7 @@ import User from "../../model/User";
 import { createJWT } from "../../helper/authentication";
 import { badRequest, internalServerError, success } from "../../helper/http";
 import Route from "../../Route";
-import { Request, Response } from "express";
+import { CookieOptions, Request, Response } from "express";
 
 export default class LoginRoute extends Route {
     constructor() {
@@ -46,7 +46,22 @@ export default class LoginRoute extends Route {
 
         let cookieExpires = Number.parseInt(process.env.JWT_EXPIRE || "86400");
         cookieExpires *= 1000; // Convert to ms
-        response.cookie("_jwt", jwt, {expires: new Date(Date.now() + cookieExpires), httpOnly: true});
+
+        const cookieOptions: CookieOptions = {
+            expires: new Date(Date.now() + cookieExpires),
+            httpOnly: true,
+            secure: true,
+            sameSite: "strict"
+        };
+
+        if (process.env.NODE_ENV != "production") {
+            cookieOptions.sameSite = "none";
+            response.header("Access-Control-Allow-Credentials", "true");
+            response.header("Access-Control-Allow-Origin", "http://127.0.0.1:5173")
+            response.header("Access-Control-Allow-Headers", "Set-Cookie")
+        }
+
+        response.cookie("_jwt", jwt, cookieOptions);
 
         success(response, {"username": username, "email": user.email, "isConfirmed": user.isConfirmed})
     }
