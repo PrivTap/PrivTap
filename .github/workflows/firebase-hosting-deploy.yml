@@ -6,6 +6,11 @@ name: Deploy frontend to Firebase Hosting
   push:
     branches:
       - production
+
+env:
+  VITE_BACKEND_URL: /api
+  NODE_ENV: production
+
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
