@@ -34,14 +34,14 @@ export default class RegisterRoute extends Route {
         const activateToken = randomBytes(64).toString("hex");
         try {
             await User.insertNewUser(username, hash, email, activateToken);
-
-            success(response, {"username": username, "email": email, "isConfirmed": false});
-
-            sendRegistrationEmail(email, activateToken).then(() => {});
         } catch (e) {
             console.log("Unexpected error: ", e);
             internalServerError(response);
+            return;
         }
+
+        success(response);
+        await sendRegistrationEmail(email, activateToken);
     }
 
     /**

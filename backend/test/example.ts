@@ -4,7 +4,7 @@ import {drop, initDb} from "mongo-unit";
 import mongoose from "mongoose";
 
 import app from "../src/app";
-import {checkURL} from "../src/helper/helper";
+import {checkURL} from "../src/helper/misc";
 import User from "../src/model/User";
 
 import testData from "./fixtures/exampleData.json";

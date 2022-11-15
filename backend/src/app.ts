@@ -1,6 +1,6 @@
 import express, {Express} from "express";
 import {config} from "dotenv";
-import {getFilesInDir} from "./helper/helper";
+import {getFilesInDir} from "./helper/misc";
 import {join} from "path";
 import logger from "morgan";
 import cookieParser from "cookie-parser";
