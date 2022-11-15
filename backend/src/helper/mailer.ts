@@ -1,15 +1,16 @@
 import { createTransport, Transporter } from "nodemailer";
 
 // SMTP server parameters
-const smtpServerAddress = "authsmtp.securemail.pro";
-const smtpServerPort = 465;
-const useSSL = true;
+const emailHost = (process.env.EMAIL_HOST || "example.com:465").split(":");
+const smtpServerAddress = emailHost[0];
+const smtpServerPort = Number.parseInt(emailHost[1]);
+const useSSL = smtpServerPort == 465;
 const adminEmail = process.env.EMAIL_USER || "";
 const adminPassword = process.env.EMAIL_PASSWORD || "";
 
 // URL where users will get redirected to activate their account
 // This is just the base URL, it will be needed to append the account activation token to it
-const accountActivationBaseUrl = "https://privtap.it/?activate=";
+const accountActivationBaseURL = (process.env.DEPLOYMENT_URL || "") + "/?activate=";
 
 // Create the transport layer that will forward the emails to the SMTP server
 let transporter: Transporter|undefined = undefined;
@@ -37,7 +38,7 @@ export async function sendRegistrationEmail(userEmailAddress: string, activation
         return;
     }
 
-    const activationUrl = encodeURI(accountActivationBaseUrl + activationToken);
+    const activationUrl = encodeURI(accountActivationBaseURL + activationToken);
     await transporter.sendMail({
         from: {
             name: "PrivTAP",

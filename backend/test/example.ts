@@ -4,8 +4,8 @@ import {drop, initDb} from "mongo-unit";
 import mongoose from "mongoose";
 
 import app from "../src/app";
-import {checkURL} from "../src/helper/helper";
-import User from "../src/model/documents/User";
+import {checkURL} from "../src/helper/misc";
+import User from "../src/model/User";
 
 import testData from "./fixtures/exampleData.json";
 
@@ -30,21 +30,21 @@ describe("PrivTAP Backend", () => {
         requester.close();
         await mongoose.disconnect();
     });
-    
+
     beforeEach(async () => {
         await initDb(testData);
     });
-    
+
     afterEach(async () => {
         await drop();
     });
-    
+
     it("should receive fake DB response", async () => {
         const result = await fakeDBQuery();
-        
+
         if (result.myKey != "myValue")
             throw new Error("Query result is wrong");
-        
+
     });
 
     it("should have user example", async () => {
@@ -56,14 +56,14 @@ describe("PrivTAP Backend", () => {
         expect(checkURL("example@example.com")).to.be.false;
         expect(checkURL("https://example.com/example")).to.be.true;
     });
-    
+
     describe("AppServer", () => {
-        
+
         it("should not serve root", async () => {
             const res = await requester.get(baseURL);
             expect(res).to.have.status(404);
         });
 
     });
-   
+
 });
