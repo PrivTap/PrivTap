@@ -19,7 +19,7 @@ export default class RegisterRoute extends Route {
         const password = request.body.password;
 
         try {
-            await this.checkValidInput(username, email,  password)
+            await RegisterRoute.checkValidInput(username, email,  password)
         } catch (e) {
             if (e instanceof Error)
                 badRequest(response, e.message);
@@ -48,7 +48,7 @@ export default class RegisterRoute extends Route {
      * Checks if the provided email is valid (format-wise).
      * @param email The email found in the request body
      */
-    protected checkEmail(email: string) {
+    protected static checkEmail(email: string) {
         const regex = /^[-!#$%&'*+/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
         const emailCheck = regex.test(email);
 
@@ -63,7 +63,7 @@ export default class RegisterRoute extends Route {
      * @param email The email found in the request body
      * @param password The password found in the request body
      */
-    protected checkUndefined(username: string, email: string, password: string) {
+    protected static checkUndefined(username: string, email: string, password: string) {
         if (!username || !email || !password) {
             throw Error("Undefined parameters");
         }
@@ -73,8 +73,8 @@ export default class RegisterRoute extends Route {
      * Checks if the username contains special characters.
      * @param username The username found in the request body
      */
-    protected checkInvalidChar(username: string) {
-        const regex = /[^a-zA-Z0-9]/;
+    protected static checkInvalidChar(username: string) {
+        const regex = /[^a-zA-Z0-9.\-_]/;
         const invalidCharCheck = !regex.test(username);
 
         if (!invalidCharCheck) {
@@ -88,8 +88,8 @@ export default class RegisterRoute extends Route {
      * @param email The email found in the request body
      * @param password The password found in the request body
      */
-    protected checkLength(username: string, email: string, password: string) {
-        const usernameConstraint = username?.length > 3 && username?.length < 15;
+    protected static checkLength(username: string, email: string, password: string) {
+        const usernameConstraint = username?.length > 3 && username?.length < 20;
         const emailConstraint = email?.length > 3 && email?.length < 255;
         const passwordConstraint = password?.length > 8 && username?.length < 20;
         const lengthCheck = usernameConstraint && emailConstraint && passwordConstraint;
@@ -103,7 +103,7 @@ export default class RegisterRoute extends Route {
      * Checks if the username is already taken.
      * @param username The username found in the request body
      */
-    protected async checkUserTaken(username: string) {
+    protected static async checkUserTaken(username: string) {
         const queryResult = await User.queryUser("username", username);
 
         if (queryResult != null) {
@@ -115,7 +115,7 @@ export default class RegisterRoute extends Route {
      * Checks if the email is already associated to another account.
      * @param email The email found in the request body
      */
-    protected async checkEmailTaken(email: string) {
+    protected static async checkEmailTaken(email: string) {
         const queryResult = await User.queryUser("email", email);
 
         if (queryResult != null) {
@@ -129,7 +129,7 @@ export default class RegisterRoute extends Route {
      * @param email The email found in the request body
      * @param password The password found in the request body
      */
-    protected async checkValidInput(username: string, email: string, password: string) {
+    protected static async checkValidInput(username: string, email: string, password: string) {
         this.checkEmail(email);
         this.checkUndefined(username, email, password);
         this.checkInvalidChar(username);
