@@ -16,6 +16,20 @@
     animation: fade-in 0.8s;
 }
 
+@keyframes slide-in {
+    0% {
+        transform: translateX(-5%);
+        animation-timing-function: cubic-bezier(0.8,1,1);
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;;
+    }
+}
+.animate-slide-in {
+    animation: slide-in 0.8s;
+}
+
 #app {
     font-family: 'Nunito', sans-serif;
     font-weight: 200;

@@ -13,7 +13,7 @@
       </button>
       <button
         class="rounded-lg py-2 px-8 font-semibold text-blue-500 ring-blue-500 ring-[3px] hover:text-blue-400 hover:ring-blue-400"
-        @click="logout"
+        @click="authStore.logout()"
       >
       Logout
       </button>
@@ -25,11 +25,8 @@
 </template>
 
 <script setup lang="ts">
-import router from '@/router/router';
 import logo from '@/assets/images/logo_light.svg';
-
-function logout() {
-  router.push('/auth');
-}
+import { useAuthStore } from '@/stores/auth_store';
+const authStore = useAuthStore();
 
 </script>
