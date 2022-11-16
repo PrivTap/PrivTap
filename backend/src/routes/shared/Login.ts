@@ -15,7 +15,7 @@ export default class LoginRoute extends Route {
         const password = request.body.password;
 
         if (!username || !password) {
-            badRequest(response, "Undefined parameters")
+            badRequest(response, "Undefined parameters");
             return;
         }
 
@@ -57,12 +57,12 @@ export default class LoginRoute extends Route {
         if (process.env.NODE_ENV != "production") {
             cookieOptions.sameSite = "none";
             response.header("Access-Control-Allow-Credentials", "true");
-            response.header("Access-Control-Allow-Origin", "http://127.0.0.1:5173")
-            response.header("Access-Control-Allow-Headers", "Set-Cookie")
+            response.header("Access-Control-Allow-Origin", "http://127.0.0.1:5173");
+            response.header("Access-Control-Allow-Headers", "Set-Cookie");
         }
 
         response.cookie("_jwt", jwt, cookieOptions);
 
-        success(response, {"username": username, "email": user.email, "isConfirmed": user.isConfirmed})
+        success(response, {"username": username, "email": user.email, "isConfirmed": user.isConfirmed});
     }
 }

@@ -19,7 +19,7 @@ export default class RegisterRoute extends Route {
         const password = request.body.password;
 
         try {
-            await RegisterRoute.checkValidInput(username, email,  password)
+            await RegisterRoute.checkValidInput(username, email,  password);
         } catch (e) {
             if (e instanceof Error)
                 badRequest(response, e.message);

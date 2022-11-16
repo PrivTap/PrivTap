@@ -13,7 +13,7 @@ export default class Route {
     // Router responsible for this API route
     readonly router: Router;
 
-    constructor(endpointName: string="", requiresAuth=false) {
+    constructor(endpointName="", requiresAuth=false) {
         this.endpointName = endpointName;
         this.requiresAuth = requiresAuth;
         // Creates a new Router
@@ -25,13 +25,13 @@ export default class Route {
 
         // If the subclass implements http methods handlers, register them to the Router
         if (this.httpGet)
-            this.router.get("/", this.httpGet)
+            this.router.get("/", this.httpGet);
         if (this.httpPost)
-            this.router.post("/", this.httpPost)
+            this.router.post("/", this.httpPost);
         if (this.httpPut)
-            this.router.put("/", this.httpPut)
+            this.router.put("/", this.httpPut);
         if (this.httpDelete)
-            this.router.delete("/", this.httpDelete)
+            this.router.delete("/", this.httpDelete);
 
         // If the subclass implements additional http methods handlers, it can define them in this method
         if (this.registerAdditionalHTTPMethods)
