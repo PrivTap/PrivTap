@@ -1,16 +1,13 @@
 import express, {Express} from "express";
 import {getFilesInDir} from "./helper/misc";
 import {join} from "path";
-import logger from "morgan";
+import requestLogger from "morgan";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import mongoose, {ConnectOptions} from "mongoose";
 import Route from "./Route";
 import env from "./helper/env";
-import {config} from "dotenv";
-
-// TODO: remove this once the refactor to using 'helper/env' is done
-config();
+import logger from "./helper/logger";
 
 // Expand the Express request definition to include the userId
 declare global {
@@ -76,7 +73,12 @@ class BackendApp {
             app.options('*', cors({
                 origin: env.FRONTEND_URL,
                 credentials: true,
-                allowedHeaders: ["Set-Cookie", "Content-Type"]
+                allowedHeaders: ["Cookie", "Content-Type"]
+            }));
+
+            app.use(cors({
+                origin: env.FRONTEND_URL,
+                credentials: true,
             }));
         }
 
@@ -86,7 +88,7 @@ class BackendApp {
 
         // Log all requests to console if we are in a development environment
         if (!env.PROD)
-            app.use(logger("dev"));
+            app.use(requestLogger("dev"));
 
         return app;
     }
@@ -150,7 +152,7 @@ if (require.main === module){
                         url = app.deploymentURL;
                     }
 
-                    console.log(`Server listening at: ${url}${app.baseURL}`);
+                    logger.info(`Server listening at: ${url}${app.baseURL}`);
                 });
         });
 }

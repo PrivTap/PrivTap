@@ -1,5 +1,6 @@
 import env from "./env";
 import Mailjet from "node-mailjet";
+import logger from "./logger";
 
 // URL where users will get redirected to activate their account
 // This is just the base URL, it will be needed to append the account activation token to it
@@ -20,7 +21,7 @@ if (env.PROD) {
 export async function sendRegistrationEmail(username: string, userEmailAddress: string, activationToken: string) {
     // If we are not in production, mailer will be undefined, and we can just print the token to console
     if (mailer == undefined) {
-        console.log(`Activation token for ${userEmailAddress}: ${activationToken}`);
+        logger.log(`Activate ${userEmailAddress} account at: ${env.FRONTEND_URL}/?activate=${activationToken}`);
         return;
     }
 

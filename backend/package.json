@@ -19,7 +19,8 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.7.2",
     "morgan": "~1.9.1",
-    "node-mailjet": "^5.1.1"
+    "node-mailjet": "^5.1.1",
+    "tracer": "^1.1.6"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
@@ -32,7 +33,6 @@
     "@types/mocha-prepare": "^0.1.0",
     "@types/morgan": "^1.9.3",
     "@types/node": "^18.11.9",
-    "@types/nodemailer": "^6.4.6",
     "@typescript-eslint/eslint-plugin": "^5.42.1",
     "@typescript-eslint/parser": "^5.42.1",
     "chai": "^4.3.7",

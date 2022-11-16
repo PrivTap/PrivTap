@@ -1,4 +1,4 @@
-import {Schema, model, Document} from "mongoose";
+import { Schema, model, Document, FilterQuery, UpdateQuery } from "mongoose";
 
 export interface IUser extends Document {
     username: string;
@@ -101,6 +101,24 @@ export default class User {
         resultObject["modifiedCount"] = queryResult.modifiedCount;
         resultObject["matchedCount"] = queryResult.matchedCount;
         return resultObject;
+    }
+
+    /**
+     * Activates the user account that has the corresponding activation token
+     * @param token the activation token to use to activate the account
+     */
+    static async activateAccount(token: string) {
+        const filterQuery: FilterQuery<IUser> = {
+            activationToken: token
+        };
+        const updateQuery: UpdateQuery<IUser> = {
+            activationToken: "",
+            isConfirmed: true
+        }
+
+        const result = await User.userModel.updateOne(filterQuery, updateQuery);
+
+        return result.modifiedCount == 1;
     }
 
     /**

@@ -6,6 +6,8 @@ import { sendRegistrationEmail } from "../../helper/mailer";
 
 import { hashSync } from "bcrypt";
 import { randomBytes } from "crypto";
+import env from "../../helper/env";
+import logger from "../../helper/logger";
 
 
 export default class RegisterRoute extends Route {
@@ -24,19 +26,19 @@ export default class RegisterRoute extends Route {
             if (e instanceof Error)
                 badRequest(response, e.message);
             else {
-                console.log("Unexpected error: ", e);
+                logger.error("Unexpected error: ", e);
                 internalServerError(response);
             }
             return;
         }
 
-        const hash = hashSync(password, Number.parseInt(process.env.SALT_ROUND || "1"));
+        const hash = hashSync(password, env.SALT_ROUNDS);
         const activateToken = randomBytes(64).toString("hex");
 
         try {
             await sendRegistrationEmail(username, email, activateToken);
         } catch (e) {
-            console.log("Unexpected error while sending email: ", e);
+            logger.error("Unexpected error while sending email: ", e);
             internalServerError(response);
             return;
         }
@@ -44,7 +46,7 @@ export default class RegisterRoute extends Route {
         try {
             await User.insertNewUser(username, hash, email, activateToken);
         } catch (e) {
-            console.log("Unexpected error: ", e);
+            logger.error("Unexpected error: ", e);
             internalServerError(response);
             return;
         }

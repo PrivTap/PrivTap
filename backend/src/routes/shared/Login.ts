@@ -1,9 +1,10 @@
 import { compareSync } from "bcrypt";
-import User from "../../model/User";
+import User, { IUser } from "../../model/User";
 import { createJWT } from "../../helper/authentication";
 import { badRequest, internalServerError, success } from "../../helper/http";
 import Route from "../../Route";
 import { CookieOptions, Request, Response } from "express";
+import env from "../../helper/env";
 
 export default class LoginRoute extends Route {
     constructor() {
@@ -38,31 +39,48 @@ export default class LoginRoute extends Route {
             return;
         }
 
-        const jwt = createJWT(user);
-        if (!jwt) {
+        if (!LoginRoute.setAuthenticationCookie(response, user)) {
             internalServerError(response);
             return;
         }
 
-        let cookieExpires = Number.parseInt(process.env.JWT_EXPIRE || "86400");
-        cookieExpires *= 1000; // Convert to ms
+        success(response, {"username": username, "email": user.email, "isConfirmed": user.isConfirmed})
+    }
 
+    /**
+     * Sets the appropriate headers in the response to send back the authentication cookie to the client.
+     * @param response the response that will set the cookie
+     * @param user the user for which the cookie will be generated
+     * @protected
+     */
+    protected static setAuthenticationCookie(response: Response, user: IUser) {
+        // Create a JWT token for the user
+        const jwt = createJWT(user);
+        if (!jwt)
+            return false;
+
+        // Calculate the expiration time for the cookie.
+        // We set it the same as the expiration time of the JWT token, but we need to convert
+        // it to milliseconds, as JWT expiration time is in seconds
+        let cookieExpires = env.JWT_EXPIRE;
+        cookieExpires *= 1000;
+
+        // Set default cookie options:
+        // - expires at the same time as the JWT does, so that the browser can recognize it and delete it
+        // - HTTPOnly to ensure that it is not vulnerable to XSS
+        // - Secure to ensure that it won't be passed through unsecure http connections (localhost is an exception)
+        // - SameSite=strict to ensure that it won't be passed to external websites
         const cookieOptions: CookieOptions = {
             expires: new Date(Date.now() + cookieExpires),
             httpOnly: true,
             secure: true,
-            sameSite: "strict"
+            // If we are in a development environment we set SameSite=none to ensure that the cookie will be
+            // set on the frontend even if it is running on a different port
+            sameSite: env.PROD ? "strict" : "none"
         };
 
-        if (process.env.NODE_ENV != "production") {
-            cookieOptions.sameSite = "none";
-            response.header("Access-Control-Allow-Credentials", "true");
-            response.header("Access-Control-Allow-Origin", "http://127.0.0.1:5173")
-            response.header("Access-Control-Allow-Headers", "Set-Cookie")
-        }
-
+        // Set the cookie header
         response.cookie("_jwt", jwt, cookieOptions);
-
-        success(response, {"username": username, "email": user.email, "isConfirmed": user.isConfirmed})
+        return true;
     }
 }

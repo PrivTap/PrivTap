@@ -80,15 +80,13 @@ export default class ManageServices extends Route {
     }
 
     protected registerAdditionalHTTPMethods(router: express.Router) {
-        router.post("/addAuthServer", async (request, response) => {
+        router.post("/add-auth-server", async (request, response) => {
             const serviceID = request.body.serviceID;
             const serviceAuthURL = request.body.authURL;
             const clientID = request.body.clientID;
             const clientSecret = request.body.clientSecret;
             if (serviceAuthURL == null || serviceID == null || clientID == null || clientSecret == null || !mongoose.isValidObjectId(serviceID)) {
-                console.log("url+ ", serviceAuthURL, " clientId+ ", clientID, "clientSecret+ ", clientSecret);
-                response.status(400);
-                response.send("400: Bad Request. The parameters you sent were invalid.");
+                badRequest(response, "Invalid parameter");
                 return;
             }
             if (!checkURL(serviceAuthURL)) {

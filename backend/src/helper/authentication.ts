@@ -2,6 +2,7 @@ import {NextFunction, Request, Response} from "express";
 import {IUser} from "../model/User";
 import {verify, sign, JwtPayload} from "jsonwebtoken";
 import {internalServerError, unauthorizedUserError} from "./http";
+import env from "./env";
 
 class AuthError extends Error {
     constructor(message?: string) {
@@ -44,7 +45,7 @@ export function checkAuthentication(request: Request, response: Response, next: 
  * @throws Error if the JWT_SECRET env variable is not defined
  */
 function checkJWT(request: Request): string {
-    const secret = process.env.JWT_SECRET;
+    const secret = env.JWT_SECRET;
     if (!secret) {
         throw Error();
     }
@@ -80,10 +81,10 @@ function checkJWT(request: Request): string {
  @param user: the user of which you want to create the token
  */
 export function createJWT(user: IUser): string | undefined {
-    const secret = process.env.JWT_SECRET;
+    const secret = env.JWT_SECRET;
     if (secret) {
         return sign({"user_id": user._id}, secret, {
-            expiresIn: Number.parseInt(process.env.JWT_EXPIRE || "86400")
+            expiresIn: env.JWT_EXPIRE
         });
     }
 }

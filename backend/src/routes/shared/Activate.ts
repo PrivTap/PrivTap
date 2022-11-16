@@ -17,13 +17,13 @@ export default class ActivateRoute extends Route {
 
         let result;
         try {
-            result = await User.modifyUser("activationToken", activationToken, "isConfirmed", true);
+            result = await User.activateAccount(activationToken);
         } catch (e) {
             internalServerError(response);
             return;
         }
 
-        if (result["modifiedCount"] == 0 || result["matchedCount"] == 0) {
+        if (!result) {
             badRequest(response, "Invalid token");
             return;
         }
