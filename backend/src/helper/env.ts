@@ -1,7 +1,8 @@
 import { config } from "dotenv";
 
-// Read environment variables from a .env file
-config();
+// Read environment variables from a .env file if we are not in a testing environment
+if (process.env.NODE_ENV != "testing")
+    config();
 
 /**
  * Interface containing all the possible environment variables needed by PrivTAP Backend.
@@ -13,6 +14,8 @@ interface EnvVariables {
     BASE_URL: string,
     // Flag representing if we are in a production environment
     PROD: boolean,
+    // Flag representing if we are in a development environment
+    DEV: boolean,
     // Rounds of salting that will be applied to password hashes before storing them in the database
     SALT_ROUNDS: number,
     // Secret key used to sign the JWT tokens
@@ -73,6 +76,9 @@ function loadEnvVariables(): EnvVariables {
 
     // Check if we are in a production environment
     res.PROD = process.env.NODE_ENV == "production";
+
+    // Check if we are in a development environment
+    res.PROD = process.env.NODE_ENV == "development";
 
     // Check if the DB connection string is set, if not throw an error
     res.DB_STRING = process.env.DB_STRING || "";

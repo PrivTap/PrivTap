@@ -68,16 +68,18 @@ class BackendApp {
     protected createExpressApp() {
         const app = express();
 
-        // If we are not in production we need to configure our app for CORS preflight requests.
+        // If we are not in production we need to configure our app for CORS requests.
         // This is necessary because we may want to run the backend and the frontend on two different
         // ports during development
         if (!env.PROD) {
+            // Configure CORS for preflight requests
             app.options("*", cors({
                 origin: env.FRONTEND_URL,
                 credentials: true,
                 allowedHeaders: ["Cookie", "Content-Type"]
             }));
 
+            // Configure CORS for all endpoints
             app.use(cors({
                 origin: env.FRONTEND_URL,
                 credentials: true,
@@ -89,7 +91,7 @@ class BackendApp {
         app.use(cookieParser());
 
         // Log all requests to console if we are in a development environment
-        if (!env.PROD)
+        if (env.DEV)
             app.use(requestLogger("dev"));
 
         return app;
