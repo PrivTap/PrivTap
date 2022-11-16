@@ -57,6 +57,7 @@ class BackendApp {
 
         // Register routes defined in /routes
         this.registerAllRoutes();
+
     }
 
     /**
@@ -125,6 +126,7 @@ class BackendApp {
      */
     async connectToDB(dbString: string) {
         await mongoose.connect(dbString, { useNewUrlParser: true, useUnifiedTopology: true } as ConnectOptions);
+        console.log("connected to DB");
     }
 
     /**
@@ -141,6 +143,7 @@ const app = new BackendApp();
 // If this is being run as a script, connect to the db and start the application server.
 // Otherwise, this is being imported for testing and the testing library will take care of the setup
 if (require.main === module){
+    console.log(app.dbString);
     // Connect to the database
     app.connectToDB(app.dbString)
         .then(() => {

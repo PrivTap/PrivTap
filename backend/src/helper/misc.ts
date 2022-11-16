@@ -27,6 +27,3 @@ export function getFilesInDir(dirPath: string, arrayOfFiles: string[] = []) {
 export function checkURL(url: string): boolean {
     return /^(http|https):\/\/[^ "]+$/.test(url);
 }
-
-
-

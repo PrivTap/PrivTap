@@ -1,0 +1,694 @@
+openapi: 3.0.3
+info:
+  title: PrivTap1
+  description: |-
+    API endpoint documentation
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: apiteam@swagger.io
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: https://petstore3.swagger.io/api/v3
+tags:
+  - name: Shared
+    description: shared API endpoints
+  - name: User
+    description: user API endpoints
+  - name: OSP
+    description: OSP API endpoints
+paths:
+  /register:
+    post:
+      tags:
+        - Shared
+      summary: OSP and end-user register to the platform
+      description: OSP and end-user register to the platform (TODO)
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Register'
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal server error
+        
+  /login:
+    post:
+      tags:
+        - Shared
+      summary: OSP and end-user log-in to the platform
+      description: OSP and end-user log-in to the platform (TODO)
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: string
+                example: "SomeSessionID"
+        '400':
+          description: Wrong credentials, Undefined parameters
+        '500':
+          description: Internal server error
+  /logout:
+    get:
+      tags:
+        - Shared
+      summary: OSP and end-user log-out from the platform
+      description: OSP and end-user log-out from the platform (TODO)
+      operationId: logout
+      parameters:
+        - name: sessionID
+          in: cookie
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid tag value
+        '500':
+          description: Internal server error
+  /activate:
+    post:
+      tags:
+        - Shared
+      summary: OSP and end-user activate their account
+      description: OSP and end-user activate their account (TODO)
+      operationId: activate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Token'
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid token
+        '500':
+          description: Internal server error
+  /rules:
+    get:
+      tags:
+        - User
+      summary: The end-user requests the set of rules already defined
+      description: The end-user requests the set of rules already defined (TODO)
+      operationId: get-rules
+      parameters:
+        - name: sessionID
+          in: cookie
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rules'
+    post:
+      tags:
+        - User
+      summary: The end-user defines a new rule
+      description: The end-user defines a new rule (TODO)
+      operationId: post-rules
+      parameters:
+        - name: sessionID
+          required: true
+          in: cookie
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewRule'
+      responses:
+        '405':
+          description: Invalid input
+      
+    delete:
+      tags:
+        - User
+      summary: The end-user deletes an already defined rule
+      description: The end-user deletes an already defined rule (TODO)
+      operationId: delete-rules
+      parameters:
+        - name: sessionID
+          in: cookie
+          schema:
+            type: string
+        - name: ruleID
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          
+  /services:
+    get:
+      tags:
+        - User
+      summary: The end-user requests a list of OSP
+      description: The end-user requests a list of OSP (TODO)
+      operationId: services
+      parameters:
+        - name: sessionID
+          in: cookie
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserService'          
+  /triggers:
+    get:
+      tags:
+        - User
+      summary: The end-user request a list of triggers exposed by the given OSP
+      description: The end-user request a list of triggers exposed by the given OSP (TODO)
+      operationId: triggers
+      parameters:
+        - name: sessionID
+          in: cookie
+          required: true
+          schema:
+            type: string
+        - name: serviceID
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Trigger'    
+  /actions:
+    get:
+      tags:
+        - User
+      summary: The end-user request a list of actions exposed by the given OSP
+      description: The end-user request a list of actions exposed by the given OSP (TODO)
+      operationId: actions
+      parameters:
+        - name: sessionID
+          in: cookie
+          required: true
+          schema:
+            type: string
+        - name: serviceID
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Action'             
+  /serviceAuthorization:
+    get:
+      tags:
+        - User
+      summary: The end-user request a set of authorization already granted
+      description: The end-user request a set of authorization already granted (TODO)
+      operationId: get-service-autorization
+      parameters:
+        - name: sessionID
+          in: cookie
+          required: true
+          schema:
+            type: string
+        - name: serviceID
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Permission'  
+    post:
+      tags:
+        - User
+      summary: The end-user grants a new authorization
+      description: The end-user grants a new authorization (TODO)
+      operationId: post-service-autorization
+      parameters:
+        - name: sessionID
+          in: cookie
+          required: true
+          schema:
+            type: string
+
+      requestBody:
+        required: True
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewAuthorization'
+      responses:
+        '200':
+          description: Successful operation
+    delete:
+      tags:
+        - User
+      summary: The end-user deletes all the permissions associated to an OSP
+      description: The end-user deletes all the permissions associated to an OSP (TODO)
+      operationId: delete-service-autorization
+      parameters:
+        - name: sessionID
+          in: cookie
+          required: true
+          schema:
+            type: string
+        - name: serviceID
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+  /manageServices:
+    get:
+      tags:
+        - OSP
+      summary: The OSP requests a list of already defined services
+      description: The OSP requests a list of already defined services (TODO)
+      operationId: get-manage-services
+      parameters:
+        - name: sessionID
+          in: cookie
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NewService'       
+        '500':
+          description: Internal server error
+    post:
+      tags:
+        - OSP
+      summary: The OSP defines a new service
+      description: The OSP defines a new service (TODO)
+      operationId: post-manage-services
+      parameters:
+        - name: sessionID
+          in: cookie
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: True
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewService'
+      responses:
+        '200':
+          description: Successful operation
+
+    delete:
+      tags:
+        - OSP
+      summary: The OSP deletes an already defined service
+      description: The OSP deletes an already defined service (TODO)
+      operationId: delete-manage-services
+      parameters:
+        - name: sessionID
+          in: cookie
+          required: true
+          schema:
+            type: string
+        - name: serviceID
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+  /triggers-data:
+    post:
+      tags:
+        - OSP
+      summary: The OSP sends data to activate a registered trigger
+      description: The OSP sends data to activate a registered trigger (TODO)
+      operationId: post-triggers-data
+      parameters:
+        - name: sessionID
+          in: cookie
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: True
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TriggerData'
+      responses:
+        '200':
+          description: Successful operation
+  /oauth-redirect:
+    get:
+      tags:
+        - OSP
+      summary: The end-user gets redirected to the specified uri
+      description: The end-user gets redirected to the specified uri (TODO)
+      operationId: get-oauth-redirect
+      parameters:
+        - name: sessionID
+          in: cookie
+          required: true
+          schema:
+            type: string
+        - name: oauth-param
+          in: cookie
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+  /manage-triggers:
+    get:
+      tags:
+        - OSP
+      summary: The OSP requests the set of already specified triggers
+      description: The OSP requests the set of already specified triggers (TODO)
+      operationId: get-manage-triggers
+      parameters:
+        - name: sessionID
+          in: cookie
+          required: true
+          schema:
+            type: string
+        - name: triggerID
+          in: query
+          required: true
+          schema:
+            type: string
+          
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Trigger' 
+    post:
+      tags:
+        - OSP
+      summary: The OSP defines a new trigger service which has as implicit endpoint /trigger-data
+      description: The OSP defines a new trigger service which has as implicit endpoint /trigger-data (TODO)
+      operationId: post-manage-triggers
+      parameters:
+        - name: sessionID
+          in: cookie
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: True
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Trigger'
+      responses:
+        '200':
+          description: Successful operation
+    delete:
+      tags:
+        - OSP
+      summary: The OSP deletes an already defined trigger
+      description: The OSP deletes an already defined trigger (TODO)
+      operationId: delete-manage-triggers
+      parameters:
+        - name: sessionID
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: triggerID
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          
+  /manage-actions:
+    get:
+      tags:
+        - OSP
+      summary: The OSP requests the set of already specified actions
+      description: The OSP requests the set of already specified actions (TODO)
+      operationId: get-manage-actions
+      parameters:
+        - name: sessionID
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  $ref: "#/components/schemas/Action"
+                  
+    post:
+      tags:
+        - OSP
+      summary: The OSP defines a new action service
+      description: The OSP defines a new action service (TODO)
+      operationId: post-manage-actions
+      parameters:
+        - name: sessionID
+          in: cookie
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: True
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewAction'
+      responses:
+        '200':
+          description: Successful operation
+    delete:
+      tags:
+        - OSP
+      summary: The OSP deletes an already defined action
+      description: The OSP deletes an already defined action (TODO)
+      operationId: delete-manage-actions
+      parameters:
+        - name: sessionID
+          in: cookie
+          required: true
+          schema:
+            type: string
+        - name: actionID
+          in: cookie
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+
+components:
+  schemas:
+    Register:
+      type: object
+      properties:
+        username:
+          type: string
+          example: "John71"
+        email:
+          type: string
+          example: "Jhon71@gmail.com"
+        password:
+          type: string
+          example: "MyPrivatePassword"
+          
+    Login:
+      type: object
+      properties:
+        username:
+          type: string
+          example: "John71"
+        password:
+          type: string
+          example: "MyPrivatePassword"
+          
+      
+    Trigger:
+      type: object
+      properties:
+        id: 
+          type: string
+          example: "SomeTriggerID"
+    
+    Action: 
+      type: object
+      properties:
+        id: 
+          type: string
+          example: "SomeActionID"
+    
+    Rules:
+      type: array
+      items:
+        type: object
+        properties:
+          Trigger:
+            type: object
+            $ref: '#/components/schemas/Trigger'
+          Action:
+            type: object
+            $ref: '#/components/schemas/Action'
+          
+    NewRule:
+      type: object
+      properties:
+        Trigger:
+          $ref: '#/components/schemas/Trigger'
+        Action:
+          $ref: '#/components/schemas/Action'
+          
+    UserService:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "SomeServiceID"
+        authorized:
+          type: boolean
+          example: "True"
+
+    Permission:
+      type: object
+      properties:
+        id: 
+          type: string
+          example: "SomePermissionID"
+          
+          
+    NewAuthorization:
+      type: object
+      properties:
+        Service:
+          type: string
+          example: "SomeServiceID"
+        Permissions:
+          type: array
+          items:
+            type: object
+            $ref: '#/components/schemas/Permission'
+    
+          
+    NewService:
+      type: object
+      properties:
+        Description:
+          type: string
+          example: "SomeDescription"
+        Name:
+          type: string
+          example: "ServiceName"
+        Creator:
+          type: string
+          example: "SomeCreatorID"
+        AuthServer:
+          type: string
+          example: "SomeAuthServer"
+        ClientId:
+          type: string
+          example: "SomeClientID"
+        ClientSecret:
+          type: string
+          example: "SomeClientSecret"
+          
+    TriggerData:
+      type: object
+      properties:
+        Data:
+          type: string
+          example: "To define"
+          
+    NewAction:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/Action'
+        endpoint:
+          type: string
+          example: "SomeEndPoint"
+          
+    Token:
+      type: string
+      example: "SomeActivationToken"
+          

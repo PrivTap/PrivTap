@@ -26,6 +26,8 @@ export default class ManageServices extends Route {
         const serviceName = request.body.name;
         const serviceDesc = request.body.description;
 
+        // TODO: Shouldn't we check the jwt?
+
         // Optional Parameters
         const serviceAuthURL = request.body.authURL;
         const clientId = request.body.clientId;
