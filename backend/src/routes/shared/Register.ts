@@ -34,7 +34,7 @@ export default class RegisterRoute extends Route {
         const activateToken = randomBytes(64).toString("hex");
 
         try {
-            await sendRegistrationEmail(email, activateToken);
+            await sendRegistrationEmail(username, email, activateToken);
         } catch (e) {
             console.log("Unexpected error while sending email: ", e);
             internalServerError(response);
