@@ -1,5 +1,4 @@
 import express, {Express} from "express";
-import {config} from "dotenv";
 import {getFilesInDir} from "./helper/misc";
 import {join} from "path";
 import logger from "morgan";
@@ -7,6 +6,11 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import mongoose, {ConnectOptions} from "mongoose";
 import Route from "./Route";
+import env from "./helper/env";
+import {config} from "dotenv";
+
+// TODO: remove this once the refactor to using 'helper/env' is done
+config();
 
 // Expand the Express request definition to include the userId
 declare global {
@@ -44,14 +48,11 @@ class BackendApp {
      * with all the routes.
      */
     constructor() {
-        // Read environment variables from a .env file
-        config();
-
         // Load environment variables defaults
-        this.deploymentURL = process.env.DEPLOYMENT_URL || "";
-        this.port = Number.parseInt(process.env.PORT || "3000");
-        this.baseURL = process.env.BASE_URL || "/api/";
-        this.dbString = process.env.DB_STRING || "";
+        this.deploymentURL = env.DEPLOYMENT_URL;
+        this.port = env.PORT;
+        this.baseURL = env.BASE_URL;
+        this.dbString = env.DB_STRING;
 
         // Create and configure Express app
         this.express = this.createExpressApp();
@@ -68,11 +69,12 @@ class BackendApp {
     protected createExpressApp() {
         const app = express();
 
-        // app.use(cors({origin: "*"}));
-        if (process.env.NODE_ENV != "production") {
-
+        // If we are not in production we need to configure our app for CORS preflight requests.
+        // This is necessary because we may want to run the backend and the frontend on two different
+        // ports during development
+        if (!env.PROD) {
             app.options('*', cors({
-                origin: "http://127.0.0.1:5173",
+                origin: env.FRONTEND_URL,
                 credentials: true,
                 allowedHeaders: ["Set-Cookie", "Content-Type"]
             }));
@@ -83,14 +85,8 @@ class BackendApp {
         app.use(cookieParser());
 
         // Log all requests to console if we are in a development environment
-        if (process.env.NODE_ENV == "development")
+        if (!env.PROD)
             app.use(logger("dev"));
-
-        // Set up Express to serve static files from the path in the environment variable.
-        // This is used to test backend and frontend locally: we can make Express serve the generated static files
-        // of our frontend.
-        if (process.env.EXPRESS_STATIC_FILES)
-            app.use(express.static(process.env.EXPRESS_STATIC_FILES));
 
         return app;
     }
@@ -149,8 +145,8 @@ if (require.main === module){
             app.startApp()
                 .then(() => {
                     // Print to console the URL of the application server
-                    let url = `http://localhost:${app.port}`;
-                    if (process.env.NODE_ENV == "production") {
+                    let url = `http://127.0.0.1:${app.port}`;
+                    if (env.PROD) {
                         url = app.deploymentURL;
                     }
 
