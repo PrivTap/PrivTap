@@ -10,7 +10,8 @@
     "overrides": [
     ],
     "ignorePatterns": [
-        "dist/**/*"
+        "dist/**/*",
+        "node_modules/**/*"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -34,6 +35,10 @@
             "double"
         ],
         "semi": [
+            "error",
+            "always"
+        ],
+        "object-curly-spacing": [
             "error",
             "always"
         ]

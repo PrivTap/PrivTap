@@ -9,7 +9,7 @@ const accountActivationBaseURL = env.DEPLOYMENT_URL + "/?activate=";
 let mailer: Mailjet | undefined = undefined;
 // If we are in production, initialize the Mailjet REST client
 if (env.PROD) {
-    mailer = new Mailjet({apiKey: env.MAILJET_API_KEY, apiSecret: env.MAILJET_SECRET_KEY});
+    mailer = new Mailjet({ apiKey: env.MAILJET_API_KEY, apiSecret: env.MAILJET_SECRET_KEY });
 }
 
 /**
@@ -30,7 +30,7 @@ export async function sendRegistrationEmail(username: string, userEmailAddress: 
 
     // Send the email
     await mailer
-        .post("send", {'version': 'v3.1'})
+        .post("send", { "version": "v3.1" })
         .request({
             "Messages":[
                 {

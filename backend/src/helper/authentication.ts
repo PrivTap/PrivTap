@@ -1,7 +1,7 @@
-import {NextFunction, Request, Response} from "express";
-import {IUser} from "../model/User";
-import {verify, sign, JwtPayload} from "jsonwebtoken";
-import {internalServerError, unauthorizedUserError} from "./http";
+import { NextFunction, Request, Response } from "express";
+import { IUser } from "../model/User";
+import { verify, sign, JwtPayload } from "jsonwebtoken";
+import { internalServerError, unauthorizedUserError } from "./http";
 import env from "./env";
 
 class AuthError extends Error {
@@ -83,7 +83,7 @@ function checkJWT(request: Request): string {
 export function createJWT(user: IUser): string | undefined {
     const secret = env.JWT_SECRET;
     if (secret) {
-        return sign({"user_id": user._id}, secret, {
+        return sign({ "user_id": user._id }, secret, {
             expiresIn: env.JWT_EXPIRE
         });
     }

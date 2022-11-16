@@ -1,10 +1,10 @@
 import express from "express";
 import Service from "../../model/Service";
-import {Request, Response} from "express";
-import {checkURL} from "../../helper/misc";
+import { Request, Response } from "express";
+import { checkURL } from "../../helper/misc";
 import mongoose from "mongoose";
 import Route from "../../Route";
-import {badRequest, forbiddenUserError, internalServerError, success} from "../../helper/http";
+import { badRequest, forbiddenUserError, internalServerError, success } from "../../helper/http";
 
 
 export default class ManageServices extends Route {

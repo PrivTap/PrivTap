@@ -46,7 +46,7 @@ export function internalServerError(response: Response) {
  * @param response The Express response used to send the error to
  * @param message The message to send to the client along with the error
  */
-export function forbiddenUserError(response: Response, message : string = "Forbidden") {
+export function forbiddenUserError(response: Response, message  = "Forbidden") {
     response.status(403).json(new APIResponse(false, message));
 }
 
@@ -63,6 +63,6 @@ export function unauthorizedUserError(response: Response) {
  * @param response The Express response used to send the error to
  * @param message The message to send to the client along with the error
  */
-export function badRequest(response: Response, message: string="Bad request") {
+export function badRequest(response: Response, message="Bad request") {
     response.status(400).json(new APIResponse(false, message));
 }

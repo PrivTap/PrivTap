@@ -1,5 +1,5 @@
-import {Schema, model, Document} from "mongoose";
-import {IOperation} from "./Operation";
+import { Schema, model, Document } from "mongoose";
+import { IOperation } from "./Operation";
 
 export interface IAction extends Document {
     data: string;

@@ -1,4 +1,4 @@
-import {Document, Error, model, Schema} from "mongoose";
+import { Document, Error, model, Schema } from "mongoose";
 
 export interface IService extends Document {
     description: string;
@@ -35,7 +35,7 @@ const serviceSchema = new Schema<IService>({
         type: String
     }
 },
-{collection: "Service"}
+{ collection: "Service" }
 );
 
 /**
@@ -69,7 +69,7 @@ export default class Service {
             clientSecret: clientSecret
         });
         // Do we already have a service with the same identifier in the database?
-        const res = await Service.serviceModel.exists({name: name});
+        const res = await Service.serviceModel.exists({ name: name });
         if (res == null) {
             //Proceed with the save operation
             await newService.save();
@@ -77,16 +77,16 @@ export default class Service {
     }
 
     static async findServicesCreatedByUser(userID: string): Promise<IService[]> {
-        return Service.serviceModel.find({creator: userID});
+        return Service.serviceModel.find({ creator: userID });
     }
 
     static async findServiceCreatedByUser(userID: string, serviceID: string): Promise<IService> {
-        const result = await Service.serviceModel.findOne({creator: userID, _id: serviceID});
+        const result = await Service.serviceModel.findOne({ creator: userID, _id: serviceID });
         return result as IService;
     }
 
     static async deleteService(userID: string, serviceID: string) {
-        await Service.serviceModel.deleteOne({creator: userID, _id: serviceID});
+        await Service.serviceModel.deleteOne({ creator: userID, _id: serviceID });
     }
 
     static async addAuthServer(service: IService, authServer: string, clientId: string, clientSecret: string) {

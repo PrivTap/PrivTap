@@ -16,7 +16,7 @@ export default class LoginRoute extends Route {
         const password = request.body.password;
 
         if (!username || !password) {
-            badRequest(response, "Undefined parameters")
+            badRequest(response, "Undefined parameters");
             return;
         }
 
@@ -44,7 +44,7 @@ export default class LoginRoute extends Route {
             return;
         }
 
-        success(response, {"username": username, "email": user.email, "isConfirmed": user.isConfirmed})
+        success(response, { "username": username, "email": user.email, "isConfirmed": user.isConfirmed });
     }
 
     /**

@@ -1,10 +1,10 @@
-import {use, expect, request} from "chai";
+import { use, expect, request } from "chai";
 import chaiHttp from "chai-http";
-import {drop, initDb} from "mongo-unit";
+import { drop, initDb } from "mongo-unit";
 import mongoose from "mongoose";
 
 import app from "../src/app";
-import {checkURL} from "../src/helper/misc";
+import { checkURL } from "../src/helper/misc";
 import User from "../src/model/User";
 
 import testData from "./fixtures/exampleData.json";
@@ -12,7 +12,7 @@ import testData from "./fixtures/exampleData.json";
 use(chaiHttp);
 
 async function fakeDBQuery() {
-    return {myKey: "myValue"};
+    return { myKey: "myValue" };
 }
 
 describe("PrivTAP Backend", () => {

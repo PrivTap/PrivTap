@@ -1,4 +1,4 @@
-import {readdirSync, statSync} from "fs";
+import { readdirSync, statSync } from "fs";
 
 /**
  * Gets all files recursively from a directory.

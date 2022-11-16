@@ -1,4 +1,4 @@
-import {config} from "dotenv";
+import { config } from "dotenv";
 
 // Read environment variables from a .env file
 config();
@@ -49,11 +49,11 @@ const defaults = {
  * @throws Error if variables are invalid or if a variable without a default is not set
  */
 function loadEnvVariables(): EnvVariables {
-    const res: {[name: string]: string|number|boolean} = {}
+    const res: {[name: string]: string|number|boolean} = {};
 
     // Check if the defaults should be overwritten
     for (const [name, value] of Object.entries(defaults)) {
-        let envVariable = process.env[name];
+        const envVariable = process.env[name];
 
         if (envVariable) {
             let newEnvVariable: string|number = envVariable;
@@ -62,7 +62,7 @@ function loadEnvVariables(): EnvVariables {
             if (typeof value == "number") {
                 newEnvVariable = Number.parseInt(envVariable);
                 if (Number.isNaN(newEnvVariable))
-                    throw Error(`Environment variable ${name} is not a valid number`)
+                    throw Error(`Environment variable ${name} is not a valid number`);
             }
 
             res[name] = newEnvVariable;

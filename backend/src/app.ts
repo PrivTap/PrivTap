@@ -1,16 +1,17 @@
-import express, {Express} from "express";
-import {getFilesInDir} from "./helper/misc";
-import {join} from "path";
+import express, { Express } from "express";
+import { getFilesInDir } from "./helper/misc";
+import { join } from "path";
 import requestLogger from "morgan";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import mongoose, {ConnectOptions} from "mongoose";
+import mongoose, { ConnectOptions } from "mongoose";
 import Route from "./Route";
 import env from "./helper/env";
 import logger from "./helper/logger";
 
 // Expand the Express request definition to include the userId
 declare global {
+    // eslint-disable-next-line @typescript-eslint/no-namespace
     namespace Express {
         interface Request {
             /**
@@ -70,7 +71,7 @@ class BackendApp {
         // This is necessary because we may want to run the backend and the frontend on two different
         // ports during development
         if (!env.PROD) {
-            app.options('*', cors({
+            app.options("*", cors({
                 origin: env.FRONTEND_URL,
                 credentials: true,
                 allowedHeaders: ["Cookie", "Content-Type"]
@@ -83,7 +84,7 @@ class BackendApp {
         }
 
         app.use(express.json());
-        app.use(express.urlencoded({extended: false}));
+        app.use(express.urlencoded({ extended: false }));
         app.use(cookieParser());
 
         // Log all requests to console if we are in a development environment
@@ -112,7 +113,7 @@ class BackendApp {
      */
     protected registerAllRoutes() {
         const routeFiles = getFilesInDir(join(__dirname, "routes"))
-                            .map(filePath => filePath.slice(0, -3))  // Remove file extension
+            .map(filePath => filePath.slice(0, -3));  // Remove file extension
         for (const filePath of routeFiles) {
             this.registerRoute(filePath).then();
         }
@@ -123,7 +124,7 @@ class BackendApp {
      * @param dbString the connection string to use
      */
     async connectToDB(dbString: string) {
-        await mongoose.connect(dbString, {useNewUrlParser: true, useUnifiedTopology: true} as ConnectOptions);
+        await mongoose.connect(dbString, { useNewUrlParser: true, useUnifiedTopology: true } as ConnectOptions);
     }
 
     /**

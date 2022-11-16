@@ -1,5 +1,5 @@
 import prepare from "mocha-prepare";
-import {start, stop} from "mongo-unit";
+import { start, stop } from "mongo-unit";
 
 prepare(done => {
     start().then(dbString => {

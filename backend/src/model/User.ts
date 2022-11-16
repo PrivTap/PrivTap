@@ -114,7 +114,7 @@ export default class User {
         const updateQuery: UpdateQuery<IUser> = {
             activationToken: "",
             isConfirmed: true
-        }
+        };
 
         const result = await User.userModel.updateOne(filterQuery, updateQuery);
 
