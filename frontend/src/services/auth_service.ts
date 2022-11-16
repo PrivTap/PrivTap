@@ -60,10 +60,33 @@ class AuthService {
   }
 
   /// TODO: Add logout function
-  logout() {}
+  async logout(): Promise<AuthResponse> {
+    try {
+      const res = await http.get<AuthResponse>("/logout");
+      useAuthStore().logout();
+      return res.data;
+    } catch (error) {
+      const err = error as AxiosError;
+      if (err.response?.data) {
+        return err.response?.data as AuthResponse;
+      }
+      return {
+        status: false,
+        message: "Somenthing went wrong..",
+      } as AuthResponse;
+    }
+  }
 
-  async activate(token: String): Promise<AxiosResponse> {
-    return await http.post("/activate", { token: token });
+  async activate(token: String): Promise<AuthResponse> {
+    try {
+      const res = await http.post<AuthResponse>("/activate", { token: token });
+      return res.data;
+    } catch (error) {
+      return {
+        status: false,
+        message: "Somenthing went wrong..",
+      } as AuthResponse;
+    }
   }
 }
 

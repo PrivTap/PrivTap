@@ -1,5 +1,4 @@
 import { useAuthStore } from "@/stores/auth_store";
-import { storeToRefs } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
 
 const router = createRouter({
@@ -30,6 +29,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const isAutheticated: boolean = useAuthStore().isAutheticated;
   if (to.meta.requireAuth && !isAutheticated) return next("/auth");
+  if(to.name === "auth" && isAutheticated) return next("/home");
   return next();
 });
 

@@ -13,7 +13,7 @@
       </button>
       <button
         class="rounded-lg py-2 px-8 font-semibold text-blue-500 ring-blue-500 ring-[3px] hover:text-blue-400 hover:ring-blue-400"
-        @click="authStore.logout()"
+        @click="AuthService.logout()"
       >
       Logout
       </button>
@@ -26,7 +26,6 @@
 
 <script setup lang="ts">
 import logo from '@/assets/images/logo_light.svg';
-import { useAuthStore } from '@/stores/auth_store';
-const authStore = useAuthStore();
+import AuthService from "@/services/auth_service";
 
 </script>

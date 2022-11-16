@@ -192,7 +192,7 @@ const toast = useToast();
 
 const showPass = ref(false);
 const remindMeChecked = ref<boolean>();
-const showLogin = ref<boolean>(false);
+const showLogin = ref<boolean>(true);
 const username = ref<String>("");
 const email = ref<String>("");
 const password = ref<String>("");
@@ -261,7 +261,8 @@ onMounted(async () => {
     try {
       const token = route.query.activate as String;
       const res = await AuthService.activate(token);
-      console.log(res.data);
+      console.log(res.message);
+      toast.success(res.message);
     } catch (error) {
       toast.warning("Code activation error, please retry");
     }
