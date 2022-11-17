@@ -9,7 +9,7 @@
     <h1 class="text-5xl text-grey text-center py-20">Personal Page</h1>
 
     <div
-      class="container mx-auto grid grid-cols-1 bg-darkGrey rounded-md px-5 py-5 border-2 border-lightBlue gap-4 overflow-y-scroll h-96 overscroll-auto"
+      class="container mx-auto grid grid-cols-1 bg-gray-800 rounded-md px-5 py-5 border-2 border-blue-600 gap-4 overflow-y-scroll h-96 overscroll-auto"
     >
       <div class="text-white px-4 bg-blue-600 w-full py-5">
         RULE 1
