@@ -4,10 +4,10 @@
       <div class="rounded-3xl shadow-2xl p-10 bg-blue-600 shadow-blue-500">
         <div>
           <img class="mx-auto h-24 w-auto" :src="logo" />
-          <h1 class="mt-6 text-center tracking-tight text-white">
+          <p class="mt-6 text-center tracking-tight text-white text-4xl font-semibold">
             {{ showLogin ? "Login into your" : "SignUp a new " }} PrivTAP
             account
-          </h1>
+          </p>
         </div>
 
         <form @submit.prevent="onSubmitted" class="mt-8 space-y-6">

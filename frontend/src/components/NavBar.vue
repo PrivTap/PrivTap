@@ -1,6 +1,6 @@
 
 <template>
-<nav class="flex justify-between pt-5 pl-6">
+<nav v-if="authStore.isAutheticated" class="flex justify-between pt-5 pl-6">
     <img
             class="h-24"
             :src="logo"
@@ -27,5 +27,7 @@
 <script setup lang="ts">
 import logo from '@/assets/images/logo_light.svg';
 import AuthService from "@/services/auth_service";
+import { useAuthStore } from "../stores/auth_store";
+const authStore = useAuthStore();
 
 </script>
