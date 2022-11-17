@@ -237,3 +237,13 @@
     </div> -->
   </div>
 </template>
+
+<script setup lang="ts">
+
+/// Scripts
+
+</script>
+
+<style scoped>
+
+</style>
