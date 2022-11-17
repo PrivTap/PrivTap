@@ -1,13 +1,12 @@
 <template>
+    <!-- <link rel="stylesheet" href="/dist/output.css" />
 
-    <link rel="stylesheet" href="/dist/output.css" />
-
-    <title>Persnal Page</title>
-
-  <div>
-
-    <h1 class="text-5xl text-white text-center py-20">Personal Page</h1>
-
+    <title>Persnal Page</title> -->
+  <div class="text-center py-20" >
+    <div class="text-4xl text-white font-semibold pb-10">
+      <a >Personal Page</a>
+    </div>
+    
     <div
       class="container mx-auto grid grid-cols-1 bg-gray-800 rounded-lg px-5 py-5 border-2 border-blue-600 gap-4 overflow-y-scroll h-96 overscroll-auto"
     >
