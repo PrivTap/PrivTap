@@ -15,7 +15,10 @@ const userSchema = new Schema<IUser>({
         required: true,
         index: {
             unique: true
-        }
+        },
+        minLength: 3,
+        maxLength: 20,
+        match: /[a-zA-Z0-9.\-_]*/
     },
     password: {
         type: String,
@@ -26,7 +29,10 @@ const userSchema = new Schema<IUser>({
         required: true,
         index: {
             unique: true
-        }
+        },
+        minLength: 3,
+        maxLenth: 255,
+        match: /^[-!#$%&'*+/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/
     },
     registrationDate: {
         type: Date,
@@ -80,27 +86,6 @@ export default class User {
         queryObject[attribute] = value;
         const queryResult = await User.userModel.findOne(queryObject);
         return queryResult as IUser;
-    }
-
-    /**
-     * Modifies the document specified by the parameters queryAttribute (e.g. username) and queryValue (e.g. "John71") accordingly to modifyAttribute (e.g. email) and modifyValue (e.g. "newEmail@gmail.com")
-     * @param queryAttribute The queried attribute
-     * @param queryValue The queried value associated to the specified attribute. IUser expects string, boolean and Date types depending on the attribute
-     * @param modifyAttribute The attribute to modify
-     * @param modifyValue The new value associated to the specified attribute. IUser expects string, boolean and Date types depending on the attribute
-     * @result Returns a dictionary containing the fields modifiedCount, equal to the number of modified documents and matchedCount, equal to the number of documents matching the query
-     */
-    static async modifyUser(queryAttribute: string, queryValue: string | boolean | Date, modifyAttribute: string, modifyValue: string | boolean | Date): Promise<{[index: string] : number}> {
-        const User = model("User", userSchema);
-        const queryObject: {[index: typeof queryAttribute] : typeof queryValue} = {};
-        queryObject[queryAttribute] = queryValue;
-        const modifyObject: {[index: typeof modifyAttribute] : typeof modifyValue} = {};
-        modifyObject[modifyAttribute] = modifyValue;
-        const queryResult = await User.updateOne(queryObject, modifyObject);
-        const resultObject: {[index: string] : number} = {};
-        resultObject["modifiedCount"] = queryResult.modifiedCount;
-        resultObject["matchedCount"] = queryResult.matchedCount;
-        return resultObject;
     }
 
     /**
