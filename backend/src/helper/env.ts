@@ -78,7 +78,7 @@ function loadEnvVariables(): EnvVariables {
     res.PROD = process.env.NODE_ENV == "production";
 
     // Check if we are in a development environment
-    res.PROD = process.env.NODE_ENV == "development";
+    res.DEV = process.env.NODE_ENV == "development";
 
     // Check if the DB connection string is set, if not throw an error
     res.DB_STRING = process.env.DB_STRING || "";
