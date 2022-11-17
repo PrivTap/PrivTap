@@ -50,6 +50,7 @@ describe("Testing authentication helper module", () => {
 
     after(async () => {
         requester.close();
+        sandbox.restore();
     });
 
     it("should create a JWT secret", () => {
