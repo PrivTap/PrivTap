@@ -24,12 +24,12 @@ const router = createRouter({
     },
 
     {
-      path: "/auth",
-      name: "auth",
-      component: () => import("../views/AuthView.vue"),
+      path: "/personalPage",
+      name: "personalPage",
+      component: () => import("../views/PersonalPage.vue"),
     },
 
-    
+
   ],
 });
 
