@@ -30,7 +30,7 @@
           </svg>
         </button>
       </div>
-      <div class="text-white px-4 bg-darkBlue w-full py-5">
+      <div class="text-white px-4 bg-blue-600 w-full py-5">
         RULE 2
         <button class="float-right">
           <svg
@@ -49,7 +49,7 @@
           </svg>
         </button>
       </div>
-      <div class="text-white px-4 bg-darkBlue w-full py-5">
+      <div class="text-white px-4 bg-blue-600  w-full py-5">
         RULE 3
         <button class="float-right">
           <svg
@@ -68,7 +68,7 @@
           </svg>
         </button>
       </div>
-      <div class="text-white px-4 bg-darkBlue w-full py-5">
+      <div class="text-white px-4 bg-blue-600  w-full py-5">
         RULE 4
         <button class="float-right">
           <svg
@@ -87,7 +87,7 @@
           </svg>
         </button>
       </div>
-      <div class="text-white px-4 bg-darkBlue w-full py-5">
+      <div class="text-white px-4 bg-blue-600  w-full py-5">
         RULE 5
         <button class="float-right">
           <svg
@@ -106,7 +106,7 @@
           </svg>
         </button>
       </div>
-      <div class="text-white px-4 bg-darkBlue w-full py-5">
+      <div class="text-white px-4 bg-blue-600  w-full py-5">
         RULE 6
         <button class="float-right">
           <svg
@@ -131,7 +131,7 @@
       <button type="button" class="px-5 py-3 bg-blue-800 text-white hover:bg-blue-900">
         Add new rules
       </button>
-      <button type="button" class="px-5 py-3 bg-blue-800 text-white">
+      <button type="button" class="px-5 py-3 bg-blue-800 text-white hover:bg-blue-900">
         See authorized devices
       </button>
     </div>
