@@ -15,15 +15,15 @@ async function fakeDBQuery() {
     return { myKey: "myValue" };
 }
 
-describe("PrivTAP Backend", () => {
-    const testUserJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2Njg2OTgyNjYsImV4cCI6MTY2ODc4NDY2Nn0.tcQsjY2mgHnB5O5XWcdsRgzsnFMkiE4250ZndJaXJL0";
+describe("PrivTAP Backend", function() {
+    const testUserJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidGVzdF91c2VyX2lkIiwiaWF0IjoxNjY4NzA1MTU0fQ.yHDqFZ0N_lu8v2yk20BM0B41-4suCJLVIpNhAagD_wY";
 
     let requester: ChaiHttp.Agent;
 
     before(async () => {
         const testDBString = process.env.TEST_DB_STRING || "INVALID_DB_STRING";
         await app.connectToDB(testDBString);
-        requester = request(app.express).keepOpen();
+        requester = request.agent(app.express).keepOpen();
     });
 
     after(async () => {
@@ -62,6 +62,14 @@ describe("PrivTAP Backend", () => {
         it("should not serve root", async () => {
             const res = await requester.get("/");
             expect(res).to.have.status(404);
+        });
+
+        it("should serve /logout only to authenticated user", async () => {
+            let res = await requester.get("/logout");
+            expect(res).to.have.status(401);
+
+            res = await requester.get("/logout").set("Cookie", `_jwt=${testUserJWT}`);
+            expect(res).to.have.status(200);
         });
 
     });

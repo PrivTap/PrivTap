@@ -29,6 +29,12 @@ const router = createRouter({
       component: () => import("../views/PersonalPage.vue"),
     },
 
+    {
+      path: "/osppersonalpage",
+      name: "osppersonalPage",
+      component: () => import("../views/OspPersonalPage.vue"),
+    },
+
 
   ],
 });

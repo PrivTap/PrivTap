@@ -1,17 +1,16 @@
 <template>
+    <!-- <link rel="stylesheet" href="/dist/output.css" />
 
-    <link rel="stylesheet" href="/dist/output.css" />
-
-    <title>Persnal Page</title>
-
-  <div class="bg-black">
-
-    <h1 class="text-5xl text-grey text-center py-20">Personal Page</h1>
-
+    <title>Persnal Page</title> -->
+  <div class="text-center py-20" >
+    <div class="text-4xl text-white font-semibold pb-10">
+      <a >Personal Page</a>
+    </div>
+    
     <div
-      class="container mx-auto grid grid-cols-1 bg-gray-800 rounded-md px-5 py-5 border-2 border-blue-600 gap-4 overflow-y-scroll h-96 overscroll-auto"
+      class="container mx-auto grid grid-cols-1 bg-gray-800 rounded-lg px-5 py-5 border-2 border-blue-600 gap-4 overflow-y-scroll h-96 overscroll-auto"
     >
-      <div class="text-white px-4 bg-blue-600 w-full py-5">
+      <div class="text-white px-4 bg-blue-600 w-full py-5 rounded-md">
         RULE 1
         <button class="float-right">
           <svg
@@ -30,7 +29,7 @@
           </svg>
         </button>
       </div>
-      <div class="text-white px-4 bg-blue-600 w-full py-5">
+      <div class="text-white px-4 bg-blue-600 w-full py-5 rounded-md">
         RULE 2
         <button class="float-right">
           <svg
@@ -49,7 +48,7 @@
           </svg>
         </button>
       </div>
-      <div class="text-white px-4 bg-blue-600  w-full py-5">
+      <div class="text-white px-4 bg-blue-600  w-full py-5 rounded-md">
         RULE 3
         <button class="float-right">
           <svg
@@ -68,7 +67,7 @@
           </svg>
         </button>
       </div>
-      <div class="text-white px-4 bg-blue-600  w-full py-5">
+      <div class="text-white px-4 bg-blue-600  w-full py-5 rounded-md">
         RULE 4
         <button class="float-right">
           <svg
@@ -87,7 +86,7 @@
           </svg>
         </button>
       </div>
-      <div class="text-white px-4 bg-blue-600  w-full py-5">
+      <div class="text-white px-4 bg-blue-600  w-full py-5 rounded-md">
         RULE 5
         <button class="float-right">
           <svg
@@ -106,7 +105,7 @@
           </svg>
         </button>
       </div>
-      <div class="text-white px-4 bg-blue-600  w-full py-5">
+      <div class="text-white px-4 bg-blue-600  w-full py-5 rounded-md">
         RULE 6
         <button class="float-right">
           <svg
@@ -128,10 +127,10 @@
     </div>
 
     <div class="flex flex-row justify-center py-10 space-x-32">
-      <button type="button" class="px-5 py-3 bg-blue-800 text-white hover:bg-blue-900">
+      <button type="button" class="px-5 py-3 bg-blue-800 text-white hover:bg-blue-900 rounded-md">
         Add new rules
       </button>
-      <button type="button" class="px-5 py-3 bg-blue-800 text-white hover:bg-blue-900">
+      <button type="button" class="px-5 py-3 bg-blue-800 text-white hover:bg-blue-900 rounded-md">
         See authorized devices
       </button>
     </div>
