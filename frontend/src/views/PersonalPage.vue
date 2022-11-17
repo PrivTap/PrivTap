@@ -128,10 +128,10 @@
     </div>
 
     <div class="flex flex-row justify-center py-10 space-x-32">
-      <button type="button" class="px-5 py-3 bg-darkBlue text-white">
+      <button type="button" class="px-5 py-3 bg-blue-800 text-white hover:bg-blue-900">
         Add new rules
       </button>
-      <button type="button" class="px-5 py-3 bg-darkBlue text-white">
+      <button type="button" class="px-5 py-3 bg-blue-800 text-white">
         See authorized devices
       </button>
     </div>
