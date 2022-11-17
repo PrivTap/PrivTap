@@ -87,7 +87,7 @@
           </svg>
         </button>
       </div>
-      <div class="text-white px-4 bg-blue3 w-full py-5">
+      <div class="text-white px-4 bg-darkBlue w-full py-5">
         RULE 5
         <button class="float-right">
           <svg
