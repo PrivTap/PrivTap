@@ -16,7 +16,7 @@ async function fakeDBQuery() {
 }
 
 describe("PrivTAP Backend", () => {
-    const baseURL = process.env.BASE_URL || "/";
+    const testUserJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2Njg2OTgyNjYsImV4cCI6MTY2ODc4NDY2Nn0.tcQsjY2mgHnB5O5XWcdsRgzsnFMkiE4250ZndJaXJL0";
 
     let requester: ChaiHttp.Agent;
 
@@ -60,7 +60,7 @@ describe("PrivTAP Backend", () => {
     describe("AppServer", () => {
 
         it("should not serve root", async () => {
-            const res = await requester.get(baseURL);
+            const res = await requester.get("/");
             expect(res).to.have.status(404);
         });
 
