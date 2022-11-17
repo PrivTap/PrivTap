@@ -11,7 +11,7 @@
     <div
       class="container mx-auto grid grid-cols-1 bg-darkGrey rounded-md px-5 py-5 border-2 border-lightBlue gap-4 overflow-y-scroll h-96 overscroll-auto"
     >
-      <div class="text-white px-4 bg-darkBlue w-full py-5">
+      <div class="text-white px-4 bg-blue-600 w-full py-5">
         RULE 1
         <button class="float-right">
           <svg
