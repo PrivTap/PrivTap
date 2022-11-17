@@ -3,6 +3,7 @@ import { storeToRefs } from "pinia";
 import { watch } from "vue";
 import { RouterView, useRouter } from "vue-router";
 import { useAuthStore } from "./stores/auth_store";
+import NavBar from "./components/NavBar.vue";
 
 /// Used to access the store variables and functions
 const authStore = useAuthStore();
@@ -19,5 +20,6 @@ watch(userStore.isAutheticated, (val) => {
 </script>
 
 <template>
+  <NavBar />
   <RouterView />
 </template>
