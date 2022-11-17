@@ -249,9 +249,8 @@ async function _signUp() {
     email.value,
     password.value
   );
-  console.log(res);
   if (!res.status) return toast.error(res.message);
-  toast.success(res.message);
+  toast.success("Registration Success!");
   changeView();
 }
 
