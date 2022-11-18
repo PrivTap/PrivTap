@@ -46,9 +46,15 @@ const router = createRouter({
       path: "/unauthorizedservices",
       name: "unauthorizedservices",
       component: () => import("../views/UnAuthorizedServices.vue"),
+    },
+
+
+    {
+      path: "/publishservice",
+      name: "publishservice",
+      component: () => import("../views/PublishService.vue"),
     }
 
-    
   ],
 });
 
