@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import logo from '@/assets/images/logo_light.svg';
+import logo from '@/assets/images/logo_dark.svg';
 import AuthService from "@/services/auth_service";
 import { useAuthStore } from "../stores/auth_store";
 import { useToast } from "vue-toastification";
