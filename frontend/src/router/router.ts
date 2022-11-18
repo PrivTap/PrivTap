@@ -26,15 +26,34 @@ const router = createRouter({
     {
       path: "/personalPage",
       name: "personalPage",
-      component: () => import("../views/PersonalPage.vue"),
+      component: () => import("../views/PersonalPageView.vue"),
     },
 
     {
       path: "/osppersonalpage",
       name: "osppersonalPage",
-      component: () => import("../views/OspPersonalPage.vue"),
+      component: () => import("../views/OspPersonalPageView.vue"),
     },
 
+    {
+      path: "/services",
+      name: "services",
+      component: () => import("../views/ServicesView.vue"),
+    },
+
+
+    {
+      path: "/unauthorizedservices",
+      name: "unauthorizedservices",
+      component: () => import("../views/UnAuthorizedServicesView.vue"),
+    },
+
+
+    {
+      path: "/publishservice",
+      name: "publishservice",
+      component: () => import("../views/PublishServiceView.vue"),
+    }
 
   ],
 });
