@@ -29,7 +29,6 @@
           id="simple-search"
           class="px-64 bg-gray-50 border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
           placeholder="Search"
-          required=""
         />  
       </div>
       <!-- <button
@@ -56,7 +55,6 @@
 
     <select
     
-      multiple=""
       class="container mx-auto grid grid-cols-1 bg-gray-800 rounded-md px-5 py-5 border-2 border-blue-600 overflow-y-scroll h-96 overscroll-auto w-full space-y-5">
 
         <option class="text-white px-4 bg-blue-600 py-5">
