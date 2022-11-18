@@ -1,5 +1,5 @@
 import { Request, Response, Router } from "express";
-import { checkAuthentication } from "./helper/authentication";
+import Authentication from "./helper/authentication";
 
 /**
  * Superclass for all routes that takes care of all the boilerplate for HTTP methods registration and
@@ -21,7 +21,7 @@ export default class Route {
 
         // If this endpoint requires authentication, register the authentication middleware to the Router
         if (requiresAuth)
-            this.router.use(checkAuthentication);
+            this.router.use(Authentication.checkAuthentication);
 
         // If the subclass implements http methods handlers, register them to the Router
         if (this.httpGet)

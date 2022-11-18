@@ -1,6 +1,6 @@
 import { compareSync } from "bcrypt";
 import User, { IUser } from "../../model/User";
-import { createJWT } from "../../helper/authentication";
+import Authentication from "../../helper/authentication";
 import { badRequest, internalServerError, success } from "../../helper/http";
 import Route from "../../Route";
 import { CookieOptions, Request, Response } from "express";
@@ -47,6 +47,7 @@ export default class LoginRoute extends Route {
         success(response, { "username": username, "email": user.email, "isConfirmed": user.isConfirmed });
     }
 
+
     /**
      * Sets the appropriate headers in the response to send back the authentication cookie to the client.
      * @param response the response that will set the cookie
@@ -55,7 +56,7 @@ export default class LoginRoute extends Route {
      */
     protected static setAuthenticationCookie(response: Response, user: IUser) {
         // Create a JWT token for the user
-        const jwt = createJWT(user);
+        const jwt = Authentication.createJWT(user);
         if (!jwt)
             return false;
 

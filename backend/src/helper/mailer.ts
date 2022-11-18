@@ -2,55 +2,51 @@ import env from "./env";
 import Mailjet from "node-mailjet";
 import logger from "./logger";
 
-// URL where users will get redirected to activate their account
-// This is just the base URL, it will be needed to append the account activation token to it
-const accountActivationBaseURL = env.DEPLOYMENT_URL + "/?activate=";
+export default abstract class Mailer {
+    // URL where users will get redirected to activate their account
+    // This is just the base URL, it will be needed to append the account activation token to it
+    static readonly accountActivationBaseURL = env.DEPLOYMENT_URL + "/?activate=";
+    static readonly mailer: Mailjet | undefined = env.PROD ? new Mailjet({ apiKey: env.MAILJET_API_KEY, apiSecret: env.MAILJET_SECRET_KEY }) : undefined;
 
-let mailer: Mailjet | undefined = undefined;
-// If we are in production, initialize the Mailjet REST client
-if (env.PROD) {
-    mailer = new Mailjet({ apiKey: env.MAILJET_API_KEY, apiSecret: env.MAILJET_SECRET_KEY });
-}
+    /**
+     * Sends the account activation email to a newly registered user.
+     * @param username the username of the user
+     * @param userEmailAddress the email address of the user
+     * @param activationToken the activation token that the user will need to activate its account
+     */
+    static async sendRegistrationEmail(username: string, userEmailAddress: string, activationToken: string) {
+        // If we are not in production, mailer will be undefined, and we can just print the token to console
+        if (this.mailer == undefined) {
+            logger.log(`Activate ${userEmailAddress} account at: ${env.FRONTEND_URL}/?activate=${activationToken}`);
+            return;
+        }
 
-/**
- * Sends the account activation email to a newly registered user.
- * @param username the username of the user
- * @param userEmailAddress the email address of the user
- * @param activationToken the activation token that the user will need to activate its account
- */
-export async function sendRegistrationEmail(username: string, userEmailAddress: string, activationToken: string) {
-    // If we are not in production, mailer will be undefined, and we can just print the token to console
-    if (mailer == undefined) {
-        logger.log(`Activate ${userEmailAddress} account at: ${env.FRONTEND_URL}/?activate=${activationToken}`);
-        return;
-    }
+        // Build the full activation URL and make sure that all special characters are properly URL-encoded
+        const activationUrl = encodeURI(this.accountActivationBaseURL + activationToken);
 
-    // Build the full activation URL and make sure that all special characters are properly URL-encoded
-    const activationUrl = encodeURI(accountActivationBaseURL + activationToken);
-
-    // Send the email
-    await mailer
-        .post("send", { "version": "v3.1" })
-        .request({
-            "Messages":[
-                {
-                    "From": {
-                        "Email": env.MAILJET_SENDER,
-                        "Name": "PrivTAP"
-                    },
-                    "To": [
-                        {
-                            "Email": userEmailAddress,
-                            "Name": username
-                        }
-                    ],
-                    "Subject": "PrivTAP - Activate your account",
-                    "TextPart": `
+        // Send the email
+        await this.mailer
+            .post("send", { "version": "v3.1" })
+            .request({
+                "Messages":[
+                    {
+                        "From": {
+                            "Email": env.MAILJET_SENDER,
+                            "Name": "PrivTAP"
+                        },
+                        "To": [
+                            {
+                                "Email": userEmailAddress,
+                                "Name": username
+                            }
+                        ],
+                        "Subject": "PrivTAP - Activate your account",
+                        "TextPart": `
                         Welcome to PrivTAP!\n
                         We just need to validate your email address to activate your PrivTAP account. Simply click the following link: ${activationUrl}\n
                         Welcome aboard!\n
                         The PrivTAP Team`,
-                    "HTMLPart": `
+                        "HTMLPart": `
                         <div>
                             <div style="background-color: rgb(245,245,245); color: rgb(140, 140, 140); font-family: Roboto, Helvetica, Arial, sans-serif, serif;">
                                 <div style="padding: 80px 0; text-align: center; line-height: 22px; font-size: 14px;">
@@ -69,7 +65,14 @@ export async function sendRegistrationEmail(username: string, userEmailAddress: 
                             </div>
                         </div>
                     `
-                }
-            ]
-        });
+                    }
+                ]
+            });
+    }
 }
+
+
+
+
+
+

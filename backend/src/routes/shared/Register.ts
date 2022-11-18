@@ -2,13 +2,12 @@ import Route from "../../Route";
 import { Request, Response } from "express";
 import User from "../../model/User";
 import { badRequest, internalServerError, success } from "../../helper/http";
-import { sendRegistrationEmail } from "../../helper/mailer";
-
+import Mailer from "../../helper/mailer";
+import { Error } from "mongoose";
 import { hashSync } from "bcrypt";
 import { randomBytes } from "crypto";
 import env from "../../helper/env";
 import logger from "../../helper/logger";
-import Error from "mongoose";
 
 export default class RegisterRoute extends Route {
     constructor() {
@@ -45,7 +44,7 @@ export default class RegisterRoute extends Route {
             return;
         }
         try {
-            await sendRegistrationEmail(username, email, activateToken);
+            await Mailer.sendRegistrationEmail(username, email, activateToken);
         } catch (e) {
             logger.error("Unexpected error: ", e);
             internalServerError(response);
