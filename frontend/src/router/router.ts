@@ -35,7 +35,17 @@ const router = createRouter({
       component: () => import("../views/OspPersonalPage.vue"),
     },
 
+    {
+      path: "/services",
+      name: "services",
+      component: () => import("../views/Services.vue"),
 
+
+    }
+
+
+
+    
   ],
 });
 
