@@ -39,11 +39,14 @@ const router = createRouter({
       path: "/services",
       name: "services",
       component: () => import("../views/Services.vue"),
+    },
 
 
+    {
+      path: "/unauthorizedservices",
+      name: "unauthorizedservices",
+      component: () => import("../views/UnAuthorizedServices.vue"),
     }
-
-
 
     
   ],
