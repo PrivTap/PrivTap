@@ -1,13 +1,13 @@
 import { use, expect, request } from "chai";
 import chaiHttp from "chai-http";
-import { drop, initDb } from "mongo-unit";
-import mongoose from "mongoose";
+// import { drop, initDb } from "mongo-unit";
+// import mongoose from "mongoose";
 
 import app from "../src/app";
 import { checkURL } from "../src/helper/misc";
-import User from "../src/model/User";
+// import User from "../src/model/User";
 
-import testData from "./fixtures/exampleData.json";
+// import testData from "./fixtures/exampleData.json";
 
 use(chaiHttp);
 
@@ -21,22 +21,22 @@ describe("PrivTAP Backend", function() {
     let requester: ChaiHttp.Agent;
 
     before(async () => {
-        const testDBString = process.env.TEST_DB_STRING || "INVALID_DB_STRING";
-        await app.connectToDB(testDBString);
+        // const testDBString = process.env.TEST_DB_STRING || "INVALID_DB_STRING";
+        // await app.connectToDB(testDBString);
         requester = request.agent(app.express).keepOpen();
     });
 
     after(async () => {
         requester.close();
-        await mongoose.disconnect();
+        // await mongoose.disconnect();
     });
 
     beforeEach(async () => {
-        await initDb(testData);
+        // await initDb(testData);
     });
 
     afterEach(async () => {
-        await drop();
+        // await drop();
     });
 
     it("should receive fake DB response", async () => {
@@ -47,10 +47,10 @@ describe("PrivTAP Backend", function() {
 
     });
 
-    it("should have user example", async () => {
-        const user = await User.queryUser("username", "example");
-        expect(user.username).to.be.eq("example");
-    });
+    // it("should have user example", async () => {
+    //     const user = await User.queryUser("username", "example");
+    //     expect(user.username).to.be.eq("example");
+    // });
 
     it("should validate links", async () => {
         expect(checkURL("example@example.com")).to.be.false;
