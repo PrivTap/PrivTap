@@ -4,7 +4,20 @@ import type { AxiosError } from "axios";
 import IAxiosService from "../helpers/axios_service";
 import type { StandartRepsonse } from "../model/response_model";
 
-class AuthService extends IAxiosService {
+
+interface IAuthService extends IAxiosService {
+  login(username: string, password: string): Promise<StandartRepsonse<Object>>;
+  logout(): Promise<StandartRepsonse<Object>>;
+  activate(token: String): Promise<StandartRepsonse<Object>>;
+  register(
+    username: string,
+    email: string,
+    password: string
+  ): Promise<StandartRepsonse<Object>>;
+}
+
+class AuthService extends IAxiosService implements IAuthService {
+
   async register(
     username: String,
     email: String,
@@ -54,7 +67,6 @@ class AuthService extends IAxiosService {
     }
   }
 
-  /// TODO: Add logout function
   async logout(): Promise<StandartRepsonse<Object>> {
     try {
       const res = await this.http.get<StandartRepsonse<Object>>("/logout");
