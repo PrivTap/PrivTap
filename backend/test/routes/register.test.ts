@@ -1,10 +1,10 @@
 import { use, expect, request } from "chai";
 import chaiHttp from "chai-http";
-import { createSandbox, SinonStub, fake } from "sinon";
+import { createSandbox, SinonStub } from "sinon";
 import sinonChai from "sinon-chai";
 import app from "../../src/app";
 import User from "../../src/model/User";
-import { sendRegistrationEmail } from "../../src/helper/mailer";
+import Mailer from "../../src/helper/mailer";
 
 use(chaiHttp);
 use(sinonChai);
@@ -15,6 +15,7 @@ describe("/register endpoint", () => {
 
     let requester: ChaiHttp.Agent;
     let insertNewUserStub: SinonStub;
+    let sendRegistrationEmailStub: SinonStub;
 
     before(() => {
         requester = request(app.express).keepOpen();
@@ -67,6 +68,18 @@ describe("/register endpoint", () => {
             expect(res.body).to.be.eql(expectedBody);
         });
 
+        it ("should fail if the mailing process fails", async () => {
+            insertNewUserStub.resolves(true);
+            sendRegistrationEmailStub = sandbox.stub(Mailer, "sendRegistrationEmail");
+            sendRegistrationEmailStub.throws();
+            const res = await requester.post("/register").send({
+                username : "someUsername",
+                email: "someEmail@gmail.com",
+                password: "somePassword"
+            });
+            expect(res).to.have.status(500);
+        });
+
         it ("should succeed when all the parameters are well defined", async () => {
             insertNewUserStub.resolves(true);
             const res = await requester.post("/register").send({
@@ -76,19 +89,5 @@ describe("/register endpoint", () => {
             });
             expect(res).to.have.status(200);
         });
-
-
-        // TODO: Make mailer module in
-/*
-        it ("should fail if the mailing process fails", async () => {
-            insertNewUserStub.resolves(true);
-            const res = await requester.post("/api/register").send({
-                username : "someUsername",
-                email: "someEmail@gmail.com",
-                password: "somePassword"
-            });
-            expect(res).to.have.status(500);
-        });
-        */
     });
 });

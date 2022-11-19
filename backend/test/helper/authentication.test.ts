@@ -1,4 +1,4 @@
-import { createJWT, checkAuthentication } from "../../src/helper/authentication";
+import Authentication from "../../src/helper/authentication";
 import { expect, request, use } from "chai";
 import * as sinon from "sinon";
 import { IUser } from "../../src/model/User";
@@ -54,11 +54,11 @@ describe("Testing authentication helper module", () => {
     });
 
     it("should create a JWT secret", () => {
-        expect(createJWT(testUser)).to.be.not.undefined;
+        expect(Authentication.createJWT(testUser)).to.be.not.undefined;
     });
 
     it("should check a JWT secret in request", () => {
-        const token = createJWT(testUser);
+        const token = Authentication.createJWT(testUser);
         const mockRequest = {
             body: {},
             cookies: {
@@ -66,7 +66,7 @@ describe("Testing authentication helper module", () => {
             }
         } as Request;
         const mockResponse = {} as Response;
-        checkAuthentication(mockRequest, mockResponse, () => {
+        Authentication.checkAuthentication(mockRequest, mockResponse, () => {
             expect(mockResponse.statusCode).to.be.not.equal(401);
             expect(mockResponse.statusCode).to.be.not.equal(500);
             expect(mockRequest.userId).to.be.equal(testUser._id);
@@ -79,7 +79,7 @@ describe("Testing authentication helper module", () => {
             cookies: {}
         } as Request;
 
-        checkAuthentication(mockRequest, mockResponse as Response, () => {
+        Authentication.checkAuthentication(mockRequest, mockResponse as Response, () => {
             console.log("Next");
         });
         expect(responseCode).to.be.equal(401);
@@ -92,7 +92,7 @@ describe("Testing authentication helper module", () => {
             cookies: { _jwt: "A non-JWT string" }
         } as Request;
 
-        checkAuthentication(mockRequest, mockResponse as Response, () => {
+        Authentication.checkAuthentication(mockRequest, mockResponse as Response, () => {
             console.log("Next");
         });
         expect(responseCode).to.be.equal(401);
@@ -105,7 +105,7 @@ describe("Testing authentication helper module", () => {
             cookies: { _jwt: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.8c7UutxCZwhe71a7pyVjNPYou5Xp6TGrjhETFuIB11o" }
         } as Request;
 
-        checkAuthentication(mockRequest, mockResponse as Response, () => {
+        Authentication.checkAuthentication(mockRequest, mockResponse as Response, () => {
             console.log("Next");
         });
         expect(responseCode).to.be.equal(401);
@@ -122,7 +122,7 @@ describe("Testing authentication helper module", () => {
         delete process.env.JWT_SECRET;
 
         console.log(process.env.JWT_SECRET);
-        checkAuthentication(mockRequest, mockResponse as Response, () => {
+        Authentication.checkAuthentication(mockRequest, mockResponse as Response, () => {
             console.log("Next");
         });
         expect(responseCode).to.be.equal(500);

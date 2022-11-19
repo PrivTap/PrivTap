@@ -1,7 +1,5 @@
 <template>
-    <!-- <link rel="stylesheet" href="/dist/output.css" />
 
-    <title>Persnal Page</title> -->
   <div class="text-center py-20" >
     <div class="text-4xl text-white font-semibold pb-10">
       <a >Personal Page</a>
