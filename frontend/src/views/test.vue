@@ -1,5 +1,5 @@
 
-<!-- <template>
+<template>
     <div>
       <h1 class="text-5xl text-white text-center py-12">Services</h1>
   
@@ -34,12 +34,16 @@
         
       </form>
   
-      <div
-        class="container mx-auto grid grid-cols-1 bg-gray-800 rounded-md px-5 py-5 border-2 border-blue-600 gap-4 overflow-y-scroll h-96 overscroll-auto"
-      >
-        <div class="text-white px-4 bg-blue-600 w-full py-5">
-          SERVICE 1...
-          <button class="float-right" @click="removeRow(index)">
+      <div class="container mx-auto bg-gray-800 gap-4 rounded-md px-5 py-5 border-2 border-blue-600 overflow-y-scroll h-96 overscroll-auto">
+
+
+        <div class="space-y-5">
+
+
+
+        <div v-for="item,index in form" :key="item" class="text-white px-4 py-8 h-10 bg-blue-600 w-full">
+          SERVICE {{ index+1 }}
+          <!-- <button class="float-right">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -54,104 +58,14 @@
                 d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-          </button>
-        </div>
-        <div class="text-white px-4 bg-blue-600 w-full py-5">
-          SERVICE 2...
-          <button class="float-right">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="2.0"
-              stroke="white"
-              class="w-6 h-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </button>
-        </div>
-        <div class="text-white px-4 bg-blue-600 w-full py-5">
-          SERVICE 3...
-          <button class="float-right">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="2.0"
-              stroke="white"
-              class="w-6 h-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </button>
-        </div>
-        <div class="text-white px-4 bg-blue-600 w-full py-5">
-          SERVICE 4...
-          <button class="float-right">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="2.0"
-              stroke="white"
-              class="w-6 h-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </button>
-        </div>
-        <div class="text-white px-4 bg-blue-600 w-full py-5">
-          SERVICE 5...
-          <button class="float-right">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="2.0"
-              stroke="white"
-              class="w-6 h-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </button>
-        </div>
-        <div class="text-white px-4 bg-blue-600 w-full py-5">
-          SERVICE 6...
-          <button class="float-right">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="2.0   "
-              stroke="white"
-              class="w-6 h-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </button>
+          </button> -->
+          <button type="button" class="btn btn-danger btn-sm" @click="removeRow(index)">x</button>&nbsp;
+          <button type="button" class="btn btn-success btn-sm" @click="addRow">+</button>
         </div>
       </div>
+    </div>
+
+
   
       <div class="flex flex-row justify-center py-10 space-x-20">
         <button type="button" class="px-5 py-3 bg-blue-800 text-white">
@@ -166,9 +80,54 @@
   </template>
   
   
+
+  <script>
+  import { reactive } from 'vue'
+  import axios from 'axios'
+  export default {
+    name: 'HelloWorld',
+    setup(){
+      const form = reactive([
+        { name : '', price: 0}
+      ])
+
+  
+      const removeRow = (index) =>{
+        if(form.length > 1){
+          form.splice(index,1)
+        }
+      }
+  
+
+      const addRow = () => {
+      form.push({ name : '', price: 0})
+      }
+
+
+
+    //   const saveItem = () =>{
+    //     // axios
+    //     axios.post('items',form).then(res=>{
+    //       console.log(res);
+    //     })
+    //   }
+  
+      return{
+        form,
+        addRow,
+        // saveItem,
+        removeRow
+      }
+    }
+  }
+  </script>
+
+
+
+
   
   
-<script type lang="ts">
+<!-- <script type lang="ts">
 @import { reactive } from 'vue'
 export default {
 const form = reactive ([
@@ -185,13 +144,26 @@ return {
     removeRow
 }
   </script>
-  <style scoped></style> -->
-  <template>
+  <style scoped></style>  -->
+
+
+
+
+<!-- COMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM -->
+
+
+
+
+  <!-- <template>
     <div class="container mt-4 bg-white">   
      <div class="card">
        <div class="card-body">
+
+
         <div  v-for="item,index in form" :key="item">
             <h3>Item {{ index+1 }}</h3>
+
+
            <div class="row">
              <div class="col-sm-5">
                <label>Name</label>
@@ -208,14 +180,14 @@ return {
            </div>
   
           
-        </div>
-           <button type="button" class="btn btn-success mt-3" @click="saveItem">Save</button>
-       </div>
+        </div> -->
+           <!-- <button type="button" class="btn btn-success mt-3" @click="saveItem">Save</button> -->
+       <!-- </div>
      </div>
     </div>
-  </template>
+  </template> -->
   
-  <script>
+  <!-- <script>
   import { reactive } from 'vue'
   import axios from 'axios'
   export default {
@@ -224,10 +196,7 @@ return {
       const form = reactive([
         { name : '', price: 0}
       ])
-  
-      const addRow = () => {
-        form.push({ name : '', price: 0})
-      }
+
   
       const removeRow = (index) =>{
         if(form.length > 1){
@@ -235,19 +204,26 @@ return {
         }
       }
   
-      const saveItem = () =>{
-        // axios
-        axios.post('items',form).then(res=>{
-          console.log(res);
-        })
+
+      const addRow = () => {
+      form.push({ name : '', price: 0})
       }
+
+
+
+    //   const saveItem = () =>{
+    //     // axios
+    //     axios.post('items',form).then(res=>{
+    //       console.log(res);
+    //     })
+    //   }
   
       return{
         form,
         addRow,
-        saveItem,
+        // saveItem,
         removeRow
       }
     }
   }
-  </script>
+  </script> -->
