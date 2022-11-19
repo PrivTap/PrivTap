@@ -59,7 +59,7 @@ export default class Service {
      * @param authenticationServer The API endpoint of the server used to authenticate the PrivTAP platform with the Service
      * @param clientId The ID of our platform on the authorization server
      * @param clientSecret The secret of our platform on the authorization server
-     * @throws {Error} An error representing what went wrong when attempting to create the Service
+     * @returns A boolean Promise which contains true if the operation was successful, and false otherwise
      */
     static async insert(name: string, description: string, creatorID: string, authenticationServer?: string, clientId?: string, clientSecret?: string) {
         const newService = new Service.serviceModel({
@@ -87,6 +87,11 @@ export default class Service {
         }
     }
 
+    /**
+     * Asynchronously retrieves the list of services that a user has created
+     * @param userID The ID of the user that created and owns the services to retrieve
+     * @returns A Promise containing either the list of services created by the user, or null if something went wrong
+     */
     static async findServicesCreatedByUser(userID: string): Promise<IService[] | null> {
         try {
             return Service.serviceModel.find({ creator: new ObjectId(userID) });
@@ -96,6 +101,12 @@ export default class Service {
         }
     }
 
+    /**
+     * Asynchronously retrieves a specific service that a user has created
+     * @param userID The ID of the user that created and owns the services to retrieve
+     * @param serviceID The ID of the service to be retrieved
+     * @returns A Promise containing either the retrieved service or null if something went wrong
+     */
     static async findServiceCreatedByUser(userID: string, serviceID: string): Promise<IService | null> {
         try {
             const result = await Service.serviceModel.findOne({ creator: new ObjectId(userID), _id: new ObjectId(serviceID) });
@@ -106,6 +117,12 @@ export default class Service {
         }
     }
 
+    /**
+     * Asynchronously deletes a service that a user created
+     * @param userID The ID of the user that created and owns the services to retrieve
+     * @param serviceID The ID of the service to be deleted
+     * @returns A boolean Promise which contains true if the operation was successful, and false otherwise
+     */
     static async deleteService(userID: string, serviceID: string) {
         try {
             await Service.serviceModel.deleteOne({ creator: new ObjectId(userID), _id: new ObjectId(serviceID) });
@@ -116,6 +133,16 @@ export default class Service {
         }
     }
 
+    /**
+     * Updates a service with new and updated data
+     * @param serviceID The ID of the service to update
+     * @param newName The new service name
+     * @param newDescription The new service description
+     * @param newAuthServer The new authorization server
+     * @param newClientId The new client ID
+     * @param newClientSecret The new client secret
+     * @returns A boolean Promise which contains true if the operation was successful, and false otherwise
+     */
     static async updateService(serviceID: string, newName: string | null, newDescription: string | null, newAuthServer: string | null, newClientId: string | null, newClientSecret: string | null) {
         const filterQuery: FilterQuery<IService> = {
             _id: new ObjectId(serviceID)
