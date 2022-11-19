@@ -5,7 +5,7 @@ import logger from "../helper/logger";
 export interface IService {
     description: string;
     name: string;
-    creator: string;
+    creator: ObjectId;
     authServer: string;
     clientId: string;
     clientSecret: string;
@@ -24,7 +24,7 @@ const serviceSchema = new Schema<IService>({
         }
     },
     creator: {
-        type: String,
+        type: Schema.Types.ObjectId,
         required: true,
     },
     authServer: {
@@ -65,7 +65,7 @@ export default class Service {
         const newService = new Service.serviceModel({
             description: description,
             name: name,
-            creator: creatorID,
+            creator: new ObjectId(creatorID),
             authServer: authenticationServer,
             clientId: clientId,
             clientSecret: clientSecret
@@ -89,7 +89,7 @@ export default class Service {
 
     static async findServicesCreatedByUser(userID: string): Promise<IService[] | null> {
         try {
-            return Service.serviceModel.find({ creator: userID });
+            return Service.serviceModel.find({ creator: new ObjectId(userID) });
         } catch (e) {
             logger.error("Error while retrieving service: ", e);
             return null;
@@ -98,7 +98,7 @@ export default class Service {
 
     static async findServiceCreatedByUser(userID: string, serviceID: string): Promise<IService | null> {
         try {
-            const result = await Service.serviceModel.findOne({ creator: userID, _id: serviceID });
+            const result = await Service.serviceModel.findOne({ creator: new ObjectId(userID), _id: new ObjectId(serviceID) });
             return result as (IService | null);
         } catch (e) {
             logger.error("Error while retrieving service: ", e);
@@ -108,7 +108,7 @@ export default class Service {
 
     static async deleteService(userID: string, serviceID: string) {
         try {
-            await Service.serviceModel.deleteOne({ creator: userID, _id: serviceID });
+            await Service.serviceModel.deleteOne({ creator: new ObjectId(userID), _id: new ObjectId(serviceID) });
             return true;
         } catch (e) {
             logger.error("Error while deleting service: ", e);
