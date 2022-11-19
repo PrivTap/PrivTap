@@ -2,7 +2,7 @@ import Route from "../../Route";
 import { Request, Response } from "express";
 import User from "../../model/User";
 import { badRequest, checkUndefinedParams, internalServerError, success } from "../../helper/http";
-import { sendRegistrationEmail } from "../../helper/mailer";
+import Mailer from "../../helper/mailer";
 
 import { hashSync } from "bcrypt";
 import { randomBytes } from "crypto";

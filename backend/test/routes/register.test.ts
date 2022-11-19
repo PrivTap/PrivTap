@@ -45,28 +45,24 @@ describe("/register endpoint", () => {
             expect(res).to.have.status(400);
         });
 
-        it("should fail when data checks fail", async () => {
-            insertNewUserStub.throws("ValidationError");
-            const expectedBody = { "message" : "Bad request", "status" : false };
+        it("should fail when data checks fails", async () => {
+            insertNewUserStub.throws(new ModelError());
             const res = await requester.post("/register").send({
                 username : "someUsername",
                 email: "someEmail@gmail.com",
                 password: "somePassword"
             });
             expect(res).to.have.status(400);
-            expect(res.body).to.be.eql(expectedBody);
         });
 
         it("should fail when the username/email is already in the DB", async () => {
-            insertNewUserStub.throws("MongoServerError");
-            const expectedBody = { "message" : "Username or email taken", "status" : false };
+            insertNewUserStub.throws(new ModelError());
             const res = await requester.post("/register").send({
                 username : "someUsername",
                 email: "someEmail@gmail.com",
                 password: "somePassword"
             });
             expect(res).to.have.status(400);
-            expect(res.body).to.be.eql(expectedBody);
         });
 
         it ("should fail if the mailing process fails", async () => {

@@ -40,7 +40,6 @@ describe("/login endpoint", () => {
     describe("POST /", () => {
 
         it("should fail when either the username or password are undefined", async () => {
-            const expectedBody = { "message" : "Undefined parameters", "status" : false };
             const resNoUser = await requester.post("/login").send({
                 password: "somePassword"
             });
@@ -48,32 +47,16 @@ describe("/login endpoint", () => {
                 username : "someUsername",
             });
             expect(resNoUser).to.have.status(400);
-            expect(resNoUser.body).to.be.eql(expectedBody);
-
             expect(resNoPw).to.have.status(400);
-            expect(resNoPw.body).to.be.eql(expectedBody);
-        });
-
-        it("should fail when the DB query fails", async () => {
-            queryUserStub.throws();
-            const expectedBody = { "message" : "Internal server error", "status" : false };
-            const res = await requester.post("/login").send({
-                username : "someUsername",
-                password: "somePassword"
-            });
-            expect(res).to.have.status(500);
-            expect(res.body).to.be.eql(expectedBody);
         });
 
         it("should fail when the query produces no result", async () => {
             queryUserStub.resolves(null);
-            const expectedBody = { "message" : "Wrong credentials", "status" : false };
             const res = await requester.post("/login").send({
                 username : "someUsername",
                 password: "somePassword"
             });
             expect(res).to.have.status(400);
-            expect(res.body).to.be.eql(expectedBody);
         });
 
 
@@ -83,27 +66,22 @@ describe("/login endpoint", () => {
             queryUserStub.resolves("username");
             compareSyncStub.returns(false);
             setAuthenticationCookieStub.returns(true);
-            const expectedBody = { "message" : "Wrong credentials", "status" : false };
             const res = await requester.post("/login").send({
                 username : "someUsername",
                 password: "somePassword"
             });
-            console.log(res.body);
             expect(res).to.have.status(400);
-            expect(res.body).to.be.eql(expectedBody);
         });
 
         it("should fail if the authentication cookie is not properly set", async () => {
             queryUserStub.resolves("username");
             compareSyncStub.returns(true);
             setAuthenticationCookieStub.returns(false);
-            const expectedBody = { "message" : "Internal server error", "status" : false };
             const res = await requester.post("/login").send({
                 username : "someUsername",
                 password: "somePassword"
             });
             expect(res).to.have.status(500);
-            expect(res.body).to.be.eql(expectedBody);
         });
 
         it("should succeed if the credentials are correct", async () => {

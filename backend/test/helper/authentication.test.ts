@@ -10,8 +10,6 @@ const sandbox = sinon.createSandbox();
 
 describe("Testing authentication helper module", () => {
 
-    let requester: ChaiHttp.Agent;
-
     const testUser = {
         _id: "ARandomID",
         username: "TestMan",
@@ -33,8 +31,6 @@ describe("Testing authentication helper module", () => {
     let responseCode = 0;
 
     before(async () => {
-        requester = request(app.express).keepOpen();
-
         sandbox.stub(http_internal, "unauthorizedUserError").callsFake(() => {
             responseCode = 401;
         });
@@ -45,7 +41,6 @@ describe("Testing authentication helper module", () => {
     });
 
     after(async () => {
-        requester.close();
         sandbox.restore();
     });
 
