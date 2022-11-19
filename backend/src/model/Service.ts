@@ -147,21 +147,4 @@ export default class Service {
             return false;
         }
     }
-
-    /*static async addAuthServer(service: IService, authServer: string, clientId: string, clientSecret: string) {
-        service.authServer = authServer;
-        service.clientId = clientId;
-        service.clientSecret = clientSecret;
-        await service.save();
-
-        const filterQuery: FilterQuery<IUser> = {
-            activationToken: token
-        };
-        const updateQuery: UpdateQuery<IUser> = {
-            activationToken: "",
-            isConfirmed: true
-        };
-
-        const result = await User.userModel.updateOne(filterQuery, updateQuery);
-    }*/
 }
