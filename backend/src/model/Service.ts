@@ -1,4 +1,4 @@
-import {FilterQuery, model, Schema, Types} from "mongoose";
+import { FilterQuery, model, Schema, Types } from "mongoose";
 import ObjectId = Types.ObjectId;
 import logger from "../helper/logger";
 
@@ -12,32 +12,32 @@ export interface IService {
 }
 
 const serviceSchema = new Schema<IService>({
-        description: {
-            type: String,
-            required: true,
-        },
-        name: {
-            type: String,
-            required: true,
-            index: {
-                unique: true
-            }
-        },
-        creator: {
-            type: Schema.Types.ObjectId,
-            required: true,
-        },
-        authServer: {
-            type: String,
-        },
-        clientId: {
-            type: String
-        },
-        clientSecret: {
-            type: String
+    description: {
+        type: String,
+        required: true,
+    },
+    name: {
+        type: String,
+        required: true,
+        index: {
+            unique: true
         }
     },
-    {collection: "Service"}
+    creator: {
+        type: Schema.Types.ObjectId,
+        required: true,
+    },
+    authServer: {
+        type: String,
+    },
+    clientId: {
+        type: String
+    },
+    clientSecret: {
+        type: String
+    }
+},
+{ collection: "Service" }
 );
 
 /**
@@ -71,7 +71,7 @@ export default class Service {
             clientSecret: clientSecret
         });
         // Do we already have a service with the same identifier in the database?
-        const res = await Service.serviceModel.exists({name: name});
+        const res = await Service.serviceModel.exists({ name: name });
         if (res == null) {
             //Proceed with the save operation
             try {
@@ -94,7 +94,7 @@ export default class Service {
      */
     static async findServicesCreatedByUser(userID: string): Promise<IService[] | null> {
         try {
-            return Service.serviceModel.find({creator: new ObjectId(userID)});
+            return Service.serviceModel.find({ creator: new ObjectId(userID) });
         } catch (e) {
             logger.error("Error while retrieving service: ", e);
             return null;
@@ -128,7 +128,7 @@ export default class Service {
      */
     static async deleteService(userID: string, serviceID: string) {
         try {
-            await Service.serviceModel.deleteOne({creator: new ObjectId(userID), _id: new ObjectId(serviceID)});
+            await Service.serviceModel.deleteOne({ creator: new ObjectId(userID), _id: new ObjectId(serviceID) });
             return true;
         } catch (e) {
             logger.error("Error while deleting service: ", e);
