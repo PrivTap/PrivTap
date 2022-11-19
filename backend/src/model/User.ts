@@ -62,7 +62,7 @@ export default abstract class User {
      * @param email The new user's email to be inserted
      * @param token The new user's activation token to be inserted
      */
-    static async insertNewUser(username: string, password: string, email: string, token: string) {
+    static async insertNewUser(username: string, password: string, email: string, token: string): Promise<boolean> {
         const user = new User.userModel({
             username: username,
             password: password,
@@ -133,9 +133,15 @@ export default abstract class User {
      * Finds an existing user given its user ID
      * @param userId The ID of the user to find in the database
      */
-    static async findById(userId: string): Promise<IUser>{
-        const query = await User.userModel.findById(userId);
-        return query as IUser;
+    static async findById(userId: string): Promise<IUser|undefined>{
+        let queryResult: FilterQuery<IUser>|null;
+        try {
+            queryResult = await User.userModel.findById(userId);
+        } catch (e) {
+            logger.error("Error finding user by id", e);
+            return undefined;
+        }
+        return queryResult?._doc as IUser;
     }
 }
 

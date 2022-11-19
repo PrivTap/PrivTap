@@ -35,17 +35,9 @@ export default class RegisterRoute extends Route {
                 return;
             }
         } catch (e) {
-            const error = e as Error;
-            // Check if it's a ValidationError (integrity check failed)
-            // or if it is a MongoServerError (duplicate key)
-            if (error.name == "ValidationError"){
-                badRequest(response);
-                return;
-            } else if (error.name == "MongoServerError"){
-                badRequest(response, "Username or email taken");
-                return;
+            if (e instanceof ModelError) {
+                badRequest(response, e.message);
             }
-            internalServerError(response);
             return;
         }
         try {

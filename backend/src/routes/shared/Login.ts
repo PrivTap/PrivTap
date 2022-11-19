@@ -5,6 +5,7 @@ import { badRequest, internalServerError, success } from "../../helper/http";
 import Route from "../../Route";
 import { CookieOptions, Request, Response } from "express";
 import env from "../../helper/env";
+import { checkUndefinedParams } from "../../helper/http";
 
 export default class LoginRoute extends Route {
     constructor() {
@@ -15,8 +16,7 @@ export default class LoginRoute extends Route {
         const username = request.body.username;
         const password = request.body.password;
 
-        if (!username || !password) {
-            badRequest(response, "Undefined parameters");
+        if (checkUndefinedParams(response, username, password)){
             return;
         }
 
@@ -28,7 +28,7 @@ export default class LoginRoute extends Route {
 
         const passwordValid = compareSync(password, user.password);
         if (!passwordValid) {
-            badRequest(response, "Wrong credentials");
+            badRequest(response, "The username or password is invalid");
             return;
         }
 
