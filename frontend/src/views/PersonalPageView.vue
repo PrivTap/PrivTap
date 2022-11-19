@@ -91,19 +91,20 @@
 
 
 
-  <teleport to="body">
+  
     <div class="fixed grid h-full place-items-center md:inset-0 h-modal md:h-full" v-if="isOpen">
       <div class="relative w-full max-w-md h-full md:h-auto">
 
 
-        <div class="relative bg-blue-700 text-white rounded-md">
+        <div class="relative bg-white
+         text-blue-900 rounded-md">
 
 
 
           <div class="flex justify-between items-center p-5 ">
 
             <button @click="isOpen = false"
-              class="text-gray-400 bg-transparent hover:text-white rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+              class="text-gray-400 bg-transparent hover:text-blue-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
               data-modal-toggle="small-modal">
               <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg">
@@ -114,7 +115,7 @@
             </button>
           </div>
 
-          <h1 class="text-3xl text-center">Add rule</h1>
+          <h2 class="text-3xl text-center">Add rule</h2>
 
           <div class="p-6 space-y-6">
 
@@ -122,17 +123,17 @@
           <form>
 
             <div class="mb-6 mx-auto w-96">
-              <label for="text" class="block mb-2 text-sm font-medium dark:text-gray-300">IF...</label>
+              <label for="text" class="block mb-2">IF...</label>
               <input type="text" id="text"
-                class="bg-gray-50 border border-gray-300 text-black text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500"
+                class= "bg-gray-50 border border-gray-300 text-black text-sm rounded-lg block w-full p-2.5"
                 placeholder="...">
             </div>
 
 
             <div class="mb-6 mx-auto w-96">
-              <label for="text" class="block mb-2 text-sm font-medium dark:text-gray-300">THEN...</label>
+              <label for="text" class="block mb-2">THEN...</label>
               <input type="text" id="text"
-                class="bg-gray-50 border border-gray-300 text-black text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500"
+                class="bg-gray-50 border border-gray-300 text-black text-sm rounded-lg block w-full p-2.5"
                 placeholder="...">
             </div>
 
@@ -149,7 +150,7 @@
 
       </div>
     </div>
-  </teleport>
+  
 
 
 </template>
