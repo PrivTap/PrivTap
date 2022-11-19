@@ -16,7 +16,10 @@ interface IAuthService extends IAxiosService {
   ): Promise<StandartRepsonse<Object>>;
 }
 
-class AuthService extends IAxiosService implements IAuthService {
+export default class AuthService extends IAxiosService implements IAuthService {
+  constructor() {
+    super();
+  };
 
   async register(
     username: String,
@@ -97,4 +100,3 @@ class AuthService extends IAxiosService implements IAuthService {
   }
 }
 
-export default new AuthService();

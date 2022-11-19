@@ -198,6 +198,7 @@ const email = ref<String>("");
 const password = ref<String>("");
 const isLoading = ref<boolean>(false);
 const showHintPassword = ref<boolean>(false);
+const authService = new AuthService();
 
 const isValidEmail = computed(() => {
   if (email.value.length) return true;
@@ -237,14 +238,14 @@ async function onSubmitted() {
 }
 
 async function _loginIn() {
-  const res = await AuthService.login(username.value, password.value);
+  const res = await authService.login(username.value, password.value);
   if (!res.status) return toast.error(res.message);
   toast.success("Login Success!");
   router.push("/home");
 }
 
 async function _signUp() {
-  const res = await AuthService.register(
+  const res = await authService.register(
     username.value,
     email.value,
     password.value
@@ -259,7 +260,7 @@ onMounted(async () => {
     console.log(route.query.activate);
     try {
       const token = route.query.activate as String;
-      const res = await AuthService.activate(token);
+      const res = await authService.activate(token);
       console.log(res.message);
       toast.success(res.message);
     } catch (error) {
