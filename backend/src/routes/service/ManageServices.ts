@@ -15,8 +15,7 @@ export default class ManageServices extends Route {
     protected async httpGet(request: Request, response: Response): Promise<void> {
         const services = await Service.findServicesCreatedByUser(request.userId.toString());
         if (services) {
-            response.status(200);
-            response.send(JSON.stringify(services));
+            success(response, new Object({ "services": services }));
         } else {
             internalServerError(response);
         }
@@ -41,15 +40,13 @@ export default class ManageServices extends Route {
         let hasOptionalParameters = false;
         const clientIdValid = clientId != null;
         const clientSecretValid = clientSecret != null;
-        let authURLValid = serviceAuthURL != null;
+        const authURLValid = serviceAuthURL != null && checkURL(serviceAuthURL);
         if (authURLValid || clientIdValid || clientSecretValid) {
-            authURLValid = authURLValid && checkURL(serviceAuthURL);
-            hasOptionalParameters = true;
-
             if (!(authURLValid && clientIdValid && clientSecretValid)) {
                 badRequest(response, "Invalid parameter");
                 return;
             }
+            hasOptionalParameters = true;
         }
 
         // Insert the service

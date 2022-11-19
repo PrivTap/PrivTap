@@ -44,7 +44,7 @@ describe("/login endpoint", () => {
                 password: "somePassword"
             });
             const resNoPw = await requester.post("/login").send({
-                username : "someUsername",
+                username: "someUsername",
             });
             expect(resNoUser).to.have.status(400);
             expect(resNoPw).to.have.status(400);
@@ -53,7 +53,7 @@ describe("/login endpoint", () => {
         it("should fail when the query produces no result", async () => {
             queryUserStub.resolves(null);
             const res = await requester.post("/login").send({
-                username : "someUsername",
+                username: "someUsername",
                 password: "somePassword"
             });
             expect(res).to.have.status(400);
@@ -67,7 +67,7 @@ describe("/login endpoint", () => {
             compareSyncStub.returns(false);
             setAuthenticationCookieStub.returns(true);
             const res = await requester.post("/login").send({
-                username : "someUsername",
+                username: "someUsername",
                 password: "somePassword"
             });
             expect(res).to.have.status(400);
@@ -78,7 +78,7 @@ describe("/login endpoint", () => {
             compareSyncStub.returns(true);
             setAuthenticationCookieStub.returns(false);
             const res = await requester.post("/login").send({
-                username : "someUsername",
+                username: "someUsername",
                 password: "somePassword"
             });
             expect(res).to.have.status(500);
@@ -89,10 +89,10 @@ describe("/login endpoint", () => {
             compareSyncStub.returns(true);
             setAuthenticationCookieStub.returns(true);
             const credentials = { "username": "someUsername" };
-            const expectedBody = { "data" : credentials, "message" : "", "status" : true };
+            const expectedBody = { "data": credentials, "message": "", "status": true };
 
             const res = await requester.post("/login").send({
-                username : "someUsername",
+                username: "someUsername",
                 password: "somePassword"
             });
             expect(res).to.have.status(200);

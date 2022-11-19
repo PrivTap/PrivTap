@@ -143,7 +143,7 @@ const app = new BackendApp();
 
 // If this is being run as a script, connect to the db and start the application server.
 // Otherwise, this is being imported for testing and the testing library will take care of the setup
-if (require.main === module){
+if (require.main === module) {
     // Connect to the database
     app.connectToDB(app.dbString)
         .then(() => {

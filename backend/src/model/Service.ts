@@ -1,4 +1,4 @@
-import { FilterQuery, model, Schema, Types } from "mongoose";
+import {FilterQuery, model, Schema, Types} from "mongoose";
 import ObjectId = Types.ObjectId;
 import logger from "../helper/logger";
 
@@ -12,32 +12,32 @@ export interface IService {
 }
 
 const serviceSchema = new Schema<IService>({
-    description: {
-        type: String,
-        required: true,
-    },
-    name: {
-        type: String,
-        required: true,
-        index: {
-            unique: true
+        description: {
+            type: String,
+            required: true,
+        },
+        name: {
+            type: String,
+            required: true,
+            index: {
+                unique: true
+            }
+        },
+        creator: {
+            type: Schema.Types.ObjectId,
+            required: true,
+        },
+        authServer: {
+            type: String,
+        },
+        clientId: {
+            type: String
+        },
+        clientSecret: {
+            type: String
         }
     },
-    creator: {
-        type: Schema.Types.ObjectId,
-        required: true,
-    },
-    authServer: {
-        type: String,
-    },
-    clientId: {
-        type: String
-    },
-    clientSecret: {
-        type: String
-    }
-},
-{ collection: "Service" }
+    {collection: "Service"}
 );
 
 /**
@@ -71,7 +71,7 @@ export default class Service {
             clientSecret: clientSecret
         });
         // Do we already have a service with the same identifier in the database?
-        const res = await Service.serviceModel.exists({ name: name });
+        const res = await Service.serviceModel.exists({name: name});
         if (res == null) {
             //Proceed with the save operation
             try {
@@ -94,7 +94,7 @@ export default class Service {
      */
     static async findServicesCreatedByUser(userID: string): Promise<IService[] | null> {
         try {
-            return Service.serviceModel.find({ creator: new ObjectId(userID) });
+            return Service.serviceModel.find({creator: new ObjectId(userID)});
         } catch (e) {
             logger.error("Error while retrieving service: ", e);
             return null;
@@ -109,7 +109,10 @@ export default class Service {
      */
     static async findServiceCreatedByUser(userID: string, serviceID: string): Promise<IService | null> {
         try {
-            const result = await Service.serviceModel.findOne({ creator: new ObjectId(userID), _id: new ObjectId(serviceID) });
+            const result = await Service.serviceModel.findOne({
+                creator: new ObjectId(userID),
+                _id: new ObjectId(serviceID)
+            });
             return result as (IService | null);
         } catch (e) {
             logger.error("Error while retrieving service: ", e);
@@ -125,7 +128,7 @@ export default class Service {
      */
     static async deleteService(userID: string, serviceID: string) {
         try {
-            await Service.serviceModel.deleteOne({ creator: new ObjectId(userID), _id: new ObjectId(serviceID) });
+            await Service.serviceModel.deleteOne({creator: new ObjectId(userID), _id: new ObjectId(serviceID)});
             return true;
         } catch (e) {
             logger.error("Error while deleting service: ", e);
@@ -172,6 +175,21 @@ export default class Service {
         } catch (error) {
             logger.error("Error while updating service with ID $(serviceID)", error);
             return false;
+        }
+    }
+
+    /**
+     * This function is used to find all the name and description of all the services present
+     * @param itemsPerPage is the number of items you want to show in a page: default 10
+     * @param page is the number of the current page: default 1
+     */
+    static async findServices(itemsPerPage = 10, page = 1): Promise<IService[] | null> {
+        try {
+            const result = await Service.serviceModel.find().skip(page * itemsPerPage).limit(itemsPerPage).select("name description -_id");
+            return result as IService[];
+        } catch (e) {
+            logger.error("Error while retrieving all the services in the database", e);
+            return null;
         }
     }
 }
