@@ -1,14 +1,14 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
 import User from "../../model/User";
-import { badRequest, internalServerError, success } from "../../helper/http";
+import { badRequest, checkUndefinedParams, internalServerError, success } from "../../helper/http";
 import { sendRegistrationEmail } from "../../helper/mailer";
 
 import { hashSync } from "bcrypt";
 import { randomBytes } from "crypto";
 import env from "../../helper/env";
 import logger from "../../helper/logger";
-import Error from "mongoose";
+import ModelError from "../../model/ModelError";
 
 export default class RegisterRoute extends Route {
     constructor() {
@@ -18,9 +18,10 @@ export default class RegisterRoute extends Route {
         const username = request.body.username;
         const email = request.body.email;
         const password = request.body.password;
+        if (checkUndefinedParams(response, username, email, password)) return;
 
         // Check password field length
-        if (!password || password.length < 8 || password.length > 20){
+        if (password.length < 8 || password.length > 20){
             badRequest(response);
             return;
         }
@@ -29,7 +30,10 @@ export default class RegisterRoute extends Route {
         const activateToken = randomBytes(64).toString("hex");
 
         try {
-            await User.insertNewUser(username, hash, email, activateToken);
+            if (!await User.insertNewUser(username, hash, email, activateToken)) {
+                internalServerError(response);
+                return;
+            }
         } catch (e) {
             const error = e as Error;
             // Check if it's a ValidationError (integrity check failed)

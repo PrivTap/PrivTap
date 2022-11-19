@@ -1,20 +1,19 @@
 import { Schema, model, Document } from "mongoose";
-import { IOperation } from "./Operation";
+import { IService } from "./Service";
 
 export interface IAction extends Document {
+    description: string;
+    name: string;
+    service: IService;
+    permission: [string];
     data: string;
-    operation: IOperation;
 }
 
 const actionSchema = new Schema<IAction>({
     data:{
         //TODO: change this type
         type: String,
-    },
-    operation: {
-        type: Schema.Types.ObjectId
     }
-
 },
 { collection: "Action" }
 );

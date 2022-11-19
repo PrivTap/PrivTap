@@ -1,5 +1,5 @@
 import User from "../../model/User";
-import { badRequest, internalServerError, success } from "../../helper/http";
+import { badRequest, checkUndefinedParams, success } from "../../helper/http";
 import Route from "../../Route";
 import { Request, Response } from "express";
 
@@ -10,19 +10,9 @@ export default class ActivateRoute extends Route {
 
     protected async httpPost(request: Request, response: Response): Promise<void> {
         const activationToken = request.body.token;
-        if (!activationToken) {
-            badRequest(response, "Undefined parameters");
-            return;
-        }
+        if (checkUndefinedParams(response, activationToken)) return;
 
-        let result;
-        try {
-            result = await User.activateAccount(activationToken);
-        } catch (e) {
-            internalServerError(response);
-            return;
-        }
-
+        const result = await User.activateAccount(activationToken);
         if (!result) {
             badRequest(response, "Invalid token");
             return;

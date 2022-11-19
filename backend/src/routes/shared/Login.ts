@@ -20,16 +20,9 @@ export default class LoginRoute extends Route {
             return;
         }
 
-        let user;
-        try {
-            user = await User.queryUser("username", username);
-        } catch (e) {
-            internalServerError(response);
-            return;
-        }
-
+        const user = await User.findByUsername(username);
         if (user == null) {
-            badRequest(response, "Wrong credentials");
+            badRequest(response, "The username or password is invalid");
             return;
         }
 

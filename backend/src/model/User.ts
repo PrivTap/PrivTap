@@ -1,6 +1,9 @@
-import { Schema, model, Document, FilterQuery, UpdateQuery } from "mongoose";
+import { Schema, model, FilterQuery, UpdateQuery, Types } from "mongoose";
+import logger from "../helper/logger";
+import ModelError from "./ModelError";
 
-export interface IUser extends Document {
+export interface IUser {
+    _id: Types.ObjectId;
     username: string;
     password: string;
     email: string;
@@ -46,14 +49,10 @@ const userSchema = new Schema<IUser>({
         type: String,
         required: true
     }
-    //TODO
-    //array of all service for relation "manages" ?
-    //array of all authorization for relation "authorizes" ?
-},
-{ collection: "User" }
-);
+});
 
-export default class User {
+export default abstract class User {
+
     private static userModel = model<IUser>("User", userSchema);
 
     /**
@@ -72,20 +71,38 @@ export default class User {
             isConfirmed: false,
             activationToken: token
         });
-        await user.save();
+        try {
+            await user.save();
+        } catch (e) {
+            logger.error("Error while inserting new user", e);
+            if (e instanceof Error) {
+                if (e.name == "ValidationError") {
+                    throw new ModelError("Invalid parameters");
+                } else if (e.name == "MongoServerError") {
+                    throw new ModelError("This username or email is already taken");
+                }
+            }
+            return false;
+        }
+        return true;
     }
 
     /**
      * Starts a query looking for the specified attribute (e.g. username) and value (e.g. "John71")
-     * @param attribute The queried attribute
-     * @param value The queried value associated to the specified attribute. IUser expects string, boolean and Date types depending on the attribute
+     * @param username the username to search for
      * @result Returns a Promise<IUser> which can be null if the query is empty
      */
-    static async queryUser(attribute: string, value: string | boolean | Date): Promise<IUser> {
-        const queryObject: {[index: typeof attribute] : typeof value} = {};
-        queryObject[attribute] = value;
-        const queryResult = await User.userModel.findOne(queryObject);
-        return queryResult as IUser;
+    static async findByUsername(username: string): Promise<IUser|null> {
+        let queryResult: FilterQuery<IUser>|null;
+        try {
+            queryResult = await User.userModel.findOne({
+                username: username
+            });
+        } catch (e) {
+            logger.error("Error while finding user by username", e);
+            return null;
+        }
+        return queryResult?._doc as IUser;
     }
 
     /**
@@ -101,7 +118,13 @@ export default class User {
             isConfirmed: true
         };
 
-        const result = await User.userModel.updateOne(filterQuery, updateQuery);
+        let result;
+        try {
+            result = await User.userModel.updateOne(filterQuery, updateQuery);
+        } catch (e) {
+            logger.error("Error while activating account", e);
+            return false;
+        }
 
         return result.modifiedCount == 1;
     }
