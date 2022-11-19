@@ -37,7 +37,7 @@ const toast = useToast();
 const router = useRouter();
 
 async function logout(){
-  const res = await AuthService.logout();
+  const res = await new AuthService().logout();
   if(res.status){
     return toast.success(res.message);
   }

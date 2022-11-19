@@ -15,6 +15,10 @@ interface IManageService extends IAxiosService {
 }
 
 class ManageService extends IAxiosService implements IManageService {
+  constructor() {
+    super();
+  }
+
   createService(
     name: string,
     description: string,
