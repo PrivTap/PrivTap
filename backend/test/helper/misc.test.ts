@@ -1,7 +1,5 @@
 import { checkURL } from "../../src/helper/misc";
 import { expect, request, use } from "chai";
-import * as sinon from "sinon";
-import { IUser } from "../../src/model/User";
 import app from "../../src/app";
 import chaiHttp = require("chai-http");
 
