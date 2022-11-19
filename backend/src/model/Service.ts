@@ -1,6 +1,8 @@
-import { Document, Error, model, Schema } from "mongoose";
+import { FilterQuery, model, Schema, Types } from "mongoose";
+import ObjectId = Types.ObjectId;
+import logger from "../helper/logger";
 
-export interface IService extends Document {
+export interface IService {
     description: string;
     name: string;
     creator: string;
@@ -72,27 +74,94 @@ export default class Service {
         const res = await Service.serviceModel.exists({ name: name });
         if (res == null) {
             //Proceed with the save operation
-            await newService.save();
-        } else throw (new Error("attempting to insert a duplicate item"));
+            try {
+                await newService.save();
+                return true;
+            } catch (e) {
+                logger.error("Error while creating service: ", e);
+                return false;
+            }
+        } else {
+            logger.error("Attempting to insert a duplicate service");
+            return false;
+        }
     }
 
-    static async findServicesCreatedByUser(userID: string): Promise<IService[]> {
-        return Service.serviceModel.find({ creator: userID });
+    static async findServicesCreatedByUser(userID: string): Promise<IService[] | null> {
+        try {
+            return Service.serviceModel.find({ creator: userID });
+        } catch (e) {
+            logger.error("Error while retrieving service: ", e);
+            return null;
+        }
     }
 
-    static async findServiceCreatedByUser(userID: string, serviceID: string): Promise<IService> {
-        const result = await Service.serviceModel.findOne({ creator: userID, _id: serviceID });
-        return result as IService;
+    static async findServiceCreatedByUser(userID: string, serviceID: string): Promise<IService | null> {
+        try {
+            const result = await Service.serviceModel.findOne({ creator: userID, _id: serviceID });
+            return result as (IService | null);
+        } catch (e) {
+            logger.error("Error while retrieving service: ", e);
+            return null;
+        }
     }
 
     static async deleteService(userID: string, serviceID: string) {
-        await Service.serviceModel.deleteOne({ creator: userID, _id: serviceID });
+        try {
+            await Service.serviceModel.deleteOne({ creator: userID, _id: serviceID });
+            return true;
+        } catch (e) {
+            logger.error("Error while deleting service: ", e);
+            return false;
+        }
     }
 
-    static async addAuthServer(service: IService, authServer: string, clientId: string, clientSecret: string) {
+    static async updateService(serviceID: string, newName: string | null, newDescription: string | null, newAuthServer: string | null, newClientId: string | null, newClientSecret: string | null) {
+        const filterQuery: FilterQuery<IService> = {
+            _id: new ObjectId(serviceID)
+        };
+
+        const updateQuery: Record<string, unknown> = {};
+        if (newName) {
+            updateQuery.name = newName;
+        }
+        if (newDescription) {
+            updateQuery.description = newDescription;
+        }
+        if (newAuthServer) {
+            updateQuery.authServer = newAuthServer;
+        }
+        if (newClientId) {
+            updateQuery.clientId = newClientId;
+        }
+        if (newClientSecret) {
+            updateQuery.clientSecret = newClientSecret;
+        }
+
+        try {
+            const result = await Service.serviceModel.updateOne(filterQuery, updateQuery);
+
+            return result.modifiedCount == 1;
+        } catch (error) {
+            logger.error("Error while updating service with ID $(serviceID)", error);
+            return false;
+        }
+    }
+
+    /*static async addAuthServer(service: IService, authServer: string, clientId: string, clientSecret: string) {
         service.authServer = authServer;
         service.clientId = clientId;
         service.clientSecret = clientSecret;
         await service.save();
-    }
+
+        const filterQuery: FilterQuery<IUser> = {
+            activationToken: token
+        };
+        const updateQuery: UpdateQuery<IUser> = {
+            activationToken: "",
+            isConfirmed: true
+        };
+
+        const result = await User.userModel.updateOne(filterQuery, updateQuery);
+    }*/
 }
