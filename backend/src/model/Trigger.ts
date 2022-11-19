@@ -1,7 +1,7 @@
-import { Schema, model, Document } from "mongoose";
+import { Schema, model } from "mongoose";
 import { IOperation } from "./Operation";
 
-export interface ITrigger extends Document {
+export interface ITrigger {
     data: string;
     operation: IOperation;
 }

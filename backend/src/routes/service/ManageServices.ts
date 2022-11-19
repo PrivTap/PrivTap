@@ -13,11 +13,10 @@ export default class ManageServices extends Route {
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
-        try {
-            const services = await Service.findServicesCreatedByUser(request.userId.toString());
-            response.status(200);
-            response.send(JSON.stringify(services));
-        } catch (error) {
+        const services = await Service.findServicesCreatedByUser(request.userId.toString());
+        if (services) {
+            success(response, new Object({ "services": services }));
+        } else {
             internalServerError(response);
         }
     }
@@ -36,28 +35,26 @@ export default class ManageServices extends Route {
             badRequest(response, "Invalid parameter");
             return;
         }
+
         // If one of the three optional params is present then we need all three of them
         let hasOptionalParameters = false;
         const clientIdValid = clientId != null;
         const clientSecretValid = clientSecret != null;
-        let authURLValid = serviceAuthURL != null;
+        const authURLValid = serviceAuthURL != null && checkURL(serviceAuthURL);
         if (authURLValid || clientIdValid || clientSecretValid) {
-            authURLValid = authURLValid && checkURL(serviceAuthURL);
-            hasOptionalParameters = true;
-
             if (!(authURLValid && clientIdValid && clientSecretValid)) {
                 badRequest(response, "Invalid parameter");
                 return;
             }
+            hasOptionalParameters = true;
         }
-        try {
-            // Insert the service
-            await Service.insert(serviceName, serviceDesc, request.userId.toString(),
-                hasOptionalParameters ? serviceAuthURL : undefined, hasOptionalParameters ? clientId : undefined, hasOptionalParameters ? clientSecret : undefined);
+
+        // Insert the service
+        if (await Service.insert(serviceName, serviceDesc, request.userId.toString(),
+            hasOptionalParameters ? serviceAuthURL : undefined, hasOptionalParameters ? clientId : undefined, hasOptionalParameters ? clientSecret : undefined)) {
             success(response);
-        } catch (error) {
-            //this is for duplicated data
-            badRequest(response, "Service with this name already exist");
+        } else {
+            badRequest(response, "Error while creating service");
         }
     }
 
@@ -68,42 +65,57 @@ export default class ManageServices extends Route {
             badRequest(response, "Invalid parameter");
             return;
         }
-        try {
-            const service = await Service.findServiceCreatedByUser(request.userId.toString(), serviceID.toString());
-            if (service != null) {
-                await Service.deleteService(request.userId.toString(), serviceID);
+
+        const service = await Service.findServiceCreatedByUser(request.userId.toString(), serviceID.toString());
+        if (service != null) {
+            if (await Service.deleteService(request.userId.toString(), serviceID)) {
                 success(response);
             } else {
-                forbiddenUserError(response, "You can't delete this service");
+                internalServerError(response);
             }
-        } catch (error) {
-            internalServerError(response);
+        } else {
+            forbiddenUserError(response, "You can't delete this service");
         }
     }
 
     protected registerAdditionalHTTPMethods(router: express.Router) {
-        router.post("/add-auth-server", async (request, response) => {
+        router.put("/", async (request, response) => {
             const serviceID = request.body.serviceID;
             const serviceAuthURL = request.body.authURL;
             const clientID = request.body.clientID;
             const clientSecret = request.body.clientSecret;
-            if (serviceAuthURL == null || serviceID == null || clientID == null || clientSecret == null || !mongoose.isValidObjectId(serviceID)) {
-                badRequest(response, "Invalid parameter");
+            const newServiceName = request.body.name;
+            const newServiceDescription = request.body.description;
+
+            let parametersValid = true;
+
+            if (!serviceID || !mongoose.isValidObjectId(serviceID)) {
+                parametersValid = false;
+            }
+            if (clientID || clientSecret) {
+                parametersValid = parametersValid && (clientID && clientSecret);
+            }
+            if (serviceAuthURL && !checkURL(serviceAuthURL)) {
+                parametersValid = false;
+            }
+
+            if (!parametersValid) {
+                badRequest(response, "Invalid parameters");
                 return;
             }
-            if (!checkURL(serviceAuthURL)) {
-                badRequest(response, "Invalid parameter");
+
+            const service = await Service.findServiceCreatedByUser(request.userId, serviceID);
+
+            if (service == null) {
+                forbiddenUserError(response, "You are not authorized to check this resource");
                 return;
             }
-            try {
-                const service = await Service.findServiceCreatedByUser(request.userId, serviceID);
-                if (service == null) {
-                    forbiddenUserError(response, "You are not authorized to check this resource");
-                    return;
-                }
-                await Service.addAuthServer(service, serviceAuthURL, clientID, clientSecret);
+
+            const result = await Service.updateService(serviceID, newServiceName, newServiceDescription, serviceAuthURL, clientID, clientSecret);
+
+            if (result) {
                 success(response);
-            } catch (error) {
+            } else {
                 internalServerError(response);
             }
         });

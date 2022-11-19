@@ -15,7 +15,10 @@ const router = createRouter({
       component: () => import("../views/HomeView.vue"),
       meta: {
         requireAuth: true,
-      }
+      },
+      children: [
+        
+      ],
     },
     {
       path: "/auth",
@@ -24,8 +27,8 @@ const router = createRouter({
     },
 
     {
-      path: "/personalPage",
-      name: "personalPage",
+      path: "/personalpage",
+      name: "personalpage",
       component: () => import("../views/PersonalPageView.vue"),
     },
 
