@@ -59,15 +59,6 @@ describe("/activate endpoint", () => {
             expect(activateAccountStub).to.have.been.calledOnceWith(sampleToken);
         });
 
-        it("should handle database error", async () => {
-            activateAccountStub.throws();
-
-            const res = await requester.post("/activate").send({ token: sampleToken });
-
-            expect(res).to.have.status(500);
-            expect(activateAccountStub).to.have.been.calledOnceWith(sampleToken);
-        });
-
     });
 
 });

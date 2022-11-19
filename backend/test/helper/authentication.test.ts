@@ -1,14 +1,10 @@
 import Authentication from "../../src/helper/authentication";
-import { expect, request, use } from "chai";
+import { expect } from "chai";
 import * as sinon from "sinon";
 import { IUser } from "../../src/model/User";
-import app from "../../src/app";
-import chaiHttp = require("chai-http");
 import { Request, Response } from "express";
 import * as http_internal from "../../src/helper/http";
-
-
-use(chaiHttp);
+import "../../src/app";
 
 const sandbox = sinon.createSandbox();
 

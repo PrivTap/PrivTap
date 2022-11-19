@@ -21,7 +21,7 @@ export default abstract class Authentication {
     static checkAuthentication(request: Request, response: Response, next: NextFunction) {
         let userId;
         try {
-            userId = this.checkJWT(request);
+            userId = Authentication.checkJWT(request);
         } catch (e) {
             if (e instanceof AuthError) {
                 unauthorizedUserError(response);
@@ -31,9 +31,6 @@ export default abstract class Authentication {
             return;
         }
 
-        // TODO: Do we need to check if the user exists and load it from the DB here, or is it enough to pass only the id
-        //  and then the endpoint makes db calls if needed?
-        // const user = await User.findById(user_id);
         request.userId = userId;
 
         next();

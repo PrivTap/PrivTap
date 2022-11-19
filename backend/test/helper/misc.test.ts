@@ -1,22 +1,7 @@
 import { checkURL } from "../../src/helper/misc";
-import { expect, request, use } from "chai";
-import app from "../../src/app";
-import chaiHttp = require("chai-http");
-
-
-use(chaiHttp);
+import { expect } from "chai";
 
 describe("Testing authentication helper module", () => {
-
-    let requester: ChaiHttp.Agent;
-
-    before(async () => {
-        requester = request(app.express).keepOpen();
-    });
-
-    after(async () => {
-        requester.close();
-    });
 
     it("should correctly verify a correct URL", () => {
         expect(checkURL("https://www.apple.com/something")).to.be.true;

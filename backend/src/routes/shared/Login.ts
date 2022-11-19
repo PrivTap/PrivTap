@@ -47,7 +47,7 @@ export default class LoginRoute extends Route {
      * @param user the user for which the cookie will be generated
      * @protected
      */
-    protected static setAuthenticationCookie(response: Response, user: IUser) {
+    static setAuthenticationCookie(response: Response, user: IUser) {
         // Create a JWT token for the user
         const jwt = Authentication.createJWT(user);
         if (!jwt)

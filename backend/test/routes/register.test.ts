@@ -5,6 +5,7 @@ import sinonChai from "sinon-chai";
 import app from "../../src/app";
 import User from "../../src/model/User";
 import Mailer from "../../src/helper/mailer";
+import ModelError from "../../src/model/ModelError";
 
 use(chaiHttp);
 use(sinonChai);

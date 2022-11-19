@@ -41,7 +41,7 @@ export default class RegisterRoute extends Route {
             return;
         }
         try {
-            await sendRegistrationEmail(username, email, activateToken);
+            await Mailer.sendRegistrationEmail(username, email, activateToken);
         } catch (e) {
             logger.error("Unexpected error: ", e);
             internalServerError(response);

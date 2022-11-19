@@ -12,7 +12,7 @@ use(sinonChai);
 
 const sandbox = createSandbox();
 
-describe("/register endpoint", () => {
+describe("/login endpoint", () => {
 
     let requester: ChaiHttp.Agent;
     let queryUserStub: SinonStub;
@@ -28,9 +28,9 @@ describe("/register endpoint", () => {
     });
 
     beforeEach(() => {
-        queryUserStub = sandbox.stub(User, "queryUser");
+        queryUserStub = sandbox.stub(User, "findByUsername");
         compareSyncStub = sandbox.stub(bcrypt, "compareSync");
-        setAuthenticationCookieStub = sandbox.stub(LoginRoute, <any> "setAuthenticationCookie");
+        setAuthenticationCookieStub = sandbox.stub(LoginRoute, "setAuthenticationCookie");
     });
 
     afterEach(() => {
@@ -113,7 +113,7 @@ describe("/register endpoint", () => {
             const credentials = { "username": "someUsername" };
             const expectedBody = { "data" : credentials, "message" : "", "status" : true };
 
-            const res = await requester.post("/api/login").send({
+            const res = await requester.post("/login").send({
                 username : "someUsername",
                 password: "somePassword"
             });

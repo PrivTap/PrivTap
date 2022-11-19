@@ -1,9 +1,9 @@
-import { Schema, model, FilterQuery, UpdateQuery, Types } from "mongoose";
+import { Schema, model, FilterQuery, UpdateQuery } from "mongoose";
 import logger from "../helper/logger";
 import ModelError from "./ModelError";
 
 export interface IUser {
-    _id: Types.ObjectId;
+    _id: string;
     username: string;
     password: string;
     email: string;
