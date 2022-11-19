@@ -53,7 +53,20 @@ const router = createRouter({
       path: "/publishservice",
       name: "publishservice",
       component: () => import("../views/PublishServiceView.vue"),
+    },
+ 
+
+
+
+
+     //Playing
+    {
+      path: "/test",
+      name: "test",
+      component: () => import("../views/test.vue"),
     }
+
+
 
   ],
 });

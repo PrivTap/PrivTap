@@ -5,6 +5,7 @@ import { RouterView, useRouter } from "vue-router";
 import { useAuthStore } from "./stores/auth_store";
 import NavBar from "./components/NavBar.vue";
 
+
 /// Used to access the store variables and functions
 const authStore = useAuthStore();
 // Used to listen on the store changes
