@@ -27,13 +27,15 @@
         <input
           type="text"
           id="simple-search"
-          class="px-64 bg-gray-50 border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          class="px-64 bg-gray-50 border border-gray-300 text-black text-sm rounded-md block w-full pl-10 p-2.5"
           placeholder="Search"
+          
         />  
       </div>
     </form>
 
     <select
+    multiple
     
       class="container mx-auto grid grid-cols-1 bg-gray-800 rounded-md px-5 py-5 border-2 border-blue-600 overflow-y-scroll h-96 overscroll-auto w-full space-y-5">
 
@@ -70,7 +72,7 @@
 
 
     <div class="flex flex-row justify-center py-10 space-x-32">
-        <button type="button" class="px-16 py-3 bg-blue3 text-white">
+        <button type="button" class="px-16 py-3 bg-blue-800 text-white rounded-md hover:bg-blue-900">
           Authorize
         </button>
       </div>
