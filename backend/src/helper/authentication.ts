@@ -37,10 +37,11 @@ export default abstract class Authentication {
     }
 
     /**
-     * Checks in the cookies of the request if a JWT token is present. If so, tries to decode it and returns the userId.
+     * Checks in the cookies of the request if a JWT token is present. If so, tries to decode it
      * @param request the HTTP request
      * @throws AuthError if the cookie does not exist or if it is not possible to decode it
      * @throws Error if the JWT_SECRET env variable is not defined
+     * @return Returns the userID
      */
     static checkJWT(request: Request): string {
         const secret = env.JWT_SECRET;

@@ -30,6 +30,20 @@ const ruleSchema = new Schema<IRule>({
 
 export default class Rule {
 
-    private static ruleModel = model<IRule>("Ruke", ruleSchema);
+    private static ruleModel = model<IRule>("Rule", ruleSchema);
+
+    static async findByUserID(userID: string): Promise<[IRule]|null>{
+        return null;
+    }
+
+    static async insertNewRule(userID: string, triggerID: string, actionID: string): Promise<boolean>{
+        // isAuthorized set to false for now
+        return false;
+    }
+
+    static async deleteRule(userID: string, ruleID: string): Promise<boolean> {
+        return false;
+    }
+
 
 }
