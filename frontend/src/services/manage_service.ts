@@ -2,7 +2,7 @@ import type { ServiceModel } from "@/model/service_model";
 import IAxiosService from "../helpers/axios_service";
 import type { StandartRepsonse } from "../model/response_model";
 
-interface IManageService extends IAxiosService {
+export default interface IManageService extends IAxiosService {
   createService(
     name: string,
     description: string,
