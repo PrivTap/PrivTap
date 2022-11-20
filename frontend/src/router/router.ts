@@ -48,12 +48,12 @@ const router = createRouter({
       component: () => import("../views/PersonalPageView.vue"),
     },
  
-    //  //Playing
-    // {
-    //   path: "/test",
-    //   name: "test",
-    //   component: () => import("../views/test.vue"),
-    // }
+     //Playing
+    {
+      path: "/test",
+      name: "test",
+      component: () => import("../views/test.vue"),
+    }
 
 
 
