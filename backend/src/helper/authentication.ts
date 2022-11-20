@@ -4,7 +4,7 @@ import { verify, sign, JwtPayload } from "jsonwebtoken";
 import { internalServerError, unauthorizedUserError } from "./http";
 import env from "./env";
 
-class AuthError extends Error {
+export class AuthError extends Error {
     constructor(message?: string) {
         super(message);
     }
@@ -87,4 +87,5 @@ export default abstract class Authentication {
             });
         }
     }
+
 }

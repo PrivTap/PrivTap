@@ -5,6 +5,7 @@ import sinonChai from "sinon-chai";
 import app from "../../src/app";
 import Authentication from "../../src/helper/authentication";
 import Rule from "../../src/model/Rule";
+import Confirmation from "../../src/helper/confirmation";
 
 use(chaiHttp);
 use(sinonChai);
@@ -14,6 +15,7 @@ const sandbox = createSandbox();
 describe("/rules endpoint", () => {
 
     let requester: ChaiHttp.Agent;
+    let checkValidationStub: SinonStub;
     let checkJWTStub: SinonStub;
     let findByUserIDStub: SinonStub;
     let insertNewRuleStub: SinonStub;
@@ -28,6 +30,7 @@ describe("/rules endpoint", () => {
     });
 
     beforeEach(() => {
+        checkValidationStub = sandbox.stub(Confirmation, "checkValidation");
         checkJWTStub = sandbox.stub(Authentication, "checkJWT");
         findByUserIDStub = sandbox.stub(Rule, "findByUserID");
         insertNewRuleStub = sandbox.stub(Rule, "insertNewRule");
@@ -39,17 +42,16 @@ describe("/rules endpoint", () => {
     });
 
     describe("GET /", () => {
+        // Confirmation flag
+        it ("should fail if the user is not confirmed", async () => {
+            checkValidationStub.resolves(false);
+        });
+
+        // Authentication flag
         it ("should fail if the user doesn't have valid jwt", async () => {
             checkJWTStub.throws();
             const res = await requester.get("/rules");
             expect(res).to.have.status(401); // Unauthorized
-        });
-
-        it ("should fail if a server error occurs", async () => {
-            checkJWTStub.returns("someID");
-            findByUserIDStub.throws();
-            const res = await requester.get("/rules");
-            expect(res).to.have.status(500);
         });
 
         it ("should succeed if the jwt is valid and no server error occurs", async () => {
@@ -70,6 +72,11 @@ describe("/rules endpoint", () => {
 
 
     describe("POST /", () => {
+
+        it ("should fail if the user is not confirmed", async () => {
+            
+        });
+
         it ("should fail if the user doesn't have valid jwt", async () => {
             checkJWTStub.throws();
             const someRule = {
@@ -80,6 +87,10 @@ describe("/rules endpoint", () => {
             };
             const res = await requester.post("/rules").send(someRule);
             expect(res).to.have.status(401); // Unauthorized
+        });
+
+        it("should fail if some of the parameters are undefined", async () => {
+
         });
 
         it ("should fail if a server error occurs", async () => {
@@ -118,6 +129,10 @@ describe("/rules endpoint", () => {
             };
             const res = await requester.delete("/rules").send(someRuleID);
             expect(res).to.have.status(401); // Unauthorized
+        });
+
+        it("should fail if some of the parameters are undefined", async () => {
+
         });
 
         it ("should fail if the jwt is valid but the rule has not been created by that specific user", async () => {

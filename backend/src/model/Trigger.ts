@@ -5,8 +5,8 @@ export interface ITrigger {
     name: string;
     description: string;
     serviceID: ObjectId;
-    permissions: [any]; // TO DEFINE
-    data: [any]; // TO DEFINE
+    permissions: any[]; // TO DEFINE
+    data: any[]; // TO DEFINE
 }
 
 const triggerSchema = new Schema<ITrigger>({

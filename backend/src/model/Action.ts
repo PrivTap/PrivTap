@@ -5,7 +5,7 @@ export interface IAction {
     name: string;
     description: string;
     serviceID: ObjectId;
-    permissions: [any]; // TO DEFINE
+    permissions: any[]; // TO DEFINE
     endpoint: string;
 }
 

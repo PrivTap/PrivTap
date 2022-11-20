@@ -65,8 +65,8 @@ export function forbiddenUserError(response: Response, message = "Forbidden") {
  * Sends to the client a response signalling "401 Unauthorized".
  * @param response The Express response used to send the error to
  */
-export function unauthorizedUserError(response: Response) {
-    response.status(401).json(new APIResponse(false, "Unauthorized"));
+export function unauthorizedUserError(response: Response, message = "Unauthorized") {
+    response.status(401).json(new APIResponse(false, message));
 }
 
 /**

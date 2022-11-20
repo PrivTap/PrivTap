@@ -1,4 +1,5 @@
 import { model, ObjectId, Schema, Types } from "mongoose";
+import logger from "../helper/logger";
 
 export interface IRule {
     _id: string;
@@ -32,8 +33,16 @@ export default class Rule {
 
     private static ruleModel = model<IRule>("Rule", ruleSchema);
 
-    static async findByUserID(userID: string): Promise<[IRule]|null>{
-        return null;
+    static async findByUserID(userID: string): Promise<IRule[]|undefined>{
+        try {
+            console.log(userID);
+            const queryResult = await Rule.ruleModel.find({ userID: userID });
+            //return queryResult;
+            console.log(queryResult);
+        } catch (e) {
+            logger.error("Error finding rules by id", e);
+            return undefined;
+        }
     }
 
     static async insertNewRule(userID: string, triggerID: string, actionID: string): Promise<boolean>{
