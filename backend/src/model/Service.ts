@@ -3,6 +3,7 @@ import ObjectId = Types.ObjectId;
 import logger from "../helper/logger";
 
 export interface IService {
+    _id: string;
     description: string;
     name: string;
     creator: ObjectId;
