@@ -49,11 +49,11 @@ const router = createRouter({
     },
  
      //Playing
-    {
-      path: "/test",
-      name: "test",
-      component: () => import("../views/Testt.vue"),
-    }
+    // {
+    //   path: "/test",
+    //   name: "test",
+    //   component: () => import("../views/Testt.vue"),
+    // }
 
 
 
