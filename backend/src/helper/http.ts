@@ -9,7 +9,7 @@ export class APIResponse {
     // Message that will be sent back to clients, DO NOT put sensitive info here
     readonly message: string;
     // Additional data that is needed by the client, optional
-    readonly data?: {[index: string] : string | boolean };
+    readonly data?: object;
 
     /**
      * Creates a new APIResponse with the given options.
@@ -17,11 +17,21 @@ export class APIResponse {
      * @param message message that will be sent back to client, mainly used for errors, default ""
      * @param data additional data that will be sent back to client, mainly used on successful requests to pass the needed data
      */
-    constructor(status=true, message="", data?: {[index: string] : string | boolean }) {
+    constructor(status = true, message = "", data?: object) {
         this.status = status;
         this.message = message;
         this.data = data;
     }
+}
+
+export function checkUndefinedParams(response: Response, ...params: (string | undefined)[]): boolean {
+    for (const param of params) {
+        if (param == undefined) {
+            badRequest(response, "One of the parameters is missing");
+            return true;
+        }
+    }
+    return false;
 }
 
 /**
@@ -30,7 +40,7 @@ export class APIResponse {
  * @param data The data needed by the client after the successful request
  * @param message The message that will be sent, for the majority of successful responses this should be left as default, use data to pass information needed by the client
  */
-export function success(response: Response, data?: {[p: string]: string | boolean}, message="") {
+export function success(response: Response, data?: object , message = "") {
     response.status(200).json(new APIResponse(true, message, data));
 }
 
@@ -41,12 +51,13 @@ export function success(response: Response, data?: {[p: string]: string | boolea
 export function internalServerError(response: Response) {
     response.status(500).json(new APIResponse(false, "Internal server error"));
 }
+
 /**
  * Sends to the client a response signalling "403 Forbidden".
  * @param response The Express response used to send the error to
  * @param message The message to send to the client along with the error
  */
-export function forbiddenUserError(response: Response, message : string = "Forbidden") {
+export function forbiddenUserError(response: Response, message = "Forbidden") {
     response.status(403).json(new APIResponse(false, message));
 }
 
@@ -54,8 +65,8 @@ export function forbiddenUserError(response: Response, message : string = "Forbi
  * Sends to the client a response signalling "401 Unauthorized".
  * @param response The Express response used to send the error to
  */
-export function unauthorizedUserError(response: Response) {
-    response.status(401).json(new APIResponse(false, "Unauthorized"));
+export function unauthorizedUserError(response: Response, message = "Unauthorized") {
+    response.status(401).json(new APIResponse(false, message));
 }
 
 /**
@@ -63,6 +74,6 @@ export function unauthorizedUserError(response: Response) {
  * @param response The Express response used to send the error to
  * @param message The message to send to the client along with the error
  */
-export function badRequest(response: Response, message: string="Bad request") {
+export function badRequest(response: Response, message = "Bad request") {
     response.status(400).json(new APIResponse(false, message));
 }

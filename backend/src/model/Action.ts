@@ -1,22 +1,39 @@
-import {Schema, model, Document} from "mongoose";
-import {IOperation} from "./Operation";
+import { model, Schema, Types } from "mongoose";
 
-export interface IAction extends Document {
-    data: string;
-    operation: IOperation;
+export interface IAction {
+    _id: string;
+    name: string;
+    description: string;
+    serviceID: Types.ObjectId;
+    permissions: any[]; // TO DEFINE
+    endpoint: string;
 }
 
 const actionSchema = new Schema<IAction>({
-    data:{
-        //TODO: change this type
+    name: {
         type: String,
+        required: true,
+        index: {
+            unique: true
+        }
     },
-    operation: {
-        type: Schema.Types.ObjectId
+    description: {
+        type: String,
+        required: true,
+    },
+    serviceID: {
+        type: Schema.Types.ObjectId,
+        required: true
+    },
+    permissions: {
+        type: [Object],
+        required: true
+    },
+    endpoint: {
+        type: String,
+        required: true
     }
-
-},
-{ collection: "Action" }
+}
 );
 
 export default class Action {

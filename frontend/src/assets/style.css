@@ -33,23 +33,9 @@
 #app {
     font-family: 'Nunito', sans-serif;
     font-weight: 200;
-    height: 100vh;
+    min-height: 100vh;
     margin: 0;
     background-color: #232323;
-    /* background-color: #DEEAFC; */
-  }
-
-h1 {
-    font-size: 2.5rem;
-    font-weight: 600;
 }
 
-h2 {
-    font-size: 1.5rem;
-    font-weight: 600;
-}
 
-h3 {
-    font-size: 1.5rem;
-    font-weight: 600;
-}

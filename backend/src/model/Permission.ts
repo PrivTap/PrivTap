@@ -1,7 +1,7 @@
 //define what is scope
-import {Schema, model, Document} from "mongoose";
+import { Schema, model } from "mongoose";
 
-export interface IPermission extends Document {
+export interface IPermission {
     scope: string;
 }
 

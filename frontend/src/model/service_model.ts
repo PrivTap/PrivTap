@@ -1,23 +1,32 @@
-import type { OperationModel } from "./operation_model";
+/// Build class for the service
 
-export class ServiceModel {
-  id: string;
+export default class ServiceModel {
+  _id: string;
   name: string;
   description: string;
-  auth_server: string;
-  operations: OperationModel[];
+  creator: string;
+  authServer: string;
+  clientId: string;
+  clientSecret: string;
+  v: number;
 
   constructor(
-    id: string,
+    serviceId: string,
     name: string,
     description: string,
-    auth_server: string,
-    operations: OperationModel[]
+    creator: string,
+    authServer: string,
+    clientId: string,
+    clientSecret: string,
+    v: number
   ) {
-    this.id = id;
+    this._id = serviceId;
     this.name = name;
     this.description = description;
-    this.auth_server = auth_server;
-    this.operations = operations;
+    this.creator = creator;
+    this.authServer = authServer;
+    this.clientId = clientId;
+    this.clientSecret = clientSecret;
+    this.v = v;
   }
 }

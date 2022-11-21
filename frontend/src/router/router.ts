@@ -1,5 +1,4 @@
 import { useAuthStore } from "@/stores/auth_store";
-import { storeToRefs } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
 
 const router = createRouter({
@@ -16,13 +15,48 @@ const router = createRouter({
       component: () => import("../views/HomeView.vue"),
       meta: {
         requireAuth: true,
-      }
+      },
     },
     {
       path: "/auth",
       name: "auth",
       component: () => import("../views/AuthView.vue"),
     },
+    {
+      path: "/osppersonalpage",
+      name: "osppersonalPage",
+      component: () => import("../views/OspPersonalPageView.vue"),
+    },
+    {
+      path: "/services",
+      name: "services",
+      component: () => import("../views/ServicesView.vue"),
+    },
+    {
+      path: "/unauthorizedservices",
+      name: "unauthorizedservices",
+      component: () => import("../views/UnAuthorizedServicesView.vue"),
+    },
+    {
+      path: "/publishservice",
+      name: "publishservice",
+      component: () => import("../views/PublishServiceView.vue"),
+    },
+    {
+      path: "/personalpage",
+      name: "personalpage",
+      component: () => import("../views/PersonalPageView.vue"),
+    },
+ 
+     //Playing
+    {
+      path: "/test",
+      name: "test",
+      component: () => import("../views/Testt.vue"),
+    }
+
+
+
   ],
 });
 
@@ -30,6 +64,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const isAutheticated: boolean = useAuthStore().isAutheticated;
   if (to.meta.requireAuth && !isAutheticated) return next("/auth");
+  if(to.name === "auth" && isAutheticated) return next("/home");
   return next();
 });
 

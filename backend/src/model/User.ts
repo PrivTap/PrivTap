@@ -1,6 +1,9 @@
-import {Schema, model, Document} from "mongoose";
+import { Schema, model, FilterQuery, UpdateQuery } from "mongoose";
+import logger from "../helper/logger";
+import ModelError from "./ModelError";
 
-export interface IUser extends Document {
+export interface IUser {
+    _id: string;
     username: string;
     password: string;
     email: string;
@@ -15,7 +18,10 @@ const userSchema = new Schema<IUser>({
         required: true,
         index: {
             unique: true
-        }
+        },
+        minLength: 3,
+        maxLength: 20,
+        match: /[a-zA-Z0-9.\-_]*/
     },
     password: {
         type: String,
@@ -26,7 +32,10 @@ const userSchema = new Schema<IUser>({
         required: true,
         index: {
             unique: true
-        }
+        },
+        minLength: 3,
+        maxLength: 255,
+        match: /^[-!#$%&'*+/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/
     },
     registrationDate: {
         type: Date,
@@ -40,14 +49,10 @@ const userSchema = new Schema<IUser>({
         type: String,
         required: true
     }
-    //TODO
-    //array of all service for relation "manages" ?
-    //array of all authorization for relation "authorizes" ?
-},
-{ collection: "User" }
-);
+});
 
-export default class User {
+export default abstract class User {
+
     private static userModel = model<IUser>("User", userSchema);
 
     /**
@@ -57,7 +62,7 @@ export default class User {
      * @param email The new user's email to be inserted
      * @param token The new user's activation token to be inserted
      */
-    static async insertNewUser(username: string, password: string, email: string, token: string) {
+    static async insertNewUser(username: string, password: string, email: string, token: string): Promise<boolean> {
         const user = new User.userModel({
             username: username,
             password: password,
@@ -66,50 +71,77 @@ export default class User {
             isConfirmed: false,
             activationToken: token
         });
-        await user.save();
+        try {
+            await user.save();
+        } catch (e) {
+            logger.error("Error while inserting new user", e);
+            if (e instanceof Error) {
+                if (e.name == "ValidationError") {
+                    throw new ModelError("Invalid parameters");
+                } else if (e.name == "MongoServerError") {
+                    throw new ModelError("This username or email is already taken");
+                }
+            }
+            return false;
+        }
+        return true;
     }
 
     /**
      * Starts a query looking for the specified attribute (e.g. username) and value (e.g. "John71")
-     * @param attribute The queried attribute
-     * @param value The queried value associated to the specified attribute. IUser expects string, boolean and Date types depending on the attribute
+     * @param username the username to search for
      * @result Returns a Promise<IUser> which can be null if the query is empty
      */
-    static async queryUser(attribute: string, value: string | boolean | Date): Promise<IUser> {
-        const queryObject: {[index: typeof attribute] : typeof value} = {};
-        queryObject[attribute] = value;
-        const queryResult = await User.userModel.findOne(queryObject);
-        return queryResult as IUser;
+    static async findByUsername(username: string): Promise<IUser|null> {
+        let queryResult: FilterQuery<IUser>|null;
+        try {
+            queryResult = await User.userModel.findOne({
+                username: username
+            });
+        } catch (e) {
+            logger.error("Error while finding user by username", e);
+            return null;
+        }
+        return queryResult?._doc as IUser;
     }
 
     /**
-     * Modifies the document specified by the parameters queryAttribute (e.g. username) and queryValue (e.g. "John71") accordingly to modifyAttribute (e.g. email) and modifyValue (e.g. "newEmail@gmail.com")
-     * @param queryAttribute The queried attribute
-     * @param queryValue The queried value associated to the specified attribute. IUser expects string, boolean and Date types depending on the attribute
-     * @param modifyAttribute The attribute to modify
-     * @param modifyValue The new value associated to the specified attribute. IUser expects string, boolean and Date types depending on the attribute
-     * @result Returns a dictionary containing the fields modifiedCount, equal to the number of modified documents and matchedCount, equal to the number of documents matching the query
+     * Activates the user account that has the corresponding activation token
+     * @param token the activation token to use to activate the account
      */
-    static async modifyUser(queryAttribute: string, queryValue: string | boolean | Date, modifyAttribute: string, modifyValue: string | boolean | Date): Promise<{[index: string] : number}> {
-        const User = model("User", userSchema);
-        const queryObject: {[index: typeof queryAttribute] : typeof queryValue} = {};
-        queryObject[queryAttribute] = queryValue;
-        const modifyObject: {[index: typeof modifyAttribute] : typeof modifyValue} = {};
-        modifyObject[modifyAttribute] = modifyValue;
-        const queryResult = await User.updateOne(queryObject, modifyObject);
-        const resultObject: {[index: string] : number} = {};
-        resultObject["modifiedCount"] = queryResult.modifiedCount;
-        resultObject["matchedCount"] = queryResult.matchedCount;
-        return resultObject;
+    static async activateAccount(token: string) {
+        const filterQuery: FilterQuery<IUser> = {
+            activationToken: token
+        };
+        const updateQuery: UpdateQuery<IUser> = {
+            activationToken: "",
+            isConfirmed: true
+        };
+
+        let result;
+        try {
+            result = await User.userModel.updateOne(filterQuery, updateQuery);
+        } catch (e) {
+            logger.error("Error while activating account", e);
+            return false;
+        }
+
+        return result.modifiedCount == 1;
     }
 
     /**
      * Finds an existing user given its user ID
      * @param userId The ID of the user to find in the database
      */
-    static async findById(userId: string): Promise<IUser>{
-        const query = await User.userModel.findById(userId);
-        return query as IUser;
+    static async findById(userId: string): Promise<IUser|undefined>{
+        let queryResult: FilterQuery<IUser>|null;
+        try {
+            queryResult = await User.userModel.findById(userId);
+        } catch (e) {
+            logger.error("Error finding user by id", e);
+            return undefined;
+        }
+        return queryResult?._doc as IUser;
     }
 }
 

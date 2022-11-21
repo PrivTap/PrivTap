@@ -6,6 +6,10 @@ module.exports = {
   ],
   theme: {
     extend: {
+      backgroundImage: {
+        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+        "gradient-circle": " radial-gradient(circle at center,(var(--tw-gradient-stops))",
+       },
     },
   },
   plugins: [],

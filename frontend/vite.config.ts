@@ -17,6 +17,11 @@ export default defineConfig({
     include: ["test/**/*.ts"],
     environment: "jsdom",
     root: "src/",
-    watch: false
+    watch: false,
+    
+    coverage:{
+      reportsDirectory: "coverage",
+      reporter:['text', 'json', 'html'],
+    }
   }
 });
