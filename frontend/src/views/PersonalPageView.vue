@@ -4,14 +4,13 @@
     <!-- <link rel="stylesheet" href="/dist/output.css" />
 
     <title>Persnal Page</title> -->
-  <div class="text-center py-20" >
-    <div class="text-4xl text-white font-semibold pb-10">
-      <a>Personal Page</a>
+  <div class="text-center py-16" >
+    <h1 class="text-5xl text-blue-100 text-center font-medium">Personal Page</h1>
     </div>
 
     <div
-      class="container mx-auto grid grid-cols-1 bg-gray-800 rounded-lg px-5 py-5 border-2 border-blue-600 gap-4 overflow-y-scroll h-96 overscroll-auto">
-      <div class="text-white px-4 bg-blue-600 w-full py-5 rounded-md">
+      class="container mx-auto grid grid-cols-1 bg-gray-800 rounded-lg px-5 py-5 border-2 border-blue-600 gap-4 overflow-y-scroll h-96 overscroll-auto ">
+      <div class="text-white px-4 bg-blue-600 w-full py-5 rounded-md hover:bg-blue-900">
         RULE 1
         <button class="float-right">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0" stroke="white"
@@ -21,7 +20,7 @@
           </svg>
         </button>
       </div>
-      <div class="text-white px-4 bg-blue-600 w-full py-5 rounded-md">
+      <div class="text-white px-4 bg-blue-600 w-full py-5 rounded-md hover:bg-blue-900">
         RULE 2
         <button class="float-right">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0" stroke="white"
@@ -31,7 +30,7 @@
           </svg>
         </button>
       </div>
-      <div class="text-white px-4 bg-blue-600  w-full py-5 rounded-md">
+      <div class="text-white px-4 bg-blue-600  w-full py-5 rounded-md hover:bg-blue-900">
         RULE 3
         <button class="float-right">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0" stroke="white"
@@ -41,7 +40,7 @@
           </svg>
         </button>
       </div>
-      <div class="text-white px-4 bg-blue-600  w-full py-5 rounded-md">
+      <div class="text-white px-4 bg-blue-600  w-full py-5 rounded-md hover:bg-blue-900">
         RULE 4
         <button class="float-right">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0" stroke="white"
@@ -51,7 +50,7 @@
           </svg>
         </button>
       </div>
-      <div class="text-white px-4 bg-blue-600  w-full py-5 rounded-md">
+      <div class="text-white px-4 bg-blue-600  w-full py-5 rounded-md hover:bg-blue-900">
         RULE 5
         <button class="float-right">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0" stroke="white"
@@ -61,7 +60,7 @@
           </svg>
         </button>
       </div>
-      <div class="text-white px-4 bg-blue-600  w-full py-5 rounded-md">
+      <div class="text-white px-4 bg-blue-600  w-full py-5 rounded-md hover:bg-blue-900">
         RULE 6
         <button class="float-right">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.0   " stroke="white"
@@ -75,19 +74,18 @@
 
     <div class="flex flex-row justify-center py-10 space-x-32">
       <button type="button" @click="isOpen = true"
-        class="px-5 py-3 bg-blue-800 text-white hover:bg-blue-900 rounded-md">
+        class="px-5 py-3 bg-blue-800 text-white hover:bg-blue-900 rounded-md font-semibold">
         Add new rules
       </button>
 
 
 
 
-      <button type="button" class="px-5 py-3 bg-blue-800 text-white hover:bg-blue-900 rounded-md">
+      <button type="button" class="px-5 py-3 bg-blue-800 text-white hover:bg-blue-900 rounded-md font-semibold">
         See authorized devices
       </button>
     </div>
 
-  </div>
 
 
 

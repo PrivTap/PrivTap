@@ -4,7 +4,9 @@
       <div class="rounded-3xl shadow-2xl p-10 bg-blue-600 shadow-blue-500">
         <div>
           <img class="mx-auto h-24 w-auto" :src="logo" />
-          <p class="mt-6 text-center tracking-tight text-white text-4xl font-semibold">
+          <p
+            class="mt-6 text-center tracking-tight text-white text-4xl font-semibold"
+          >
             {{ showLogin ? "Login into your" : "SignUp a new " }} PrivTAP
             account
           </p>
@@ -49,7 +51,7 @@
                 class="flex relative justify-between items-center bg-white rounded-none rounded-b-md border border-gray-300 px-3 py-2 placeholder-gray-500 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-base"
               >
                 <input
-                  @focus="() => showHintPassword = true"
+                  @focus="() => (showHintPassword = true)"
                   id="password"
                   name="password"
                   :type="showPass ? 'text' : 'password'"
@@ -77,46 +79,53 @@
             </div>
           </div>
 
-          <div class="flex justify-start" >
+          <div class="flex justify-start">
             <ul>
-              <li v-show="showHintPassword" class="flex items-center animate-fade-in">
-              <div
-                :class="{
-                  'bg-green-200 text-green-700': isValidPassword,
-                  'bg-red-200 text-red-700': !isValidPassword,
-                }"
-                class="rounded-full p-1 fill-current"
+              <li
+                v-show="showHintPassword"
+                class="flex items-center animate-fade-in"
               >
-                <svg
-                  class="w-4 h-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+                <div
+                  :class="{
+                    'bg-green-200 text-green-700': isValidPassword,
+                    'bg-red-200 text-red-700': !isValidPassword,
+                  }"
+                  class="rounded-full p-1 fill-current"
                 >
-                  <path
-                    v-show="isValidPassword"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M5 13l4 4L19 7"
-                  />
-                  <path
-                    v-show="!isValidPassword"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </div>
-              <span
-                :class="{
-                  'text-green-400': isValidPassword,
-                  'text-red-200': !isValidPassword,
-                }"
-                class="font-medium text-sm ml-3"
-                v-text="isValidPassword ? 'The minimum length is reached' : 'At least 9 characters required' "
-              ></span>
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      v-show="isValidPassword"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M5 13l4 4L19 7"
+                    />
+                    <path
+                      v-show="!isValidPassword"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </div>
+                <span
+                  :class="{
+                    'text-green-400': isValidPassword,
+                    'text-red-200': !isValidPassword,
+                  }"
+                  class="font-medium text-sm ml-3"
+                  v-text="
+                    isValidPassword
+                      ? 'The minimum length is reached'
+                      : 'At least 9 characters required'
+                  "
+                ></span>
               </li>
             </ul>
           </div>
@@ -198,6 +207,7 @@ const email = ref<String>("");
 const password = ref<String>("");
 const isLoading = ref<boolean>(false);
 const showHintPassword = ref<boolean>(false);
+const authService = new AuthService();
 
 const isValidEmail = computed(() => {
   if (email.value.length) return true;
@@ -237,34 +247,30 @@ async function onSubmitted() {
 }
 
 async function _loginIn() {
-  const res = await AuthService.login(username.value, password.value);
+  const res = await authService.login(username.value, password.value);
   if (!res.status) return toast.error(res.message);
   toast.success("Login Success!");
   router.push("/home");
 }
 
 async function _signUp() {
-  const res = await AuthService.register(
+  const res = await authService.register(
     username.value,
     email.value,
     password.value
   );
   if (!res.status) return toast.error(res.message);
-  toast.success("Registration Success!");
+  toast.success("Registration Success! Please check your email to verify it.");
   changeView();
 }
 
 onMounted(async () => {
   if (route.query.activate) {
     console.log(route.query.activate);
-    try {
-      const token = route.query.activate as String;
-      const res = await AuthService.activate(token);
-      console.log(res.message);
-      toast.success(res.message);
-    } catch (error) {
-      toast.warning("Code activation error, please retry");
-    }
+    const token = route.query.activate as String;
+    const res = await authService.activate(token);
+    if (!res.status) return toast.error(res.message);
+    toast.success("Account activated!");
   }
 });
 </script>

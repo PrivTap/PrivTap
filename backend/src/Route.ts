@@ -1,5 +1,6 @@
 import { Request, Response, Router } from "express";
 import Authentication from "./helper/authentication";
+import Confirmation from "./helper/confirmation";
 
 /**
  * Superclass for all routes that takes care of all the boilerplate for HTTP methods registration and
@@ -10,18 +11,25 @@ export default class Route {
     readonly endpointName: string;
     // Flag that indicates if this API route requires user authentication
     readonly requiresAuth: boolean;
+    // Flag that indicates if this API route requires that the user is confirmed
+    readonly requiresConfirmation: boolean;
     // Router responsible for this API route
     readonly router: Router;
 
-    constructor(endpointName="", requiresAuth=false) {
+    constructor(endpointName="", requiresAuth=false, requiresConfirmation=false) {
         this.endpointName = endpointName;
         this.requiresAuth = requiresAuth;
+        this.requiresConfirmation = requiresConfirmation;
         // Creates a new Router
         this.router = Router();
 
         // If this endpoint requires authentication, register the authentication middleware to the Router
         if (requiresAuth)
             this.router.use(Authentication.checkAuthentication);
+
+        // If this endpoint requires authentication, register the confirmation middleware to the Router
+        if (requiresConfirmation)
+            this.router.use(Confirmation.checkValidation);
 
         // If the subclass implements http methods handlers, register them to the Router
         if (this.httpGet)

@@ -8,20 +8,23 @@ import mongoose, { ConnectOptions } from "mongoose";
 import Route from "./Route";
 import env from "./helper/env";
 import logger from "./helper/logger";
+import YAML from "yamljs";
+import swaggerUI from "swagger-ui-express";
+const swaggerDocument = YAML.load("../openapi.yaml");
 
 // Expand the Express request definition to include the userId
 declare global {
-    // eslint-disable-next-line @typescript-eslint/no-namespace
-    namespace Express {
-        interface Request {
-            /**
-             * The id of the user that sent this request.
-             * Optionally set by PrivTAP authentication middleware if JWT cookie is provided and valid.  Can be used by other middleware.
-             * [Declaration merging](https://www.typescriptlang.org/docs/handbook/declaration-merging.html) can be used to add your own properties.
-             */
-            userId: string;
-        }
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace Express {
+    interface Request {
+      /**
+       * The id of the user that sent this request.
+       * Optionally set by PrivTAP authentication middleware if JWT cookie is provided and valid.  Can be used by other middleware.
+       * [Declaration merging](https://www.typescriptlang.org/docs/handbook/declaration-merging.html) can be used to add your own properties.
+       */
+      userId: string;
     }
+  }
 }
 
 /**
@@ -42,11 +45,11 @@ class BackendApp {
     readonly express: Express;
 
     /**
-     * Creates a new BackendApp instance, initializing the configuration data and configuring the app server
-     * with all the routes.
-     */
+   * Creates a new BackendApp instance, initializing the configuration data and configuring the app server
+   * with all the routes.
+   */
     constructor() {
-        // Load environment variables defaults
+    // Load environment variables defaults
         this.deploymentURL = env.DEPLOYMENT_URL;
         this.port = env.PORT;
         this.baseURL = env.BASE_URL;
@@ -57,14 +60,13 @@ class BackendApp {
 
         // Register routes defined in /routes
         this.registerAllRoutes();
-
     }
 
     /**
-     * Creates a new Express application server and configures all the needed extensions.
-     * @private
-     * @return the newly created application server
-     */
+   * Creates a new Express application server and configures all the needed extensions.
+   * @private
+   * @return the newly created application server
+   */
     protected createExpressApp() {
         const app = express();
 
@@ -73,17 +75,22 @@ class BackendApp {
         // ports during development
         if (!env.PROD) {
             // Configure CORS for preflight requests
-            app.options("*", cors({
-                origin: env.FRONTEND_URL,
-                credentials: true,
-                allowedHeaders: ["Cookie", "Content-Type"]
-            }));
+            app.options(
+                "*",
+                cors({
+                    origin: env.FRONTEND_URL,
+                    credentials: true,
+                    allowedHeaders: ["Cookie", "Content-Type"],
+                })
+            );
 
             // Configure CORS for all endpoints
-            app.use(cors({
-                origin: env.FRONTEND_URL,
-                credentials: true,
-            }));
+            app.use(
+                cors({
+                    origin: env.FRONTEND_URL,
+                    credentials: true,
+                })
+            );
         }
 
         app.use(express.json());
@@ -91,48 +98,57 @@ class BackendApp {
         app.use(cookieParser());
 
         // Log all requests to console if we are in a development environment
-        if (env.DEV)
+        // use Swagger UI in development mode
+        if (env.DEV) {
             app.use(requestLogger("dev"));
+            app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocument));
+        }
 
         return app;
     }
 
     /**
-     * Registers a new route from a TypeScript file. The file should export as default a class declaration
-     * that extends Route.
-     * @param filePath the path from where to import the route class
-     * @protected
-     */
+   * Registers a new route from a TypeScript file. The file should export as default a class declaration
+   * that extends Route.
+   * @param filePath the path from where to import the route class
+   * @protected
+   */
     protected async registerRoute(filePath: string) {
         const routeClass = (await import(filePath)).default as typeof Route;
         const routeInstance = new routeClass();
-
-        this.express.use(this.baseURL + routeInstance.endpointName, routeInstance.router);
+        this.express.use(
+            this.baseURL + routeInstance.endpointName,
+            routeInstance.router
+        );
     }
 
     /**
-     * Registers all the routes defines in the 'routes/' directory to the Express app server.
-     * @private
-     */
+   * Registers all the routes defines in the 'routes/' directory to the Express app server.
+   * @private
+   */
     protected registerAllRoutes() {
-        const routeFiles = getFilesInDir(join(__dirname, "routes"))
-            .map(filePath => filePath.slice(0, -3));  // Remove file extension
+        const routeFiles = getFilesInDir(join(__dirname, "routes")).map(
+            (filePath) => filePath.slice(0, -3)
+        ); // Remove file extension
         for (const filePath of routeFiles) {
             this.registerRoute(filePath).then();
         }
     }
 
     /**
-     * Connects to a MongoDB database instance.
-     * @param dbString the connection string to use
-     */
+   * Connects to a MongoDB database instance.
+   * @param dbString the connection string to use
+   */
     async connectToDB(dbString: string) {
-        await mongoose.connect(dbString, { useNewUrlParser: true, useUnifiedTopology: true } as ConnectOptions);
+        await mongoose.connect(dbString, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        } as ConnectOptions);
     }
 
     /**
-     * Starts the Express application server on the configured port.
-     */
+   * Starts the Express application server on the configured port.
+   */
     async startApp() {
         await this.express.listen(this.port);
     }
@@ -143,22 +159,20 @@ const app = new BackendApp();
 
 // If this is being run as a script, connect to the db and start the application server.
 // Otherwise, this is being imported for testing and the testing library will take care of the setup
-if (require.main === module){
+if (require.main === module) {
     // Connect to the database
-    app.connectToDB(app.dbString)
-        .then(() => {
-            // Once connected to the database, start the application server
-            app.startApp()
-                .then(() => {
-                    // Print to console the URL of the application server
-                    let url = `http://127.0.0.1:${app.port}`;
-                    if (env.PROD) {
-                        url = app.deploymentURL;
-                    }
+    app.connectToDB(app.dbString).then(() => {
+    // Once connected to the database, start the application server
+        app.startApp().then(() => {
+            // Print to console the URL of the application server
+            let url = `http://127.0.0.1:${app.port}`;
+            if (env.PROD) {
+                url = app.deploymentURL;
+            }
 
-                    logger.info(`Server listening at: ${url}${app.baseURL}`);
-                });
+            logger.info(`Server listening at: ${url}${app.baseURL}`);
         });
+    });
 }
 
 // Export app for testing

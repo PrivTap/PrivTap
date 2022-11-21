@@ -15,45 +15,47 @@ const router = createRouter({
       component: () => import("../views/HomeView.vue"),
       meta: {
         requireAuth: true,
-      }
+      },
     },
     {
       path: "/auth",
       name: "auth",
       component: () => import("../views/AuthView.vue"),
     },
-
-    {
-      path: "/personalPage",
-      name: "personalPage",
-      component: () => import("../views/PersonalPageView.vue"),
-    },
-
     {
       path: "/osppersonalpage",
       name: "osppersonalPage",
       component: () => import("../views/OspPersonalPageView.vue"),
     },
-
     {
       path: "/services",
       name: "services",
       component: () => import("../views/ServicesView.vue"),
     },
-
-
     {
       path: "/unauthorizedservices",
       name: "unauthorizedservices",
       component: () => import("../views/UnAuthorizedServicesView.vue"),
     },
-
-
     {
       path: "/publishservice",
       name: "publishservice",
       component: () => import("../views/PublishServiceView.vue"),
+    },
+    {
+      path: "/personalpage",
+      name: "personalpage",
+      component: () => import("../views/PersonalPageView.vue"),
+    },
+ 
+     //Playing
+    {
+      path: "/test",
+      name: "test",
+      component: () => import("../views/Testt.vue"),
     }
+
+
 
   ],
 });

@@ -1,22 +1,38 @@
-import { Schema, model, Document } from "mongoose";
-import { IOperation } from "./Operation";
+import { model, Schema, Types } from "mongoose";
 
-export interface ITrigger extends Document {
-    data: string;
-    operation: IOperation;
+export interface ITrigger {
+    _id: string;
+    name: string;
+    description: string;
+    serviceID: Types.ObjectId;
+    permissions: any[]; // TO DEFINE
+    data: any[]; // TO DEFINE
 }
 
 const triggerSchema = new Schema<ITrigger>({
-    data:{
-        //TODO: change this type
+    name: {
         type: String,
+        required: true,
+        index: {
+            unique: true
+        }
     },
-    operation: {
+    description: {
+        type: String,
+        required: true,
+    },
+    serviceID: {
         type: Schema.Types.ObjectId,
+        required: true
+    },
+    permissions: {
+        type: [Object],
+        required: true
+    },
+    data: {
+        type: [Object]
     }
-
-},
-{ collection: "trigger" }
+}
 );
 
 export default class Trigger {

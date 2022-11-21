@@ -1,4 +1,4 @@
-export class StandartRepsonse<T> {
+export class StandartRepsonse<T extends Object> {
   status: boolean;
   message: String;
   data?: T;

@@ -34,7 +34,7 @@ const userSchema = new Schema<IUser>({
             unique: true
         },
         minLength: 3,
-        maxLenth: 255,
+        maxLength: 255,
         match: /^[-!#$%&'*+/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/
     },
     registrationDate: {

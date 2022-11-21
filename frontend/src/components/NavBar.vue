@@ -7,6 +7,10 @@
             @click="router.push('home')"
           />
     <div class="flex pr-10 space-x-5 text-center items-center">
+      <div class="text-xl font-medium text-white px-5 space-x-7">
+        <a @click="router.push('personalpage')">My Rules</a>
+        <a @click="router.push('osppersonalpage')">My Services</a>
+      </div>
       <button
         class="rounded-lg bg-blue-600 py-2 px-9 text-lg font-medium text-white hover:bg-blue-700"
       >
@@ -18,7 +22,7 @@
       >
       Logout
       </button>
-      <div class="rounded-full ring-[3px] ring-blue-500 w-10 h-10 hover:ring-blue-400" @click="router.push('personalPage')">
+      <div class="rounded-full ring-[3px] ring-blue-500 w-10 h-10 hover:ring-blue-400" @click="router.push('personalpage')">
         <img src="//web-assets.ifttt.com/packs/media/header/icon-avatar-5d8d838b5b5b3f55ce30.svg" alt="">
       </div>
     </div>
@@ -26,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import logo from '@/assets/images/logo_dark.svg';
+import logo from '@/assets/images/logo_light.svg';
 import AuthService from "@/services/auth_service";
 import { useAuthStore } from "../stores/auth_store";
 import { useToast } from "vue-toastification";
@@ -37,7 +41,7 @@ const toast = useToast();
 const router = useRouter();
 
 async function logout(){
-  const res = await AuthService.logout();
+  const res = await new AuthService().logout();
   if(res.status){
     return toast.success(res.message);
   }

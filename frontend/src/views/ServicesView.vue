@@ -1,8 +1,8 @@
 <template>
   <div>
-    <h1 class="text-5xl text-white text-center py-12">Services</h1>
+    <h1 class="text-5xl text-blue-100 font-medium text-center py-5">Services</h1>
 
-    <form class="flex items-center mx-auto justify-center py-10">
+    <form class="flex items-center mx-auto justify-center py-20">
       <label for="simple-search" class="sr-only">Search</label>
 
       <div class="relative">
@@ -34,9 +34,9 @@
     </form>
 
     <div
-      class="container mx-auto grid grid-cols-1 bg-gray-800 rounded-md px-5 py-5 border-2 border-blue-600 gap-4 overflow-y-scroll h-96 overscroll-auto"
+      class="container mx-auto grid grid-cols-1 bg-gray-800 px-5 py-5 border-2 border-blue-600 gap-4 overflow-y-scroll h-96 overscroll-auto"
     >
-      <div class="text-white px-4 bg-blue-600 w-full py-5">
+      <div class="text-white px-4 bg-blue-600 w-full py-5 rounded-md hover:bg-blue-900">
         SERVICE 1...
         <button class="float-right">
           <svg
@@ -55,7 +55,7 @@
           </svg>
         </button>
       </div>
-      <div class="text-white px-4 bg-blue-600 w-full py-5">
+      <div class="text-white px-4 bg-blue-600 w-full py-5 rounded-md hover:bg-blue-900">
         SERVICE 2...
         <button class="float-right">
           <svg
@@ -74,7 +74,7 @@
           </svg>
         </button>
       </div>
-      <div class="text-white px-4 bg-blue-600 w-full py-5">
+      <div class="text-white px-4 bg-blue-600 w-full py-5 rounded-md hover:bg-blue-900">
         SERVICE 3...
         <button class="float-right">
           <svg
@@ -93,7 +93,7 @@
           </svg>
         </button>
       </div>
-      <div class="text-white px-4 bg-blue-600 w-full py-5">
+      <div class="text-white px-4 bg-blue-600 w-full py-5 rounded-md hover:bg-blue-900">
         SERVICE 4...
         <button class="float-right">
           <svg
@@ -112,7 +112,7 @@
           </svg>
         </button>
       </div>
-      <div class="text-white px-4 bg-blue-600 w-full py-5">
+      <div class="text-white px-4 bg-blue-600 w-full py-5 rounded-md hover:bg-blue-900">
         SERVICE 5...
         <button class="float-right">
           <svg
@@ -131,7 +131,7 @@
           </svg>
         </button>
       </div>
-      <div class="text-white px-4 bg-blue-600 w-full py-5">
+      <div class="text-white px-4 bg-blue-600 w-full py-5 rounded-md hover:bg-blue-900">
         SERVICE 6...
         <button class="float-right">
           <svg
@@ -153,12 +153,24 @@
     </div>
 
     <div class="flex flex-row justify-center py-10 space-x-20">
-      <button type="button" class="px-5 py-3 bg-blue-800 text-white">
+      <button type="button" class="px-5 py-3 bg-blue-800 text-white rounded-md hover:bg-blue-900">
         Modify authorization
       </button>
-      <button type="button" class="px-5 py-3 bg-blue-800 text-white">
+      <button type="button" class="px-5 py-3 bg-blue-800 text-white rounded-md hover:bg-blue-900">
         Authorize new service
       </button>
     </div>
   </div>
+  
 </template>
+
+
+
+
+<script setup lang="ts">
+
+
+
+
+</script>
+<style scoped></style>

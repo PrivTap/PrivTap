@@ -3,7 +3,7 @@
 import axios, { type AxiosInstance } from "axios";
 
 // this is a singleton class
-export default class IAxiosService {
+export default class AxiosService {
   http: AxiosInstance;
 
   constructor() {
