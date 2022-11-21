@@ -38,11 +38,12 @@
 
 
         <div class="space-y-5">
-
-
-
         <div v-for="item,index in form" :key="item" class="text-white px-4 py-8 h-10 bg-blue-600 w-full">
-          SERVICE {{ index+1 }}
+
+
+        <div class="align-super">
+        SERVICE {{ index+1 }}
+        </div>    
           <!-- <button class="float-right">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -59,8 +60,8 @@
               />
             </svg>
           </button> -->
-          <button type="button" class="btn btn-danger btn-sm" @click="removeRow(index)">x</button>&nbsp;
-          <button type="button" class="btn btn-success btn-sm" @click="addRow">+</button>
+          <!-- <button type="button" class="btn btn-danger btn-sm" @click="removeRow(index)">x</button>&nbsp;
+          <button type="button" class="btn btn-success btn-sm" @click="addRow">+</button> -->
         </div>
       </div>
     </div>
