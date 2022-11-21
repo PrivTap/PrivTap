@@ -49,7 +49,7 @@
               </ul>
               <div class="text-white font-semibold text-xl space-x-16 pt-20">
                 <button
-                  class="rounded-lg bg-blue-600 py-5 px-16 font-normal text-white hover:bg-blue-700"
+                  class="rounded-lg bg-blue-600 py-5 px-16 font-normal text-white hover:bg-blue-700" @click="router.push('/personalpage')"
                 >
                   Create your Rule
                 </button>
