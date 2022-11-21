@@ -73,9 +73,7 @@ describe("/rules endpoint", () => {
 
     describe("POST /", () => {
 
-        it ("should fail if the user is not confirmed", async () => {
-
-        });
+        it ("should fail if the user is not confirmed");
 
         it ("should fail if the user doesn't have valid jwt", async () => {
             checkJWTStub.throws();
@@ -89,9 +87,7 @@ describe("/rules endpoint", () => {
             expect(res).to.have.status(401); // Unauthorized
         });
 
-        it("should fail if some of the parameters are undefined", async () => {
-
-        });
+        it("should fail if some of the parameters are undefined");
 
         it ("should fail if a server error occurs", async () => {
             checkJWTStub.returns("someUserID");
@@ -131,9 +127,7 @@ describe("/rules endpoint", () => {
             expect(res).to.have.status(401); // Unauthorized
         });
 
-        it("should fail if some of the parameters are undefined", async () => {
-
-        });
+        it("should fail if some of the parameters are undefined");
 
         it ("should fail if the rule doesn't exist", async () => {
             checkJWTStub.returns("someUserID");

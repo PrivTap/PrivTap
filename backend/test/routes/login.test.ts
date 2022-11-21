@@ -5,7 +5,7 @@ import sinonChai from "sinon-chai";
 import app from "../../src/app";
 import User from "../../src/model/User";
 import bcrypt from "bcrypt";
-import LoginRoute from "../../src/routes/shared/Login";
+import LoginRoute from "../../src/routes/authentication/Login";
 
 use(chaiHttp);
 use(sinonChai);
