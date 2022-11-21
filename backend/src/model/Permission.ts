@@ -11,9 +11,7 @@ const permissionSchema = new Schema<IPermission>({
         required: true,
     },
 
-},
-{ collection: "Permission" }
-);
+});
 
 export default class Permission {
 

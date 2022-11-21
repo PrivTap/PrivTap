@@ -28,8 +28,7 @@ const ruleSchema = new Schema<IRule>({
         type: Boolean,
         required: true
     }
-}
-);
+});
 
 export default class Rule {
 

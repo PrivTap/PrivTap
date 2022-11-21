@@ -32,8 +32,7 @@ const triggerSchema = new Schema<ITrigger>({
     data: {
         type: [Object]
     }
-}
-);
+});
 
 export default class Trigger {
 
