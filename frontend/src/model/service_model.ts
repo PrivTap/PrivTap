@@ -1,12 +1,14 @@
 /// Build class for the service
+
 export default class ServiceModel {
-  serviceId: string;
+  _id: string;
   name: string;
   description: string;
   creator: string;
   authServer: string;
   clientId: string;
   clientSecret: string;
+  v: number;
 
   constructor(
     serviceId: string,
@@ -15,14 +17,16 @@ export default class ServiceModel {
     creator: string,
     authServer: string,
     clientId: string,
-    clientSecret: string
+    clientSecret: string,
+    v: number
   ) {
-    this.serviceId = serviceId;
+    this._id = serviceId;
     this.name = name;
     this.description = description;
     this.creator = creator;
     this.authServer = authServer;
     this.clientId = clientId;
     this.clientSecret = clientSecret;
+    this.v = v;
   }
 }

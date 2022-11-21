@@ -1,11 +1,11 @@
 import type { UserModel } from "@/model/user_model";
 import { useAuthStore } from "@/stores/auth_store";
 import type { AxiosError } from "axios";
-import IAxiosService from "../helpers/axios_service";
+import AxiosService from "../helpers/axios_service";
 import type { StandartRepsonse } from "../model/response_model";
 
 
-interface IAuthService extends IAxiosService {
+interface IAuthService extends AxiosService {
   login(username: string, password: string): Promise<StandartRepsonse<Object>>;
   logout(): Promise<StandartRepsonse<Object>>;
   activate(token: String): Promise<StandartRepsonse<Object>>;
@@ -16,7 +16,7 @@ interface IAuthService extends IAxiosService {
   ): Promise<StandartRepsonse<Object>>;
 }
 
-export default class AuthService extends IAxiosService implements IAuthService {
+export default class AuthService extends AxiosService implements IAuthService {
   constructor() {
     super();
   };

@@ -34,7 +34,6 @@ export const useAuthStore = defineStore("auth_store", (): IAuthStoreState => {
 
   function logout() {
     setUser(null);
-    /// TODO: remove token from cookie
   }
 
   return { user, isAutheticated, setUser, logout };
