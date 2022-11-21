@@ -37,9 +37,7 @@ const serviceSchema = new Schema<IService>({
     clientSecret: {
         type: String
     }
-},
-{ collection: "Service" }
-);
+});
 
 /**
  * The entrypoint class to handle all Database access operations related to services.
