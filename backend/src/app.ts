@@ -10,7 +10,6 @@ import env from "./helper/env";
 import logger from "./helper/logger";
 import YAML from "yamljs";
 import swaggerUI from "swagger-ui-express";
-const swaggerDocument = YAML.load("../openapi.yaml");
 
 // Expand the Express request definition to include the userId
 declare global {
@@ -97,10 +96,13 @@ class BackendApp {
         app.use(express.urlencoded({ extended: false }));
         app.use(cookieParser());
 
-        // Log all requests to console if we are in a development environment
-        // use Swagger UI in development mode
+        // If we are in a development environment
         if (env.DEV) {
+            // Log all requests to console
             app.use(requestLogger("dev"));
+
+            // Host API docs through Swagger UI
+            const swaggerDocument = YAML.load("../openapi.yaml");
             app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocument));
         }
 
