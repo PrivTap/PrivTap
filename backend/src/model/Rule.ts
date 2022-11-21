@@ -1,11 +1,11 @@
-import { model, ObjectId, Schema, Types } from "mongoose";
+import { model, Schema, Types } from "mongoose";
 import logger from "../helper/logger";
 
 export interface IRule {
     _id: string;
-    userID: ObjectId;
-    triggerID: ObjectId;
-    actionID: ObjectId;
+    userID: Types.ObjectId;
+    triggerID: Types.ObjectId;
+    actionID: Types.ObjectId;
     isAuthorized: boolean;
 }
 
@@ -13,15 +13,15 @@ export interface IRule {
 
 const ruleSchema = new Schema<IRule>({
     userID: {
-        type: Types.ObjectId,
+        type: Schema.Types.ObjectId,
         required: true
     },
     triggerID: {
-        type: Types.ObjectId,
+        type: Schema.Types.ObjectId,
         required: true
     },
     actionID: {
-        type: Types.ObjectId,
+        type: Schema.Types.ObjectId,
         required: true
     },
     isAuthorized: {

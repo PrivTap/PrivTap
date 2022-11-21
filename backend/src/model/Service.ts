@@ -6,7 +6,7 @@ export interface IService {
     _id: string;
     description: string;
     name: string;
-    creator: ObjectId;
+    creator: Types.ObjectId;
     authServer: string;
     clientId: string;
     clientSecret: string;

@@ -1,10 +1,10 @@
-import { model, ObjectId, Schema, Types } from "mongoose";
+import { model, Schema, Types } from "mongoose";
 
 export interface IAction {
     _id: string;
     name: string;
     description: string;
-    serviceID: ObjectId;
+    serviceID: Types.ObjectId;
     permissions: any[]; // TO DEFINE
     endpoint: string;
 }
@@ -22,7 +22,7 @@ const actionSchema = new Schema<IAction>({
         required: true,
     },
     serviceID: {
-        type: Types.ObjectId,
+        type: Schema.Types.ObjectId,
         required: true
     },
     permissions: {
