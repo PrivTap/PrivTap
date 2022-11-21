@@ -74,7 +74,7 @@ describe("/rules endpoint", () => {
     describe("POST /", () => {
 
         it ("should fail if the user is not confirmed", async () => {
-            
+
         });
 
         it ("should fail if the user doesn't have valid jwt", async () => {
@@ -133,6 +133,16 @@ describe("/rules endpoint", () => {
 
         it("should fail if some of the parameters are undefined", async () => {
 
+        });
+
+        it ("should fail if the rule doesn't exist", async () => {
+            checkJWTStub.returns("someUserID");
+            deleteRuleStub.throws();
+            const someRuleID = {
+                "ruleID" : "someRuleID"
+            };
+            const res = await requester.delete("/rules").send(someRuleID);
+            expect(res).to.have.status(400);
         });
 
         it ("should fail if the jwt is valid but the rule has not been created by that specific user", async () => {

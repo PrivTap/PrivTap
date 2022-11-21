@@ -9,6 +9,8 @@ export interface IRule {
     isAuthorized: boolean;
 }
 
+// TODO: Understand how to make <triggerID, actionID> unique key
+
 const ruleSchema = new Schema<IRule>({
     userID: {
         type: Types.ObjectId,
@@ -36,22 +38,39 @@ export default class Rule {
     static async findByUserID(userID: string): Promise<IRule[]|undefined>{
         try {
             console.log(userID);
-            const queryResult = await Rule.ruleModel.find({ userID: userID });
-            //return queryResult;
-            console.log(queryResult);
+            return await Rule.ruleModel.find({ userID: userID });
         } catch (e) {
             logger.error("Error finding rules by id", e);
             return undefined;
         }
     }
 
-    static async insertNewRule(userID: string, triggerID: string, actionID: string): Promise<boolean>{
-        // isAuthorized set to false for now
-        return false;
+
+    static async insertNewRule(userID: Types.ObjectId, triggerID: Types.ObjectId, actionID: Types.ObjectId): Promise<boolean>{
+        const rule = new Rule.ruleModel({
+            userID: userID,
+            triggerID: triggerID,
+            actionID: actionID,
+            // Draft
+            isAuthorized: false
+        });
+        try {
+            await rule.save();
+            return true;
+        } catch (e) {
+            console.log(e);
+            return false;
+        }
     }
 
-    static async deleteRule(userID: string, ruleID: string): Promise<boolean> {
-        return false;
+    static async deleteRule(ruleID: string): Promise<boolean> {
+        try{
+            await Rule.ruleModel.findByIdAndDelete(ruleID);
+            return true;
+        } catch (e) {
+            logger.error("Error deleting a rule:", e);
+            return false;
+        }
     }
 
 
