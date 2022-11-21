@@ -33,8 +33,7 @@ const actionSchema = new Schema<IAction>({
         type: String,
         required: true
     }
-}
-);
+});
 
 export default class Action {
 
