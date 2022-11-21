@@ -2,16 +2,24 @@ import type ServiceModel from "@/model/service_model";
 import { defineStore } from "pinia";
 import { ref, type Ref, reactive, getCurrentInstance, onMounted } from "vue";
 import ManageService from "@/services/manage_service";
+import { useToast } from "vue-toastification";
 
 export default interface IOspServiceStoreState {
   services: Ref<Array<ServiceModel> | []>;
   setServices: (services: Array<ServiceModel>) => void;
   deleteService: (serviceId: string) => void;
-  addService: (service: ServiceModel) => void;
+  addService: (
+    name: string,
+    description: string,
+    authUrl: string,
+    clientID: string,
+    clientSecret: string
+  ) => void;
   updateService: (service: ServiceModel) => void;
 }
 
 export const useOspServiceStore = defineStore("osp_service_store", () => {
+  const manageService = new ManageService();
 
   if (getCurrentInstance()) {
     console.log("manage service mounted");
@@ -32,9 +40,34 @@ export const useOspServiceStore = defineStore("osp_service_store", () => {
       (service) => service._id !== serviceId
     );
   };
-  const addService = (service: ServiceModel) => {
-    services.value = [...services.value, service];
-  };
+
+  async function addService(
+    name: string,
+    description: string,
+    authUrl: string,
+    clientID: string,
+    clientSecret: string
+  ) {
+    console.log("add service");
+    console.log(name);
+    console.log(description);
+    console.log(authUrl);
+    console.log(clientID);
+    console.log(clientSecret);
+    const res = await manageService.createService(
+      name,
+      description,
+      authUrl,
+      clientID,
+      clientSecret
+    );
+    if (res.status) {
+      const newService = res.data as ServiceModel;
+      services.value = [...services.value, newService];
+      if (res) return useToast().success("Service added successfully");
+    }
+    return useToast().error(res.message);
+  }
 
   const updateService = (service: ServiceModel) => {
     services.value = services.value.map((oldService) => {

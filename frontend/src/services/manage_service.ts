@@ -27,14 +27,14 @@ export default class ManageService extends IAxiosService implements IManageServi
   async createService(
     name: string,
     description: string,
-    authUrl: string,
+    authURL: string,
     clientId: string,
     clientSecret: string
   ): Promise<StandartRepsonse<Object>> {
     const body = {
       name: name,
       description: description,
-      authUrl: authUrl,
+      authURL: authURL,
       clientId: clientId,
       clientSecret: clientSecret,
     };

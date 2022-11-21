@@ -55,6 +55,7 @@
                 </button>
                 <button
                   class="rounded-lg py-4 px-16 font-normal text-blue-500 ring-blue-500 ring-[4px] hover:text-blue-400 hover:ring-blue-400"
+                  @click="router.push('/publishservice')"
                 >
                   Publish your Service
                 </button>
@@ -76,7 +77,9 @@
 <script setup lang="ts">
 import { useAuthStore } from "../stores/auth_store";
 import draw from "@/assets/images/draw.svg";
+import { useRouter } from "vue-router";
 const authStore = useAuthStore();
+const router = useRouter();
 </script>
 
 <style scoped></style>

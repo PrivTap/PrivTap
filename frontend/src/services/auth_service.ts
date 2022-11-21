@@ -5,7 +5,7 @@ import AxiosService from "../helpers/axios_service";
 import type { StandartRepsonse } from "../model/response_model";
 
 
-interface IAuthService extends AxiosService {
+interface IAuthService {
   login(username: string, password: string): Promise<StandartRepsonse<Object>>;
   logout(): Promise<StandartRepsonse<Object>>;
   activate(token: String): Promise<StandartRepsonse<Object>>;
