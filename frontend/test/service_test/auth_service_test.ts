@@ -134,17 +134,4 @@ describe("Auth Service Tests", () => {
     expect(res.data).to.be.undefined;
   });
 
-
-
-
-
-
-
-
-
-
-
-
-
-  /// TODO: Test for logout function
 });

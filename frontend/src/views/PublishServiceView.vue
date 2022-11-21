@@ -3,7 +3,7 @@
     <h1 class="text-5xl text-blue-100 font-medium text-center py-20">
       Publish Service
     </h1>
-    <form @submit.prevent="onSubmitted">
+    <form>
       <div class="mb-6 mx-auto w-96">
         <label
           for="text"
@@ -124,6 +124,7 @@
         <button
           type="button"
           class="px-16 py-3 bg-blue-800 rounded-md text-white font-semibold"
+          @click="onSubmitted"
         >
           Create API endpoint
         </button>
@@ -144,7 +145,7 @@ const newService = ref({
   clientSecret: "",
 });
 
-const isValidUrl = ref<boolean>(true);
+const isValidUrl = ref<boolean>(false);
 
 watch(newService.value, (_, newValue) => {
   isValidUrl.value = checkUrl(newValue.authUrl);
@@ -158,7 +159,7 @@ function checkUrl(url: string): boolean {
 }
 
 const manageServiceStore = useOspServiceStore();
-const onSubmitted = () =>
+function onSubmitted() {
   manageServiceStore.addService(
     newService.value.name,
     newService.value.description,
@@ -166,6 +167,7 @@ const onSubmitted = () =>
     newService.value.clientID,
     newService.value.clientSecret
   );
+}
 </script>
 
 <style scoped></style>
