@@ -1,15 +1,15 @@
-
 <template>
-
-
-
   <div>
-    <h1 class="text-5xl text-blue-100 text-center py-16 font-medium">OSP Personal Page</h1>
+    <h1 class="text-5xl text-blue-100 text-center py-16 font-medium">
+      OSP Personal Page
+    </h1>
 
     <div
       class="bg-gray-800 container mx-auto grid grid-cols-1 rounded-md px-5 py-5 border-2 border-blue-600 gap-4 overflow-y-scroll h-96 overscroll-auto"
-    > 
-      <div class="text-white px-4 bg-blue-600 w-full py-5 rounded-md font-medium hover:bg-blue-900">
+    >
+      <div
+        class="text-white px-4 bg-blue-600 w-full py-5 rounded-md font-medium hover:bg-blue-900"
+      >
         SERVICE 1...
         <button class="float-right">
           <svg
@@ -28,7 +28,9 @@
           </svg>
         </button>
       </div>
-      <div class="text-white px-4 bg-blue-600 w-full py-5 rounded-md font-medium hover:bg-blue-900">
+      <div
+        class="text-white px-4 bg-blue-600 w-full py-5 rounded-md font-medium hover:bg-blue-900"
+      >
         SERVICE 2...
         <button class="float-right">
           <svg
@@ -47,7 +49,9 @@
           </svg>
         </button>
       </div>
-      <div class="text-white px-4 bg-blue-600 w-full py-5 rounded-md font-medium hover:bg-blue-900">
+      <div
+        class="text-white px-4 bg-blue-600 w-full py-5 rounded-md font-medium hover:bg-blue-900"
+      >
         SERVICE 3...
         <button class="float-right">
           <svg
@@ -66,7 +70,9 @@
           </svg>
         </button>
       </div>
-      <div class="text-white px-4 bg-blue-600 w-full py-5 rounded-md font-medium hover:bg-blue-900">
+      <div
+        class="text-white px-4 bg-blue-600 w-full py-5 rounded-md font-medium hover:bg-blue-900"
+      >
         SERVICE 4...
         <button class="float-right">
           <svg
@@ -85,7 +91,9 @@
           </svg>
         </button>
       </div>
-      <div class="text-white px-4 bg-blue-600 w-full py-5 rounded-md font-medium hover:bg-blue-900">
+      <div
+        class="text-white px-4 bg-blue-600 w-full py-5 rounded-md font-medium hover:bg-blue-900"
+      >
         SERVICE 5...
         <button class="float-right">
           <svg
@@ -104,8 +112,10 @@
           </svg>
         </button>
       </div>
-      <div class="text-white px-4 bg-blue-600 w-full py-5 rounded-md font-medium hover:bg-blue-900">
-        SERVICE 6...    
+      <div
+        class="text-white px-4 bg-blue-600 w-full py-5 rounded-md font-medium hover:bg-blue-900"
+      >
+        SERVICE 6...
         <button class="float-right">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -126,23 +136,27 @@
     </div>
 
     <div class="flex flex-row justify-center py-10 space-x-32">
-      <button type="button" class="px-5 py-3 bg-blue-800 text-white font-semibold hover:bg-blue-900 rounded-md">
+      <button
+        type="button"
+        class="px-5 py-3 bg-blue-800 text-white font-semibold hover:bg-blue-900 rounded-md"
+      >
         Create API endpoint
       </button>
     </div>
-
-
   </div>
 </template>
 
-
-
 <script setup lang="ts">
+import type ServiceModel from "@/model/service_model";
+import { useOspServiceStore } from "../stores/osp_service_store";
+import ManageService from "../services/manage_service";
+import { onMounted } from "vue";
 
-/// Scripts
+const ospServiceStore = useOspServiceStore();
+const services = ospServiceStore.services;
+console.log(services);
+
 
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -13,7 +13,8 @@ describe("Manage Service Tests", () => {
     "Test Creator",
     "Test Auth Server",
     "Test Client Id",
-    "Test ClientSecret"
+    "Test ClientSecret",
+    0,
   );
   beforeAll(() => {
     manageServiceStub = stubInterface<IManageService>();
@@ -29,7 +30,9 @@ describe("Manage Service Tests", () => {
     const res = await manageServiceStub.createService(
       "Test Service Name",
       "Test Description",
-      "Test Auth Server"
+      "Test Auth Server",
+      "Test Client Id",
+      "Tes Client Sercret",
     );
     expect(res.status).toBe(true);
     expect(res.message).to.empty;

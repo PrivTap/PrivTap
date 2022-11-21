@@ -16,7 +16,7 @@ describe("Auth Store Test", () => {
     authStore.setUser(null);
   });
 
-  it("Set Login Test Success", () => {
+  it("Should change the isAuthenitcated to TRUE - Login Test Success", () => {
     expect(authStore.user).toStrictEqual(null);
     expect(authStore.isAutheticated).toBe(false);
     authStore.setUser(userTest);
