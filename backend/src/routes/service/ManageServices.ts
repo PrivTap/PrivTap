@@ -1,4 +1,4 @@
-import express from "express";
+
 import Service from "../../model/Service";
 import { Request, Response } from "express";
 import { checkURL } from "../../helper/misc";
@@ -15,7 +15,7 @@ export default class ManageServices extends Route {
     protected async httpGet(request: Request, response: Response): Promise<void> {
         const services = await Service.findServicesCreatedByUser(request.userId.toString());
         if (services) {
-            success(response, services );
+            success(response,  services);
         } else {
             internalServerError(response);
         }
@@ -78,46 +78,44 @@ export default class ManageServices extends Route {
         }
     }
 
-    protected registerAdditionalHTTPMethods(router: express.Router) {
-        router.put("/", async (request, response) => {
-            const serviceID = request.body.serviceID;
-            const serviceAuthURL = request.body.authURL;
-            const clientID = request.body.clientID;
-            const clientSecret = request.body.clientSecret;
-            const newServiceName = request.body.name;
-            const newServiceDescription = request.body.description;
+    protected async httpPut(request: Request, response: Response): Promise<void> {
+        const serviceID = request.body.serviceID;
+        const serviceAuthURL = request.body.authURL;
+        const clientID = request.body.clientID;
+        const clientSecret = request.body.clientSecret;
+        const newServiceName = request.body.name;
+        const newServiceDescription = request.body.description;
 
-            let parametersValid = true;
+        let parametersValid = true;
 
-            if (!serviceID || !mongoose.isValidObjectId(serviceID)) {
-                parametersValid = false;
-            }
-            if (clientID || clientSecret) {
-                parametersValid = parametersValid && (clientID && clientSecret);
-            }
-            if (serviceAuthURL && !checkURL(serviceAuthURL)) {
-                parametersValid = false;
-            }
+        if (!serviceID || !mongoose.isValidObjectId(serviceID)) {
+            parametersValid = false;
+        }
+        if (clientID || clientSecret) {
+            parametersValid = parametersValid && (clientID && clientSecret);
+        }
+        if (serviceAuthURL && !checkURL(serviceAuthURL)) {
+            parametersValid = false;
+        }
 
-            if (!parametersValid) {
-                badRequest(response, "Invalid parameters");
-                return;
-            }
+        if (!parametersValid) {
+            badRequest(response, "Invalid parameters");
+            return;
+        }
 
-            const service = await Service.findServiceCreatedByUser(request.userId, serviceID);
+        const service = await Service.findServiceCreatedByUser(request.userId, serviceID);
 
-            if (service == null) {
-                forbiddenUserError(response, "You are not authorized to check this resource");
-                return;
-            }
+        if (service == null) {
+            forbiddenUserError(response, "You are not authorized to check this resource");
+            return;
+        }
 
-            const result = await Service.updateService(serviceID, newServiceName, newServiceDescription, serviceAuthURL, clientID, clientSecret);
+        const result = await Service.updateService(serviceID, newServiceName, newServiceDescription, serviceAuthURL, clientID, clientSecret);
 
-            if (result) {
-                success(response);
-            } else {
-                internalServerError(response);
-            }
-        });
+        if (result) {
+            success(response);
+        } else {
+            internalServerError(response);
+        }
     }
 }

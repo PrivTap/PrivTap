@@ -171,7 +171,6 @@ export default class Service {
 
         try {
             const result = await Service.serviceModel.updateOne(filterQuery, updateQuery);
-
             return result.modifiedCount == 1;
         } catch (error) {
             logger.error("Error while updating service with ID $(serviceID)", error);
@@ -182,10 +181,14 @@ export default class Service {
     /**
      * This function is used to find all the name and description of all the services present
      * @param itemsPerPage is the number of items you want to show in a page: default 10
-     * @param page is the number of the current page: default 1
+     * @param page is the number of the current page: default 0
      */
-    static async findServices(itemsPerPage = 10, page = 1): Promise<IService[] | null> {
+    static async findServices(itemsPerPage?: number, page?: number): Promise<IService[] | null> {
+        const defaultItemsPerPage = 10;
+        const defaultPage = 0;
         try {
+            itemsPerPage = itemsPerPage === undefined ? defaultItemsPerPage : itemsPerPage;
+            page = page === undefined ? defaultPage : page;
             const result = await Service.serviceModel.find().skip(page * itemsPerPage).limit(itemsPerPage).select("name description -_id");
             return result as IService[];
         } catch (e) {

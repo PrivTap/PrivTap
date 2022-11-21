@@ -106,7 +106,6 @@ class BackendApp {
     protected async registerRoute(filePath: string) {
         const routeClass = (await import(filePath)).default as typeof Route;
         const routeInstance = new routeClass();
-
         this.express.use(this.baseURL + routeInstance.endpointName, routeInstance.router);
     }
 

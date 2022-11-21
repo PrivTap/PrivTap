@@ -130,4 +130,27 @@ describe("Testing the Service model class", () => {
 
         expect(await Service.updateService("612g281261gw", "ARandomID", null, null, null, null)).to.be.false;
     });
+    it("should correctly return all the services", async () => {
+        const service1= {
+            _id: "612g281261gw",
+            name: "Test 1",
+            description: "Description 1",
+            creator: "612g281261gw",
+            authServer: "https://www.test.com/auth",
+            clientId: "Client ID",
+            clientSecret: "Client Secret"
+        };
+        const service2 ={
+            _id: "612g281261ga",
+            name: "Test 2",
+            description: "Description 2",
+            creator: "612g281261gw",
+            authServer: "https://www.test.com/auth",
+            clientId: "Client ID",
+            clientSecret: "Client Secret"
+        };
+        const queryResult = [service1, service2];
+        findStub.resolves(queryResult);
+        expect(await Service.findServices(1,1)).to.be.eql(service1);
+    });
 });

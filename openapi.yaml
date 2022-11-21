@@ -43,7 +43,7 @@ paths:
           description: Bad Request
         '500':
           description: Internal server error
-        
+
   /login:
     post:
       tags:
@@ -149,7 +149,7 @@ paths:
       responses:
         '405':
           description: Invalid input
-      
+
     delete:
       tags:
         - User
@@ -168,13 +168,13 @@ paths:
       responses:
         '200':
           description: Successful operation
-          
+
   /services:
     get:
       tags:
         - User
       summary: The end-user requests a list of OSP
-      description: The end-user requests a list of OSP (TODO)
+      description: The end-user requests a list of OSP. It can select the current page and the number of items for each page. The page count starts from 0
       operationId: services
       parameters:
         - name: sessionID
@@ -182,6 +182,18 @@ paths:
           required: true
           schema:
             type: string
+        - name: items
+          in: query
+          required: false
+          description: number of service in the response, default 10
+          schema:
+            type: integer
+        - name: page
+          in: query
+          required: false
+          description: number of the current page, default 0
+          schema:
+            type: integer
       responses:
         '200':
           description: Successful operation
@@ -190,7 +202,9 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/UserService'          
+                  $ref: '#/components/schemas/NewServicePartial'
+        '500':
+          description: Internal Server Error
   /triggers:
     get:
       tags:
@@ -217,7 +231,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Trigger'    
+                  $ref: '#/components/schemas/Trigger'
   /actions:
     get:
       tags:
@@ -244,7 +258,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Action'             
+                  $ref: '#/components/schemas/Action'
   /serviceAuthorization:
     get:
       tags:
@@ -271,7 +285,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Permission'  
+                  $ref: '#/components/schemas/Permission'
     post:
       tags:
         - User
@@ -319,7 +333,7 @@ paths:
       tags:
         - OSP
       summary: The OSP requests a list of already defined services
-      description: The OSP requests a list of already defined services (TODO)
+      description: The OSP requests a list of already defined services
       operationId: get-manage-services
       parameters:
         - name: sessionID
@@ -335,14 +349,17 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/NewService'       
+                  $ref: '#/components/schemas/OspService'
+
+        '401':
+          description: Unauthorized
         '500':
           description: Internal server error
     post:
       tags:
         - OSP
       summary: The OSP defines a new service
-      description: The OSP defines a new service (TODO)
+      description: The OSP defines a new service
       operationId: post-manage-services
       parameters:
         - name: sessionID
@@ -355,16 +372,28 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewService'
+              oneOf:
+                - $ref: '#/components/schemas/NewServicePartial'
+                - $ref: '#/components/schemas/NewServiceComplete'
+            examples:
+              partialService:
+                $ref: '#/components/examples/NewServicePartial'
+              completeService:
+                $ref: '#/components/examples/NewServiceComplete'
       responses:
         '200':
           description: Successful operation
-
+        '400':
+          description: Invalid Parameter
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
     delete:
       tags:
         - OSP
       summary: The OSP deletes an already defined service
-      description: The OSP deletes an already defined service (TODO)
+      description: The OSP deletes an already defined service
       operationId: delete-manage-services
       parameters:
         - name: sessionID
@@ -380,6 +409,32 @@ paths:
       responses:
         '200':
           description: Successful operation
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+    put:
+      tags:
+        - OSP
+      summary: The OSP changes an already defined service
+      description: The OSP changes an already defined service. Put in the request only the field you want to change
+      operationId: put-manage-services
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OspService'
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid parameters
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+
   /triggers-data:
     post:
       tags:
@@ -441,7 +496,7 @@ paths:
           required: true
           schema:
             type: string
-          
+
       responses:
         '200':
           description: Successful operation
@@ -450,7 +505,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Trigger' 
+                  $ref: '#/components/schemas/Trigger'
     post:
       tags:
         - OSP
@@ -492,7 +547,7 @@ paths:
       responses:
         '200':
           description: Successful operation
-          
+
   /manage-actions:
     get:
       tags:
@@ -514,9 +569,7 @@ paths:
               schema:
                 type: array
                 items:
-                  type: object
-                  $ref: "#/components/schemas/Action"
-                  
+                  $ref : "#/components/schemas/Action"
     post:
       tags:
         - OSP
@@ -573,7 +626,7 @@ components:
         password:
           type: string
           example: "MyPrivatePassword"
-          
+
     Login:
       type: object
       properties:
@@ -583,34 +636,32 @@ components:
         password:
           type: string
           example: "MyPrivatePassword"
-          
-      
     Trigger:
       type: object
       properties:
-        id: 
+        _id:
           type: string
           example: "SomeTriggerID"
-    
-    Action: 
+
+    Action:
       type: object
       properties:
-        id: 
+        id:
           type: string
           example: "SomeActionID"
-    
+
     Rules:
       type: array
       items:
         type: object
         properties:
           Trigger:
-            type: object
-            $ref: '#/components/schemas/Trigger'
+            allOf:
+              - $ref: '#/components/schemas/Trigger'
           Action:
-            type: object
-            $ref: '#/components/schemas/Action'
-          
+            allOf:
+              - $ref: '#/components/schemas/Action'
+
     NewRule:
       type: object
       properties:
@@ -618,25 +669,23 @@ components:
           $ref: '#/components/schemas/Trigger'
         Action:
           $ref: '#/components/schemas/Action'
-          
+
     UserService:
       type: object
       properties:
-        id:
+        _id:
           type: string
           example: "SomeServiceID"
         authorized:
           type: boolean
           example: "True"
-
     Permission:
       type: object
       properties:
-        id: 
+        _id:
           type: string
           example: "SomePermissionID"
-          
-          
+
     NewAuthorization:
       type: object
       properties:
@@ -646,39 +695,65 @@ components:
         Permissions:
           type: array
           items:
-            type: object
-            $ref: '#/components/schemas/Permission'
-    
-          
-    NewService:
+            $ref : '#/components/schemas/Permission'
+
+    NewServicePartial:
       type: object
       properties:
-        Description:
-          type: string
-          example: "SomeDescription"
-        Name:
+        name:
           type: string
           example: "ServiceName"
-        Creator:
+        description:
           type: string
-          example: "SomeCreatorID"
-        AuthServer:
+          example: "SomeDescription"
+
+    OspService:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "serviceId:637119ac77fa46cba460452d"
+        name:
+          type: string
+          example: "ServiceName"
+        description:
+          type: string
+          example: "SomeDescription"
+        authServer:
+          type: string
+          example: "SomeAuthServer/ null"
+        clientId:
+          type: string
+          example: "SomeClientID/ null"
+        clientSecret:
+          type: string
+          example: "SomeClientSecret/ null"
+    NewServiceComplete:
+      type: object
+      properties:
+        description:
+          type: string
+          example: "SomeDescription"
+        name:
+          type: string
+          example: "ServiceName"
+        authServer:
           type: string
           example: "SomeAuthServer"
-        ClientId:
+        clientId:
           type: string
           example: "SomeClientID"
-        ClientSecret:
+        clientSecret:
           type: string
           example: "SomeClientSecret"
-          
+
     TriggerData:
       type: object
       properties:
         Data:
           type: string
           example: "To define"
-          
+
     NewAction:
       type: object
       properties:
@@ -687,8 +762,20 @@ components:
         endpoint:
           type: string
           example: "SomeEndPoint"
-          
+
     Token:
       type: string
       example: "SomeActivationToken"
-          
+
+  examples:
+    NewServicePartial:
+      value:
+        name: "ServiceName"
+        description: "Some description"
+    NewServiceComplete:
+      value:
+        name: "ServiceName"
+        description: "SomeDescription"
+        authServer: "SomeAuthServer"
+        clientId: "SomeClientID"
+        clientSecret: "SomeClientSecret"
