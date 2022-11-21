@@ -131,7 +131,47 @@ describe("Auth Service Tests", () => {
     expect(res.data).to.be.undefined;
   });
 
+
+
   /// TODO: Test for activate function
+
+
+  test("Should fail with wrong token", async () => {
+    /// Stub the login funcion
+    authServiceStub.activate.resolves({
+      status: false,
+      message: "Some effor text",
+    });
+    /// Call the stubbed login function
+    const res = await authServiceStub.activate("wrongToken");
+    expect(res.status).to.false;
+    expect(res.message).to.not.empty;
+    expect(res.data).to.be.undefined;
+  });
+
+
+   /// TODO: Test for logout function -> Success for the logout
+   test("Shoud success if has cookie or token", async () => {
+    /// Stub the login funcion
+    authServiceStub.logout.resolves({ status: true, message: "" });
+    /// Call the stubbed login function
+    const res = await authServiceStub.logout("");
+    expect(res.status).to.true;
+    expect(res.message).to.empty;
+    expect(res.data).to.be.undefined;
+  });
+
+
+
+
+
+
+
+
+
+
+
+
 
   /// TODO: Test for logout function
 });
