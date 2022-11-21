@@ -57,7 +57,7 @@ describe("Manage Service Tests", () => {
     });
     const res = await manageServiceStub.deleteService("Test Service id");
     expect(res.status).toBe(true);
-    expect(res.message).toBe("Service deleted");
+    expect(res.message).toBe("Service deleted correctly");
   });
 
   /// Test updateService
