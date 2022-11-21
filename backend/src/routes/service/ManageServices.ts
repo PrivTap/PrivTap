@@ -15,7 +15,7 @@ export default class ManageServices extends Route {
     protected async httpGet(request: Request, response: Response): Promise<void> {
         const services = await Service.findServicesCreatedByUser(request.userId.toString());
         if (services) {
-            success(response, new Object({ "services": services }));
+            success(response, services );
         } else {
             internalServerError(response);
         }
