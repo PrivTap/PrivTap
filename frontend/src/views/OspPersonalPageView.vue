@@ -4,11 +4,13 @@
       OSP Personal Page
     </h1>
 
-    <div
+
+
+    <!-- <div
       class="bg-gray-800 container mx-auto grid grid-cols-1 rounded-md px-5 py-5 border-2 border-blue-600 gap-4 overflow-y-scroll h-96 overscroll-auto"
     >
       <div
-        class="text-white px-4 bg-blue-600 w-full py-5 rounded-md font-medium hover:bg-blue-900"
+        class="text-white px-4 bg-blue-600 w-full py-5 rounded-md font-semibold hover:bg-blue-900"
       >
         SERVICE 1...
         <button class="float-right">
@@ -29,7 +31,7 @@
         </button>
       </div>
       <div
-        class="text-white px-4 bg-blue-600 w-full py-5 rounded-md font-medium hover:bg-blue-900"
+        class="text-white px-4 bg-blue-600 w-full py-5 rounded-md font-semibold hover:bg-blue-900"
       >
         SERVICE 2...
         <button class="float-right">
@@ -50,7 +52,7 @@
         </button>
       </div>
       <div
-        class="text-white px-4 bg-blue-600 w-full py-5 rounded-md font-medium hover:bg-blue-900"
+        class="text-white px-4 bg-blue-600 w-full py-5 rounded-md font-semibold hover:bg-blue-900"
       >
         SERVICE 3...
         <button class="float-right">
@@ -71,7 +73,7 @@
         </button>
       </div>
       <div
-        class="text-white px-4 bg-blue-600 w-full py-5 rounded-md font-medium hover:bg-blue-900"
+        class="text-white px-4 bg-blue-600 w-full py-5 rounded-md font-semibold hover:bg-blue-900"
       >
         SERVICE 4...
         <button class="float-right">
@@ -92,7 +94,7 @@
         </button>
       </div>
       <div
-        class="text-white px-4 bg-blue-600 w-full py-5 rounded-md font-medium hover:bg-blue-900"
+        class="text-white px-4 bg-blue-600 w-full py-5 rounded-md font-semibold hover:bg-blue-900"
       >
         SERVICE 5...
         <button class="float-right">
@@ -113,7 +115,7 @@
         </button>
       </div>
       <div
-        class="text-white px-4 bg-blue-600 w-full py-5 rounded-md font-medium hover:bg-blue-900"
+        class="text-white px-4 bg-blue-600 w-full py-5 rounded-md font-semibold hover:bg-blue-900"
       >
         SERVICE 6...
         <button class="float-right">
@@ -133,17 +135,64 @@
           </svg>
         </button>
       </div>
-    </div>
+    </div> -->
+
+
+
+    <select
+multiple
+
+  class="container mx-auto grid grid-cols-1 bg-gray-800 rounded-md px-5 py-5 border-2 border-blue-600 overflow-y-scroll h-96 overscroll-auto w-full space-y-5">
+    
+    <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
+      SERVICE 1...
+    </option>
+
+    <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
+      SERVICE 2...
+    </option>
+
+    <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
+      SERVICE 3...
+    </option>
+
+    <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
+      SERVICE 4...
+    </option>
+
+    <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
+      SERVICE 5...
+    </option>
+
+    <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
+      SERVICE 6...
+    </option>
+
+    <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
+      SERVICE 7...
+    </option>
+
+</select>
+
+
 
     <div class="flex flex-row justify-center py-10 space-x-32">
       <button
         type="button"
+        class="px-5 py-3 bg-blue-800 text-white font-semibold hover:bg-blue-900 rounded-md" @click="router.push(RoutingPath.PUBLISH_SERVICE_PAGE)"
+      > Create API endpoint
+      </button>
+
+      <button
+        type="button"
         class="px-5 py-3 bg-blue-800 text-white font-semibold hover:bg-blue-900 rounded-md"
-        @click="router.push(RoutingPath.PUBLISH_SERVICE_PAGE)"
-      >
-        Create API endpoint
+      > Remove Service
       </button>
     </div>
+
+
+
+    
     <!-- <h1 class="text-5xl text-blue-100 text-center py-16 font-medium">
       OSP Personal Page
     </h1>
