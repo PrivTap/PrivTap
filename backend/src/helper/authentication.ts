@@ -52,9 +52,9 @@ export default abstract class Authentication {
             throw Error();
         }
 
-        const cookieJWT: string | undefined = request.cookies._jwt;
+        const cookieJWT: string | undefined = request.cookies.__session;
         if (!cookieJWT) {
-            logger.debug("_jwt cookie is undefined, 'cookie' header is: ", request.headers.cookie);
+            logger.debug("__session cookie is undefined, 'cookie' header is: ", request.headers.cookie);
             throw new AuthError("JWT Cookie is undefined");
         }
 
