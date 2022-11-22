@@ -1,10 +1,15 @@
 import { expect } from "chai";
-import * as sinon from "sinon";
+
 import "../../src/app";
 import mongoose, { Types } from "mongoose";
 import Service from "../../src/model/Service";
 import { beforeEach } from "mocha";
 import { SinonStub } from "sinon";
+
+import { randomInt } from "crypto";
+import * as sinon from "sinon";
+
+
 
 const sandbox = sinon.createSandbox();
 
@@ -130,27 +135,17 @@ describe("Testing the Service model class", () => {
 
         expect(await Service.updateService("612g281261gw", "ARandomID", null, null, null, null)).to.be.false;
     });
-    it("should correctly return all the services", async () => {
-        const service1= {
-            _id: "612g281261gw",
-            name: "Test 1",
-            description: "Description 1",
-            creator: "612g281261gw",
-            authServer: "https://www.test.com/auth",
-            clientId: "Client ID",
-            clientSecret: "Client Secret"
-        };
-        const service2 ={
-            _id: "612g281261ga",
-            name: "Test 2",
-            description: "Description 2",
-            creator: "612g281261gw",
-            authServer: "https://www.test.com/auth",
-            clientId: "Client ID",
-            clientSecret: "Client Secret"
-        };
-        const queryResult = [service1, service2];
-        findStub.resolves(queryResult);
-        expect(await Service.findServices(1,1)).to.be.eql(service1);
+    it("should correctly executes the query with the correct parameter", async () => {
+        const itemsPerPage = randomInt(0, 100);
+        const page = randomInt(0, 100);
+
+        const limitSpy = sinon.spy(mongoose.Query.prototype, "limit");
+        const skipSpy = sinon.spy(mongoose.Query.prototype, "skip");
+        const selectSpy = sinon.spy(mongoose.Query.prototype, "select");
+        await Service.findServices(itemsPerPage, page);
+        expect(findStub).to.be.calledOnce;
+        limitSpy.calledOnceWith(itemsPerPage);
+        skipSpy.calledOnceWith(itemsPerPage * page);
+        selectSpy.calledOnceWith("name description -_id");
     });
 });

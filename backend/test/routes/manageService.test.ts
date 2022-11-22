@@ -54,7 +54,7 @@ describe("/manageService endpoint", () => {
             const expectedObject = {
                 "status": true,
                 "message": "",
-                "data": { "services": serviceArray }
+                "data": serviceArray
             };
             expect(res.body).to.be.eql(expectedObject);
         });
