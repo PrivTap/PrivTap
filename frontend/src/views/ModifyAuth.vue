@@ -4,7 +4,7 @@
         Service number..
       </h1>
   
-      <div
+      <!-- <div
         class="bg-gray-800 container mx-auto grid grid-cols-1 rounded-md px-5 py-5 border-2 border-blue-600 gap-4 overflow-y-scroll h-96 overscroll-auto"
       >
         <div
@@ -133,7 +133,41 @@
             </svg>
           </button>
         </div>
-      </div>
+      </div> -->
+      <select
+multiple
+
+  class="container mx-auto grid grid-cols-1 bg-gray-800 rounded-md px-5 py-5 border-2 border-blue-600 overflow-y-scroll h-96 overscroll-auto w-full space-y-5">
+    
+    <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
+      Thing to Authorize 1...
+    </option>
+
+    <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
+      Thing to Authorize 2...
+    </option>
+
+    <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
+      Thing to Authorize 3...
+    </option>
+
+    <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
+      Thing to Authorize 4...
+    </option>
+
+    <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
+      Thing to Authorize 5...
+    </option>
+
+    <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
+      Thing to Authorize 6...
+    </option>
+
+    <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
+      Thing to Authorize 7...
+    </option>
+
+</select>
   
       <div class="flex flex-row justify-center py-10 space-x-32">
         <button
