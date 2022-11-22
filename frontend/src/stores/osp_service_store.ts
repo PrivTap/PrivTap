@@ -45,6 +45,7 @@ export const useOspServiceStore = defineStore("osp_service_store", () => {
     services.value = newServices;
   };
   const deleteService = (serviceId: string) => {
+    /// TODO: Show alert dialog before delete it
     services.value = services.value.filter(
       (service) => service._id !== serviceId
     );
