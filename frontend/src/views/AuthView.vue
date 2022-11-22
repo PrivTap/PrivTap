@@ -187,17 +187,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { ref, computed } from "vue";
 import { EyeSlashIcon, EyeIcon } from "@heroicons/vue/24/solid";
 import logo_light from "@/assets/images/logo_light.svg";
-import AuthService from "@/services/auth_service";
-import { useToast } from "vue-toastification";
+import { useAuthStore } from "@/stores/auth_store";
 
 const logo = logo_light;
-const router = useRouter();
-const route = useRoute();
-const toast = useToast();
 
 const showPass = ref(false);
 const remindMeChecked = ref<boolean>();
@@ -207,7 +202,7 @@ const email = ref<String>("");
 const password = ref<String>("");
 const isLoading = ref<boolean>(false);
 const showHintPassword = ref<boolean>(false);
-const authService = new AuthService();
+const authStore = useAuthStore();
 
 const isValidEmail = computed(() => {
   if (email.value.length) return true;
@@ -239,40 +234,22 @@ function changeView() {
 async function onSubmitted() {
   isLoading.value = true;
   if (showLogin.value) {
-    await _loginIn();
+    authStore.login(username.value, password.value);
   } else {
     await _signUp();
   }
   isLoading.value = false;
 }
 
-async function _loginIn() {
-  const res = await authService.login(username.value, password.value);
-  if (!res.status) return toast.error(res.message);
-  toast.success("Login Success!");
-  router.push("/home");
-}
-
 async function _signUp() {
-  const res = await authService.register(
-    username.value,
-    email.value,
-    password.value
-  );
-  if (!res.status) return toast.error(res.message);
-  toast.success("Registration Success! Please check your email to verify it.");
-  changeView();
+  await authStore
+    .register(username.value, email.value, password.value)
+    .then((res) => {
+      if (res) {
+        changeView();
+      }
+    });
 }
-
-onMounted(async () => {
-  if (route.query.activate) {
-    console.log(route.query.activate);
-    const token = route.query.activate as String;
-    const res = await authService.activate(token);
-    if (!res.status) return toast.error(res.message);
-    toast.success("Account activated!");
-  }
-});
 </script>
 
 <style scoped></style>

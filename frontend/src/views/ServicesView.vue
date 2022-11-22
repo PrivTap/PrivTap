@@ -153,10 +153,10 @@
     </div>
 
     <div class="flex flex-row justify-center py-10 space-x-20">
-      <button type="button" class="px-5 py-3 bg-blue-800 text-white rounded-md hover:bg-blue-900" @click="router.push('/modifyauth')"> 
+      <button type="button" class="px-5 py-3 bg-blue-800 text-white rounded-md hover:bg-blue-900" @click="router.push(RoutingPath.MODIFY_AUTH_PAGE)"> 
         Modify authorization
       </button>
-      <button type="button" class="px-5 py-3 bg-blue-800 text-white rounded-md hover:bg-blue-900" @click="router.push('/unauthorizedservices')">
+      <button type="button" class="px-5 py-3 bg-blue-800 text-white rounded-md hover:bg-blue-900" @click="router.push(RoutingPath.UNAUTHORIZED_SERVICE_PAGE)">
         Authorize new service
       </button>
     </div>
@@ -170,6 +170,7 @@
 <script setup lang="ts">
 import { useAuthStore } from "../stores/auth_store";
 import { useRouter } from "vue-router";
+import RoutingPath from "@/router/routing_path";
 const authStore = useAuthStore();
 const router = useRouter();
 

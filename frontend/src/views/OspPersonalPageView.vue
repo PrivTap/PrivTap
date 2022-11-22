@@ -139,9 +139,17 @@
       <button
         type="button"
         class="px-5 py-3 bg-blue-800 text-white font-semibold hover:bg-blue-900 rounded-md"
+        @click="router.push(RoutingPath.PUBLISH_SERVICE_PAGE)"
       >
         Create API endpoint
       </button>
+    </div>
+
+    <div v-if="services.length">
+      <div v-for="item in services" :key="item._id">
+        {{ item }}
+        ciao
+      </div>
     </div>
   </div>
 </template>
@@ -149,13 +157,20 @@
 <script setup lang="ts">
 import type ServiceModel from "@/model/service_model";
 import { useOspServiceStore } from "../stores/osp_service_store";
-import ManageService from "../services/manage_service";
 import { onMounted } from "vue";
+import { storeToRefs } from "pinia";
+import { useRouter } from "vue-router";
+import RoutingPath from "@/router/routing_path";
+
+const router = useRouter();
 
 const ospServiceStore = useOspServiceStore();
-const services = ospServiceStore.services;
-console.log(services);
+const obsStore = storeToRefs(ospServiceStore);
+const services = obsStore.services;
 
+onMounted(async () => {
+  await ospServiceStore.getServices();
+});
 
 </script>
 

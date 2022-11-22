@@ -81,7 +81,7 @@
 
 
 
-      <button type="button" class="px-5 py-3 bg-blue-800 text-white hover:bg-blue-900 rounded-md font-semibold" @click="router.push('/services')">
+      <button type="button" class="px-5 py-3 bg-blue-800 text-white hover:bg-blue-900 rounded-md font-semibold" @click="router.push(RoutingPath.SERVICES_PAGE)">
         See authorized services
       </button>
     </div>
@@ -158,6 +158,7 @@
 import { ref } from 'vue'
 import { useAuthStore } from "../stores/auth_store";
 import { useRouter } from "vue-router";
+import RoutingPath from '@/router/routing_path';
 const authStore = useAuthStore();
 const router = useRouter();
 

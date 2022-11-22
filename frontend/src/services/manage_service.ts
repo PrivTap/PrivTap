@@ -1,3 +1,4 @@
+import axiosCatch from "@/helpers/axios_catch";
 import type ServiceModel from "@/model/service_model";
 import type { AxiosError } from "axios";
 import IAxiosService from "../helpers/axios_service";
@@ -17,7 +18,10 @@ export default interface IManageService extends IAxiosService {
   getAllServices(): Promise<StandartRepsonse<ServiceModel[] | Object>>;
 }
 
-export default class ManageService extends IAxiosService implements IManageService {
+export default class ManageService
+  extends IAxiosService
+  implements IManageService
+{
   path: string = "/manageServices";
 
   constructor() {
@@ -39,19 +43,11 @@ export default class ManageService extends IAxiosService implements IManageServi
       clientSecret: clientSecret,
     };
     try {
-      const res = await this.http.post(this.path, body); 
+      const res = await this.http.post(this.path, body);
       return res.data as StandartRepsonse<ServiceModel>;
     } catch (error) {
-      const err = error as AxiosError;
-      if(err.response?.data) {
-        return err.response?.data as StandartRepsonse<Object>;
-      }
-      return {
-        status: false,
-        message: "Somenthing went wrong..",
-      } as StandartRepsonse<Object>;
+      return axiosCatch(error);
     }
-    
   }
   getService(serviceId: string): Promise<StandartRepsonse<ServiceModel>> {
     throw new Error("Method not implemented.");
@@ -65,17 +61,10 @@ export default class ManageService extends IAxiosService implements IManageServi
   }
   async getAllServices(): Promise<StandartRepsonse<ServiceModel[] | Object>> {
     try {
-      const res = await this.http.get(this.path); 
+      const res = await this.http.get(this.path);
       return res.data as StandartRepsonse<ServiceModel[]>;
     } catch (error) {
-      const err = error as AxiosError;
-      if(err.response?.data) {
-        return err.response?.data as StandartRepsonse<Object>;
-      }
-      return {
-        status: false,
-        message: "Somenthing went wrong..",
-      } as StandartRepsonse<Object>;
+      return axiosCatch(error);
     }
   }
 }
