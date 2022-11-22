@@ -62,7 +62,7 @@ paths:
           description: successful operation
           headers:
             Set-Cookie:
-              schema: 
+              schema:
                 type: string
                 example: _jwt=a_jwt_token; Path=/; HttpOnly; Secure
         '400':
@@ -84,8 +84,8 @@ paths:
       security: []
       tags:
         - Authentication
-      summary: Registered user activate their account on the platform
-      description: Registered user activate their account on the platform (TODO)
+      summary: Activates the account of a user
+      description: Once a user registers a new account, he will receive an activation token. That token needs to be sent here to access the full functionalities of the platform.
       operationId: activate
       requestBody:
         required: true
@@ -99,9 +99,10 @@ paths:
                   example: 823217d03a2d149c7d3c8c8f3235d62dcc7047730990f405b7f0feb104ce7c3ec7899ddbf0562558af9e0de7e71953456e840925556c494492e7c876c8f47413
       responses:
         '200':
-          description: successful operation
+          description: The request was successful
         '400':
-          description: Invalid token
+          description: The token is not valid
+
   /rules:
     get:
       tags:
@@ -137,7 +138,7 @@ paths:
       responses:
         '405':
           description: Invalid input
-      
+
     delete:
       tags:
         - Rules Management
@@ -152,7 +153,7 @@ paths:
       responses:
         '200':
           description: successful operation
-          
+
   /services:
     get:
       tags:
@@ -168,51 +169,76 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/UserService'          
+                  $ref: '#/components/schemas/UserService'
+
   /triggers:
     get:
       tags:
         - Rules Management
-      summary: The end-user request a list of triggers exposed by the given OSP
-      description: The end-user request a list of triggers exposed by the given OSP (TODO)
+      summary:  Gets a list of available triggers
+      description: Returns a list of triggers offered by services that the user has authorized. The triggers will be grouped by the service that is providing them. The results can be filtered with a search query.
       operationId: triggers
       parameters:
-        - name: serviceID
+        - name: search
+          description: Search query that will restrict the result to only triggers whose name or description matches it
           in: query
-          required: true
           schema:
             type: string
       responses:
         '200':
-          description: successful operation
+          description: The request was successful
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Trigger'    
+                  type: object
+                  properties:
+                    serviceName:
+                      type: string
+                      example: SensorService
+                    serviceID:
+                      type: string
+                      example: 025ccd4951hld089ba219okl
+                    triggers:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Trigger'
+
   /actions:
     get:
       tags:
         - Rules Management
-      summary: The end-user request a list of actions exposed by the given OSP
-      description: The end-user request a list of actions exposed by the given OSP (TODO)
+      summary: Gets a list of available actions
+      description: Returns a list of actions offered by services that the user has authorized. The actions will be grouped by the service that is providing them. The results can be filtered with a search query.
       operationId: actions
       parameters:
-        - name: serviceID
+        - name: search
+          description: Search query that will restrict the result to only actions whose name or description matches it
           in: query
-          required: true
           schema:
             type: string
       responses:
         '200':
-          description: successful operation
+          description: The request was successful
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Action'             
+                  type: object
+                  properties:
+                    serviceName:
+                      type: string
+                      example: NotificationService
+                    serviceID:
+                      type: string
+                      example: 025ccd4951hld089ba219okl
+                    actions:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Action'
+
   /service-authorization:
     get:
       tags:
@@ -234,7 +260,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Permission'  
+                  $ref: '#/components/schemas/Permission'
     post:
       tags:
         - OSP Authorization
@@ -281,7 +307,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Service'          
+                  $ref: '#/components/schemas/Service'
     post:
       tags:
         - Services Management
@@ -358,7 +384,7 @@ paths:
           required: true
           schema:
             type: string
-          
+
       responses:
         '200':
           description: successful operation
@@ -367,7 +393,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Trigger' 
+                  $ref: '#/components/schemas/Trigger'
     post:
       tags:
         - Services Management
@@ -403,7 +429,7 @@ paths:
       responses:
         '200':
           description: successful operation
-          
+
   /manage-actions:
     get:
       tags:
@@ -426,7 +452,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Action"
-                  
+
     post:
       tags:
         - Services Management
@@ -464,9 +490,34 @@ components:
       type: apiKey
       description: The cookie that is set after a succesfull call to the /login endpoint
       in: cookie
-      name: _jwt
+      name: __session
 
   schemas:
+    Trigger:
+      properties:
+        id:
+          type: string
+          example: 637ccd4951cdf089ba2123be
+        name:
+          type: string
+          example: Sensor detects movement
+        description:
+          type: string
+          example: Fires when a SensorService sensor detects movement
+
+    Action:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 6489ccd4951cdf089ba21288c
+        name:
+          type: string
+          example: Send notification to mobile app
+        description:
+          type: string
+          example: Send a push notification to the NotificationService mobile app
+
     Register:
       type: object
       properties:
@@ -479,7 +530,7 @@ components:
         password:
           type: string
           example: "MyPrivatePassword"
-          
+
     Login:
       type: object
       properties:
@@ -489,22 +540,7 @@ components:
         password:
           type: string
           example: "MyPrivatePassword"
-          
-      
-    Trigger:
-      type: object
-      properties:
-        id: 
-          type: string
-          example: "SomeTriggerID"
-    
-    Action: 
-      type: object
-      properties:
-        id: 
-          type: string
-          example: "SomeActionID"
-    
+
     Rules:
       type: array
       items:
@@ -514,7 +550,7 @@ components:
             $ref: '#/components/schemas/Trigger'
           Action:
             $ref: '#/components/schemas/Action'
-          
+
     NewRule:
       type: object
       properties:
@@ -522,15 +558,15 @@ components:
           $ref: '#/components/schemas/Trigger'
         Action:
           $ref: '#/components/schemas/Action'
-    
-    
+
+
     Service:
       type: object
       properties:
         id:
           type: string
           example: "SomeServiceID"
-          
+
     UserService:
       type: object
       properties:
@@ -544,11 +580,11 @@ components:
     Permission:
       type: object
       properties:
-        id: 
+        id:
           type: string
           example: "SomePermissionID"
-          
-          
+
+
     NewAuthorization:
       type: object
       properties:
@@ -558,8 +594,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Permission'
-    
-          
+
+
     NewService:
       type: object
       properties:
@@ -574,14 +610,14 @@ components:
         Secret:
           type: string
           example: "SomeSecret"
-          
+
     TriggerData:
       type: object
       properties:
         Data:
           type: string
           example: "To define"
-          
+
     NewAction:
       type: object
       properties:
