@@ -54,6 +54,7 @@ export default abstract class Authentication {
 
         const cookieJWT: string | undefined = request.cookies._jwt;
         if (!cookieJWT) {
+            logger.debug("_jwt cookie is undefined, 'cookie' header is: ", request.headers.cookie);
             throw new AuthError("JWT Cookie is undefined");
         }
 
