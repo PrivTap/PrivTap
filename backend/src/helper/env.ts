@@ -26,6 +26,8 @@ interface EnvVariables {
     DEPLOYMENT_URL: string,
     // Absolute URL of the frontend, needed to configure CORS policy in development environment
     FRONTEND_URL: string,
+    // The minimum level of messages to log
+    LOG_LEVEL: "log"|"trace"|"debug"|"info"|"warn"|"error"|"fatal",
     // The database connection string for a MongoDB database
     DB_STRING: string,
     // API key for the Mailjet service
@@ -44,7 +46,8 @@ const defaults = {
     JWT_SECRET: "this_is_an_insecure_secret",
     JWT_EXPIRE: 86400,
     DEPLOYMENT_URL: "https://privtap.it",
-    FRONTEND_URL: "http://127.0.0.1:5173"
+    FRONTEND_URL: "http://127.0.0.1:5173",
+    LOG_LEVEL: "info"
 };
 
 /**

@@ -3,6 +3,7 @@ import { IUser } from "../model/User";
 import { verify, sign, JwtPayload } from "jsonwebtoken";
 import { internalServerError, unauthorizedUserError } from "./http";
 import env from "./env";
+import logger from "./logger";
 
 export class AuthError extends Error {
     constructor(message?: string) {
@@ -24,8 +25,10 @@ export default abstract class Authentication {
             userId = Authentication.checkJWT(request);
         } catch (e) {
             if (e instanceof AuthError) {
+                logger.debug("Auth check failed, JWT is not valid: ", e.message);
                 unauthorizedUserError(response);
             } else {
+                logger.warn("Auth check failed, something bad happened\n", e);
                 internalServerError(response);
             }
             return;
