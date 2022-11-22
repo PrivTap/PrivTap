@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { IUser } from "../model/User";
+import User, { IUser } from "../model/User";
 import { verify, sign, JwtPayload } from "jsonwebtoken";
 import { internalServerError, unauthorizedUserError } from "./http";
 import env from "./env";
@@ -35,6 +35,38 @@ export default abstract class Authentication {
         }
 
         request.userId = userId;
+
+        next();
+    }
+
+    /**
+     * Middleware function used to check if a certain user has activated its account.
+     * Automatically sends back unauthorized response if the account is not activated
+     * @param request the HTTP request
+     * @param response the HTTP response
+     * @param next function to call if the request authentication is valid
+     */
+    static async checkActivation(request: Request, response: Response, next: NextFunction){
+        const userId = request.userId;
+        if (!userId) {
+            logger.warn("Activation check has run without auth check being run");
+            internalServerError(response);
+            return;
+        }
+
+        // TODO It would be better to keep info about account inside the JWT token, to avoid querying the DB for every request
+
+        const queryResult = await User.findById(userId);
+        if (queryResult == null) {
+            logger.warn("Activation check failed, user does not exist in DB");
+            internalServerError(response);
+            return;
+        }
+        if (!queryResult.isConfirmed){
+            logger.debug("Activation check failed, user is not confirmed");
+            unauthorizedUserError(response, "To visit this page your account must be activated, check your email for the activation link");
+            return;
+        }
 
         next();
     }

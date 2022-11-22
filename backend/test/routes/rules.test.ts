@@ -5,7 +5,6 @@ import sinonChai from "sinon-chai";
 import app from "../../src/app";
 import Authentication from "../../src/helper/authentication";
 import Rule from "../../src/model/Rule";
-import Confirmation from "../../src/helper/confirmation";
 
 use(chaiHttp);
 use(sinonChai);
@@ -15,7 +14,7 @@ const sandbox = createSandbox();
 describe("/rules endpoint", () => {
 
     let requester: ChaiHttp.Agent;
-    let checkValidationStub: SinonStub;
+    let checkActivationStub: SinonStub;
     let checkJWTStub: SinonStub;
     let findByUserIDStub: SinonStub;
     let insertNewRuleStub: SinonStub;
@@ -30,7 +29,7 @@ describe("/rules endpoint", () => {
     });
 
     beforeEach(() => {
-        checkValidationStub = sandbox.stub(Confirmation, "checkValidation");
+        checkActivationStub = sandbox.stub( Authentication, "checkActivation");
         checkJWTStub = sandbox.stub(Authentication, "checkJWT");
         findByUserIDStub = sandbox.stub(Rule, "findByUserID");
         insertNewRuleStub = sandbox.stub(Rule, "insertNewRule");
@@ -44,7 +43,7 @@ describe("/rules endpoint", () => {
     describe("GET /", () => {
         // Confirmation flag
         it ("should fail if the user is not confirmed", async () => {
-            checkValidationStub.resolves(false);
+            checkActivationStub.resolves(false);
         });
 
         // Authentication flag
