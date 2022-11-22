@@ -69,28 +69,26 @@ class BackendApp {
     protected createExpressApp() {
         const app = express();
 
-        // If we are not in production we need to configure our app for CORS requests.
-        // This is necessary because we may want to run the backend and the frontend on two different
-        // ports during development
-        if (!env.PROD) {
-            // Configure CORS for preflight requests
-            app.options(
-                "*",
-                cors({
-                    origin: env.FRONTEND_URL,
-                    credentials: true,
-                    allowedHeaders: ["Cookie", "Content-Type"],
-                })
-            );
+        // We need to configure our app for CORS requests.
+        // The environment variable FRONTEND_URL should be the URL of the frontend that is making the requests
 
-            // Configure CORS for all endpoints
-            app.use(
-                cors({
-                    origin: env.FRONTEND_URL,
-                    credentials: true,
-                })
-            );
-        }
+        // Configure CORS for preflight requests
+        app.options(
+            "*",
+            cors({
+                origin: env.FRONTEND_URL,
+                credentials: true,
+                allowedHeaders: ["Cookie", "Content-Type"],
+            })
+        );
+
+        // Configure CORS for all endpoints
+        app.use(
+            cors({
+                origin: env.FRONTEND_URL,
+                credentials: true,
+            })
+        );
 
         app.use(express.json());
         app.use(express.urlencoded({ extended: false }));
