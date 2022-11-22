@@ -39,31 +39,31 @@
     
       class="container mx-auto grid grid-cols-1 bg-gray-800 rounded-md px-5 py-5 border-2 border-blue-600 overflow-y-scroll h-96 overscroll-auto w-full space-y-5">
 
-        <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md">
+        <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
           SERVICE 1...
         </option>
 
-        <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md">
+        <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
           SERVICE 1...
         </option>
 
-        <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md">
+        <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
           SERVICE 1...
         </option>
 
-        <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md">
+        <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
           SERVICE 1...
         </option>
 
-        <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md">
+        <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
           SERVICE 1...
         </option>
 
-        <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md">
+        <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
           SERVICE 1...
         </option>
 
-        <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md">
+        <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
           SERVICE 1...
         </option>
 
@@ -72,7 +72,7 @@
 
 
     <div class="flex flex-row justify-center py-10 space-x-32">
-        <button type="button" class="px-16 py-3 bg-blue-800 text-white rounded-md hover:bg-blue-900">
+        <button type="button" class="px-16 py-3 bg-blue-800 text-white rounded-md hover:bg-blue-900 font-semibold">
           Authorize
         </button>
       </div>
