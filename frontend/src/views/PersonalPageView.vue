@@ -81,8 +81,8 @@
 
 
 
-      <button type="button" class="px-5 py-3 bg-blue-800 text-white hover:bg-blue-900 rounded-md font-semibold">
-        See authorized devices
+      <button type="button" class="px-5 py-3 bg-blue-800 text-white hover:bg-blue-900 rounded-md font-semibold" @click="router.push('/services')">
+        See authorized services
       </button>
     </div>
 
@@ -94,7 +94,7 @@
       <div class="relative w-full max-w-md h-full md:h-auto">
 
 
-        <div class="relative bg-white
+        <div class="relative bg-blue-700
          text-blue-900 rounded-md">
 
 
@@ -113,7 +113,7 @@
             </button>
           </div>
 
-          <h2 class="text-3xl text-center">Add rule</h2>
+          <h2 class="text-3xl text-center text-white">Add rule</h2>
 
           <div class="p-6 space-y-6">
 
@@ -121,17 +121,17 @@
           <form>
 
             <div class="mb-6 mx-auto w-96">
-              <label for="text" class="block mb-2">IF...</label>
+              <label for="text" class="block mb-2 text-white">IF...</label>
               <input type="text" id="text"
-                class= "bg-gray-50 border border-gray-300 text-black text-sm rounded-lg block w-full p-2.5"
+                class= "bg-white border border-gray-300 text-black text-sm rounded-lg block w-full p-2.5"
                 placeholder="...">
             </div>
 
 
             <div class="mb-6 mx-auto w-96">
-              <label for="text" class="block mb-2">THEN...</label>
+              <label for="text" class="block mb-2 text-white">THEN...</label>
               <input type="text" id="text"
-                class="bg-gray-50 border border-gray-300 text-black text-sm rounded-lg block w-full p-2.5"
+                class="bg-white border border-gray-300 text-black text-sm rounded-lg block w-full p-2.5"
                 placeholder="...">
             </div>
 
@@ -156,8 +156,13 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-const isOpen = ref(false)
+import { useAuthStore } from "../stores/auth_store";
+import { useRouter } from "vue-router";
+const authStore = useAuthStore();
+const router = useRouter();
 
+
+const isOpen = ref(false)
 </script>
 
 
