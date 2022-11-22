@@ -74,7 +74,7 @@ export default class LoginRoute extends Route {
         };
 
         // Set the cookie header
-        response.cookie("_jwt", jwt, cookieOptions);
+        response.cookie("__session", jwt, cookieOptions);
         return true;
     }
 }

@@ -3,6 +3,7 @@ import { IUser } from "../model/User";
 import { verify, sign, JwtPayload } from "jsonwebtoken";
 import { internalServerError, unauthorizedUserError } from "./http";
 import env from "./env";
+import logger from "./logger";
 
 export class AuthError extends Error {
     constructor(message?: string) {
@@ -24,8 +25,10 @@ export default abstract class Authentication {
             userId = Authentication.checkJWT(request);
         } catch (e) {
             if (e instanceof AuthError) {
+                logger.debug("Auth check failed, JWT is not valid: ", e.message);
                 unauthorizedUserError(response);
             } else {
+                logger.warn("Auth check failed, something bad happened\n", e);
                 internalServerError(response);
             }
             return;
@@ -49,8 +52,9 @@ export default abstract class Authentication {
             throw Error();
         }
 
-        const cookieJWT: string | undefined = request.cookies._jwt;
+        const cookieJWT: string | undefined = request.cookies.__session;
         if (!cookieJWT) {
+            logger.debug("__session cookie is undefined, 'cookie' header is: ", request.headers.cookie);
             throw new AuthError("JWT Cookie is undefined");
         }
 

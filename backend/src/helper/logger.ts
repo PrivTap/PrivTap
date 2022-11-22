@@ -1,13 +1,8 @@
 import { colorConsole } from "tracer";
 import env from "./env";
 
-let level = "fatal";
-
-if (env.DEV)
-    level = "log";
-
-if (env.PROD)
-    level = "info";
+// log: 0, trace: 1, debug: 2, info: 3, warn: 4, error: 5, fatal: 6
+const level = env.LOG_LEVEL;
 
 const logger = colorConsole({
     level: level,

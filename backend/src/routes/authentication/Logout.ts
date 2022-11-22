@@ -8,7 +8,7 @@ export default class LogoutRoute extends Route {
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
-        response.clearCookie("_jwt");
+        response.clearCookie("__session");
         success(response, {}, "Logged out");
     }
 }
