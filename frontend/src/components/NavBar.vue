@@ -23,8 +23,8 @@
       >
       Logout
       </button>
-      <div class="rounded-full ring-[3px] ring-blue-500 w-10 h-10 hover:ring-blue-400" @click="router.push(RoutingPath.PERSONAL_PAGE)">
-        <img src="//web-assets.ifttt.com/packs/media/header/icon-avatar-5d8d838b5b5b3f55ce30.svg" alt="">
+      <div class="bg-stone-500 flex font-medium text-white items-center justify-center content-center rounded-full ring-[3px] ring-blue-500 w-10 h-10 hover:ring-blue-400" @click="router.push(RoutingPath.PERSONAL_PAGE)">
+        {{ authStore.user?.username.slice(0, 2).toUpperCase() }}
       </div>
     </div>
   </nav>

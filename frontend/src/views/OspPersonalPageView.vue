@@ -144,23 +144,45 @@
         Create API endpoint
       </button>
     </div>
-
-    <div v-if="services.length">
-      <div v-for="item in services" :key="item._id">
-        {{ item }}
-        ciao
+    <!-- <h1 class="text-5xl text-blue-100 text-center py-16 font-medium">
+      OSP Personal Page
+    </h1>
+    <div
+      class="mt-6 grid grid-cols-1 gap-y-10 gap-x-6 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 xl:gap-x-8 px-10 pb-24"
+    >
+      <div v-if="services.length">
+        <div v-for="item in services" :key="item._id">
+          <ServiceCard :service="item" />
+        </div>
       </div>
-    </div>
+
+      <div v-if="services.length">
+        <div v-for="item in services" :key="item._id">
+          <ServiceCard :service="item" />
+        </div>
+      </div>
+      <div v-if="services.length">
+        <div v-for="item in services" :key="item._id">
+          <ServiceCard :service="item" />
+        </div>
+      </div>
+
+      <div v-if="services.length">
+        <div v-for="item in services" :key="item._id">
+          <ServiceCard :service="item" />
+        </div>
+      </div>
+    </div> -->
   </div>
 </template>
 
 <script setup lang="ts">
-import type ServiceModel from "@/model/service_model";
 import { useOspServiceStore } from "../stores/osp_service_store";
 import { onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 import RoutingPath from "@/router/routing_path";
+import ServiceCard from "@/components/ServiceCard.vue";
 
 const router = useRouter();
 
@@ -171,7 +193,6 @@ const services = obsStore.services;
 onMounted(async () => {
   await ospServiceStore.getServices();
 });
-
 </script>
 
 <style scoped></style>
