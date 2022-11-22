@@ -2,7 +2,7 @@
   <div>
     <h1 class="text-5xl text-blue-100 font-medium text-center py-5">Services</h1>
 
-    <form class="flex items-center mx-auto justify-center py-20">
+    <form class="flex items-center mx-auto justify-center py-16 ">
       <label for="simple-search" class="sr-only">Search</label>
 
       <div class="relative">
@@ -33,7 +33,7 @@
       
     </form>
 
-    <div
+    <!-- <div
       class="container mx-auto grid grid-cols-1 bg-gray-800 px-5 py-5 border-2 border-blue-600 gap-4 overflow-y-scroll h-96 overscroll-auto"
     >
       <div class="text-white px-4 bg-blue-600 w-full py-5 rounded-md hover:bg-blue-900">
@@ -150,14 +150,52 @@
           </svg>
         </button>
       </div>
-    </div>
+    </div> -->
+
+    <select
+multiple
+
+  class="container mx-auto grid grid-cols-1 bg-gray-800 rounded-md px-5 py-5 border-2 border-blue-600 overflow-y-scroll h-96 overscroll-auto w-full space-y-5">
+    
+    <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
+      SERVICE 1...
+    </option>
+
+    <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
+      SERVICE 2...
+    </option>
+
+    <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
+      SERVICE 3...
+    </option>
+
+    <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
+      SERVICE 4...
+    </option>
+
+    <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
+      SERVICE 5...
+    </option>
+
+    <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
+      SERVICE 6...
+    </option>
+
+    <option class="text-white px-4 bg-blue-600 py-5 hover:bg-blue-900 rounded-md font-semibold">
+      SERVICE 7...
+    </option>
+
+</select>
 
     <div class="flex flex-row justify-center py-10 space-x-20">
-      <button type="button" class="px-5 py-3 bg-blue-800 text-white rounded-md hover:bg-blue-900" @click="router.push(RoutingPath.MODIFY_AUTH_PAGE)"> 
+      <button type="button" class="px-5 py-3 bg-blue-800 font-semibold text-white rounded-md hover:bg-blue-900" @click="router.push(RoutingPath.MODIFY_AUTH_PAGE)"> 
         Modify authorization
       </button>
-      <button type="button" class="px-5 py-3 bg-blue-800 text-white rounded-md hover:bg-blue-900" @click="router.push(RoutingPath.UNAUTHORIZED_SERVICE_PAGE)">
+      <button type="button" class="px-5 py-3 bg-blue-800 font-semibold text-white rounded-md hover:bg-blue-900" @click="router.push(RoutingPath.UNAUTHORIZED_SERVICE_PAGE)">
         Authorize new service
+      </button>
+      <button type="button" class="px-5 py-3 bg-blue-800 font-semibold text-white rounded-md hover:bg-blue-900">
+        Remove Service
       </button>
     </div>
   </div>
