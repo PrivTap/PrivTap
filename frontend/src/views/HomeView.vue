@@ -48,17 +48,15 @@
                 </li>
               </ul>
               <div class="text-white font-semibold text-xl space-x-16 pt-20">
-                <button
-                  class="rounded-lg bg-blue-600 py-5 px-16 font-normal text-white hover:bg-blue-700" @click="router.push(RoutingPath.PERSONAL_PAGE)"
-                >
-                  Create your Rule
-                </button>
-                <button
-                  class="rounded-lg py-4 px-16 font-normal text-blue-500 ring-blue-500 ring-[4px] hover:text-blue-400 hover:ring-blue-400"
-                  @click="router.push(RoutingPath.PUBLISH_SERVICE_PAGE)"
-                >
-                  Publish your Service
-                </button>
+                <PrimaryButton
+                  text="Create your Rule"
+                  :onClick="() => router.push(RoutingPath.PERSONAL_PAGE)"
+                />
+
+                <OutilinedButton
+                  text="Publish your Service"
+                  :onClick="() => router.push(RoutingPath.PUBLISH_SERVICE_PAGE)"
+                />
               </div>
             </div>
             <div class="w-0 lg:w-1 rounded bg-blue-500 mr-10"></div>
@@ -79,6 +77,8 @@ import { useAuthStore } from "../stores/auth_store";
 import draw from "@/assets/images/draw.svg";
 import { useRouter } from "vue-router";
 import RoutingPath from "../router/routing_path";
+import OutilinedButton from "../components/OutlinedButton.vue";
+import PrimaryButton from "@/components/PrimaryButton.vue";
 const authStore = useAuthStore();
 const router = useRouter();
 </script>
