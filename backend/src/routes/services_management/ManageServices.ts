@@ -11,9 +11,13 @@ export default class ManageServices extends Route {
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
-        const services = await Service.findServicesCreatedByUser(request.userId.toString());
-        if (services) {
-            success(response,  services);
+        let queryResult;
+        if (request.query.serviceId != undefined)
+            queryResult = await Service.findById(request.query.serviceId.toString(), request.userId);
+        else
+            queryResult = await Service.findServicesCreatedByUser(request.userId.toString());
+        if (queryResult) {
+            success(response,  queryResult);
         } else {
             internalServerError(response);
         }
@@ -68,7 +72,7 @@ export default class ManageServices extends Route {
             return;
         }
 
-        const validModification = Service.updateService(request.userId, serviceID, newServiceName, newServiceDescription, newServiceAuthURL, newClientID, newClientSecret);
+        const validModification = Service.updateService(serviceID, request.userId, newServiceName, newServiceDescription, newServiceAuthURL, newClientID, newClientSecret);
 
         if(!validModification)
             forbiddenUserError(response);

@@ -134,14 +134,12 @@ export default abstract class User {
      * @param userId The ID of the user to find in the database
      */
     static async findById(userId: string): Promise<IUser|undefined>{
-        let queryResult: FilterQuery<IUser>|null;
         try {
-            queryResult = await User.userModel.findById(userId);
+            return await User.userModel.findById(userId) as IUser;
         } catch (e) {
             logger.error("Error finding user by id", e);
             return undefined;
         }
-        return queryResult as IUser;
     }
 }
 

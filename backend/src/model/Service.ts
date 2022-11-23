@@ -104,8 +104,8 @@ export default class Service {
 
     /**
      * Updates a service associated to a given user with new and updated data
-     * @param userID The ID of the user associated to the service
      * @param serviceID The ID of the service to update
+     * @param userID The ID of the user associated to the service
      * @param newName The new service name
      * @param newDescription The new service description
      * @param newAuthServer The new authorization server
@@ -113,7 +113,7 @@ export default class Service {
      * @param newClientSecret The new client secret
      * @returns A boolean Promise which contains true if the operation was successful, and false otherwise
      */
-    static async updateService(userID: string, serviceID: string, newName: string|undefined = undefined, newDescription: string|undefined = undefined, newAuthServer: string|undefined = undefined, newClientId: string|undefined = undefined, newClientSecret: string|undefined = undefined): Promise<boolean>{
+    static async updateService(serviceID: string, userID: string, newName: string|undefined = undefined, newDescription: string|undefined = undefined, newAuthServer: string|undefined = undefined, newClientId: string|undefined = undefined, newClientSecret: string|undefined = undefined): Promise<boolean>{
         serviceSchema.pre("updateOne", { document: false, query: true }, function(next) {
             const updated = this.getUpdate();
             if (updated) {
@@ -146,21 +146,21 @@ export default class Service {
     }
 
     /**
-     * This function is used to find all the name and description of all the services present
-     * @param itemsPerPage is the number of items you want to show in a page: default 10
-     * @param page is the number of the current page: default 0
+     * Returns the queried service if the specified user is the owner
+     * @param serviceId The ID of the service to update
+     * @param userId The ID of the user associated to the service
      */
-    static async findServices(itemsPerPage?: number, page?: number): Promise<IService[] | null> {
-        const defaultItemsPerPage = 10;
-        const defaultPage = 0;
-        try {
-            itemsPerPage = itemsPerPage === undefined ? defaultItemsPerPage : itemsPerPage;
-            page = page === undefined ? defaultPage : page;
-            const result = await Service.serviceModel.find().skip(page * itemsPerPage).limit(itemsPerPage).select("name description -_id");
-            return result as IService[];
-        } catch (e) {
-            logger.error("Error while retrieving all the services in the database", e);
-            return null;
+    static async findById(serviceId: string, userId: string): Promise<IService|undefined>{
+        const query = {
+            "_id": serviceId,
+            "creator": userId
+        };
+        try{
+            return await Service.serviceModel.findOne(query) as IService;
+        } catch (e){
+            logger.error("Error querying service:", e);
+            return undefined;
         }
+
     }
 }

@@ -10,6 +10,7 @@ export default class ServicesRoute extends Route {
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
+        /*
         const itemsPerPageS = request.query.items;
         const pageS = request.query.page;
         const itemsPerPageN = itemsPerPageS === undefined ? undefined : Number.parseInt(itemsPerPageS.toString());
@@ -21,5 +22,7 @@ export default class ServicesRoute extends Route {
         } else {
             internalServerError(response);
         }
+
+         */
     }
 }
