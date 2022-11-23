@@ -14,15 +14,30 @@ export default interface IOspServiceStoreState {
 }
 
 export const useOspServiceStore = defineStore("ospServiceStore", {
-  state: (): IOspServiceStoreState => ({
+  persist: {
+    enabled: true,
+  },
+  state: () => ({
     services: ref<ServiceModel[]>([]),
     manageService: new ManageService(),
   }),
   actions: {
-    async postCallService(name: string, description: string, authUrl: string, clientId: string, clientSecret: string) {
+    async postCallService(
+      name: string,
+      description: string,
+      authUrl: string,
+      clientId: string,
+      clientSecret: string
+    ) {
       const toast = useToast();
       try {
-        const response = await this.manageService.createService(name, description, authUrl, clientId, clientSecret);
+        const response = await this.manageService.createService(
+          name,
+          description,
+          authUrl,
+          clientId,
+          clientSecret
+        );
         if (response) {
           toast.success("Service created successfully");
           this.addService(response.data as ServiceModel);
@@ -48,7 +63,8 @@ export const useOspServiceStore = defineStore("ospServiceStore", {
       const toast = useToast();
       try {
         const response = await this.manageService.deleteService(service._id);
-        if (response) {
+        console.log(response);
+        if (response.status) {
           toast.success("Service deleted successfully");
           this.removeService(service._id);
         }
@@ -85,86 +101,3 @@ export const useOspServiceStore = defineStore("ospServiceStore", {
     },
   },
 });
-
-// export const useOspServiceStore = defineStore("osp_service_store", () => {
-//   let services = ref<Array<ServiceModel> | []>([]);
-//   const manageService = new ManageService();
-//   const toast = useToast();
-
-//   async function getServices() {
-//     const res = await new ManageService().getAllServices();
-//     if (res.status) {
-//       setServices(res.data as ServiceModel[]);
-//     }
-//   }
-
-//   if (getCurrentInstance()) {
-//     console.log("manage service mounted");
-//     onMounted(async () => {
-//       const res = await new ManageService().getAllServices();
-//       if (res.status) {
-//         setServices(res.data as ServiceModel[]);
-//       }
-//     });
-//   }
-
-//   const setServices = (newServices: Array<ServiceModel>) => {
-//     services.value = newServices;
-//   };
-//   const deleteService = async (serviceId: string) => {
-//     const res = await manageService.deleteService(serviceId);
-//     if (res.status) {
-//       services.value = services.value.filter(
-//         (service) => service._id !== serviceId
-//       );
-//       toast.success("Service deleted successfully");
-//       return;
-//     }
-//     toast.error(res.message);
-//     return;
-//   };
-
-//   async function addService(
-//     name: string,
-//     description: string,
-//     authUrl: string,
-//     clientID: string,
-//     clientSecret: string
-//   ) {
-//     const res = await manageService.createService(
-//       name,
-//       description,
-//       authUrl,
-//       clientID,
-//       clientSecret
-//     );
-//     if (res.status) {
-//       const newService = res.data as ServiceModel;
-//       services.value = [...services.value, newService];
-//       if (res) {
-//         useToast().success("Service added successfully");
-//         return true;
-//       }
-//     }
-//     useToast().error(res.message);
-//     return false;
-//   }
-
-//   const updateService = (service: ServiceModel) => {
-//     services.value = services.value.map((oldService) => {
-//       if (oldService._id === service._id) {
-//         return service;
-//       }
-//       return oldService;
-//     });
-//   };
-
-//   return {
-//     services,
-//     setServices,
-//     deleteService,
-//     addService,
-//     updateService,
-//     getServices,
-//   };
-// });

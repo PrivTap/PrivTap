@@ -65,7 +65,10 @@ export default class ManageService
   }
   async deleteService(serviceId: string): Promise<StandartRepsonse<Object>> {
     try {
-      const res = await this.http.delete(`${this.path}?serviceID=${serviceId}`);
+      const res = await this.http.delete(this.path, {
+        params: { serviceID: serviceId },
+      });
+      console.log(res);
       return res.data as StandartRepsonse<Object>;
     } catch (error) {
       return axiosCatch(error);

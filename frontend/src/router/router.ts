@@ -48,7 +48,7 @@ const router = createRouter({
       },
     },
     {
-      path: RoutingPath.PUBLISH_SERVICE_PAGE,
+      path: "/publishservice/:id?",
       name: "publishservice",
       component: () => import("../views/PublishServiceView.vue"),
       meta: {
