@@ -49,7 +49,7 @@ describe("Manage Service Store Test", () => {
     const ospServiceStore = useOspServiceStore();
     let services = [testServiceModel];
     ospServiceStore.services = services;
-    ospServiceStore.deleteService(testServiceModel._id);
+    ospServiceStore.removeService(testServiceModel._id);
     expect(ospServiceStore.services.length).toBe(0);
   });
 

@@ -7,26 +7,52 @@ import type { StandartRepsonse } from "@/model/response_model";
 import axiosCatch from "@/helpers/axios_catch";
 
 export default interface IOspServiceStoreState {
-  services: Ref<Array<ServiceModel> | []>;
-  getServices: () => void;
-  setServices: (services: Array<ServiceModel>) => void;
-  deleteService: (serviceId: string) => void;
-  addService: (
-    name: string,
-    description: string,
-    authUrl: string,
-    clientID: string,
-    clientSecret: string
-  ) => void;
-  updateService: (service: ServiceModel) => void;
+  services: Ref<ServiceModel[] | []>;
+  manageService: ManageService;
 }
 
 export const useOspServiceStore = defineStore("ospServiceStore", {
-  state: () => ({
-    services: ref<Array<ServiceModel>>([]),
+  state: (): IOspServiceStoreState => ({
+    services: ref<ServiceModel[]>([]),
     manageService: new ManageService(),
   }),
   actions: {
+    async postCallService(name: string, description: string, authUrl: string, clientId: string, clientSecret: string) {
+      const toast = useToast();
+      try {
+        const response = await this.manageService.createService(name, description, authUrl, clientId, clientSecret);
+        if (response) {
+          toast.success("Service created successfully");
+          this.addService(response.data as ServiceModel);
+        }
+      } catch (error) {
+        axiosCatch(error);
+      }
+    },
+    async updateCallService(service: ServiceModel) {
+      const toast = useToast();
+      try {
+        const response = await this.manageService.updateService(service);
+        if (response) {
+          toast.success("Service updated successfully");
+          this.updateService(response.data as ServiceModel);
+        }
+      } catch (error) {
+        axiosCatch(error);
+      }
+    },
+    async deleteCallService(service: ServiceModel) {
+      const toast = useToast();
+      try {
+        const response = await this.manageService.deleteService(service._id);
+        if (response) {
+          toast.success("Service deleted successfully");
+          this.removeService(service._id);
+        }
+      } catch (error) {
+        axiosCatch(error);
+      }
+    },
     async getServices() {
       try {
         const response = await this.manageService.getAllServices();
@@ -37,13 +63,13 @@ export const useOspServiceStore = defineStore("ospServiceStore", {
         axiosCatch(error);
       }
     },
-    deleteService(serviceId: string) {
+    removeService(serviceId: string) {
       this.services = this.services.filter(
         (service) => service._id !== serviceId
       );
     },
     addService(newService: ServiceModel) {
-      this.services.push(newService);
+      this.services = [...this.services, newService];
     },
     updateService(updatedService: ServiceModel) {
       this.services = this.services.map((oldService) => {
