@@ -1,20 +1,39 @@
 //define what is scope
-import { Schema, model } from "mongoose";
+import { Schema } from "mongoose";
 
 export interface IPermission {
-    scope: string;
+    readonly scope: string;
+    readonly name: string;
 }
 
-const permissionSchema = new Schema<IPermission>({
-    scope: {
-        type: String,
-        required: true,
-    },
+export class Permission implements IPermission {
+    readonly scope: string;
+    readonly name: string;
 
-});
+    static schema = new Schema<IPermission>({
+        name: {
+            type: String,
+            required: true,
+            index: {
+                unique: true
+            }
+        },
+        scope: {
+            type: String,
+            required: true,
+        },
+    });
 
-export default class Permission {
+    constructor(scope: string, name: string) {
+        this.scope = scope;
+        this.name = name;
+    }
 
-    private static permissionModel = model<IPermission>("Permission", permissionSchema);
+    public getName(): string {
+        return this.name;
+    }
 
+    public getScope(): string {
+        return this.scope;
+    }
 }
