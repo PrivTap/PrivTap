@@ -9,6 +9,7 @@ export default class ManageTriggersRoute extends Route {
     constructor() {
         super("manage-triggers", true);
     }
+    /*
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
         const parentServiceID = request.body.parentId;
@@ -62,4 +63,6 @@ export default class ManageTriggersRoute extends Route {
             internalServerError(response);
         }
     }
+
+     */
 }

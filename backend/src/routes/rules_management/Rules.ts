@@ -26,7 +26,7 @@ export default class RulesRoute extends Route {
             return;
         }
         if (await Rule.insertNewRule(new Types.ObjectId(userID), new Types.ObjectId(triggerID), new Types.ObjectId(actionId)))
-            success(response, {}, "Not implemented");
+            success(response, {});
         else
             internalServerError(response);
     }

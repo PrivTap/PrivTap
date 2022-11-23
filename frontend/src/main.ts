@@ -1,19 +1,18 @@
 import { createApp } from "vue";
 import { createPinia } from "pinia";
-
 import App from "./App.vue";
 import router from "./router/router";
-
 import "./assets/style.css";
-import dotenv from "dotenv";
-
 import Toast, { type PluginOptions, POSITION } from "vue-toastification";
-// Import the CSS or use your own!
 import "vue-toastification/dist/index.css";
+import piniaPersist from "pinia-plugin-persist";
+
+const pinia = createPinia();
+pinia.use(piniaPersist);
 
 const app = createApp(App);
 
-app.use(createPinia());
+app.use(pinia);
 app.use(router);
 const options: PluginOptions = {
   // You can set your default options here

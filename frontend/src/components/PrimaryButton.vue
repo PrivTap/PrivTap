@@ -1,9 +1,5 @@
 <template>
-  <button
-    type="button"
-    @click="onClick()"
-    class="rounded-lg bg-blue-600 py-5 px-16 font-normal text-white hover:bg-blue-700"
-  >
+  <button class=" rounded-lg bg-blue-600 py-5 px-16 font-normal text-white hover:bg-blue-700">
     {{ text }}
   </button>
 </template>
@@ -13,10 +9,6 @@ defineProps({
   text: {
     type: String,
     required: true,
-  },
-  onClick: {
-    type: Function,
-    default: null,
   },
 });
 </script>

@@ -8,8 +8,11 @@ export default class TriggersRoute extends Route {
         super("triggers", true);
     }
 
+    /*
     //Do we need filters here?
     protected async httpGet(request: Request, response: Response): Promise<void> {
 
     }
+
+     */
 }

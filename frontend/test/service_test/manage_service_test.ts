@@ -2,7 +2,6 @@ import { StubbedInstance, stubInterface } from "ts-sinon";
 import { beforeAll, describe, expect, test } from "vitest";
 import IManageService from "../../src/services/manage_service";
 import ServiceModel from "../../src/model/service_model";
-import { StandartRepsonse } from "../../src/model/response_model";
 
 describe("Manage Service Tests", () => {
   let manageServiceStub: StubbedInstance<IManageService>;

@@ -1,8 +1,5 @@
-import { model, Schema, Types } from "mongoose";
-import logger from "../helper/logger";
-import ObjectId = Types.ObjectId;
+import { Schema, Types } from "mongoose";
 import { Permission } from "./Permission";
-import Service from "./Service";
 
 export interface ITrigger {
     _id: string;
@@ -39,6 +36,7 @@ const triggerSchema = new Schema<ITrigger>({
 });
 
 export default class Trigger {
+    /*
 
     private static triggerModel = model<ITrigger>("Trigger", triggerSchema);
 
@@ -101,4 +99,6 @@ export default class Trigger {
             return false;
         }
     }
+
+     */
 }
