@@ -56,53 +56,79 @@ paths:
       tags:
         - Authentication
       summary: New user register to the platform
-      description: OSP and end-user register to the platform (TODO)
+      description: The user has the possibility to create a new account in order to access the platform
       operationId: register
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Register'
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "John71"
+                email:
+                  type: string
+                  example: "Jhon71@gmail.com"
+                password:
+                  type: string
+                  example: "MyPrivatePassword"
       responses:
         '200':
           description: Successful operation
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
   /login:
     post:
       security: []
       tags:
         - Authentication
       summary: Registered user log-in to the platform
-      description: OSP and end-user log-in to the platform (TODO)
+      description: The user has the possibility to log into the platform and access his private account
       operationId: login
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Login'
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "John71"
+                password:
+                  type: string
+                  example: "MyPrivatePassword"
       responses:
         '200':
-          description: successful operation
+          description: Successful operation
           headers:
             Set-Cookie:
               schema:
                 type: string
                 example: _jwt=a_jwt_token; Path=/; HttpOnly; Secure
         '400':
-          description: Invalid status value
+          description: Bad request
+        '500':
+          description: Internal server error
   /logout:
     get:
       tags:
         - Authentication
       summary: OSP and end-user log-out from the platform
-      description: OSP and end-user log-out from the platform (TODO)
+      description: The user has the possibility to logout from his account
       operationId: logout
       responses:
         '200':
           description: Successful logout, delete the _jwt cookie from the user's browser
         '400':
-          description: Invalid tag value
+          description: Bad request
+        '500':
+          description: Internal server error
   /activate:
     post:
       security: []
@@ -123,7 +149,7 @@ paths:
                   example: 823217d03a2d149c7d3c8c8f3235d62dcc7047730990f405b7f0feb104ce7c3ec7899ddbf0562558af9e0de7e71953456e840925556c494492e7c876c8f47413
       responses:
         '200':
-          description: The request was successful
+          description: Successful operation
         '400':
           description: The token is not valid
 
@@ -131,52 +157,72 @@ paths:
     get:
       tags:
         - Rules Management
-      summary: The end-user requests the set of rules already defined
-      description: The end-user requests the set of rules already defined (TODO)
+      summary: The user requests the set of rules already defined
+      description: Returns all the rules defined by the user
       operationId: get-rules
       responses:
         '200':
-          description: successful operation
+          description: Successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Rules'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Rule'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
     post:
       tags:
         - Rules Management
-      summary: The end-user defines a new rule
-      description: The end-user defines a new rule (TODO)
+      summary: The user defines a new rule
+      description: The user has the possibility of defining a new rule specifying the chosen trigger and action
       operationId: post-rules
-      parameters:
-        - name: sessionID
-          required: true
-          in: cookie
-          schema:
-            type: string
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewRule'
+              type: object
+              properties:
+                triggerId:
+                  type: string
+                  example: 63446c0e2677ffe654ea9672
+                actionId:
+                  type: string
+                  example: 632e6caa2677ffe654ea9672
       responses:
-        '405':
-          description: Invalid input
+        '200':
+          description: Successful operation
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
 
     delete:
       tags:
         - Rules Management
-      summary: The end-user deletes an already defined rule
-      description: The end-user deletes an already defined rule (TODO)
+      summary: The user deletes an already defined rule
+      description: The user has the possibility of deleting a rule he created
       operationId: delete-rules
-      parameters:
-        - name: ruleID
-          in: query
-          schema:
-            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ruleId:
+                  type: string
+                  example: 6377550e2677ffe654ea9672
       responses:
         '200':
-          description: successful operation
+          description: Successful operation
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
 
   /services:
     get:
@@ -321,7 +367,7 @@ paths:
       tags:
         - Services Management
       summary: The OSP requests a list of already defined services
-      description: The OSP requests a list of already defined services (TODO)
+      description: The OSP can request a list of defined services in order to view, modify or delete them
       operationId: get-manage-services
       responses:
         '200':
@@ -332,37 +378,119 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Service'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
     post:
       tags:
         - Services Management
       summary: The OSP defines a new service
-      description: The OSP defines a new service (TODO)
+      description: The OSP can create a new service defining the service name, a description, the creator
       operationId: post-manage-services
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewService'
+                type: object
+                properties:
+                  description:
+                    type: string
+                    example: "Some very nice service description"
+                  name:
+                    type: string
+                    example: "someServiceName"
+                  authServer:
+                    type: string
+                    example: "someAuthorizationServerUrl"
+                  clientId:
+                    type: string
+                    example: "someSecretClientID"
+                  clientSecret:
+                    type: string
+                    example: "someVerySecretSecret"
       responses:
         '200':
           description: successful operation
+        '400':
+          description: Error while creating a service
+        '500':
+          description: Internal server error
 
     delete:
       tags:
         - Services Management
       summary: The OSP deletes an already defined service
-      description: The OSP deletes an already defined service (TODO)
+      description: A OSP can delete a defined service, assuming that he's the creator of the latter
       operationId: delete-manage-services
-      parameters:
-        - name: serviceID
-          in: query
-          required: true
-          schema:
-            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                schema:
+                  type: object
+                  properties:
+                    description:
+                      type: string
+                      example: "Some very nice new service description"
+                    name:
+                      type: string
+                      example: "someNewServiceName"
+                    creator:
+                      type: string
+                      example: "632e69a12677ffe654ea9672"
+                    authServer:
+                      type: string
+                      example: "someNewAuthorizationServerUrl"
+                    clientId:
+                      type: string
+                      example: "someNewSecretClientID"
+                    clientSecret:
+                      type: string
+                      example: "someNewVerySecretSecret"
       responses:
         '200':
           description: successful operation
+        '400':
+          description: Error while creating a service
+
+    put:
+      tags:
+        - Services Management
+      summary: The OSP modify an already defined service
+      description: A OSP can modify a defined service, assuming that he's the creator of the latter
+      operationId: modify-manage-services
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                  example: "Some very nice new service description"
+                name:
+                  type: string
+                  example: "someNewServiceName"
+                authServer:
+                  type: string
+                  example: "someNewAuthorizationServerUrl"
+                clientId:
+                  type: string
+                  example: "someNewSecretClientID"
+                clientSecret:
+                  type: string
+                  example: "someNewVerySecretSecret"
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Error while creating a service
   /triggers-data:
     post:
       tags:
@@ -517,136 +645,44 @@ components:
       name: __session
 
   schemas:
-    Trigger:
+    Rule:
       properties:
         id:
           type: string
-          example: 637ccd4951cdf089ba2123be
-        name:
+          example: "637e6c0e2677ffe654ea9672"
+        userId:
           type: string
-          example: Sensor detects movement
-        description:
+          example: "637e11162677ffe654ea9672"
+        triggerId:
           type: string
-          example: Fires when a SensorService sensor detects movement
-
-    Action:
-      type: object
-      properties:
-        id:
+          example: "617e6c0e2677ffe659999672"
+        actionId:
           type: string
-          example: 6489ccd4951cdf089ba21288c
-        name:
-          type: string
-          example: Send notification to mobile app
-        description:
-          type: string
-          example: Send a push notification to the NotificationService mobile app
-
-    Register:
-      type: object
-      properties:
-        username:
-          type: string
-          example: "John71"
-        email:
-          type: string
-          example: "Jhon71@gmail.com"
-        password:
-          type: string
-          example: "MyPrivatePassword"
-
-    Login:
-      type: object
-      properties:
-        username:
-          type: string
-          example: "John71"
-        password:
-          type: string
-          example: "MyPrivatePassword"
-
-    Rules:
-      type: array
-      items:
-        type: object
-        properties:
-          Trigger:
-            $ref: '#/components/schemas/Trigger'
-          Action:
-            $ref: '#/components/schemas/Action'
-
-    NewRule:
-      type: object
-      properties:
-        Trigger:
-          $ref: '#/components/schemas/Trigger'
-        Action:
-          $ref: '#/components/schemas/Action'
-
+          example: "632e6c0e2677ffe654ea9672"
+        isAuthorized:
+          type: boolean
+          example: "true"
 
     Service:
-      type: object
       properties:
         id:
           type: string
-          example: "SomeServiceID"
-
-    UserService:
-      type: object
-      properties:
-        id:
+          example: "637e6c0e2677ffe654ea9672"
+        description:
           type: string
-          example: "SomeServiceID"
-        authorized:
-          type: boolean
-          example: "True"
-
-    Permission:
-      type: object
-      properties:
-        id:
+          example: "Some very nice service description"
+        name:
           type: string
-          example: "SomePermissionID"
-
-
-    NewAuthorization:
-      type: object
-      properties:
-        Service:
-          $ref: '#/components/schemas/Service'
-        Permissions:
-          type: array
-          items:
-            $ref: '#/components/schemas/Permission'
-
-
-    NewService:
-      type: object
-      properties:
-        Service:
-          $ref: '#/components/schemas/Service'
-        Endpoint:
+          example: "someServiceName"
+        creator:
           type: string
-          example: "/some_endpoint"
-        ClientId:
+          example: "632e69a12677ffe654ea9672"
+        authServer:
           type: string
-          example: "SomeClientID"
-        Secret:
+          example: "someAuthorizationServerUrl"
+        clientId:
           type: string
-          example: "SomeSecret"
-
-    TriggerData:
-      type: object
-      properties:
-        Data:
+          example: "someSecretClientID"
+        clientSecret:
           type: string
-          example: "To define"
-
-    NewAction:
-      type: object
-      properties:
-        action:
-          $ref: '#/components/schemas/Action'
-        endpoint:
-          type: string
-          example: "SomeEndPoint"
+          example: "someVerySecretSecret"
