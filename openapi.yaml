@@ -2,7 +2,31 @@ openapi: 3.0.3
 info:
   title: PrivTAP
   description: |-
-    Privacy preserving Trigger-Action Platform.
+    ### Privacy preserving Trigger-Action Platform
+    This document describes the interface of the REST API that is exposed by PrivTAP backend.
+    
+    #### Conventions
+    All responses are in JSON format and will include an object like this in their body:
+    ```typescript
+    {
+      // Flag indicating if the request has been executed successfully
+      "status": boolean,
+      // Optional message, this is usually used for error messages
+      "message": string,
+      // Optional data, this is usually used in successful requests to return the results
+      "data": object | array
+    }
+    ```
+    This external structure will not be represented in this document to avoid clutter:
+    - for successful responses (status codes 2xx), it is represented the value associated with the *data* field, if present
+    - for unsuccessful responses (status codes 4xx/5xx), it is specified a description of what caused the error
+    
+    Common errors will not be specified in endpoints description, keep in mind that:
+    - endpoints that needs authentication can respond with *401 unauthorized*, if the authentication cookie is not valid
+    - all endpoints can respond with *5xx internal server error*, if something unexpected happens on the server
+    - all endpoints can respons with *400 bad request*, if the required parameters/body fields are not present
+    
+    Only errors specific to the single endpoints will be specified in this document.
   termsOfService: https://privtap.it/terms/
   contact:
     email: contact@privtap.it
