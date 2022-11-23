@@ -12,15 +12,15 @@ export default class ManageTriggersRoute extends Route {
     /*
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
-        const parentServiceID = request.body.parentId;
+        const parentServiceId = request.body.parentId;
 
-        if (!parentServiceID) {
+        if (!parentServiceId) {
             badRequest(response, "Invalid parameters");
             return;
         }
 
         // Insert the trigger
-        if (await Trigger.findAllChildrenOfService(parentServiceID)) {
+        if (await Trigger.findAllChildrenOfService(parentServiceId)) {
             success(response);
         } else {
             badRequest(response, "Error while querying available triggers for the service");
@@ -30,17 +30,17 @@ export default class ManageTriggersRoute extends Route {
     protected async httpPost(request: Request, response: Response): Promise<void> {
         const triggerName = request.body.name;
         const triggerDesc = request.body.description;
-        const parentServiceID = request.body.parentId;
+        const parentServiceId = request.body.parentId;
         const availablePermissions = request.body.permissions as ([Permission] | null);
-        const creatorID = request.userId.toString();
+        const creatorId = request.userId.toString();
 
-        if (!(triggerName && triggerDesc && parentServiceID && availablePermissions && creatorID && mongoose.isValidObjectId(parentServiceID) && mongoose.isValidObjectId(creatorID))) {
+        if (!(triggerName && triggerDesc && parentServiceId && availablePermissions && creatorId && mongoose.isValidObjectId(parentServiceId) && mongoose.isValidObjectId(creatorId))) {
             badRequest(response, "Invalid parameters");
             return;
         }
 
         // Insert the trigger
-        if (await Trigger.insert(triggerName, triggerDesc, parentServiceID, creatorID, availablePermissions)) {
+        if (await Trigger.insert(triggerName, triggerDesc, parentServiceId, creatorId, availablePermissions)) {
             success(response);
         } else {
             badRequest(response, "Error while creating trigger");
@@ -48,16 +48,16 @@ export default class ManageTriggersRoute extends Route {
     }
 
     protected async httpDelete(request: Request, response: Response): Promise<void> {
-        const serviceID = request.body.serviceID;
-        const triggerID = request.body.triggerID;
-        const userID = request.userId.toString();
+        const serviceId = request.body.serviceId;
+        const triggerId = request.body.triggerId;
+        const userId = request.userId.toString();
 
-        if (!(serviceID && triggerID && userID && mongoose.isValidObjectId(serviceID) && mongoose.isValidObjectId(triggerID) && mongoose.isValidObjectId(userID))) {
+        if (!(serviceId && triggerId && userId && mongoose.isValidObjectId(serviceId) && mongoose.isValidObjectId(triggerId) && mongoose.isValidObjectId(userId))) {
             badRequest(response, "Invalid parameters");
             return;
         }
 
-        if (await Trigger.delete(triggerID, serviceID, userID)) {
+        if (await Trigger.delete(triggerId, serviceId, userId)) {
             success(response);
         } else {
             internalServerError(response);

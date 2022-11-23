@@ -130,8 +130,8 @@ export default abstract class User {
     }
 
     /**
-     * Finds an existing user given its user ID
-     * @param userId The ID of the user to find in the database
+     * Finds an existing user given its user Id
+     * @param userId The Id of the user to find in the database
      */
     static async findById(userId: string): Promise<IUser|undefined>{
         try {

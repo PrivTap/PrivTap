@@ -54,17 +54,17 @@ export default class Service {
      * Asynchronously adds a new service to the database
      * @param name The name of the new service
      * @param description The description of the service
-     * @param creatorID The ID of the user that created this service
+     * @param creatorId The Id of the user that created this service
      * @param authenticationServer The API endpoint of the server used to authenticate the PrivTAP platform with the Service
-     * @param clientId The ID of our platform on the authorization server
+     * @param clientId The Id of our platform on the authorization server
      * @param clientSecret The secret of our platform on the authorization server
      * @returns A boolean Promise which contains true if the operation was successful, and false otherwise
      */
-    static async insert(name: string, description: string, creatorID: string, authenticationServer: string, clientId: string, clientSecret: string) {
+    static async insert(name: string, description: string, creatorId: string, authenticationServer: string, clientId: string, clientSecret: string) {
         const newService = new Service.serviceModel({
             description: description,
             name: name,
-            creator: new ObjectId(creatorID),
+            creator: new ObjectId(creatorId),
             authServer: authenticationServer,
             clientId: clientId,
             clientSecret: clientSecret
@@ -80,12 +80,12 @@ export default class Service {
 
     /**
      * Asynchronously retrieves the list of services that a user has created
-     * @param userID The ID of the user that created and owns the services to retrieve
+     * @param userId The Id of the user that created and owns the services to retrieve
      * @returns A Promise containing either the list of services created by the user, or null if something went wrong
      */
-    static async findServicesCreatedByUser(userID: string): Promise<IService[] | null> {
+    static async findServicesCreatedByUser(userId: string): Promise<IService[] | null> {
         try {
-            return Service.serviceModel.find({ creator: new ObjectId(userID) });
+            return Service.serviceModel.find({ creator: new ObjectId(userId) });
         } catch (e) {
             logger.error("Error while retrieving service: ", e);
             return null;
@@ -104,16 +104,16 @@ export default class Service {
 
     /**
      * Updates a service associated to a given user with new and updated data
-     * @param serviceID The ID of the service to update
-     * @param userID The ID of the user associated to the service
+     * @param serviceId The Id of the service to update
+     * @param userId The Id of the user associated to the service
      * @param newName The new service name
      * @param newDescription The new service description
      * @param newAuthServer The new authorization server
-     * @param newClientId The new client ID
+     * @param newClientId The new client Id
      * @param newClientSecret The new client secret
      * @returns A boolean Promise which contains true if the operation was successful, and false otherwise
      */
-    static async updateService(serviceID: string, userID: string, newName: string|undefined = undefined, newDescription: string|undefined = undefined, newAuthServer: string|undefined = undefined, newClientId: string|undefined = undefined, newClientSecret: string|undefined = undefined): Promise<boolean>{
+    static async updateService(serviceId: string, userId: string, newName: string|undefined = undefined, newDescription: string|undefined = undefined, newAuthServer: string|undefined = undefined, newClientId: string|undefined = undefined, newClientSecret: string|undefined = undefined): Promise<boolean>{
         serviceSchema.pre("updateOne", { document: false, query: true }, function(next) {
             const updated = this.getUpdate();
             if (updated) {
@@ -124,8 +124,8 @@ export default class Service {
         });
 
         const query = {
-            "_id": new ObjectId(serviceID),
-            "creator": new ObjectId(userID)
+            "_id": new ObjectId(serviceId),
+            "creator": new ObjectId(userId)
         };
 
         const update = {
@@ -147,8 +147,8 @@ export default class Service {
 
     /**
      * Returns the queried service if the specified user is the owner
-     * @param serviceId The ID of the service to update
-     * @param userId The ID of the user associated to the service
+     * @param serviceId The Id of the service to update
+     * @param userId The Id of the user associated to the service
      */
     static async findById(serviceId: string, userId: string): Promise<IService|undefined>{
         const query = {

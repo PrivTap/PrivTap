@@ -5,7 +5,7 @@ export interface ITrigger {
     _id: string;
     name: string;
     description: string;
-    serviceID: Types.ObjectId;
+    serviceId: Types.ObjectId;
     permissions: [Permission]; // TO DEFINE
     data: any[]; // TO DEFINE
 }
@@ -22,7 +22,7 @@ const triggerSchema = new Schema<ITrigger>({
         type: String,
         required: true,
     },
-    serviceID: {
+    serviceId: {
         type: Schema.Types.ObjectId,
         required: true
     },
@@ -40,18 +40,18 @@ export default class Trigger {
 
     private static triggerModel = model<ITrigger>("Trigger", triggerSchema);
 
-    static async insert(triggerName: string, description: string, parentServiceID: string, inserterUserID: string, availablePermissions: [Permission]) {
+    static async insert(triggerName: string, description: string, parentServiceId: string, inserterUserId: string, availablePermissions: [Permission]) {
         //TODO: HOW DO WE DEFINE PERMISSIONS????
         const newTrigger = new Trigger.triggerModel({
             description: description,
             name: triggerName,
-            serviceID: new ObjectId(parentServiceID),
+            serviceId: new ObjectId(parentServiceId),
             permissions: availablePermissions,
             data: []
         });
 
         // Is the parent Service owned by this user?
-        const isInserterOwner = await Service.findServiceCreatedByUser(inserterUserID, parentServiceID);
+        const isInserterOwner = await Service.findServiceCreatedByUser(inserterUserId, parentServiceId);
         if (!isInserterOwner) {
             logger.error("Attempting to create a trigger for a service that the creator user does not own");
             return false;
@@ -74,25 +74,25 @@ export default class Trigger {
         }
     }
 
-    static async findAllChildrenOfService(parentID: string): Promise<ITrigger[] | null> {
+    static async findAllChildrenOfService(parentId: string): Promise<ITrigger[] | null> {
         try {
-            return Trigger.triggerModel.find({ serviceID: new ObjectId(parentID) });
+            return Trigger.triggerModel.find({ serviceId: new ObjectId(parentId) });
         } catch (e) {
             logger.error("Error while retrieving service: ", e);
             return null;
         }
     }
 
-    static async delete(triggerID: string, serviceID: string, ownerID: string) {
+    static async delete(triggerId: string, serviceId: string, ownerId: string) {
         // Is the parent Service owned by this user?
-        const isInserterOwner = await Service.findServiceCreatedByUser(ownerID, serviceID);
+        const isInserterOwner = await Service.findServiceCreatedByUser(ownerId, serviceId);
         if (!isInserterOwner) {
             logger.error("Attempting to delete a trigger for a service that the creator user does not own");
             return false;
         }
 
         try {
-            await Trigger.triggerModel.deleteOne({ serviceID: new ObjectId(serviceID), _id: new ObjectId(triggerID) });
+            await Trigger.triggerModel.deleteOne({ serviceId: new ObjectId(serviceId), _id: new ObjectId(triggerId) });
             return true;
         } catch (e) {
             logger.error("Error while deleting trigger: ", e);

@@ -3,24 +3,24 @@ import logger from "../helper/logger";
 
 export interface IRule {
     _id: string;
-    userID: Types.ObjectId;
-    triggerID: Types.ObjectId;
-    actionID: Types.ObjectId;
+    userId: Types.ObjectId;
+    triggerId: Types.ObjectId;
+    actionId: Types.ObjectId;
     isAuthorized: boolean;
 }
 
-// TODO: Understand how to make <triggerID, actionID> unique key
+// TODO: Understand how to make <triggerId, actionId> unique key
 
 const ruleSchema = new Schema<IRule>({
-    userID: {
+    userId: {
         type: Schema.Types.ObjectId,
         required: true
     },
-    triggerID: {
+    triggerId: {
         type: Schema.Types.ObjectId,
         required: true
     },
-    actionID: {
+    actionId: {
         type: Schema.Types.ObjectId,
         required: true
     },
@@ -34,21 +34,21 @@ export default class Rule {
 
     private static ruleModel = model<IRule>("Rule", ruleSchema);
 
-    static async findByUserID(userID: string): Promise<IRule[]|undefined>{
+    static async findByUserId(userId: string): Promise<IRule[]|undefined>{
         try {
-            console.log(userID);
-            return await Rule.ruleModel.find({ userID: userID });
+            console.log(userId);
+            return await Rule.ruleModel.find({ userId: userId });
         } catch (e) {
             logger.error("Error finding rules by id", e);
             return undefined;
         }
     }
 
-    static async insertNewRule(userID: Types.ObjectId, triggerID: Types.ObjectId, actionID: Types.ObjectId): Promise<boolean>{
+    static async insertNewRule(userId: Types.ObjectId, triggerId: Types.ObjectId, actionId: Types.ObjectId): Promise<boolean>{
         const rule = new Rule.ruleModel({
-            userID: userID,
-            triggerID: triggerID,
-            actionID: actionID,
+            userId: userId,
+            triggerId: triggerId,
+            actionId: actionId,
             // Draft
             isAuthorized: false
         });
@@ -61,9 +61,9 @@ export default class Rule {
         }
     }
 
-    static async deleteRule(ruleID: string): Promise<boolean> {
+    static async deleteRule(ruleId: string): Promise<boolean> {
         try{
-            await Rule.ruleModel.findByIdAndDelete(ruleID);
+            await Rule.ruleModel.findByIdAndDelete(ruleId);
             return true;
         } catch (e) {
             logger.error("Error deleting a rule:", e);

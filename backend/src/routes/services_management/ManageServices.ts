@@ -45,13 +45,13 @@ export default class ManageServices extends Route {
     }
 
     protected async httpDelete(request: Request, response: Response): Promise<void> {
-        const serviceID = request.body.serviceId;
+        const serviceId = request.body.serviceId;
 
-        if(checkUndefinedParams(response, serviceID))
+        if(checkUndefinedParams(response, serviceId))
             return;
 
         console.log(request.userId.toString());
-        const validDeletion = await Service.deleteService(request.userId.toString(), serviceID.toString());
+        const validDeletion = await Service.deleteService(request.userId.toString(), serviceId.toString());
         if (!validDeletion){
             badRequest(response, "Error deleting the specified service");
             return ;
@@ -61,18 +61,18 @@ export default class ManageServices extends Route {
     }
 
     protected async httpPut(request: Request, response: Response): Promise<void> {
-        const serviceID = request.body.serviceID;
+        const serviceId = request.body.serviceId;
         const newServiceName = request.body.name;
         const newServiceDescription = request.body.description;
         const newServiceAuthURL = request.body.authURL;
-        const newClientID = request.body.clientID;
+        const newClientId = request.body.clientId;
         const newClientSecret = request.body.clientSecret;
 
-        if(checkUndefinedParams(response, serviceID)){
+        if(checkUndefinedParams(response, serviceId)){
             return;
         }
 
-        const validModification = Service.updateService(serviceID, request.userId, newServiceName, newServiceDescription, newServiceAuthURL, newClientID, newClientSecret);
+        const validModification = Service.updateService(serviceId, request.userId, newServiceName, newServiceDescription, newServiceAuthURL, newClientId, newClientSecret);
 
         if(!validModification)
             forbiddenUserError(response);
