@@ -15,19 +15,19 @@ export default class Route {
     // Router responsible for this API route
     readonly router: Router;
 
-    constructor(endpointName="", requiresAuth=false, requiresConfirmation=false) {
+    constructor(endpointName="", requiresAuth=false, requiresValidation=false) {
         this.endpointName = endpointName;
         this.requiresAuth = requiresAuth;
-        this.requiresActivation = requiresConfirmation;
+        this.requiresActivation = requiresValidation;
         // Creates a new Router
         this.router = Router();
 
         // If this endpoint requires authentication, register the authentication middleware to the Router
-        if (requiresAuth || requiresConfirmation)
+        if (requiresAuth || requiresValidation)
             this.router.use(Authentication.checkAuthentication);
 
         // If this endpoint requires authentication, register the confirmation middleware to the Router
-        if (requiresConfirmation)
+        if (requiresValidation)
             this.router.use(Authentication.checkActivation);
 
         // If the subclass implements http methods handlers, register them to the Router

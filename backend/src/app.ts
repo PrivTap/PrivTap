@@ -1,15 +1,17 @@
+import "./mongoose.config";
 import express, { Express } from "express";
 import { getFilesInDir } from "./helper/misc";
 import { join } from "path";
 import requestLogger from "morgan";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import mongoose, { ConnectOptions } from "mongoose";
+import { connect, ConnectOptions } from "mongoose";
 import Route from "./Route";
 import env from "./helper/env";
 import logger from "./helper/logger";
 import YAML from "yamljs";
 import swaggerUI from "swagger-ui-express";
+import Authorization from "./model/Authorization";
 
 // Expand the Express request definition to include the userId
 declare global {
@@ -140,7 +142,7 @@ class BackendApp {
    * @param dbString the connection string to use
    */
     async connectToDB(dbString: string) {
-        await mongoose.connect(dbString, {
+        await connect(dbString, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         } as ConnectOptions);
@@ -171,6 +173,10 @@ if (require.main === module) {
             }
 
             logger.info(`Server listening at: ${url}${app.baseURL}`);
+
+            Authorization.getUserAuthorizations("637e67faac00391be8f8911c").then(o => {
+                console.log(o?._id);
+            });
         });
     });
 }
