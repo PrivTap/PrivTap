@@ -10,18 +10,6 @@ export default class TriggersRoute extends Route {
 
     //Do we need filters here?
     protected async httpGet(request: Request, response: Response): Promise<void> {
-        const parentServiceID = request.body.parentId;
 
-        if (!parentServiceID) {
-            badRequest(response, "Invalid parameters");
-            return;
-        }
-
-        // Insert the trigger
-        if (await Trigger.findAllChildrenOfService(parentServiceID)) {
-            success(response);
-        } else {
-            badRequest(response, "Error while querying available triggers for the service");
-        }
     }
 }
