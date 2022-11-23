@@ -1,9 +1,7 @@
 <template>
-  <div>
-    <h1 class="text-5xl text-blue-100 font-medium text-center py-20">
-      Publish Service
-    </h1>
-    <form>
+  <div class="text-center pb-20">
+    <h1 class="text-5xl text-blue-100 font-medium py-20">Publish Service</h1>
+    <form @click.prevent="onSubmitted">
       <div class="mb-6 mx-auto w-96">
         <label
           for="text"
@@ -120,15 +118,7 @@
           >
         </div>
       </div>
-      <div class="flex flex-row justify-center py-10 space-x-32">
-        <button
-          type="button"
-          class="px-16 py-3 bg-blue-800 rounded-md text-white font-semibold"
-          @click="onSubmitted"
-        >
-          Create API endpoint
-        </button>
-      </div>
+      <PrimaryButton class="mt-5" text="Create API endpoint" />
     </form>
   </div>
 </template>
@@ -137,6 +127,9 @@
 <script setup lang="ts">
 import { useOspServiceStore } from "@/stores/osp_service_store";
 import { ref, watch } from "vue";
+import PrimaryButton from "@/components/PrimaryButton.vue";
+import router from "@/router/router";
+import RoutingPath from "@/router/routing_path";
 const newService = ref({
   name: "",
   description: "",
@@ -159,14 +152,15 @@ function checkUrl(url: string): boolean {
 }
 
 const manageServiceStore = useOspServiceStore();
-function onSubmitted() {
-  manageServiceStore.addService(
+async function onSubmitted() {
+  const res = await manageServiceStore.addService(
     newService.value.name,
     newService.value.description,
     newService.value.authUrl,
     newService.value.clientID,
     newService.value.clientSecret
   );
+  if (res) router.push(RoutingPath.OSP_PERSONAL_PAGE);
 }
 </script>
 

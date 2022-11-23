@@ -21,7 +21,9 @@ export default interface IOspServiceStoreState {
 }
 
 export const useOspServiceStore = defineStore("osp_service_store", () => {
+  let services = ref<Array<ServiceModel> | []>([]);
   const manageService = new ManageService();
+  const toast = useToast();
 
   async function getServices() {
     const res = await new ManageService().getAllServices();
@@ -40,15 +42,21 @@ export const useOspServiceStore = defineStore("osp_service_store", () => {
     });
   }
 
-  let services = ref<Array<ServiceModel> | []>([]);
+
   const setServices = (newServices: Array<ServiceModel>) => {
     services.value = newServices;
   };
-  const deleteService = (serviceId: string) => {
-    /// TODO: Show alert dialog before delete it
-    services.value = services.value.filter(
-      (service) => service._id !== serviceId
-    );
+  const deleteService = async (serviceId: string) => {
+    const res = await manageService.deleteService(serviceId);
+    if (res.status) {
+      services.value = services.value.filter(
+        (service) => service._id !== serviceId
+      );
+      toast.success("Service deleted successfully");
+      return;
+    }
+    toast.error(res.message);
+    return;
   };
 
   async function addService(
@@ -68,9 +76,13 @@ export const useOspServiceStore = defineStore("osp_service_store", () => {
     if (res.status) {
       const newService = res.data as ServiceModel;
       services.value = [...services.value, newService];
-      if (res) return useToast().success("Service added successfully");
+      if (res) {
+        useToast().success("Service added successfully");
+        return true;
+      }
     }
-    return useToast().error(res.message);
+    useToast().error(res.message);
+    return false;
   }
 
   const updateService = (service: ServiceModel) => {
@@ -82,5 +94,12 @@ export const useOspServiceStore = defineStore("osp_service_store", () => {
     });
   };
 
-  return { services, setServices, deleteService, addService, updateService, getServices };
+  return {
+    services,
+    setServices,
+    deleteService,
+    addService,
+    updateService,
+    getServices,
+  };
 });

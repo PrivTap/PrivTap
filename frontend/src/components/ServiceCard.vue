@@ -1,10 +1,14 @@
 <template>
   <div
-    class="my-auto text-gray-200 rounded-xl shadow-xl hover:shadow-2xl p-10 bg-blue-600 bg-gradient-to-tr from-blue-600 to-blue-400 hover:-translate-y-6 hover:ring-4 ring-white hover:ring-offset-2 ring-offset-white transition ease-in-out duration-700"
+    class="my-auto mx-auto min-w-md max-w-lg text-gray-200 rounded-xl shadow-xl hover:shadow-2xl p-10 bg-blue-600 bg-gradient-to-tr from-blue-600 to-blue-400 hover:-translate-y-6 hover:ring-4 ring-white hover:ring-offset-2 ring-offset-white transition ease-in-out duration-700"
   >
-    <div class="flex justify-between">
+    <div class="flex justify-between content-center items-center">
       <p class="text-3xl font-medium">{{ service.name }}</p>
-      <p class="text-4xl font-medium">
+
+      <p
+        @click="editMode = !editMode"
+        class="text-4xl font-medium bg-blue-400 p-2 mb-3 rounded-lg shadow-md"
+      >
         {{ !editMode ? "🔒" : "🔓" }}
       </p>
     </div>
@@ -17,7 +21,7 @@
       Endpoint URL:
       <label class="text-lg font-normal">{{ service.authServer }} </label>
     </p>
-    <p class="text-xl font-medium">
+    <p class="text-xl font-medium my-2">
       Client ID:
       <label class="text-lg font-normal">{{ service.clientId }} </label>
     </p>
@@ -60,17 +64,24 @@
     <div class="space-x-4">
       <button
         class="rounded-lg bg-blue-700 py-2 px-12 text-lg font-medium text-white hover:bg-blue-900"
-        @click="editMode = !editMode"
+        @click=""
       >
-        Edit ✍️
+        Save ✍️
       </button>
       <button
         class="rounded-lg bg-white py-2 px-9 text-lg font-medium text-red-500 hover:ring-red-500 hover:ring-4 ring-2 ring-red-500 duration-500"
-        @click="deleteService"
+        @click="showModal = true"
       >
         Delete 🗑️
       </button>
     </div>
+  </div>
+  <div v-if="showModal">
+    <ModalComponent
+      title="Are you sure?"
+      subTitle="You are deleting the service permanently"
+      :onPressed="onModalClose"
+    />
   </div>
 </template>
 
@@ -79,18 +90,24 @@ import type ServiceModel from "@/model/service_model";
 import { ref } from "vue";
 import { EyeSlashIcon, EyeIcon } from "@heroicons/vue/24/solid";
 import { useOspServiceStore } from "@/stores/osp_service_store";
+import ModalComponent from "@/components/ModalComponent.vue";
 
 const ospServiceStore = useOspServiceStore();
 const showPass = ref(false);
 const editMode = ref(false);
+const showModal = ref(false);
+
+function onModalClose(res: boolean | null) {
+  console.log(res);
+  showModal.value = false;
+  if (res) {
+    ospServiceStore.deleteService(props.service._id);
+  }
+}
 
 const props = defineProps<{
   service: ServiceModel;
 }>();
-
-function deleteService() {
-  ospServiceStore.deleteService(props.service._id);
-}
 </script>
 
 <style scoped></style>

@@ -203,13 +203,12 @@
 
 <script setup lang="ts">
 import { useOspServiceStore } from "../stores/osp_service_store";
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 import RoutingPath from "@/router/routing_path";
 import ServiceCard from "@/components/ServiceCard.vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
-
 const router = useRouter();
 
 const ospServiceStore = useOspServiceStore();

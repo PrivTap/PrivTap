@@ -15,8 +15,8 @@ defineProps({
     required: true,
   },
   onClick: {
-    required: true,
     type: Function,
+    default: null,
   },
 });
 </script>
