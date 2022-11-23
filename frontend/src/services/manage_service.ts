@@ -53,11 +53,26 @@ export default class ManageService
     throw new Error("Method not implemented.");
   }
 
-  updateService(manage: ServiceModel): Promise<StandartRepsonse<ServiceModel>> {
-    throw new Error("Method not implemented.");
+  async updateService(
+    manage: ServiceModel
+  ): Promise<StandartRepsonse<ServiceModel | Object>> {
+    try {
+      const res = await this.http.put(this.path, manage);
+      return res.data as StandartRepsonse<ServiceModel>;
+    } catch (error) {
+      return axiosCatch(error);
+    }
   }
-  deleteService(serviceId: string): Promise<StandartRepsonse<ServiceModel>> {
-    throw new Error("Method not implemented.");
+  async deleteService(serviceId: string): Promise<StandartRepsonse<Object>> {
+    try {
+      const res = await this.http.delete(this.path, {
+        params: { serviceID: serviceId },
+      });
+      console.log(res);
+      return res.data as StandartRepsonse<Object>;
+    } catch (error) {
+      return axiosCatch(error);
+    }
   }
   async getAllServices(): Promise<StandartRepsonse<ServiceModel[] | Object>> {
     try {
