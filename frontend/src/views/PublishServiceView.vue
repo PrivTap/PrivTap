@@ -151,16 +151,15 @@ function checkUrl(url: string): boolean {
   );
 }
 
-const manageServiceStore = useOspServiceStore();
+const ospServiceStore = useOspServiceStore();
 async function onSubmitted() {
-  const res = await manageServiceStore.addService(
+  ospServiceStore.postCallService(
     newService.value.name,
     newService.value.description,
     newService.value.authUrl,
     newService.value.clientID,
     newService.value.clientSecret
   );
-  if (res) router.push(RoutingPath.OSP_PERSONAL_PAGE);
 }
 </script>
 

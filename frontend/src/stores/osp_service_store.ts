@@ -5,6 +5,8 @@ import ManageService from "@/services/manage_service";
 import { useToast } from "vue-toastification";
 import type { StandartRepsonse } from "@/model/response_model";
 import axiosCatch from "@/helpers/axios_catch";
+import router from "@/router/router";
+import RoutingPath from "@/router/routing_path";
 
 export default interface IOspServiceStoreState {
   services: Ref<ServiceModel[] | []>;
@@ -24,6 +26,7 @@ export const useOspServiceStore = defineStore("ospServiceStore", {
         if (response) {
           toast.success("Service created successfully");
           this.addService(response.data as ServiceModel);
+          router.push(RoutingPath.OSP_PERSONAL_PAGE);
         }
       } catch (error) {
         axiosCatch(error);
@@ -55,6 +58,7 @@ export const useOspServiceStore = defineStore("ospServiceStore", {
     },
     async getServices() {
       try {
+        console.log("getServices");
         const response = await this.manageService.getAllServices();
         if (response.status) {
           this.services = response.data as Array<ServiceModel>;
