@@ -8,8 +8,7 @@ export default class ActionsRoute extends Route {
         super("actions", true);
     }
 
-
     protected async httpGet(request: Request, response: Response): Promise<void> {
-
+        //
     }
 }

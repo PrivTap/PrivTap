@@ -28,7 +28,7 @@ describe("/actions endpoint", () => {
     beforeEach(() => {
         checkJWTStub = sandbox.stub(Authentication, "checkJWT");
         checkJWTStub.returns("userID");
-        findActionsStub = sandbox.stub(Action, "findAllChildrenOfService");
+        // findActionsStub = sandbox.stub(Action, "findAllChildrenOfService");
     });
 
     afterEach(() => {
@@ -37,7 +37,7 @@ describe("/actions endpoint", () => {
 
     describe("GET /", () => {
 
-
+        it("should return actions");
 
     });
 });

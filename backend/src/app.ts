@@ -173,10 +173,6 @@ if (require.main === module) {
             }
 
             logger.info(`Server listening at: ${url}${app.baseURL}`);
-
-            Authorization.getUserAuthorizations("637e67faac00391be8f8911c").then(o => {
-                console.log(o?._id);
-            });
         });
     });
 }
