@@ -26,7 +26,7 @@ export default class RulesRoute extends Route {
             return;
         }
         if (await Rule.insertNewRule(new Types.ObjectId(userId), new Types.ObjectId(triggerId), new Types.ObjectId(actionId)))
-            success(response, {});
+            success(response);
         else
             internalServerError(response);
     }
@@ -58,4 +58,3 @@ export default class RulesRoute extends Route {
     }
 
 }
-// 637a9f0d80258262920259fb

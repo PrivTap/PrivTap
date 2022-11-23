@@ -36,7 +36,7 @@ export default class ManageServices extends Route {
         // Insert the service
         const validInsertion = await Service.insert(name, description, request.userId.toString(),authURL, clientId, clientSecret);
         if (!validInsertion) {
-            badRequest(response, "Error while creating service");
+            badRequest(response, "Error while creating a service");
             return;
         }
         success(response);
