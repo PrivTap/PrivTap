@@ -10,6 +10,7 @@ export default class ManageActionsRoute extends Route {
         super("manage-actions", true);
     }
 
+    /*
     protected async httpGet(request: Request, response: Response): Promise<void> {
         const parentServiceID = request.body.parentId;
 
@@ -63,4 +64,6 @@ export default class ManageActionsRoute extends Route {
             internalServerError(response);
         }
     }
+
+     */
 }

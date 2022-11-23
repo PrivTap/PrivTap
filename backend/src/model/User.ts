@@ -74,7 +74,6 @@ export default abstract class User {
         try {
             await user.save();
         } catch (e) {
-            logger.error("Error while inserting new user", e);
             if (e instanceof Error) {
                 if (e.name == "ValidationError") {
                     throw new ModelError("Invalid parameters");
@@ -82,6 +81,7 @@ export default abstract class User {
                     throw new ModelError("This username or email is already taken");
                 }
             }
+            logger.error("Error while inserting new user", e);
             return false;
         }
         return true;
@@ -102,7 +102,7 @@ export default abstract class User {
             logger.error("Error while finding user by username", e);
             return null;
         }
-        return queryResult?._doc as IUser;
+        return queryResult as IUser;
     }
 
     /**
@@ -141,7 +141,7 @@ export default abstract class User {
             logger.error("Error finding user by id", e);
             return undefined;
         }
-        return queryResult?._doc as IUser;
+        return queryResult as IUser;
     }
 }
 

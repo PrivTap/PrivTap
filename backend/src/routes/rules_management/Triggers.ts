@@ -8,6 +8,7 @@ export default class TriggersRoute extends Route {
         super("triggers", true);
     }
 
+    /*
     //Do we need filters here?
     protected async httpGet(request: Request, response: Response): Promise<void> {
         const parentServiceID = request.body.parentId;
@@ -24,4 +25,6 @@ export default class TriggersRoute extends Route {
             badRequest(response, "Error while querying available triggers for the service");
         }
     }
+
+     */
 }

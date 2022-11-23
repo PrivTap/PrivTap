@@ -44,7 +44,6 @@ export default class Rule {
         }
     }
 
-
     static async insertNewRule(userID: Types.ObjectId, triggerID: Types.ObjectId, actionID: Types.ObjectId): Promise<boolean>{
         const rule = new Rule.ruleModel({
             userID: userID,

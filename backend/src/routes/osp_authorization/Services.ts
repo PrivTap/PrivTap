@@ -18,7 +18,7 @@ export default class ServicesRoute extends Route {
         const services = await Service.findServices(itemsPerPageN, pageN);
         if (services!=null) {
             success(response,services);
-        }else{
+        } else {
             internalServerError(response);
         }
     }

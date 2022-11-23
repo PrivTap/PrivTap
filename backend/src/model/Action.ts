@@ -1,8 +1,5 @@
-import { model, Schema, Types } from "mongoose";
+import { Schema, Types } from "mongoose";
 import { Permission } from "./Permission";
-import Service from "./Service";
-import logger from "../helper/logger";
-import ObjectId = Types.ObjectId;
 
 export interface IAction {
     _id: string;
@@ -40,6 +37,7 @@ const actionSchema = new Schema<IAction>({
 });
 
 export default class Action {
+    /*
 
     private static actionModel = model<IAction>("Action", actionSchema);
 
@@ -102,4 +100,6 @@ export default class Action {
             return false;
         }
     }
+
+     */
 }
