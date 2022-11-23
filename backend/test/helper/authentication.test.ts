@@ -16,7 +16,7 @@ describe("Testing authentication helper module", () => {
         password: "TestManPassword",
         email: "test@man.com",
         registrationDate: new Date(),
-        isConfirmed: true,
+        isActive: true,
         activationToken: "ActivationToken"
     } as IUser;
 

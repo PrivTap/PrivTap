@@ -6,6 +6,7 @@ import app from "../../src/app";
 import User from "../../src/model/User";
 import bcrypt from "bcrypt";
 import LoginRoute from "../../src/routes/authentication/Login";
+import Authentication from "../../src/helper/authentication";
 
 use(chaiHttp);
 use(sinonChai);
@@ -30,7 +31,7 @@ describe("/login endpoint", () => {
     beforeEach(() => {
         queryUserStub = sandbox.stub(User, "findByUsername");
         compareSyncStub = sandbox.stub(bcrypt, "compareSync");
-        setAuthenticationCookieStub = sandbox.stub(LoginRoute, "setAuthenticationCookie");
+        setAuthenticationCookieStub = sandbox.stub(Authentication, "setAuthenticationCookie");
     });
 
     afterEach(() => {

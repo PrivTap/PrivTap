@@ -29,8 +29,8 @@ describe("/rules endpoint", () => {
     });
 
     beforeEach(() => {
-        checkActivationStub = sandbox.stub( Authentication, "checkActivation");
-        checkJWTStub = sandbox.stub(Authentication, "checkJWT");
+        checkActivationStub = sandbox.stub(Authentication, "checkActivation");
+        checkJWTStub = sandbox.stub(Authentication, "checkJWT").returns("a_user_id");
         findByUserIdStub = sandbox.stub(Rule, "findByUserId");
         insertNewRuleStub = sandbox.stub(Rule, "insertNewRule");
         deleteRuleStub = sandbox.stub(Rule, "deleteRule");
@@ -44,6 +44,8 @@ describe("/rules endpoint", () => {
         // Confirmation flag
         it ("should fail if the user is not confirmed", async () => {
             checkActivationStub.resolves(false);
+            const res = await requester.get("/rules");
+            expect(res).to.have.status(401); // Unauthorized
         });
 
         // Authentication flag

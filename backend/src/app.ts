@@ -11,21 +11,24 @@ import env from "./helper/env";
 import logger from "./helper/logger";
 import YAML from "yamljs";
 import swaggerUI from "swagger-ui-express";
-import Authorization from "./model/Authorization";
 
 // Expand the Express request definition to include the userId
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace Express {
-    interface Request {
-      /**
-       * The id of the user that sent this request.
-       * Optionally set by PrivTAP authentication middleware if JWT cookie is provided and valid.  Can be used by other middleware.
-       * [Declaration merging](https://www.typescriptlang.org/docs/handbook/declaration-merging.html) can be used to add your own properties.
-       */
-      userId: string;
+    namespace Express {
+        interface Request {
+            /**
+            * The id of the user that sent this request.
+            * Optionally set by PrivTAP authentication middleware if JWT cookie is provided and valid. Can be used by other middleware.
+            */
+            userId: string;
+            /**
+            * The activation status of the user that sent this request.
+            * Optionally set by PrivTAP authentication middleware if JWT cookie is provided and valid. Can be used by other middleware.
+            */
+            userActive: boolean;
+        }
     }
-  }
 }
 
 /**

@@ -37,7 +37,13 @@ describe("/actions endpoint", () => {
 
     describe("GET /", () => {
 
-        it("should return actions");
+        it("should fail if the user is not activated", async () => {
+            //
+        });
+
+        it("should fail if the user is not authenticated");
+
+        it("should return a list of actions for services that the user has authorized");
 
     });
 });

@@ -8,7 +8,7 @@ export interface IUser {
     password: string;
     email: string;
     registrationDate: Date;
-    isConfirmed: boolean;
+    isActive: boolean;
     activationToken: string;
 }
 
@@ -41,7 +41,7 @@ const userSchema = new Schema<IUser>({
         type: Date,
         required: true
     },
-    isConfirmed: {
+    isActive: {
         type: Boolean,
         required: true
     },
@@ -68,7 +68,7 @@ export default abstract class User {
             password: password,
             email: email,
             registrationDate: Date(),
-            isConfirmed: false,
+            isActive: false,
             activationToken: token
         });
         try {
@@ -115,18 +115,16 @@ export default abstract class User {
         };
         const updateQuery: UpdateQuery<IUser> = {
             activationToken: "",
-            isConfirmed: true
+            isActive: true
         };
 
-        let result;
         try {
-            result = await User.userModel.updateOne(filterQuery, updateQuery);
+            return await User.userModel.findOneAndUpdate(filterQuery, updateQuery);
         } catch (e) {
             logger.error("Error while activating account", e);
-            return false;
         }
 
-        return result.modifiedCount == 1;
+        return null;
     }
 
     /**

@@ -68,7 +68,7 @@ describe("PrivTAP Backend", function() {
             let res = await requester.get("/logout");
             expect(res).to.have.status(401);
 
-            res = await requester.get("/logout").set("Cookie", `_jwt=${testUserJWT}`);
+            res = await requester.get("/logout").set("Cookie", `__session=${testUserJWT}`);
             expect(res).to.have.status(200);
         });
 

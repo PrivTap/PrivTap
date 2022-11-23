@@ -1,7 +1,7 @@
-import { NextFunction, Request, Response } from "express";
+import { CookieOptions, NextFunction, Request, Response } from "express";
 import User, { IUser } from "../model/User";
 import { verify, sign, JwtPayload } from "jsonwebtoken";
-import { internalServerError, unauthorizedUserError } from "./http";
+import { forbiddenUserError, internalServerError, unauthorizedUserError } from "./http";
 import env from "./env";
 import logger from "./logger";
 
@@ -20,9 +20,9 @@ export default abstract class Authentication {
      * @param next function to call if the request authentication is valid
      */
     static checkAuthentication(request: Request, response: Response, next: NextFunction) {
-        let userId;
+        let decodedJWT;
         try {
-            userId = Authentication.checkJWT(request);
+            decodedJWT = Authentication.checkJWT(request);
         } catch (e) {
             if (e instanceof AuthError) {
                 logger.debug("Auth check failed, JWT is not valid: ", e.message);
@@ -34,7 +34,8 @@ export default abstract class Authentication {
             return;
         }
 
-        request.userId = userId;
+        request.userId = decodedJWT.userId;
+        request.userActive = decodedJWT.active;
 
         next();
     }
@@ -46,25 +47,9 @@ export default abstract class Authentication {
      * @param response the HTTP response
      * @param next function to call if the request authentication is valid
      */
-    static async checkActivation(request: Request, response: Response, next: NextFunction){
-        const userId = request.userId;
-        if (!userId) {
-            logger.warn("Activation check has run without auth check being run");
-            internalServerError(response);
-            return;
-        }
-
-        // TODO It would be better to keep info about account inside the JWT token, to avoid querying the DB for every request
-
-        const queryResult = await User.findById(userId);
-        if (queryResult == null) {
-            logger.warn("Activation check failed, user does not exist in DB");
-            internalServerError(response);
-            return;
-        }
-        if (!queryResult.isConfirmed){
-            logger.debug("Activation check failed, user is not confirmed");
-            unauthorizedUserError(response, "To visit this page your account must be activated, check your email for the activation link");
+    static checkActivation(request: Request, response: Response, next: NextFunction){
+        if (!request.userActive) {
+            forbiddenUserError(response, "Your account is not active");
             return;
         }
 
@@ -76,9 +61,9 @@ export default abstract class Authentication {
      * @param request the HTTP request
      * @throws AuthError if the cookie does not exist or if it is not possible to decode it
      * @throws Error if the JWT_SECRET env variable is not defined
-     * @return Returns the userId
+     * @return Returns the userId and the activation status
      */
-    static checkJWT(request: Request): string {
+    static checkJWT(request: Request): { userId: string, active: boolean } {
         const secret = env.JWT_SECRET;
         if (!secret) {
             throw Error();
@@ -86,7 +71,7 @@ export default abstract class Authentication {
 
         const cookieJWT: string | undefined = request.cookies.__session;
         if (!cookieJWT) {
-            logger.debug("__session cookie is undefined, 'cookie' header is: ", request.headers.cookie);
+            logger.debug("__session cookie is undefined, headers are: ", request.headers);
             throw new AuthError("JWT Cookie is undefined");
         }
 
@@ -103,12 +88,17 @@ export default abstract class Authentication {
             throw new AuthError(errMessage);
         }
 
-        const userId = decoded["user_id"];
-        if (!decoded || !userId || typeof userId != "string") {
+        if (!decoded) {
+            throw new AuthError("JWT Cookie can't be decoded");
+        }
+
+        const userId = decoded["userId"];
+        const active = decoded["active"];
+        if (!userId || typeof userId != "string" || active == undefined || typeof active != "boolean") {
             throw new AuthError("JWT Cookie is invalid");
         }
 
-        return userId;
+        return { userId, active };
     }
 
     /**
@@ -118,10 +108,47 @@ export default abstract class Authentication {
     static createJWT(user: IUser): string | undefined {
         const secret = env.JWT_SECRET;
         if (secret) {
-            return sign({ "user_id": user._id }, secret, {
+            return sign({ "userId": user._id, "active": user.isActive }, secret, {
                 expiresIn: env.JWT_EXPIRE
             });
         }
+    }
+
+    /**
+     * Sets the appropriate headers in the response to send back the authentication cookie to the client.
+     * @param response the response that will set the cookie
+     * @param user the user for which the cookie will be generated
+     * @protected
+     */
+    static setAuthenticationCookie(response: Response, user: IUser) {
+        // Create a JWT token for the user
+        const jwt = Authentication.createJWT(user);
+        if (!jwt)
+            return false;
+
+        // Calculate the expiration time for the cookie.
+        // We set it the same as the expiration time of the JWT token, but we need to convert
+        // it to milliseconds, as JWT expiration time is in seconds
+        let cookieExpires = env.JWT_EXPIRE;
+        cookieExpires *= 1000;
+
+        // Set default cookie options:
+        // - expires at the same time as the JWT does, so that the browser can recognize it and delete it
+        // - HTTPOnly to ensure that it is not vulnerable to XSS
+        // - Secure to ensure that it won't be passed through unsecure http connections (localhost is an exception)
+        // - SameSite=strict to ensure that it won't be passed to external websites
+        const cookieOptions: CookieOptions = {
+            expires: new Date(Date.now() + cookieExpires),
+            httpOnly: true,
+            secure: true,
+            // If we are in a development environment we set SameSite=none to ensure that the cookie will be
+            // set on the frontend even if it is running on a different port
+            sameSite: env.PROD ? "strict" : "none"
+        };
+
+        // Set the cookie header
+        response.cookie("__session", jwt, cookieOptions);
+        return true;
     }
 
 }
