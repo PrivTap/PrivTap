@@ -88,7 +88,7 @@ describe("Testing the Action model class", () => {
             _id: "612g281261gw",
             name: "Test 1",
             description: "Description 1",
-            serviceID: "612g281261gw",
+            serviceId: "612g281261gw",
             permissions: [
                 {
                     _id: "612g281261aw",
@@ -101,7 +101,7 @@ describe("Testing the Action model class", () => {
             _id: "612g281261ga",
             name: "Test 2",
             description: "Description 2",
-            serviceID: "612g281261gw",
+            serviceId: "612g281261gw",
             permissions: [
                 {
                     _id: "612g281261aw",

@@ -137,7 +137,7 @@ describe("/manageService endpoint", () => {
         it("should fail when the user can't delete the service", async () => {
             findServiceCreatedByUserStub.resolves(null);
             const res = await requester.delete("/manageServices").set("Cookie", `_jwt=${testUserJWT}`).send({
-                serviceID: serviceSample.serviceSampleId
+                serviceId: serviceSample.serviceSampleId
             });
             expect(res).to.have.status(403);
         });
@@ -145,13 +145,13 @@ describe("/manageService endpoint", () => {
             findServiceCreatedByUserStub.returns(null);
             deleteServiceStub.resolves();
             let res = await requester.delete("/manageServices").set("Cookie", `_jwt=${testUserJWT}`).send({
-                serviceID: serviceSample.serviceSampleId
+                serviceId: serviceSample.serviceSampleId
             });
             expect(res).to.have.status(403);
             findServiceCreatedByUserStub.resolves(serviceSample as Service);
             deleteServiceStub.resolves(false);
             res = await requester.delete("/manageServices").set("Cookie", `_jwt=${testUserJWT}`).send({
-                serviceID: serviceSample.serviceSampleId
+                serviceId: serviceSample.serviceSampleId
             });
             expect(res).to.have.status(500);
         });
@@ -160,7 +160,7 @@ describe("/manageService endpoint", () => {
             findServiceCreatedByUserStub.resolves(serviceSample as Service);
             deleteServiceStub.resolves(true);
             const res = await requester.delete("/manageServices").set("Cookie", `_jwt=${testUserJWT}`).send({
-                serviceID: serviceSample.serviceSampleId
+                serviceId: serviceSample.serviceSampleId
             });
             expect(res).to.have.status(200);
         });

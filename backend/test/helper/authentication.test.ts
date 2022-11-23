@@ -11,7 +11,7 @@ const sandbox = sinon.createSandbox();
 describe("Testing authentication helper module", () => {
 
     const testUser = {
-        _id: "ARandomID",
+        _id: "ARandomId",
         username: "TestMan",
         password: "TestManPassword",
         email: "test@man.com",

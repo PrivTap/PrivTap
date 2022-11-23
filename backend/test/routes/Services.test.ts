@@ -27,7 +27,7 @@ describe("/services endpoint", () => {
 
     beforeEach(() => {
         checkJWTStub = sandbox.stub(Authentication, "checkJWT");
-        checkJWTStub.returns("userID");
+        checkJWTStub.returns("userId");
         findServicesStub = sandbox.stub(Service, "findServices");
     });
 

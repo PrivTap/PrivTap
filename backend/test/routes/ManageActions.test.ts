@@ -209,8 +209,8 @@ describe("/manage-actions endpoint", () => {
             deleteStub.resolves();
 
             const res = await requester.delete(endpoint).send({
-                serviceID: "612g281261gt",
-                actionID: "612g281261gw"
+                serviceId: "612g281261gt",
+                actionId: "612g281261gw"
             });
             expect(res).to.have.status(200);
         });
@@ -230,7 +230,7 @@ describe("/manage-actions endpoint", () => {
             actionExists.resolves(null);
 
             const res = await requester.delete(endpoint).send({
-                serviceID: "Test"
+                serviceId: "Test"
             });
             expect(res).to.have.status(400);
         });
@@ -240,8 +240,8 @@ describe("/manage-actions endpoint", () => {
             actionExists.resolves(null);
 
             const res = await requester.delete(endpoint).send({
-                serviceID: "612g281261gt",
-                actionID: "612g281261gw"
+                serviceId: "612g281261gt",
+                actionId: "612g281261gw"
             });
             expect(res).to.have.status(500);
         });
@@ -252,8 +252,8 @@ describe("/manage-actions endpoint", () => {
             deleteStub.throws();
 
             const res = await requester.delete(endpoint).send({
-                serviceID: "612g281261gt",
-                actionID: "612g281261gw"
+                serviceId: "612g281261gt",
+                actionId: "612g281261gw"
             });
             expect(res).to.have.status(500);
         });

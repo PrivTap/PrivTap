@@ -27,7 +27,7 @@ describe("/actions endpoint", () => {
 
     beforeEach(() => {
         checkJWTStub = sandbox.stub(Authentication, "checkJWT");
-        checkJWTStub.returns("userID");
+        checkJWTStub.returns("userId");
         // findActionsStub = sandbox.stub(Action, "findAllChildrenOfService");
     });
 

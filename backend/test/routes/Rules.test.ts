@@ -16,7 +16,7 @@ describe("/rules endpoint", () => {
     let requester: ChaiHttp.Agent;
     let checkActivationStub: SinonStub;
     let checkJWTStub: SinonStub;
-    let findByUserIDStub: SinonStub;
+    let findByUserIdStub: SinonStub;
     let insertNewRuleStub: SinonStub;
     let deleteRuleStub: SinonStub;
 
@@ -31,7 +31,7 @@ describe("/rules endpoint", () => {
     beforeEach(() => {
         checkActivationStub = sandbox.stub( Authentication, "checkActivation");
         checkJWTStub = sandbox.stub(Authentication, "checkJWT");
-        findByUserIDStub = sandbox.stub(Rule, "findByUserID");
+        findByUserIdStub = sandbox.stub(Rule, "findByUserId");
         insertNewRuleStub = sandbox.stub(Rule, "insertNewRule");
         deleteRuleStub = sandbox.stub(Rule, "deleteRule");
     });
@@ -54,15 +54,15 @@ describe("/rules endpoint", () => {
         });
 
         it ("should succeed if the jwt is valid and no server error occurs", async () => {
-            checkJWTStub.returns("someUserID");
+            checkJWTStub.returns("someUserId");
             const someRule = {
-                "userID": "someUserID",
-                "triggerID": "someTriggerID",
-                "actionID": "someActionID",
+                "userId": "someUserId",
+                "triggerId": "someTriggerId",
+                "actionId": "someActionId",
                 "isAuthorized": true
             };
             const expectedBody = { "rules" : [someRule] };
-            findByUserIDStub.resolves(someRule);
+            findByUserIdStub.resolves(someRule);
             const res = await requester.get("/rules");
             expect(res).to.have.status(200);
             expect(res).to.be.eql(expectedBody);
@@ -77,9 +77,9 @@ describe("/rules endpoint", () => {
         it ("should fail if the user doesn't have valid jwt", async () => {
             checkJWTStub.throws();
             const someRule = {
-                "userID": "someUserID",
-                "triggerID": "someTriggerID",
-                "actionID": "someActionID",
+                "userId": "someUserId",
+                "triggerId": "someTriggerId",
+                "actionId": "someActionId",
                 "isAuthorized": true
             };
             const res = await requester.post("/rules").send(someRule);
@@ -89,12 +89,12 @@ describe("/rules endpoint", () => {
         it("should fail if some of the parameters are undefined");
 
         it ("should fail if a server error occurs", async () => {
-            checkJWTStub.returns("someUserID");
+            checkJWTStub.returns("someUserId");
             insertNewRuleStub.resolves(false);
             const someRule = {
-                "userID": "someUserID",
-                "triggerID": "someTriggerID",
-                "actionID": "someActionID",
+                "userId": "someUserId",
+                "triggerId": "someTriggerId",
+                "actionId": "someActionId",
                 "isAuthorized": true
             };
             const res = await requester.post("/rules").send(someRule);
@@ -102,15 +102,15 @@ describe("/rules endpoint", () => {
         });
 
         it ("should succeed if the jwt is valid and no server error occurs", async () => {
-            checkJWTStub.returns("someUserID");
+            checkJWTStub.returns("someUserId");
             insertNewRuleStub.resolves(true);
             const someRule = {
-                "userID": "someUserID",
-                "triggerID": "someTriggerID",
-                "actionID": "someActionID",
+                "userId": "someUserId",
+                "triggerId": "someTriggerId",
+                "actionId": "someActionId",
                 "isAuthorized": true
             };
-            findByUserIDStub.resolves(someRule);
+            findByUserIdStub.resolves(someRule);
             const res = await requester.post("/rules").send(someRule);
             expect(res).to.have.status(200);
         });
@@ -119,52 +119,52 @@ describe("/rules endpoint", () => {
     describe("DELETE /", () => {
         it ("should fail if the user doesn't have valid jwt", async () => {
             checkJWTStub.throws();
-            const someRuleID = {
-                "ruleID" : "someRuleID"
+            const someRuleId = {
+                "ruleId" : "someRuleId"
             };
-            const res = await requester.delete("/rules").send(someRuleID);
+            const res = await requester.delete("/rules").send(someRuleId);
             expect(res).to.have.status(401); // Unauthorized
         });
 
         it("should fail if some of the parameters are undefined");
 
         it ("should fail if the rule doesn't exist", async () => {
-            checkJWTStub.returns("someUserID");
+            checkJWTStub.returns("someUserId");
             deleteRuleStub.throws();
-            const someRuleID = {
-                "ruleID" : "someRuleID"
+            const someRuleId = {
+                "ruleId" : "someRuleId"
             };
-            const res = await requester.delete("/rules").send(someRuleID);
+            const res = await requester.delete("/rules").send(someRuleId);
             expect(res).to.have.status(400);
         });
 
         it ("should fail if the jwt is valid but the rule has not been created by that specific user", async () => {
-            checkJWTStub.returns("someUserID");
+            checkJWTStub.returns("someUserId");
             deleteRuleStub.throws();
-            const someRuleID = {
-                "ruleID" : "someRuleID"
+            const someRuleId = {
+                "ruleId" : "someRuleId"
             };
-            const res = await requester.delete("/rules").send(someRuleID);
+            const res = await requester.delete("/rules").send(someRuleId);
             expect(res).to.have.status(401); // Unauthorized
         });
 
         it ("should fail if a server error occurs", async () => {
-            checkJWTStub.returns("someID");
+            checkJWTStub.returns("someId");
             deleteRuleStub.resolves(false);
-            const someRuleID = {
-                "ruleID" : "someRuleID"
+            const someRuleId = {
+                "ruleId" : "someRuleId"
             };
-            const res = await requester.delete("/rules").send(someRuleID);
+            const res = await requester.delete("/rules").send(someRuleId);
             expect(res).to.have.status(500);
         });
 
         it ("should succeed if the jwt is valid, is associated to the rule creator and no server error occurs", async () => {
-            checkJWTStub.returns("someID");
+            checkJWTStub.returns("someId");
             deleteRuleStub.resolves(true);
-            const someRuleID = {
-                "ruleID" : "someRuleID"
+            const someRuleId = {
+                "ruleId" : "someRuleId"
             };
-            const res = await requester.post("/rules").send(someRuleID);
+            const res = await requester.post("/rules").send(someRuleId);
             expect(res).to.have.status(200);
         });
     });

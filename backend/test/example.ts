@@ -21,7 +21,7 @@ describe("PrivTAP Backend", function() {
     let requester: ChaiHttp.Agent;
 
     before(async () => {
-        // const testDBString = process.env.TEST_DB_STRING || "INVALID_DB_STRING";
+        // const testDBString = process.env.TEST_DB_STRING || "INVALId_DB_STRING";
         // await app.connectToDB(testDBString);
         requester = request.agent(app.express).keepOpen();
     });

@@ -29,7 +29,7 @@ describe("/triggers endpoint", () => {
 
     beforeEach(() => {
         checkJWTStub = sandbox.stub(Authentication, "checkJWT");
-        checkJWTStub.returns("userID");
+        checkJWTStub.returns("userId");
         // findTriggersStub = sandbox.stub(Trigger, "findAllChildrenOfService");
         findAllStub = sandbox.stub(mongoose.Model, "find");
     });

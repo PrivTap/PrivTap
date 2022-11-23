@@ -205,8 +205,8 @@ describe("/manage-triggers endpoint", () => {
             deleteStub.resolves();
 
             const res = await requester.delete(endpoint).send({
-                serviceID: "612g281261gt",
-                triggerID: "612g281261gw"
+                serviceId: "612g281261gt",
+                triggerId: "612g281261gw"
             });
             expect(res).to.have.status(200);
         });
@@ -226,7 +226,7 @@ describe("/manage-triggers endpoint", () => {
             triggerExists.resolves(null);
 
             const res = await requester.delete(endpoint).send({
-                serviceID: "Test"
+                serviceId: "Test"
             });
             expect(res).to.have.status(400);
         });
@@ -236,8 +236,8 @@ describe("/manage-triggers endpoint", () => {
             triggerExists.resolves(null);
 
             const res = await requester.delete(endpoint).send({
-                serviceID: "612g281261gt",
-                triggerID: "612g281261gw"
+                serviceId: "612g281261gt",
+                triggerId: "612g281261gw"
             });
             expect(res).to.have.status(500);
         });
@@ -248,8 +248,8 @@ describe("/manage-triggers endpoint", () => {
             deleteStub.throws();
 
             const res = await requester.delete(endpoint).send({
-                serviceID: "612g281261gt",
-                triggerID: "612g281261gw"
+                serviceId: "612g281261gt",
+                triggerId: "612g281261gw"
             });
             expect(res).to.have.status(500);
         });
