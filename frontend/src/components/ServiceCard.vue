@@ -101,7 +101,7 @@ function onModalClose(res: boolean | null) {
   console.log(res);
   showModal.value = false;
   if (res) {
-    ospServiceStore.deleteService(props.service._id);
+    ospServiceStore.deleteCallService(props.service);
   }
 }
 

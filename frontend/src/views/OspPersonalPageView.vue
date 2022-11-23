@@ -212,12 +212,13 @@ import PrimaryButton from "@/components/PrimaryButton.vue";
 const router = useRouter();
 
 const ospServiceStore = useOspServiceStore();
-const obsStore = storeToRefs(ospServiceStore);
-const services = obsStore.services;
+const storeRef = storeToRefs(ospServiceStore);
+const services = storeRef.services;
 
 onMounted(async () => {
   await ospServiceStore.getServices();
 });
+
 </script>
 
 <style scoped></style>
