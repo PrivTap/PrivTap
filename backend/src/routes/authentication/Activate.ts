@@ -6,11 +6,12 @@ import Authentication from "../../helper/authentication";
 
 export default class ActivateRoute extends Route {
     constructor() {
-        super("activate");
+        super("activate", false, false);
     }
 
     protected async httpPost(request: Request, response: Response): Promise<void> {
         const activationToken = request.body.token;
+
         if (checkUndefinedParams(response, activationToken)) return;
 
         const user = await User.activateAccount(activationToken);

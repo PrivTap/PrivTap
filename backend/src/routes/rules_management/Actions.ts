@@ -4,7 +4,7 @@ import { success } from "../../helper/http";
 
 export default class ActionsRoute extends Route {
     constructor() {
-        super("actions", true);
+        super("actions");
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {

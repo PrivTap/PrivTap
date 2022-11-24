@@ -4,7 +4,7 @@ import { success } from "../../helper/http";
 
 export default class ServiceAuthorizationRoute extends Route {
     constructor() {
-        super("service-authorization", true);
+        super("service-authorization");
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {

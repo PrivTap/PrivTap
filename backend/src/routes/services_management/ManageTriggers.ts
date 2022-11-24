@@ -1,9 +1,9 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
-import { badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
+import { badRequest, checkUndefinedParams, forbiddenUserError, success } from "../../helper/http";
 import Trigger from "../../model/Trigger";
 import Service from "../../model/Service";
-import { ModelError } from "../../helper/model";
+import { handleInsert } from "../../helper/misc";
 
 export default class ManageTriggersRoute extends Route {
     constructor() {
@@ -16,40 +16,31 @@ export default class ManageTriggersRoute extends Route {
         if (checkUndefinedParams(response, parentServiceId)) return;
 
         // Insert the trigger
-        if (await Trigger.findAllForService(parentServiceId)) {
-            success(response);
+        const services = await Trigger.findAllForService(parentServiceId);
+
+        if (services) {
+            success(response, services);
         } else {
-            badRequest(response, "Error while querying available triggers for the service");
+            success(response, []);
         }
     }
 
     protected async httpPost(request: Request, response: Response): Promise<void> {
-        const triggerName = request.body.name;
-        const triggerDesc = request.body.description;
-        const parentServiceId = request.body.parentId;
-        const availablePermissions = request.body.permissions;
+        const name = request.body.name;
+        const description = request.body.description;
+        const serviceId = request.body.serviceId;
+        const permissions = request.body.permissions;
 
-        if (checkUndefinedParams(response, triggerName, triggerDesc, parentServiceId)) return;
+        if (checkUndefinedParams(response, name, description, serviceId)) return;
 
         // Check that the user is the owner of the service
-        if (!await Service.isCreator(request.userId, parentServiceId)) {
+        if (!await Service.isCreator(request.userId, serviceId)) {
             forbiddenUserError(response, "You are not the owner of this service");
             return;
         }
 
         // Insert the trigger
-        try {
-            const res = await Trigger.insert(triggerName, triggerDesc, parentServiceId, availablePermissions);
-            if (!res) {
-                internalServerError(response);
-                return;
-            }
-        } catch (e) {
-            if (e instanceof ModelError) {
-                badRequest(response, e.message);
-            }
-            return;
-        }
+        if (!await handleInsert(response, Trigger, { name, description, serviceId, permissions })) return;
 
         success(response);
     }
@@ -68,7 +59,7 @@ export default class ManageTriggersRoute extends Route {
         if (await Trigger.delete(triggerId)) {
             success(response);
         } else {
-            internalServerError(response);
+            badRequest(response, "This trigger doesn't exists");
         }
     }
 }

@@ -1,17 +1,17 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
-import { badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
+import { checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
 import Action, { IAction } from "../../model/Action";
 import Service from "../../model/Service";
-import { ModelError } from "../../helper/model";
+import { handleInsert } from "../../helper/misc";
 
 export default class ManageActionsRoute extends Route {
     constructor() {
-        super("manage-actions", true);
+        super("manage-actions");
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
-        const parentServiceId = request.body.parentId;
+        const parentServiceId = request.params.parentId;
 
         if (checkUndefinedParams(response, parentServiceId)) return;
 
@@ -25,33 +25,22 @@ export default class ManageActionsRoute extends Route {
     }
 
     protected async httpPost(request: Request, response: Response): Promise<void> {
-        const actionName = request.body.name;
-        const actionDesc = request.body.description;
-        const parentServiceId = request.body.parentId;
+        const name = request.body.name;
+        const description = request.body.description;
+        const serviceId = request.body.serviceId;
         const permissions = request.body.permissions;
         const endpoint = request.body.endpoint;
 
-        if (checkUndefinedParams(response, actionName, actionDesc, parentServiceId, endpoint)) return;
+        if (checkUndefinedParams(response, name, description, serviceId, endpoint)) return;
 
         // Check that the user is the owner of the service
-        if (!await Service.isCreator(request.userId, parentServiceId)) {
+        if (!await Service.isCreator(request.userId, serviceId)) {
             forbiddenUserError(response, "You are not the owner of this service");
             return;
         }
 
         // Insert the action
-        try {
-            const res = await Action.insert(actionName, actionDesc, parentServiceId, endpoint, permissions);
-            if (!res) {
-                internalServerError(response);
-                return;
-            }
-        } catch (e) {
-            if (e instanceof ModelError) {
-                badRequest(response, e.message);
-            }
-            return;
-        }
+        if (!await handleInsert(response, Action, { name, description, serviceId, endpoint, permissions })) return;
 
         success(response);
     }

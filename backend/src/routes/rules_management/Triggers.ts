@@ -4,7 +4,7 @@ import { success } from "../../helper/http";
 
 export default class TriggersRoute extends Route {
     constructor() {
-        super("triggers", true);
+        super("triggers");
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {

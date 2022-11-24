@@ -15,7 +15,7 @@ export default class Route {
     // Router responsible for this API route
     readonly router: Router;
 
-    constructor(endpointName="", requiresAuth=false, requiresValidation=false) {
+    constructor(endpointName="", requiresAuth=true, requiresValidation=true) {
         this.endpointName = endpointName;
         this.requiresAuth = requiresAuth;
         this.requiresActivation = requiresValidation;

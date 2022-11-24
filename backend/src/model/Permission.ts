@@ -1,11 +1,12 @@
-import { model, Schema } from "mongoose";
+import { Schema } from "mongoose";
+import Model from "../Model";
 
 export interface IPermission {
-    readonly scope: string;
-    readonly name: string;
+    name: string;
+    description: string
 }
 
-const permissionSchema = new Schema<IPermission>({
+const permissionSchema = new Schema({
     name: {
         type: String,
         required: true,
@@ -13,14 +14,19 @@ const permissionSchema = new Schema<IPermission>({
             unique: true
         }
     },
-    scope: {
+    description: {
         type: String,
-        required: true,
-    },
+        required: true
+    }
 });
 
-export class Permission {
-    private static permissionModel = model<IPermission>("Permission", permissionSchema);
+export class Permission extends Model<IPermission> {
+
+    constructor() {
+        super("permission", permissionSchema);
+    }
 
     // TODO: Implement
 }
+
+export default new Permission();

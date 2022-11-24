@@ -8,16 +8,14 @@ import { checkUndefinedParams } from "../../helper/http";
 
 export default class LoginRoute extends Route {
     constructor() {
-        super("login");
+        super("login", false, false);
     }
 
     protected async httpPost(request: Request, response: Response): Promise<void> {
         const username = request.body.username;
         const password = request.body.password;
 
-        if (checkUndefinedParams(response, username, password)){
-            return;
-        }
+        if (checkUndefinedParams(response, username, password)) return;
 
         const user = await User.findByUsername(username);
         if (user == null) {

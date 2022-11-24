@@ -4,7 +4,7 @@ import { success } from "../../helper/http";
 
 export default class OAuthRoute extends Route {
     constructor() {
-        super("oauth", true);
+        super("oauth");
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {

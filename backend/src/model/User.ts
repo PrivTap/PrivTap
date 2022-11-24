@@ -1,6 +1,5 @@
-import { Schema, model, FilterQuery, UpdateQuery } from "mongoose";
-import logger from "../helper/logger";
-import { ModelError } from "../helper/model";
+import { Schema } from "mongoose";
+import Model from "../Model";
 
 export interface IUser {
     _id: string;
@@ -12,7 +11,7 @@ export interface IUser {
     activationToken: string;
 }
 
-const userSchema = new Schema<IUser>({
+const userSchema = new Schema({
     username: {
         type: String,
         required: true,
@@ -51,95 +50,31 @@ const userSchema = new Schema<IUser>({
     }
 });
 
-export default abstract class User {
+class User extends Model<IUser> {
 
-    private static userModel = model<IUser>("User", userSchema);
-
-    /**
-     * Inserts a new user in the database
-     * @param username The new user's username to be inserted
-     * @param password The new user's password to be inserted
-     * @param email The new user's email to be inserted
-     * @param token The new user's activation token to be inserted
-     */
-    static async insertNewUser(username: string, password: string, email: string, token: string): Promise<boolean> {
-        const user = new User.userModel({
-            username: username,
-            password: password,
-            email: email,
-            registrationDate: Date(),
-            isActive: false,
-            activationToken: token
-        });
-        try {
-            await user.save();
-        } catch (e) {
-            if (e instanceof Error) {
-                if (e.name == "ValidationError") {
-                    throw new ModelError("Invalid parameters");
-                } else if (e.name == "MongoServerError") {
-                    throw new ModelError("This username or email is already taken");
-                }
-            }
-            logger.error("Error while inserting new user", e);
-            return false;
-        }
-        return true;
+    constructor() {
+        super("user", userSchema);
     }
 
     /**
-     * Starts a query looking for the specified attribute (e.g. username) and value (e.g. "John71")
+     * Finds a user by username.
      * @param username the username to search for
-     * @result Returns a Promise<IUser> which can be null if the query is empty
      */
-    static async findByUsername(username: string): Promise<IUser|null> {
-        let queryResult: FilterQuery<IUser>|null;
-        try {
-            queryResult = await User.userModel.findOne({
-                username: username
-            });
-        } catch (e) {
-            logger.error("Error while finding user by username", e);
-            return null;
-        }
-        return queryResult as IUser;
+    async findByUsername(username: string): Promise<IUser|null> {
+        return await this.find({ username });
     }
 
     /**
-     * Activates the user account that has the corresponding activation token
+     * Activates the user account that has the corresponding activation token.
      * @param token the activation token to use to activate the account
      */
-    static async activateAccount(token: string) {
-        const filterQuery: FilterQuery<IUser> = {
-            activationToken: token
-        };
-        const updateQuery: UpdateQuery<IUser> = {
-            activationToken: "",
-            isActive: true
-        };
-
-        try {
-            return await User.userModel.findOneAndUpdate(filterQuery, updateQuery);
-        } catch (e) {
-            logger.error("Error while activating account", e);
-        }
-
-        return null;
-    }
-
-    /**
-     * Finds an existing user given its user id
-     * @param userId The id of the user to find in the database
-     */
-    static async findById(userId: string): Promise<IUser|undefined>{
-        try {
-            return await User.userModel.findById(userId) as IUser;
-        } catch (e) {
-            logger.error("Error finding user by id", e);
-            return undefined;
-        }
+    async activateAccount(token: string) {
+        return await this.findAndUpdate({ activationToken: token },
+            { activationToken: "", isActive: true });
     }
 }
+
+export default new User();
 
 
 

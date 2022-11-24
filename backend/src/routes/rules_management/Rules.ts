@@ -1,12 +1,12 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
-import { badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
+import { checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
 import Rule from "../../model/Rule";
-import { ModelError } from "../../helper/model";
+import { handleInsert } from "../../helper/misc";
 
 export default class RulesRoute extends Route {
     constructor() {
-        super("rules", true, true);
+        super("rules");
     }
 
     // Implement filter option?
@@ -26,18 +26,7 @@ export default class RulesRoute extends Route {
 
         if (checkUndefinedParams(response, triggerId, actionId)) return;
 
-        try {
-            const res = await Rule.insert(userId, triggerId, actionId);
-            if (!res) {
-                internalServerError(response);
-                return;
-            }
-        } catch (e) {
-            if (e instanceof ModelError) {
-                badRequest(response, e.message);
-            }
-            return;
-        }
+        if (!await handleInsert(response, Rule, { userId, triggerId, actionId })) return;
 
         success(response);
     }
@@ -45,17 +34,15 @@ export default class RulesRoute extends Route {
     protected async httpDelete(request: Request, response: Response): Promise<void> {
         const ruleId = request.body.ruleId;
 
-        if (checkUndefinedParams(response, ruleId)){
-            return;
-        }
+        if (checkUndefinedParams(response, ruleId)) return;
 
         // Checks if the rule is associated to the user
-        if (!await Rule.isCreator(request.userId, ruleId)){
+        if (!await Rule.isCreator(request.userId, ruleId)) {
             forbiddenUserError(response, "You are not the owner of this rule");
             return;
         }
 
-        if (!await Rule.deleteRule(ruleId)){
+        if (!await Rule.delete(ruleId)){
             internalServerError(response);
             return;
         }
