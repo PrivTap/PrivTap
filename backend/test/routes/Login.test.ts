@@ -1,11 +1,10 @@
 import { use, expect, request } from "chai";
-import chaiHttp from "chai-http";
+import chaiHttp = require("chai-http");
 import { createSandbox, SinonStub } from "sinon";
-import sinonChai from "sinon-chai";
+import sinonChai = require("sinon-chai");
 import app from "../../src/app";
 import User from "../../src/model/User";
-import bcrypt from "bcrypt";
-import LoginRoute from "../../src/routes/authentication/Login";
+import bcrypt = require( "bcrypt");
 import Authentication from "../../src/helper/authentication";
 
 use(chaiHttp);
