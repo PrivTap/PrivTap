@@ -1,13 +1,14 @@
 <template>
   <div class="text-center pb-20">
-    <h1 class="text-5xl text-blue-100 font-medium py-20">{{ route.params.id ? 'Edit' : 'Publish' }} Service</h1>
+    <h1 class="text-5xl text-blue-100 font-medium py-20">
+      {{ route.params.id ? "Edit" : "Publish" }} Service
+    </h1>
     <form @submit.prevent="onSubmitted">
       <div class="mb-6 mx-auto w-96">
         <label for="text" class="block mb-2 text-sm font-semibold text-white dark:text-gray-300">Name</label>
         <input type="text" id="text"
           class="border-2 border-gray-600 text-white text-md rounded-lg block w-full p-2.5 dark:bg-gray-700 focus:outline-none focus:border-blue-500"
           placeholder="..." v-model="newService.name" required />
-
       </div>
 
       <div class="mb-6 mx-auto w-96">
@@ -16,7 +17,6 @@
         <input type="text" id="text"
           class="border-2 border-gray-600 text-white text-md rounded-lg block w-full p-2.5 dark:bg-gray-700 focus:outline-none focus:border-blue-500"
           placeholder="..." v-model="newService.description" required />
-
       </div>
 
       <div class="mb-6 mx-auto w-96">
@@ -37,7 +37,6 @@
         <input type="text" id="text"
           class="border-2 border-gray-600 text-white text-md rounded-lg block w-full p-2.5 dark:bg-gray-700 focus:outline-none focus:border-blue-500"
           placeholder="..." v-model="newService.clientID" required />
-
       </div>
 
       <div class="mb-6 mx-auto w-96">
@@ -45,7 +44,6 @@
         <input type="text" id="text"
           class="border-2 border-gray-600 text-white text-md rounded-lg block w-full p-2.5 dark:bg-gray-700 focus:outline-none focus:border-blue-500"
           placeholder="..." v-model="newService.clientSecret" required />
-
       </div>
       <PrimaryButton class="mt-5" :text="route.params.id ? 'Edit API endpoint' : 'Create API endpoint'" />
     </form>
@@ -54,13 +52,17 @@
 >
 
 <script setup lang="ts">
-import { useOspServiceStore } from "@/stores/osp_service_store";
+// import { useOspServiceStore } from "@/stores/osp_service_store";
 import { onMounted, ref, watch } from "vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
 import { useRoute } from "vue-router";
-const route = useRoute()
+import { ManageService } from "@/services/manage_service";
+
+const route = useRoute();
 const isValidUrl = ref<boolean>(true);
-const ospServiceStore = useOspServiceStore();
+
+const manageService = ManageService.getInstance()
+
 let newService = ref({
   name: "",
   description: "",
@@ -72,30 +74,31 @@ let newService = ref({
 async function checkEdit() {
   if (route.params.id) {
     /// Means that we are editing a service
-    if (!ospServiceStore.services.length) await ospServiceStore.getServices();
-
-    let editedService = ospServiceStore.services.find(
-      (service) => service._id === route.params.id
-    );
-    if (editedService) {
+    let serviceToEdit = await manageService.getServiceById(route.params.id as string);
+    if (serviceToEdit) {
       newService.value = {
-        name: editedService.name,
-        description: editedService.description,
-        authUrl: editedService.authServer,
-        clientID: editedService.clientId,
-        clientSecret: editedService.clientSecret,
-      }
+        name: serviceToEdit.name,
+        description: serviceToEdit.description,
+        authUrl: serviceToEdit.authServer,
+        clientID: serviceToEdit.clientId,
+        clientSecret: serviceToEdit.clientSecret,
+      };
     }
   }
 }
 
 onMounted(async () => {
   await checkEdit();
-})
+});
 
-watch(() => newService.value.authUrl, (newValue) => {
-  !newValue.length ? isValidUrl.value = true : isValidUrl.value = checkUrl(newValue);
-})
+watch(
+  () => newService.value.authUrl,
+  (newValue) => {
+    !newValue.length
+      ? (isValidUrl.value = true)
+      : (isValidUrl.value = checkUrl(newValue));
+  }
+);
 
 /// function that check if a string is a valid url
 function checkUrl(url: string): boolean {
@@ -104,19 +107,18 @@ function checkUrl(url: string): boolean {
   );
 }
 
-
 async function onSubmitted() {
   if (route.params.id) {
     /// Update service model
     return;
   }
-  ospServiceStore.postCallService(
-    newService.value.name,
-    newService.value.description,
-    newService.value.authUrl,
-    newService.value.clientID,
-    newService.value.clientSecret
-  );
+  // ospServiceStore.postCallService(
+  //   newService.value.name,
+  //   newService.value.description,
+  //   newService.value.authUrl,
+  //   newService.value.clientID,
+  //   newService.value.clientSecret
+  // );
 }
 </script>
 
