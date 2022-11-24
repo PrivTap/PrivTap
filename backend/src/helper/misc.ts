@@ -1,5 +1,5 @@
 import { readdirSync, statSync } from "fs";
-import { ModelSaveError } from "../Model";
+import Model, { ModelSaveError } from "../Model";
 import { badRequest, internalServerError } from "./http";
 import { Response } from "express";
 
@@ -37,7 +37,7 @@ export function checkURL(url: string): boolean {
  * @param model the model to insert to
  * @param document the document to insert
  */
-export async function handleInsert(response: Response, model: any, document: object) {
+export async function handleInsert<T>(response: Response, model: Model<T>, document: object) {
     try {
         console.log(model, document);
         const isInserted = await model.insert(document);
@@ -64,7 +64,7 @@ export async function handleInsert(response: Response, model: any, document: obj
  * @param filter the filter to find the document to update
  * @param update the document containing the updates
  */
-export async function handleUpdate(response: Response, model: any, filter: object, update: object) {
+export async function handleUpdate<T>(response: Response, model: Model<T>, filter: object, update: object) {
     try {
         const isModified = await model.updateWithFilter(filter, update);
         if(!isModified) {
