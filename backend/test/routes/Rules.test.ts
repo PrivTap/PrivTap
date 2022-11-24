@@ -3,7 +3,7 @@ import chaiHttp = require("chai-http");
 import { createSandbox, SinonStub } from "sinon";
 import sinonChai = require("sinon-chai");
 import app from "../../src/app";
-import Authentication, { AuthError } from "../../src/helper/authentication";
+import { AuthError } from "../../src/helper/authentication";
 import Rule from "../../src/model/Rule";
 
 use(chaiHttp);
@@ -30,11 +30,7 @@ describe("/rules endpoint", () => {
     });
 
     beforeEach(() => {
-        checkActivationStub = sandbox.stub(Authentication, "checkActivation");
-        checkJWTStub = sandbox.stub(Authentication, "checkJWT").returns({
-            userId: "someUserId",
-            active: true
-        });
+
         findByUserIdStub = sandbox.stub(Rule, "findAllForUser");
         insertNewRuleStub = sandbox.stub(Rule, "insert");
         deleteRuleStub = sandbox.stub(Rule, "delete");
