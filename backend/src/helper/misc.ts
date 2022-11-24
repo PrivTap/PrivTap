@@ -49,8 +49,8 @@ export async function handleInsert(response: Response, model: any, document: obj
             badRequest(response, e.message);
         } else {
             internalServerError(response);
-            return false;
         }
+        return false;
     }
 
     return true;

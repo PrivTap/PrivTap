@@ -38,11 +38,11 @@ const userSchema = new Schema({
     },
     registrationDate: {
         type: Date,
-        required: true
+        default: () => new Date()
     },
     isActive: {
         type: Boolean,
-        required: true
+        default: false
     },
     activationToken: {
         type: String,

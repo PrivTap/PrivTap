@@ -151,7 +151,7 @@ export default class Model<T> {
                 // Schema validation has failed: a type cast has failed or one of the specified constraints is not respected
                 const castedE: MongooseError.ValidationError = e as MongooseError.ValidationError;
 
-                logger.debug(`Validation error in model ${this.name}: ${castedE.errors}`);
+                logger.debug(`Validation error in model ${this.name}\n`, castedE);
 
                 throw new ModelSaveError(`This ${this.name} contains an invalid value`, castedE.errors);
             } else if (e.name == "MongoServerError") {
