@@ -18,34 +18,24 @@
 </template>
 
 <script setup lang="ts">
-import { useOspServiceStore } from "../stores/osp_service_store";
+// import { useOspServiceStore } from "../stores/osp_service_store";
 import { onMounted, ref } from "vue";
 // import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 import RoutingPath from "@/router/routing_path";
 import ServiceCard from "@/components/ServiceCard.vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
-import type ServiceModel from "@/model/service_model";
+import { ManageService }  from "@/services/manage_service";
 const router = useRouter();
-
-const services = ref<ServiceModel[]>([])
+const isLoading = ref(true);
+const manageService = ManageService.getInstance();
+const services = manageService.services;
 
 onMounted(async () => {
-  await useOspServiceStore().getServices();
-  services.value = useOspServiceStore().services
+   await manageService.getAllServices();
+    isLoading.value = false;
 });
 
-// const ospServiceStore = useOspServiceStore();
-// // const storeRef = storeToRefs(ospServiceStore);
-
-
-// onMounted(async () => {
-//   services.value = ospServiceStore.services;
-//   // setTimeout(async () => {
-//   //   await ospServiceStore.getServices();
-//   // }, 1000);
-
-// });
 </script>
 
 <style scoped>

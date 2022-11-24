@@ -62,14 +62,14 @@
 import type ServiceModel from "@/model/service_model";
 import { ref } from "vue";
 import { EyeSlashIcon, EyeIcon } from "@heroicons/vue/24/solid";
-import { useOspServiceStore } from "@/stores/osp_service_store";
 import ModalComponent from "@/components/ModalComponent.vue";
 import router from "@/router/router";
 import RoutingPath from "@/router/routing_path";
+import { ManageService } from "@/services/manage_service";
 
-const ospServiceStore = useOspServiceStore();
 const showPass = ref(false);
 const showModal = ref(false);
+const manageService = ManageService.getInstance();
 
 function edit() {
   router.replace(`${RoutingPath.PUBLISH_SERVICE_PAGE}/${props.service._id}`);
@@ -78,7 +78,7 @@ function edit() {
 function onModalClose(res: boolean | null) {
   showModal.value = false;
   if (res) {
-    ospServiceStore.deleteCallService(props.service);
+    manageService.deleteService(props.service._id);
   }
 }
 

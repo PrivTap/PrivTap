@@ -1,8 +1,8 @@
 import axiosCatch from "@/helpers/axios_catch";
 import type ServiceModel from "@/model/service_model";
-import type { AxiosError } from "axios";
+import { ref } from "vue";
+import { useToast } from "vue-toastification";
 import IAxiosService from "../helpers/axios_service";
-import type { StandartRepsonse } from "../model/response_model";
 
 export default interface IManageService extends IAxiosService {
   createService(
@@ -11,21 +11,60 @@ export default interface IManageService extends IAxiosService {
     authUrl: string,
     clientId: string,
     clientSecret: string
-  ): Promise<StandartRepsonse<Object>>;
-  getService(serviceId: string): Promise<StandartRepsonse<ServiceModel>>;
-  updateService(manage: ServiceModel): Promise<StandartRepsonse<ServiceModel>>;
-  deleteService(serviceId: string): Promise<StandartRepsonse<ServiceModel>>;
-  getAllServices(): Promise<StandartRepsonse<ServiceModel[] | Object>>;
+  ): Promise<ServiceModel | null>;
+  getServiceById(serviceId: string): Promise<ServiceModel | null>;
+  updateService(manage: ServiceModel): Promise<ServiceModel | null>;
+  deleteService(serviceId: string): Promise<void>;
+  getAllServices(): Promise<ServiceModel[] | null>;
 }
 
-export default class ManageService
+export class ManageService
   extends IAxiosService
-  implements IManageService
-{
+  implements IManageService {
+
+  /// Singelton intance
+  private static _instance: ManageService;
+
+  /**
+   * The Singleton's constructor should always be private to prevent direct
+   * construction calls with the `new` operator.
+   */
+  private constructor() {
+    super();
+  }
+
+  /**
+  * The static method that controls the access to the singleton instance.
+  * This implementation let you subclass the Singleton class while keeping
+  * just one instance of each subclass around.
+  */
+  public static getInstance(): ManageService {
+    if (!ManageService._instance) {
+      ManageService._instance = new ManageService();
+    }
+
+    return ManageService._instance;
+  }
+
+  /**
+   * Path to the api
+   */
   path: string = "/manageServices";
 
-  constructor() {
-    super();
+  /**
+   *  Services to reference 
+   */
+  services = ref<ServiceModel[]>([]);
+
+  async getAllServices(): Promise<ServiceModel[] | null> {
+    try {
+      const res = await this.http.get(this.path);
+      this.services.value = res.data.data as ServiceModel[];
+      return res.data.data;
+    } catch (error) {
+      axiosCatch(error);
+      return null;
+    }
   }
 
   async createService(
@@ -34,7 +73,7 @@ export default class ManageService
     authURL: string,
     clientId: string,
     clientSecret: string
-  ): Promise<StandartRepsonse<Object>> {
+  ): Promise<ServiceModel | null> {
     const body = {
       name: name,
       description: description,
@@ -44,42 +83,44 @@ export default class ManageService
     };
     try {
       const res = await this.http.post(this.path, body);
-      return res.data as StandartRepsonse<ServiceModel>;
+      useToast().success("Service created");
+      return res.data.data as ServiceModel;
     } catch (error) {
-      return axiosCatch(error);
+      axiosCatch(error);
+      return null;
     }
   }
-  getService(serviceId: string): Promise<StandartRepsonse<ServiceModel>> {
-    throw new Error("Method not implemented.");
+
+  async getServiceById(serviceId: string): Promise<ServiceModel | null> {
+    try {
+      const res = await this.http.get(this.path, { params: { serviceId } });
+      return res.data.data as ServiceModel;
+    } catch (error) {
+      const err = axiosCatch(error);
+      return null;
+    }
   }
 
   async updateService(
     manage: ServiceModel
-  ): Promise<StandartRepsonse<ServiceModel | Object>> {
+  ): Promise<ServiceModel | null> {
     try {
       const res = await this.http.put(this.path, manage);
-      return res.data as StandartRepsonse<ServiceModel>;
+      useToast().success("Service updated");
+      return res.data.data as ServiceModel;
     } catch (error) {
-      return axiosCatch(error);
+      axiosCatch(error);
+      return null;
     }
   }
-  async deleteService(serviceId: string): Promise<StandartRepsonse<Object>> {
+  async deleteService(serviceId: string): Promise<void> {
     try {
       const res = await this.http.delete(this.path, {
         params: { serviceID: serviceId },
       });
-      console.log(res);
-      return res.data as StandartRepsonse<Object>;
+      useToast().success("Service deleted");
     } catch (error) {
-      return axiosCatch(error);
-    }
-  }
-  async getAllServices(): Promise<StandartRepsonse<ServiceModel[] | Object>> {
-    try {
-      const res = await this.http.get(this.path);
-      return res.data as StandartRepsonse<ServiceModel[]>;
-    } catch (error) {
-      return axiosCatch(error);
+      axiosCatch(error);
     }
   }
 }
