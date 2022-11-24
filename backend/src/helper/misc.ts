@@ -39,6 +39,7 @@ export function checkURL(url: string): boolean {
  */
 export async function handleInsert(response: Response, model: any, document: object) {
     try {
+        console.log(model, document);
         const isInserted = await model.insert(document);
         if(!isInserted) {
             internalServerError(response);
@@ -78,6 +79,5 @@ export async function handleUpdate(response: Response, model: any, filter: objec
             return false;
         }
     }
-
     return true;
 }

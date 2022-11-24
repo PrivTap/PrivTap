@@ -2,7 +2,7 @@
 import Service, { IService } from "../../model/Service";
 import { Request, Response } from "express";
 import Route from "../../Route";
-import { badRequest, checkUndefinedParams, forbiddenUserError, success } from "../../helper/http";
+import { badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
 import { handleInsert, handleUpdate } from "../../helper/misc";
 
 
@@ -32,11 +32,12 @@ export default class ManageServices extends Route {
             }
             data = service;
         } else {
-            const res = await Service.findAllForUser(request.userId);
-            if (!res) {
+            const services = await Service.findAllForUser(request.userId);
+            if (!services) {
+                internalServerError(response);
                 return;
             }
-            data = res;
+            data = services;
         }
 
         success(response,  data);
