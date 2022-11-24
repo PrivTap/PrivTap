@@ -1,10 +1,6 @@
 <template>
-  <div
-    class="h-[calc(100vh-116px)] relative w-full flex items-center justify-center"
-  >
-    <div
-      class="w-1/2 h-[80vh] mx-auto rounded-full bg-gradient-radial from-blue-300 via-transparent"
-    ></div>
+  <div class="h-[calc(100vh-116px)] relative w-full flex items-center justify-center">
+    <div class="w-1/2 h-[80vh] mx-auto rounded-full bg-gradient-radial from-blue-300 via-transparent"></div>
     <div class="h-full w-full bg-[#232323]/90 absolute z-10"></div>
 
     <div class="absolute z-50">
@@ -15,14 +11,11 @@
         <p class="text-stone-400">Welcome back and start new automation</p>
       </div>
       <div class="grid grid-cols-12 gap-20 lg:gap-none pt-10">
-        <div
-          class="col-span-full lg:col-span-7 flex items-center justify-center0"
-        >
+        <div class="col-span-full lg:col-span-7 flex items-center justify-center0">
           <div class="flex justify-between w-full">
             <div class=""></div>
             <div>
-              <span class="text-white text-5xl font-semibold"
-                >Start connecting your world
+              <span class="text-white text-5xl font-semibold">Start connecting your world
               </span>
               <div class="h-1 w-40 bg-blue-600 rounded-full mb-5 mt-2"></div>
               <ul class="list-disc pl-4 text-stone-400 text-lg">
@@ -48,15 +41,10 @@
                 </li>
               </ul>
               <div class="text-white font-semibold text-xl space-x-16 pt-20">
-                <PrimaryButton
-                  text="Create your Rule"
-                  :onClick="() => router.push(RoutingPath.PERSONAL_PAGE)"
-                />
+                <PrimaryButton text="Create your Rule" :onClick="() => router.push(RoutingPath.PERSONAL_PAGE)" />
 
-                <OutilinedButton
-                  text="Publish your Service"
-                  :onClick="() => router.push(RoutingPath.PUBLISH_SERVICE_PAGE)"
-                />
+                <OutilinedButton text="Publish your Service"
+                  :onClick="() => router.push(RoutingPath.PUBLISH_SERVICE_PAGE)" />
               </div>
             </div>
             <div class="w-0 lg:w-1 rounded bg-blue-500 mr-10"></div>
@@ -83,4 +71,6 @@ const authStore = useAuthStore();
 const router = useRouter();
 </script>
 
-<style scoped></style>
+<style scoped>
+
+</style>

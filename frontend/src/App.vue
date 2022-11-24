@@ -21,6 +21,6 @@ watch(userStore.isAutheticated, (val) => {
 </script>
 
 <template>
-  <NavBar />
-  <RouterView />
+  <NavBar class="flex" />
+  <RouterView class="h-[calc(100vh-116px)]" />
 </template>
