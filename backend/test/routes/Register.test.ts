@@ -5,7 +5,7 @@ import sinonChai from "sinon-chai";
 import app from "../../src/app";
 import User from "../../src/model/User";
 import Mailer from "../../src/helper/mailer";
-import ModelError from "../../src/model/ModelError";
+import { ModelSaveError } from "../../src/Model";
 
 use(chaiHttp);
 use(sinonChai);
@@ -27,7 +27,7 @@ describe("/register endpoint", () => {
     });
 
     beforeEach(() => {
-        insertNewUserStub = sandbox.stub(User, "insertNewUser");
+        insertNewUserStub = sandbox.stub(User, "insert");
     });
 
     afterEach(() => {
@@ -46,7 +46,7 @@ describe("/register endpoint", () => {
         });
 
         it("should fail when data checks fails", async () => {
-            insertNewUserStub.throws(new ModelError());
+            insertNewUserStub.throws(new ModelSaveError("", undefined));
             const res = await requester.post("/register").send({
                 username : "someUsername",
                 email: "someEmail@gmail.com",
@@ -56,7 +56,7 @@ describe("/register endpoint", () => {
         });
 
         it("should fail when the username/email is already in the DB", async () => {
-            insertNewUserStub.throws(new ModelError());
+            insertNewUserStub.throws(new ModelSaveError("", undefined));
             const res = await requester.post("/register").send({
                 username : "someUsername",
                 email: "someEmail@gmail.com",
