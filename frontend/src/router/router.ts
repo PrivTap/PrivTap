@@ -80,6 +80,11 @@ const router = createRouter({
         requireAuth: true,
       },
     },
+    {
+      path: "/:pathMatch(.*)*",
+      name: "not-found",
+      redirect: "/home",
+    }
   ],
 });
 
