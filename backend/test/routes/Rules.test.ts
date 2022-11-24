@@ -31,8 +31,8 @@ describe("/rules endpoint", () => {
     beforeEach(() => {
         checkActivationStub = sandbox.stub(Authentication, "checkActivation");
         checkJWTStub = sandbox.stub(Authentication, "checkJWT").returns("a_user_id");
-        findByUserIdStub = sandbox.stub(Rule, "findByUserId");
-        insertNewRuleStub = sandbox.stub(Rule, "insertNewRule");
+        findByUserIdStub = sandbox.stub(Rule, "findAllForUser");
+        insertNewRuleStub = sandbox.stub(Rule, "insert");
         deleteRuleStub = sandbox.stub(Rule, "deleteRule");
     });
 

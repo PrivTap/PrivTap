@@ -1,7 +1,6 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
-import { badRequest, success } from "../../helper/http";
-import Trigger from "../../model/Trigger";
+import { success } from "../../helper/http";
 
 export default class TriggersRoute extends Route {
     constructor() {
@@ -9,7 +8,7 @@ export default class TriggersRoute extends Route {
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
-        //
+        success(response, {}, "Not implemented");
     }
 
 }

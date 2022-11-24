@@ -1,8 +1,9 @@
 
-import Service from "../../model/Service";
+import Service, { IService } from "../../model/Service";
 import { Request, Response } from "express";
 import Route from "../../Route";
 import { badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
+import { ModelError } from "../../helper/model";
 
 
 export default class ManageServices extends Route {
@@ -11,16 +12,33 @@ export default class ManageServices extends Route {
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
-        let queryResult;
-        if (request.query.serviceId != undefined)
-            queryResult = await Service.findById(request.query.serviceId.toString(), request.userId);
-        else
-            queryResult = await Service.findServicesCreatedByUser(request.userId.toString());
-        if (queryResult) {
-            success(response,  queryResult);
+        const serviceId = request.params.serviceId;
+
+        let data: IService | IService[] = [];
+
+        // If the serviceId parameter is defined return only info about that service
+        // Else return info about all services created by the user
+        if (serviceId) {
+            // Check that the user is the owner of the service
+            if (!await Service.isCreator(request.userId, serviceId)) {
+                forbiddenUserError(response, "You are not the owner of this service");
+                return;
+            }
+
+            const res = await Service.findById(serviceId);
+            if (!res) {
+                return;
+            }
+            data = res;
         } else {
-            internalServerError(response);
+            const res = await Service.findAllForUser(request.userId);
+            if (!res) {
+                return;
+            }
+            data = res;
         }
+
+        success(response,  data);
     }
 
     protected async httpPost(request: Request, response: Response): Promise<void> {
@@ -30,31 +48,40 @@ export default class ManageServices extends Route {
         const clientId = request.body.clientId;
         const clientSecret = request.body.clientSecret;
 
-        if(checkUndefinedParams(response, name, description, authURL, clientId, clientSecret))
-            return;
+        if(checkUndefinedParams(response, name, description)) return;
 
         // Insert the service
-        const validInsertion = await Service.insert(name, description, request.userId.toString(),authURL, clientId, clientSecret);
-        if (!validInsertion) {
-            badRequest(response, "Error while creating a service");
+        try {
+            const validInsertion = await Service.insert(name, description, request.userId,authURL, clientId, clientSecret);
+            if (!validInsertion) {
+                internalServerError(response);
+                return;
+            }
+        } catch (e) {
+            if (e instanceof ModelError) {
+                badRequest(response, e.message);
+            }
             return;
         }
-        success(response);
-        return;
 
+        success(response);
     }
 
     protected async httpDelete(request: Request, response: Response): Promise<void> {
         const serviceId = request.body.serviceId;
 
-        if(checkUndefinedParams(response, serviceId))
-            return;
+        if(checkUndefinedParams(response, serviceId)) return;
 
-        console.log(request.userId.toString());
-        const validDeletion = await Service.deleteService(request.userId.toString(), serviceId.toString());
+        // Check that the user is the owner of the service
+        if (!await Service.isCreator(request.userId, serviceId)) {
+            forbiddenUserError(response, "You are not the owner of this service");
+            return;
+        }
+
+        const validDeletion = await Service.deleteService(serviceId);
         if (!validDeletion){
-            badRequest(response, "Error deleting the specified service");
-            return ;
+            badRequest(response, "This service does not exist");
+            return;
         }
 
         success(response);
@@ -62,21 +89,34 @@ export default class ManageServices extends Route {
 
     protected async httpPut(request: Request, response: Response): Promise<void> {
         const serviceId = request.body.serviceId;
-        const newServiceName = request.body.name;
-        const newServiceDescription = request.body.description;
-        const newServiceAuthURL = request.body.authURL;
-        const newClientId = request.body.clientId;
-        const newClientSecret = request.body.clientSecret;
+        const name = request.body.name;
+        const description = request.body.description;
+        const authServer = request.body.authURL;
+        const clientId = request.body.clientId;
+        const clientSecret = request.body.clientSecret;
 
-        if(checkUndefinedParams(response, serviceId)){
+        if(checkUndefinedParams(response, serviceId)) return;
+
+        // Check that the user is the owner of the service
+        if (!await Service.isCreator(request.userId, serviceId)) {
+            forbiddenUserError(response, "You are not the owner of this service");
             return;
         }
 
-        const validModification = Service.updateService(serviceId, request.userId, newServiceName, newServiceDescription, newServiceAuthURL, newClientId, newClientSecret);
+        try {
+            const validModification = await Service.update(serviceId,
+                { name, description, authServer, clientId, clientSecret });
+            if(!validModification) {
+                badRequest(response, "A service with this id does not exist");
+                return;
+            }
+        } catch (e) {
+            if (e instanceof ModelError) {
+                badRequest(response, e.message);
+            }
+            return;
+        }
 
-        if(!validModification)
-            forbiddenUserError(response);
-        else
-            success(response);
+        success(response);
     }
 }

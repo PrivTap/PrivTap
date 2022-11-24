@@ -1,69 +1,76 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
-import { badRequest, internalServerError, success } from "../../helper/http";
-import Action from "../../model/Action";
-import { Permission } from "../../model/Permission";
-import mongoose from "mongoose";
+import { badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
+import Action, { IAction } from "../../model/Action";
+import Service from "../../model/Service";
+import { ModelError } from "../../helper/model";
 
 export default class ManageActionsRoute extends Route {
     constructor() {
         super("manage-actions", true);
     }
 
-    /*
     protected async httpGet(request: Request, response: Response): Promise<void> {
         const parentServiceId = request.body.parentId;
 
-        if (!parentServiceId) {
-            badRequest(response, "Invalid parameters");
-            return;
-        }
+        if (checkUndefinedParams(response, parentServiceId)) return;
 
-        // Insert the trigger
-        if (await Action.findAllChildrenOfService(parentServiceId)) {
-            success(response);
-        } else {
-            badRequest(response, "Error while querying available actions for the service");
-        }
+        let actions: IAction[] = [];
+
+        const res = await Action.findAllForService(parentServiceId);
+        if (res)
+            actions = res;
+
+        success(response, actions);
     }
 
     protected async httpPost(request: Request, response: Response): Promise<void> {
         const actionName = request.body.name;
         const actionDesc = request.body.description;
         const parentServiceId = request.body.parentId;
-        const availablePermissions = request.body.permissions as ([Permission] | null);
+        const permissions = request.body.permissions;
         const endpoint = request.body.endpoint;
-        const creatorId = request.userId.toString();
 
-        if (!(actionName && actionDesc && parentServiceId && availablePermissions && creatorId && endpoint && mongoose.isValidObjectId(parentServiceId) && mongoose.isValidObjectId(creatorId))) {
-            badRequest(response, "Invalid parameters");
+        if (checkUndefinedParams(response, actionName, actionDesc, parentServiceId, endpoint)) return;
+
+        // Check that the user is the owner of the service
+        if (!await Service.isCreator(request.userId, parentServiceId)) {
+            forbiddenUserError(response, "You are not the owner of this service");
             return;
         }
 
-        // Insert the trigger
-        if (await Action.insert(actionName, actionDesc, parentServiceId, creatorId, availablePermissions, endpoint)) {
-            success(response);
-        } else {
-            badRequest(response, "Error while creating action");
+        // Insert the action
+        try {
+            const res = await Action.insert(actionName, actionDesc, parentServiceId, endpoint, permissions);
+            if (!res) {
+                internalServerError(response);
+                return;
+            }
+        } catch (e) {
+            if (e instanceof ModelError) {
+                badRequest(response, e.message);
+            }
+            return;
         }
+
+        success(response);
     }
 
     protected async httpDelete(request: Request, response: Response): Promise<void> {
-        const serviceId = request.body.serviceId;
         const actionId = request.body.actionId;
-        const userId = request.userId.toString();
 
-        if (!(serviceId && actionId && userId && mongoose.isValidObjectId(serviceId) && mongoose.isValidObjectId(actionId) && mongoose.isValidObjectId(userId))) {
-            badRequest(response, "Invalid parameters");
+        if (checkUndefinedParams(response, actionId)) return;
+
+        // Check that the user is the owner of the action
+        if (!await Action.isCreator(request.userId, actionId)) {
+            forbiddenUserError(response, "You are not the owner of this action");
             return;
         }
 
-        if (await Action.delete(actionId, serviceId, userId)) {
+        if (await Action.delete(actionId)) {
             success(response);
         } else {
             internalServerError(response);
         }
     }
-
-     */
 }

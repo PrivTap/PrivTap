@@ -1,6 +1,6 @@
 import { model, Schema, Types } from "mongoose";
-import ObjectId = Types.ObjectId;
 import logger from "../helper/logger";
+import ModelHelper from "../helper/model";
 
 export interface IService {
     _id: string;
@@ -54,113 +54,99 @@ export default class Service {
      * Asynchronously adds a new service to the database
      * @param name The name of the new service
      * @param description The description of the service
-     * @param creatorId The Id of the user that created this service
+     * @param creatorId The id of the user that created this service
      * @param authenticationServer The API endpoint of the server used to authenticate the PrivTAP platform with the Service
-     * @param clientId The Id of our platform on the authorization server
+     * @param clientId The id of our platform on the authorization server
      * @param clientSecret The secret of our platform on the authorization server
      * @returns A boolean Promise which contains true if the operation was successful, and false otherwise
      */
-    static async insert(name: string, description: string, creatorId: string, authenticationServer: string, clientId: string, clientSecret: string) {
+    static async insert(name: string, description: string, creatorId: string, authenticationServer?: string, clientId?: string, clientSecret?: string) {
         const newService = new Service.serviceModel({
-            description: description,
-            name: name,
-            creator: new ObjectId(creatorId),
+            description,
+            name,
+            creator: creatorId,
             authServer: authenticationServer,
-            clientId: clientId,
-            clientSecret: clientSecret
+            clientId,
+            clientSecret
         });
         try {
             await newService.save();
             return true;
         } catch (e) {
-            logger.error("Error while creating service: ", e);
-            return false;
+            ModelHelper.handleMongooseSavingErrors(e, "A service with the same name already exists");
         }
+        return false;
     }
 
     /**
      * Asynchronously retrieves the list of services that a user has created
-     * @param userId The Id of the user that created and owns the services to retrieve
+     * @param userId The id of the user that created and owns the services to retrieve
      * @returns A Promise containing either the list of services created by the user, or null if something went wrong
      */
-    static async findServicesCreatedByUser(userId: string): Promise<IService[] | null> {
+    static async findAllForUser(userId: string): Promise<IService[] | null> {
         try {
-            return Service.serviceModel.find({ creator: new ObjectId(userId) });
+            return await Service.serviceModel.find({ creator: userId });
         } catch (e) {
             logger.error("Error while retrieving service: ", e);
-            return null;
         }
-    }
-
-    static async deleteService (userId: string, serviceId: string): Promise<boolean>{
-        try {
-            const queryResult = await Service.serviceModel.findById(new ObjectId(serviceId)) as IService;
-            return queryResult.creator.toString() == userId;
-        } catch (e){
-            console.log("Error deleting a service:", e);
-            return false;
-        }
+        return null;
     }
 
     /**
-     * Updates a service associated to a given user with new and updated data
-     * @param serviceId The Id of the service to update
-     * @param userId The Id of the user associated to the service
-     * @param newName The new service name
-     * @param newDescription The new service description
-     * @param newAuthServer The new authorization server
-     * @param newClientId The new client Id
-     * @param newClientSecret The new client secret
+     * Deletes a service from the DB.
+     * @param serviceId the id of the service to delete
+     */
+    static async deleteService(serviceId: string): Promise<boolean> {
+        try {
+            const res = await Service.serviceModel.deleteOne({ _id: serviceId });
+            return res.deletedCount == 1;
+        } catch (e) {
+            console.log("Error while deleting a service:", e);
+        }
+        return false;
+    }
+
+    /**
+     * Updates a service associated to a given user with new and updated data.
+     * @param serviceId the id of the service to update
+     * @param newValues an object containing the values to update
      * @returns A boolean Promise which contains true if the operation was successful, and false otherwise
      */
-    static async updateService(serviceId: string, userId: string, newName: string|undefined = undefined, newDescription: string|undefined = undefined, newAuthServer: string|undefined = undefined, newClientId: string|undefined = undefined, newClientSecret: string|undefined = undefined): Promise<boolean>{
-        serviceSchema.pre("updateOne", { document: false, query: true }, function(next) {
-            const updated = this.getUpdate();
-            if (updated) {
-                updated.entries().filter((key: string, value: never) => value != undefined);
-                this.setUpdate(updated);
-            }
-            next();
-        });
-
-        const query = {
-            "_id": new ObjectId(serviceId),
-            "creator": new ObjectId(userId)
-        };
-
-        const update = {
-            "name": newName,
-            "description": newDescription,
-            "authServer": newAuthServer,
-            "clientId": newClientId,
-            "clientSecret": newClientSecret
-        };
-
+    static async update(serviceId: string, newValues: { name?: string, description?: string, authServer?: string, clientId?: string, clientSecret?: string}): Promise<boolean> {
         try {
-            const queryResult = await Service.serviceModel.updateOne(query, update);
+            const queryResult = await Service.serviceModel.updateOne({ _id: serviceId }, newValues);
             return queryResult.modifiedCount == 1;
         } catch (e) {
-            logger.error("Error updating a service", e);
-            return false;
+            ModelHelper.handleMongooseSavingErrors(e, "A service with the same name already exists");
         }
+        return false;
     }
 
     /**
-     * Returns the queried service if the specified user is the owner
-     * @param serviceId The Id of the service to update
-     * @param userId The Id of the user associated to the service
+     * Finds the service with the id.
+     * @param serviceId the id of the service to find
      */
-    static async findById(serviceId: string, userId: string): Promise<IService|undefined>{
-        const query = {
-            "_id": serviceId,
-            "creator": userId
-        };
+    static async findById(serviceId: string): Promise<IService | null>{
         try{
-            return await Service.serviceModel.findOne(query) as IService;
+            return await Service.serviceModel.findById(serviceId);
         } catch (e){
             logger.error("Error querying service:", e);
-            return undefined;
         }
+        return null;
+    }
 
+    /**
+     * Checks if a user is the creator of a service.
+     * @param userId the id of the user
+     * @param serviceId the id of the service
+     */
+    static async isCreator(userId: string, serviceId: string) {
+        try {
+            const res = await Service.serviceModel.findOne({ _id: serviceId, creator: userId });
+            return res != null;
+        } catch (e) {
+            logger.error("Error while verifying service ownership: ", e);
+        }
+        return false;
     }
 }

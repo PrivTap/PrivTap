@@ -1,26 +1,22 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
-import { badRequest, internalServerError, success } from "../../helper/http";
-import { Permission } from "../../model/Permission";
+import { badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
 import Trigger from "../../model/Trigger";
-import mongoose  from "mongoose";
+import Service from "../../model/Service";
+import { ModelError } from "../../helper/model";
 
 export default class ManageTriggersRoute extends Route {
     constructor() {
         super("manage-triggers", true);
     }
-    /*
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
         const parentServiceId = request.body.parentId;
 
-        if (!parentServiceId) {
-            badRequest(response, "Invalid parameters");
-            return;
-        }
+        if (checkUndefinedParams(response, parentServiceId)) return;
 
         // Insert the trigger
-        if (await Trigger.findAllChildrenOfService(parentServiceId)) {
+        if (await Trigger.findAllForService(parentServiceId)) {
             success(response);
         } else {
             badRequest(response, "Error while querying available triggers for the service");
@@ -31,38 +27,48 @@ export default class ManageTriggersRoute extends Route {
         const triggerName = request.body.name;
         const triggerDesc = request.body.description;
         const parentServiceId = request.body.parentId;
-        const availablePermissions = request.body.permissions as ([Permission] | null);
-        const creatorId = request.userId.toString();
+        const availablePermissions = request.body.permissions;
 
-        if (!(triggerName && triggerDesc && parentServiceId && availablePermissions && creatorId && mongoose.isValidObjectId(parentServiceId) && mongoose.isValidObjectId(creatorId))) {
-            badRequest(response, "Invalid parameters");
+        if (checkUndefinedParams(response, triggerName, triggerDesc, parentServiceId)) return;
+
+        // Check that the user is the owner of the service
+        if (!await Service.isCreator(request.userId, parentServiceId)) {
+            forbiddenUserError(response, "You are not the owner of this service");
             return;
         }
 
         // Insert the trigger
-        if (await Trigger.insert(triggerName, triggerDesc, parentServiceId, creatorId, availablePermissions)) {
-            success(response);
-        } else {
-            badRequest(response, "Error while creating trigger");
-        }
-    }
-
-    protected async httpDelete(request: Request, response: Response): Promise<void> {
-        const serviceId = request.body.serviceId;
-        const triggerId = request.body.triggerId;
-        const userId = request.userId.toString();
-
-        if (!(serviceId && triggerId && userId && mongoose.isValidObjectId(serviceId) && mongoose.isValidObjectId(triggerId) && mongoose.isValidObjectId(userId))) {
-            badRequest(response, "Invalid parameters");
+        try {
+            const res = await Trigger.insert(triggerName, triggerDesc, parentServiceId, availablePermissions);
+            if (!res) {
+                internalServerError(response);
+                return;
+            }
+        } catch (e) {
+            if (e instanceof ModelError) {
+                badRequest(response, e.message);
+            }
             return;
         }
 
-        if (await Trigger.delete(triggerId, serviceId, userId)) {
+        success(response);
+    }
+
+    protected async httpDelete(request: Request, response: Response): Promise<void> {
+        const triggerId = request.body.triggerId;
+
+        if (checkUndefinedParams(response, triggerId)) return;
+
+        // Check that the user is the owner of the action
+        if (!await Trigger.isCreator(request.userId, triggerId)) {
+            forbiddenUserError(response, "You are not the owner of this trigger");
+            return;
+        }
+
+        if (await Trigger.delete(triggerId)) {
             success(response);
         } else {
             internalServerError(response);
         }
     }
-
-     */
 }

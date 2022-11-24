@@ -1,5 +1,5 @@
 import { CookieOptions, NextFunction, Request, Response } from "express";
-import User, { IUser } from "../model/User";
+import { IUser } from "../model/User";
 import { verify, sign, JwtPayload } from "jsonwebtoken";
 import { forbiddenUserError, internalServerError, unauthorizedUserError } from "./http";
 import env from "./env";
@@ -49,7 +49,7 @@ export default abstract class Authentication {
      */
     static checkActivation(request: Request, response: Response, next: NextFunction){
         if (!request.userActive) {
-            forbiddenUserError(response, "Your account is not active");
+            forbiddenUserError(response, "Your account needs to be activated to do this, check your email");
             return;
         }
 

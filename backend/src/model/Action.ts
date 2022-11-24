@@ -1,13 +1,15 @@
-import { Schema, Types } from "mongoose";
-import { Permission } from "./Permission";
+import { model, Schema, Types } from "mongoose";
+import Service from "./Service";
+import logger from "../helper/logger";
+import ModelHelper from "../helper/model";
 
 export interface IAction {
     _id: string;
     name: string;
     description: string;
     serviceId: Types.ObjectId;
-    permissions: [Permission]; // TO DEFINE
     endpoint: string;
+    permissions?: Types.Array<Types.ObjectId>;
 }
 
 const actionSchema = new Schema<IAction>({
@@ -26,80 +28,84 @@ const actionSchema = new Schema<IAction>({
         type: Schema.Types.ObjectId,
         required: true
     },
-    permissions: {
-        type: [Permission.schema],
-        required: true
-    },
     endpoint: {
         type: String,
         required: true
-    }
+    },
+    permissions: [Schema.Types.ObjectId]
 });
 
 export default class Action {
-    /*
 
     private static actionModel = model<IAction>("Action", actionSchema);
 
-    static async insert(actionName: string, description: string, parentServiceId: string, inserterUserId: string, availablePermissions: [Permission], endpoint: string) {
-        //TODO: HOW DO WE DEFINE PERMISSIONS????
+    /**
+     * Inserts a new action into the DB.
+     * @param actionName the name of the action
+     * @param description the description of the action
+     * @param parentServiceId the id of the service for which the action will be created
+     * @param endpoint the endpoint that this action will send requests to
+     * @param requiredPermissionsIds the ids of permissions required by this action
+     */
+    static async insert(actionName: string, description: string, parentServiceId: string, endpoint: string, requiredPermissionsIds?: string[]) {
         const newAction = new Action.actionModel({
             description: description,
             name: actionName,
-            serviceId: new ObjectId(parentServiceId),
-            permissions: availablePermissions,
-            endpoint: endpoint
+            serviceId: parentServiceId,
+            endpoint: endpoint,
+            permissions: requiredPermissionsIds
         });
 
-        // Is the parent Service owned by this user?
-        const isInserterOwner = await Service.findServiceCreatedByUser(inserterUserId, parentServiceId);
-        if (!isInserterOwner) {
-            logger.error("Attempting to create an action for a service that the creator user does not own");
-            return false;
-        }
-
-        // Do we already have an action with the same identifier in the database?
-        const res = await Action.actionModel.exists({ name: actionName });
-        if (res == null) {
-            //Proceed with the save operation
-            try {
-                await newAction.save();
-                return true;
-            } catch (e) {
-                logger.error("Error while creating action: ", e);
-                return false;
-            }
-        } else {
-            logger.error("Attempting to insert a duplicate action");
-            return false;
-        }
-    }
-
-    static async findAllChildrenOfService(parentId: string): Promise<IAction[] | null> {
         try {
-            return Action.actionModel.find({ serviceId: new ObjectId(parentId) });
-        } catch (e) {
-            logger.error("Error while retrieving action: ", e);
-            return null;
-        }
-    }
-
-    static async delete(actionId: string, serviceId: string, ownerId: string) {
-        // Is the parent Service owned by this user?
-        const isInserterOwner = await Service.findServiceCreatedByUser(ownerId, serviceId);
-        if (!isInserterOwner) {
-            logger.error("Attempting to delete an action for a service that the creator user does not own");
-            return false;
-        }
-
-        try {
-            await Action.actionModel.deleteOne({ serviceId: new ObjectId(serviceId), _id: new ObjectId(actionId) });
+            await newAction.save();
             return true;
         } catch (e) {
-            logger.error("Error while deleting action: ", e);
-            return false;
+            ModelHelper.handleMongooseSavingErrors(e, "An action with the same name already exists");
         }
+        return false;
     }
 
+    /**
+     * Finds all the actions provided by a service.
+     * @param serviceId the id of the service
      */
+    static async findAllForService(serviceId: string): Promise<IAction[] | null> {
+        try {
+            return await Action.actionModel.find({ serviceId });
+        } catch (e) {
+            logger.error("Error while retrieving action: ", e);
+        }
+        return null;
+    }
+
+    /**
+     * Deletes an action from the DB.
+     * @param actionId the id of the action to delete
+     */
+    static async delete(actionId: string) {
+        try {
+            const res = await Action.actionModel.deleteOne({ _id: actionId });
+            return res.deletedCount == 1;
+        } catch (e) {
+            logger.error("Error while deleting action: ", e);
+        }
+        return false;
+    }
+
+    /**
+     * Checks if a user is the creator of an action.
+     * @param userId the id of the user
+     * @param actionId the id of the action
+     */
+    static async isCreator(userId: string, actionId: string) {
+        try {
+            const res = await Action.actionModel.findById(actionId);
+            if (res != null) {
+                return Service.isCreator(userId, res.serviceId.toString());
+            }
+        } catch (e) {
+            logger.error("Error while verifying action ownership: ", e);
+        }
+        return false;
+    }
 }

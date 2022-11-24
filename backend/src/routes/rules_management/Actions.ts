@@ -1,7 +1,6 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
-import { badRequest, success } from "../../helper/http";
-import Action from "../../model/Action";
+import { success } from "../../helper/http";
 
 export default class ActionsRoute extends Route {
     constructor() {
@@ -9,6 +8,6 @@ export default class ActionsRoute extends Route {
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
-        //
+        success(response, {}, "Not implemented");
     }
 }

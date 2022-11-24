@@ -1,13 +1,15 @@
-import { Schema, Types } from "mongoose";
-import { Permission } from "./Permission";
+import { model, Schema, Types } from "mongoose";
+import logger from "../helper/logger";
+import Service from "./Service";
+import ModelHelper from "../helper/model";
 
 export interface ITrigger {
     _id: string;
     name: string;
     description: string;
     serviceId: Types.ObjectId;
-    permissions: [Permission]; // TO DEFINE
-    data: any[]; // TO DEFINE
+    permissions?: Types.Array<Types.ObjectId>;
+    data?: Types.Array<string>; // TO DEFINE
 }
 
 const triggerSchema = new Schema<ITrigger>({
@@ -26,79 +28,80 @@ const triggerSchema = new Schema<ITrigger>({
         type: Schema.Types.ObjectId,
         required: true
     },
-    permissions: {
-        type: [Permission.schema], //Permissions MUST be defined at Trigger/Action level, NOT saved into a general DB (Mongoose can also store nested objects)
-        required: true
-    },
-    data: {
-        type: [Object]
-    }
+    permissions: [Schema.Types.ObjectId],
+    data: [String]
 });
 
 export default class Trigger {
-    /*
 
     private static triggerModel = model<ITrigger>("Trigger", triggerSchema);
 
-    static async insert(triggerName: string, description: string, parentServiceId: string, inserterUserId: string, availablePermissions: [Permission]) {
-        //TODO: HOW DO WE DEFINE PERMISSIONS????
+    /**
+     * Inserts a new trigger into the DB.
+     * @param triggerName the name of the trigger
+     * @param description the description of the trigger
+     * @param parentServiceId the id of the service for which the trigger will be created
+     * @param requiredPermissions the ids of permissions required by this trigger
+     */
+    static async insert(triggerName: string, description: string, parentServiceId: string, requiredPermissions: string[]) {
         const newTrigger = new Trigger.triggerModel({
             description: description,
             name: triggerName,
-            serviceId: new ObjectId(parentServiceId),
-            permissions: availablePermissions,
+            serviceId: parentServiceId,
+            permissions: requiredPermissions,
             data: []
         });
 
-        // Is the parent Service owned by this user?
-        const isInserterOwner = await Service.findServiceCreatedByUser(inserterUserId, parentServiceId);
-        if (!isInserterOwner) {
-            logger.error("Attempting to create a trigger for a service that the creator user does not own");
-            return false;
-        }
-
-        // Do we already have a service with the same identifier in the database?
-        const res = await Trigger.triggerModel.exists({ name: triggerName });
-        if (res == null) {
-            //Proceed with the save operation
-            try {
-                await newTrigger.save();
-                return true;
-            } catch (e) {
-                logger.error("Error while creating trigger: ", e);
-                return false;
-            }
-        } else {
-            logger.error("Attempting to insert a duplicate trigger");
-            return false;
-        }
-    }
-
-    static async findAllChildrenOfService(parentId: string): Promise<ITrigger[] | null> {
         try {
-            return Trigger.triggerModel.find({ serviceId: new ObjectId(parentId) });
-        } catch (e) {
-            logger.error("Error while retrieving service: ", e);
-            return null;
-        }
-    }
-
-    static async delete(triggerId: string, serviceId: string, ownerId: string) {
-        // Is the parent Service owned by this user?
-        const isInserterOwner = await Service.findServiceCreatedByUser(ownerId, serviceId);
-        if (!isInserterOwner) {
-            logger.error("Attempting to delete a trigger for a service that the creator user does not own");
-            return false;
-        }
-
-        try {
-            await Trigger.triggerModel.deleteOne({ serviceId: new ObjectId(serviceId), _id: new ObjectId(triggerId) });
+            await newTrigger.save();
             return true;
         } catch (e) {
-            logger.error("Error while deleting trigger: ", e);
-            return false;
+            ModelHelper.handleMongooseSavingErrors(e, "A trigger with the same name already exists");
         }
+        return false;
     }
 
+    /**
+     * Finds all the triggers provided by a service.
+     * @param serviceId the id of the service
      */
+    static async findAllForService(serviceId: string): Promise<ITrigger[] | null> {
+        try {
+            return Trigger.triggerModel.find({ serviceId });
+        } catch (e) {
+            logger.error("Error while retrieving service: ", e);
+        }
+        return null;
+    }
+
+    /**
+     * Deletes a trigger from the DB.
+     * @param triggerId the id of the trigger
+     */
+    static async delete(triggerId: string) {
+        try {
+            const res = await Trigger.triggerModel.deleteOne({ _id: triggerId });
+            return res.deletedCount == 1;
+        } catch (e) {
+            logger.error("Error while deleting trigger: ", e);
+        }
+        return false;
+    }
+
+    /**
+     * Checks if a user is the creator of a trigger.
+     * @param userId the id of the user
+     * @param triggerId the id of the trigger
+     */
+    static async isCreator(userId: string, triggerId: string) {
+        try {
+            const res = await Trigger.triggerModel.findById(triggerId);
+            if (res != null) {
+                return Service.isCreator(userId, res.serviceId.toString());
+            }
+        } catch (e) {
+            logger.error("Error while verifying action ownership: ", e);
+        }
+        return false;
+    }
 }

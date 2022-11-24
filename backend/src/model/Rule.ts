@@ -1,5 +1,6 @@
 import { model, Schema, Types } from "mongoose";
 import logger from "../helper/logger";
+import ModelHelper from "../helper/model";
 
 export interface IRule {
     _id: string;
@@ -8,8 +9,6 @@ export interface IRule {
     actionId: Types.ObjectId;
     isAuthorized: boolean;
 }
-
-// TODO: Understand how to make <triggerId, actionId> unique key
 
 const ruleSchema = new Schema<IRule>({
     userId: {
@@ -29,26 +28,37 @@ const ruleSchema = new Schema<IRule>({
         required: true
     }
 });
+// Build an unique index on tuple <userId, triggerId, actionId> to prevent duplicates
+ruleSchema.index({ userId: 1, triggerId: 1, actionId: 1 }, { unique: true });
 
 export default class Rule {
 
     private static ruleModel = model<IRule>("Rule", ruleSchema);
 
-    static async findByUserId(userId: string): Promise<IRule[]|undefined>{
+    /**
+     * Finds all rules created by a user.
+     * @param userId the id of the user
+     */
+    static async findAllForUser(userId: string): Promise<IRule[] | null>{
         try {
-            console.log(userId);
             return await Rule.ruleModel.find({ userId: userId });
         } catch (e) {
             logger.error("Error finding rules by id", e);
-            return undefined;
         }
+        return null;
     }
 
-    static async insertNewRule(userId: Types.ObjectId, triggerId: Types.ObjectId, actionId: Types.ObjectId): Promise<boolean>{
+    /**
+     * Inserts a new rule into the DB.
+     * @param userId the id of the user
+     * @param triggerId the id of the trigger
+     * @param actionId the id of the action
+     */
+    static async insert(userId: string, triggerId: string, actionId: string): Promise<boolean>{
         const rule = new Rule.ruleModel({
-            userId: userId,
-            triggerId: triggerId,
-            actionId: actionId,
+            userId,
+            triggerId,
+            actionId,
             // Draft
             isAuthorized: false
         });
@@ -56,20 +66,37 @@ export default class Rule {
             await rule.save();
             return true;
         } catch (e) {
-            console.log(e);
-            return false;
+            ModelHelper.handleMongooseSavingErrors(e, "This rule already exists");
         }
+        return false;
     }
 
+    /**
+     * Deletes a rule from the DB.
+     * @param ruleId the id of the rule
+     */
     static async deleteRule(ruleId: string): Promise<boolean> {
         try{
-            await Rule.ruleModel.findByIdAndDelete(ruleId);
-            return true;
+            const res = await Rule.ruleModel.deleteOne({ _id: ruleId });
+            return res.deletedCount == 1;
         } catch (e) {
-            logger.error("Error deleting a rule:", e);
-            return false;
+            logger.error("Error while deleting a rule:", e);
         }
+        return false;
     }
 
-
+    /**
+     * Checks if a user is the creator of a rule.
+     * @param userId the id of the user
+     * @param ruleId the rule of the user
+     */
+    static async isCreator(userId: string, ruleId: string) {
+        try {
+            const res = await Rule.ruleModel.findOne({ _id: ruleId, creator: userId });
+            return res != null;
+        } catch (e) {
+            logger.error("Error while verifying rule ownership: ", e);
+        }
+        return false;
+    }
 }

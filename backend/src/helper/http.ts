@@ -25,10 +25,10 @@ export class APIResponse {
 }
 
 /**
- * Checks if the specified parameters are undefined
+ * Checks if the specified parameters are undefined. Sends 400 BAD REQUEST response if so.
  * @param response the provided response
  * @param params the parameters to checjk
- * @returns true if one of the parameters is undefined. False otherwise
+ * @returns true if one of the parameters is undefined, false otherwise
  */
 
 export function checkUndefinedParams(response: Response, ...params: (string | undefined)[]): boolean {

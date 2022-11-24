@@ -1,7 +1,6 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
-import {  internalServerError, success } from "../../helper/http";
-import Service from "../../model/Service";
+import { success } from "../../helper/http";
 
 
 export default class ServicesRoute extends Route {
@@ -10,6 +9,11 @@ export default class ServicesRoute extends Route {
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
+        // TODO: Rewrite this so that it returns a list of services where it is added if the user has authorized it or not
+
+        success(response, {}, "Not implemented");
+
+        // We don't really need to worry about pagination now, if we want to implement it, we will do it later with a plugin
         /*
         const itemsPerPageS = request.query.items;
         const pageS = request.query.page;

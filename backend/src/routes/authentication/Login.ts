@@ -1,10 +1,9 @@
 import { compareSync } from "bcrypt";
-import User, { IUser } from "../../model/User";
+import User from "../../model/User";
 import Authentication from "../../helper/authentication";
 import { badRequest, internalServerError, success } from "../../helper/http";
 import Route from "../../Route";
-import { CookieOptions, Request, Response } from "express";
-import env from "../../helper/env";
+import { Request, Response } from "express";
 import { checkUndefinedParams } from "../../helper/http";
 
 export default class LoginRoute extends Route {

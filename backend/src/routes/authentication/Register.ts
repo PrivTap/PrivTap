@@ -8,7 +8,7 @@ import { hashSync } from "bcrypt";
 import { randomBytes } from "crypto";
 import env from "../../helper/env";
 import logger from "../../helper/logger";
-import ModelError from "../../model/ModelError";
+import { ModelError } from "../../helper/model";
 
 export default class RegisterRoute extends Route {
     constructor() {
