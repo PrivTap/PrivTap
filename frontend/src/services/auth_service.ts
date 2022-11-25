@@ -1,6 +1,5 @@
 import axiosCatch from "@/helpers/axios_catch";
 import type { UserModel } from "@/model/user_model";
-import type { AxiosError } from "axios";
 import AxiosService from "../helpers/axios_service";
 import type { StandartRepsonse } from "../model/response_model";
 

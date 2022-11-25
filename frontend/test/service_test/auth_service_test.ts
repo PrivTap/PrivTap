@@ -1,10 +1,7 @@
 import {
-  afterEach,
   beforeAll,
-  beforeEach,
   describe,
   expect,
-  it,
   test,
 } from "vitest";
 import IAuthService from "../../src/services/auth_service";
@@ -67,71 +64,52 @@ describe("Auth Service Tests", () => {
   });
 
   test("Should success with correct username, email and password", async () => {
-    authServiceStub.register.resolves({ status: true, message: "" });
+    authServiceStub.register.resolves(true);
     const res = await authServiceStub.register(
       "username",
       "email@email.it",
       "passwordlong"
     );
-    expect(res.status).to.true;
-    expect(res.message).to.empty;
-    expect(res.data).to.be.undefined;
+    expect(res).to.true;
   });
 
   test("Should fail with low username length", async () => {
-    authServiceStub.register.resolves({
-      status: false,
-      message: "Some effor text",
-    });
+    authServiceStub.register.resolves(false);
     const res = await authServiceStub.register(
       "u",
       "email@email.it",
       "passwordlong"
     );
-    expect(res.status).to.false;
-    expect(res.message).to.not.empty;
-    expect(res.data).to.be.undefined;
+    expect(res).to.false;
   });
 
   test("Should fail with not a Email format", async () => {
-    authServiceStub.register.resolves({
-      status: false,
-      message: "Some effor text",
-    });
-    const res = await authServiceStub.register("username", "email", "passwordlong");
-    expect(res.status).to.false;
-    expect(res.message).to.not.empty;
-    expect(res.data).to.be.undefined;
+    authServiceStub.register.resolves(false);
+    const res = await authServiceStub.register("username", "wrongemail", "passwordlong");
+    expect(res).to.false;
   });
 
   test("Should fail with not a low password length", async () => {
-    authServiceStub.register.resolves( {
-      status: false,
-      message: "Some effor text",
-    });
+    authServiceStub.register.resolves(false);
     const res = await authServiceStub.register("username", "email@emal.it", "lowpsw");
-    expect(res.status).to.false;
-    expect(res.message).to.not.empty;
-    expect(res.data).to.be.undefined;
+    expect(res).to.false;
   });
 
   test("Should fail with wrong token", async () => {
-    authServiceStub.activate.resolves({
-      status: false,
-      message: "Some effor text",
-    });
+    authServiceStub.activate.resolves(false);
     const res = await authServiceStub.activate("wrongToken");
-    expect(res.status).to.false;
-    expect(res.message).to.not.empty;
-    expect(res.data).to.be.undefined;
+    expect(res).to.false;
+  });
+  test("Should success with right token", async () => {
+    authServiceStub.activate.resolves(true);
+    const res = await authServiceStub.activate("238y28h9bs829b893");
+    expect(res).toBe(true);
   });
 
-   test("Shoud success if has cookie or token", async () => {
-    authServiceStub.logout.resolves({ status: true, message: "" });
+  test("Shoud success if has cookie or token", async () => {
+    authServiceStub.logout.resolves(true);
     const res = await authServiceStub.logout();
-    expect(res.status).to.true;
-    expect(res.message).to.empty;
-    expect(res.data).to.be.undefined;
+    expect(res).to.true;
   });
 
 });

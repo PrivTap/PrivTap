@@ -19,7 +19,7 @@ export default interface IManageService extends IAxiosService {
     authServer: string,
     clientId: string,
     clientSecret: string): Promise<ServiceModel | null>;
-  deleteService(serviceId: string): Promise<void>;
+  deleteService(serviceId: string): Promise<ServiceModel[] | null>;
   getAllServices(): Promise<ServiceModel[] | null>;
 }
 
@@ -135,14 +135,16 @@ export class ManageService
       return null;
     }
   }
-  async deleteService(serviceId: string): Promise<void> {
+  async deleteService(serviceId: string): Promise<Array<ServiceModel> | null> {
     try {
       const body = { "serviceId": serviceId }
       const res = await this.http.delete(this.path, { data: body });
       this.services.value = this.services.value.filter((service) => service._id !== serviceId);
       useToast().success("Service deleted");
+      return this.services.value;
     } catch (error) {
       axiosCatch(error);
+      return null;
     }
   }
 }

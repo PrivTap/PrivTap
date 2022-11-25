@@ -40,38 +40,36 @@ describe("Manage Service Tests", () => {
 
   /// Test getAllServices
   test("should return a list of defined service", async () => {
-    manageServiceStub.getAllServices.resolves({
-      status: true,
-      message: "",
-      data: [serviceModel],
-    });
+    manageServiceStub.getAllServices.resolves(
+      [serviceModel]
+    );
     const res = await manageServiceStub.getAllServices();
-    expect(res.status).toBe(true);
-    expect(res.message).to.empty;
-    expect(res.data).toBeInstanceOf(Array<ServiceModel>);
+    expect(res).not.toBe(null);
+    expect(res?.length).toBe(1);
+    expect(res).toBeInstanceOf(Array<ServiceModel>);
   });
 
   /// Test deleteService
-  test("should return a list of defined service", async () => {
-    manageServiceStub.deleteService.resolves({
-      status: true,
-      message: "Service deleted correctly",
-    });
+  test("should return a list of service after delete", async () => {
+    manageServiceStub.deleteService.resolves([]);
     const res = await manageServiceStub.deleteService("Test Service id");
-    expect(res.status).toBe(true);
-    expect(res.message).toBe("Service deleted correctly");
+    expect(res).to.empty;
   });
 
   /// Test updateService
-  test("should return a list of defined service", async () => {
-    manageServiceStub.updateService.resolves({
-      status: true,
-      message: "Service updated correctly",
-      data: serviceModel,
-    });
-    const res = await manageServiceStub.updateService(serviceModel);
-    expect(res.status).toBe(true);
-    expect(res.message).toBe("Service updated correctly");
-    expect(res.data).toBeInstanceOf(ServiceModel);
+  test("should return the updated service", async () => {
+    manageServiceStub.updateService.resolves(
+      serviceModel
+    );
+    const res = await manageServiceStub.updateService(
+      "Test Service id",
+      "Test Service Name",
+      "Test Description",
+      "Test Auth Server",
+      "Test Client Id",
+      "Tes Client Sercret",
+    );
+    expect(res).not.toBe(null);
+    expect(res).toBeInstanceOf(ServiceModel);
   });
 });
