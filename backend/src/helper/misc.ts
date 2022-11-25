@@ -39,7 +39,6 @@ export function checkURL(url: string): boolean {
  */
 export async function handleInsert<T>(response: Response, model: Model<T>, document: object) {
     try {
-        console.log(model, document);
         const isInserted = await model.insert(document);
         if(!isInserted) {
             internalServerError(response);
