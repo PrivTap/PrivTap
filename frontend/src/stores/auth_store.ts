@@ -51,7 +51,7 @@ export const useAuthStore = defineStore("auth_store", (): IAuthStoreState => {
     if (!user) return
     setUser(user);
     toast.success("Login Success!");
-    router.push(RoutingPath.HOME);
+    router.replace(RoutingPath.HOME);
   }
 
   async function register(
@@ -64,7 +64,6 @@ export const useAuthStore = defineStore("auth_store", (): IAuthStoreState => {
     toast.success(
       "Registration Success! Please check your email to activate your account."
     );
-    router.push(RoutingPath.HOME);
     return true;
   }
   async function activate(token: String) {
