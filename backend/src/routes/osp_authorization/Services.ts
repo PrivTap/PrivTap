@@ -12,7 +12,7 @@ export default class ServicesRoute extends Route {
     protected async httpGet(request: Request, response: Response): Promise<void> {
         // TODO: Rewrite this so that it returns a list of services where it is added if the user has authorized it or not
 
-        const services = await Service.findAll();
+        const services = await Service.findAll({}, "name description");
 
         if (services)
             success(response, services);

@@ -15,7 +15,7 @@ export default class ManageActionsRoute extends Route {
 
         if (checkUndefinedParams(response, serviceId)) return;
 
-        let actions: IAction[] = [];
+        let actions: Partial<IAction>[] = [];
 
         const res = await Action.findAllForService(serviceId);
         if (res)
