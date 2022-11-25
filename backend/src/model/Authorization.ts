@@ -1,10 +1,12 @@
 import { Schema } from "mongoose";
 import Model from "../Model";
+import logger from "../helper/logger";
+import { IService } from "./Service";
 
 export interface IAuthorization {
     _id: string;
     userId: string;
-    serviceId: string;
+    service: string | Partial<IService>;
     oAuthToken: string;
     grantedPermissions?: string[];
 }
@@ -14,8 +16,9 @@ const authorizationSchema= new Schema({
         type: Schema.Types.ObjectId,
         required: true
     },
-    serviceId: {
+    service: {
         type: Schema.Types.ObjectId,
+        ref: "service",
         required: true
     },
     oAuthToken: {
@@ -24,13 +27,26 @@ const authorizationSchema= new Schema({
     },
     grantedPermissions: [Schema.Types.ObjectId]
 });
-// Build an unique index on tuple <userId, serviceId> to prevent duplicates
-authorizationSchema.index({ userId: 1, serviceId: 1 }, { unique: true });
+// Build an unique index on tuple <userId, service> to prevent duplicates
+authorizationSchema.index({ userId: 1, service: 1 }, { unique: true });
 
 class Authorization extends Model<IAuthorization> {
 
     constructor() {
         super("authorization", authorizationSchema);
+    }
+
+    /**
+     * Finds all the services that have been authorized by a user.
+     * @param userId the id of the user
+     */
+    async findAllServicesAuthorizedByUser(userId: string): Promise<Partial<IAuthorization>[] | null> {
+        try {
+            return await this.model.find({ userId }).select("service").populate("service", "name");
+        } catch (e) {
+            logger.error("Unexpected error while finding services authorized by a user\n", e);
+        }
+        return null;
     }
 
     /**

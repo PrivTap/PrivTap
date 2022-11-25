@@ -32,7 +32,7 @@ export default class ManageServices extends Route {
             }
             data = service;
         } else {
-            const services = await Service.findAllForUser(request.userId);
+            const services = await Service.findAllCreatedByUser(request.userId);
             if (!services) {
                 internalServerError(response);
                 return;

@@ -31,7 +31,7 @@ describe("Testing the Service model class", () => {
 
     it("findAllForUser should return the results of findAll", async () => {
         findAllStub.resolves([{ service: "service" }]);
-        const res = await Service.findAllForUser(userIdExample);
+        const res = await Service.findAllCreatedByUser(userIdExample);
         expect(findAllStub).to.be.calledOnceWith({ creator: userIdExample });
         expect(res).to.be.eql([{ service: "service" }]);
 

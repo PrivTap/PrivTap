@@ -51,7 +51,7 @@ class Service extends Model<IService> {
      * Finds all services that a user has created.
      * @param userId the id of the user
      */
-    async findAllForUser(userId: string): Promise<IService[] | null> {
+    async findAllCreatedByUser(userId: string): Promise<IService[] | null> {
         return await this.findAll({ creator: userId });
     }
 

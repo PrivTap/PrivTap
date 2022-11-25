@@ -63,7 +63,7 @@ export default class Model<T> {
      * @param filter the query to find the document to update
      * @param documentUpdate the document containing the updates
      */
-    async updateWithFilter(filter: FilterQuery<T>, documentUpdate: Partial<T>) {
+    async updateWithFilter(filter: FilterQuery<T>, documentUpdate: Partial<T>): Promise<boolean> {
         try {
             const updateResult = await this.model.updateOne(filter, documentUpdate);
             return updateResult.modifiedCount == 1;
@@ -90,10 +90,14 @@ export default class Model<T> {
     /**
      * Finds a document that matches the query.
      * @param query a key-value pair to be used as a query
+     * @param select a selection string to include/exclude fields from the result (see Mongoose select())
      */
-    async find(query: FilterQuery<T>): Promise<T | null> {
+    async find(query: FilterQuery<T>, select?: string): Promise<T | null> {
         try {
-            return (await this.model.findOne(query)) as T;
+            const findQuery = this.model.findOne(query);
+            if (select)
+                findQuery.select(select);
+            return (await findQuery) as T;
         } catch (e) {
             logger.error(`Unexpected error while querying ${this.name}\n`, e);
         }
@@ -103,10 +107,14 @@ export default class Model<T> {
     /**
      * Finds a document with a matching id.
      * @param id the id of the document to find
+     * @param select a selection string to include/exclude fields from the result (see Mongoose select())
      */
-    async findById(id: string): Promise<T | null> {
+    async findById(id: string, select?: string): Promise<T | null> {
         try {
-            return await this.model.findById(id);
+            const findQuery = this.model.findById(id);
+            if (select)
+                findQuery.select(select);
+            return await findQuery;
         } catch (e) {
             logger.error(`Unexpected error while finding ${this.name}\n`, e);
         }
@@ -131,10 +139,14 @@ export default class Model<T> {
     /**
      * Finds all the documents that match the query.
      * @param query a key-value pair to be used as a query
+     * @param select a selection string to include/exclude fields from the result (see Mongoose select())
      */
-    async findAll(query: FilterQuery<T> = {}): Promise<T[] | null> {
+    async findAll(query: FilterQuery<T> = {}, select?: string): Promise<T[] | null> {
         try {
-            return (await this.model.find(query)) as T[];
+            const findQuery = this.model.find(query);
+            if (select)
+                findQuery.select(select);
+            return (await findQuery) as T[];
         } catch (e) {
             logger.error(`Unexpected error while finding multiple ${this.name}s\n`, e);
         }

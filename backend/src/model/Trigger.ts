@@ -41,8 +41,8 @@ class Trigger extends Model<ITrigger> {
      * Finds all the triggers provided by a service.
      * @param serviceId the id of the service
      */
-    async findAllForService(serviceId: string): Promise<ITrigger[] | null> {
-        return await this.findAll({ serviceId });
+    async findAllForService(serviceId: string): Promise<Partial<ITrigger>[] | null> {
+        return await this.findAll({ serviceId }, "-serviceId");
     }
 
     /**
