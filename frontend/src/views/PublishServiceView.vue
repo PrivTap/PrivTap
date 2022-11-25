@@ -110,6 +110,7 @@ function checkUrl(url: string): boolean {
 
 async function onSubmitted() {
   isLoading.value = true;
+  if(!isValidUrl.value) return;
   if (route.params.id) {
     const serviceId = route.params.id as string;
     console.log("Editing service with id: ", serviceId);
