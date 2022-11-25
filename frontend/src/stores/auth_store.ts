@@ -47,9 +47,9 @@ export const useAuthStore = defineStore("auth_store", (): IAuthStoreState => {
   }
 
   async function login(username: String, password: String) {
-    const res = await _authService.login(username, password);
-    if (!res.status) return toast.error(res.message);
-    setUser(res.data as UserModel);
+    const user = await _authService.login(username, password);
+    if (!user) return
+    setUser(user);
     toast.success("Login Success!");
     router.push(RoutingPath.HOME);
   }
@@ -60,10 +60,7 @@ export const useAuthStore = defineStore("auth_store", (): IAuthStoreState => {
     password: String
   ): Promise<boolean> {
     const res = await _authService.register(username, email, password);
-    if (!res.status) {
-      toast.error(res.message);
-      return false;
-    }
+    if (!res) return res;
     toast.success(
       "Registration Success! Please check your email to activate your account."
     );
@@ -72,10 +69,7 @@ export const useAuthStore = defineStore("auth_store", (): IAuthStoreState => {
   }
   async function activate(token: String) {
     const res = await _authService.activate(token);
-    if (!res.status) {
-      toast.error(res.message);
-      return;
-    }
+    if (!res) return;
     toast.success("Account activated successfully!");
   }
 
