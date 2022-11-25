@@ -11,12 +11,12 @@ export default class ManageTriggersRoute extends Route {
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
-        const parentServiceId = request.body.parentId;
+        const serviceId = request.params.serviceId;
 
-        if (checkUndefinedParams(response, parentServiceId)) return;
+        if (checkUndefinedParams(response, serviceId)) return;
 
         // Insert the trigger
-        const services = await Trigger.findAllForService(parentServiceId);
+        const services = await Trigger.findAllForService(serviceId);
 
         if (services) {
             success(response, services);

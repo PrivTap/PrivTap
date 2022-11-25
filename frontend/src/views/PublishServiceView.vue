@@ -1,5 +1,5 @@
 <template>
-  <div class="text-center pb-20">
+  <div class="text-center h-screen">
     <h1 class="text-5xl text-blue-100 font-medium py-20">
       {{ route.params.id ? "Edit" : "Publish" }} Service
     </h1>
@@ -23,7 +23,7 @@
         <label for="text" class="block mb-2 text-sm font-semibold text-white dark:text-gray-300">Endpoint Url</label>
         <input type="text" id="text"
           class="border-2 border-gray-600 text-white text-md rounded-lg block w-full p-2.5 dark:bg-gray-700 focus:outline-none focus:border-blue-500"
-          placeholder="http://example.com:8080" v-model="newService.authUrl" required />
+          placeholder="http://example.com:8080" v-model="newService.authServer" required />
         <div v-show="!isValidUrl" class="animate-fade-in mt-2">
           <span :class="{
             'text-green-400': isValidUrl,
@@ -36,7 +36,7 @@
         <label type="url" class="block mb-2 text-sm font-semibold text-white dark:text-gray-300">Client ID</label>
         <input type="text" id="text"
           class="border-2 border-gray-600 text-white text-md rounded-lg block w-full p-2.5 dark:bg-gray-700 focus:outline-none focus:border-blue-500"
-          placeholder="..." v-model="newService.clientID" required />
+          placeholder="..." v-model="newService.clientId" required />
       </div>
 
       <div class="mb-6 mx-auto w-96">
@@ -57,17 +57,18 @@ import { onMounted, ref, watch } from "vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
 import { useRoute } from "vue-router";
 import { ManageService } from "@/services/manage_service";
+import router from "@/router/router";
+import RoutingPath from "@/router/routing_path";
 
 const route = useRoute();
 const isValidUrl = ref<boolean>(true);
-
+const isLoading = ref<boolean>(false);
 const manageService = ManageService.getInstance()
-
 let newService = ref({
   name: "",
   description: "",
-  authUrl: "",
-  clientID: "",
+  authServer: "",
+  clientId: "",
   clientSecret: "",
 });
 
@@ -79,8 +80,8 @@ async function checkEdit() {
       newService.value = {
         name: serviceToEdit.name,
         description: serviceToEdit.description,
-        authUrl: serviceToEdit.authServer,
-        clientID: serviceToEdit.clientId,
+        authServer: serviceToEdit.authServer,
+        clientId: serviceToEdit.clientId,
         clientSecret: serviceToEdit.clientSecret,
       };
     }
@@ -92,7 +93,7 @@ onMounted(async () => {
 });
 
 watch(
-  () => newService.value.authUrl,
+  () => newService.value.authServer,
   (newValue) => {
     !newValue.length
       ? (isValidUrl.value = true)
@@ -108,17 +109,31 @@ function checkUrl(url: string): boolean {
 }
 
 async function onSubmitted() {
+  isLoading.value = true;
+  if(!isValidUrl.value) return;
   if (route.params.id) {
-    /// Update service model
-    return;
+    const serviceId = route.params.id as string;
+    console.log("Editing service with id: ", serviceId);
+    await manageService.updateService(
+      serviceId,
+      newService.value.name,
+      newService.value.description,
+      newService.value.authServer,
+      newService.value.clientId,
+      newService.value.clientSecret
+    )
+    isLoading.value = false;
+  }else{
+    await manageService.createService(
+      newService.value.name,
+      newService.value.description,
+      newService.value.authServer,
+      newService.value.clientId,
+      newService.value.clientSecret
+    );
+    isLoading.value = false;
   }
-  // ospServiceStore.postCallService(
-  //   newService.value.name,
-  //   newService.value.description,
-  //   newService.value.authUrl,
-  //   newService.value.clientID,
-  //   newService.value.clientSecret
-  // );
+  return router.replace(RoutingPath.OSP_PERSONAL_PAGE);
 }
 </script>
 

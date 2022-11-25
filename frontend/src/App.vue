@@ -16,7 +16,7 @@ const router = useRouter();
 // if not, redirect to login
 watch(userStore.isAutheticated, (val) => {
   console.log("isAutheticated", val);
-  if (!val) return router.push(RoutingPath.AUTH);
+  if (!val) return router.replace(RoutingPath.AUTH);
 });
 </script>
 

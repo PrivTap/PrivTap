@@ -11,13 +11,13 @@ export default class ManageActionsRoute extends Route {
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
-        const parentServiceId = request.params.parentId;
+        const serviceId = request.params.serviceId;
 
-        if (checkUndefinedParams(response, parentServiceId)) return;
+        if (checkUndefinedParams(response, serviceId)) return;
 
         let actions: IAction[] = [];
 
-        const res = await Action.findAllForService(parentServiceId);
+        const res = await Action.findAllForService(serviceId);
         if (res)
             actions = res;
 
