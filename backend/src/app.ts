@@ -99,14 +99,14 @@ class BackendApp {
         app.use(express.urlencoded({ extended: false }));
         app.use(cookieParser());
 
+        // Host API docs through Swagger UI
+        const swaggerDocument = YAML.load("./openapi.yaml");
+        app.use(this.baseURL + "docs", swaggerUI.serve, swaggerUI.setup(swaggerDocument));
+
         // If we are in a development environment
         if (env.DEV) {
             // Log all requests to console
             app.use(requestLogger("dev"));
-
-            // Host API docs through Swagger UI
-            const swaggerDocument = YAML.load("../openapi.yaml");
-            app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocument));
         }
 
         return app;
