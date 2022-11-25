@@ -1,5 +1,4 @@
-import { expect } from "chai";
-import chai = require("chai");
+import { expect, use } from "chai";
 import "../../src/app";
 import mongoose, { Types, FilterQuery } from "mongoose";
 import Model from "../../src/Model";
@@ -7,8 +6,11 @@ import { beforeEach } from "mocha";
 import { SinonStub } from "sinon";
 import * as sinon from "sinon";
 import logger from "../../src/helper/logger";
+import sinonChai = require("sinon-chai");
+import chaiHttp = require("chai-http");
 
-chai.use(require("sinon-chai"));
+use(chaiHttp);
+use(sinonChai);
 const sandbox = sinon.createSandbox();
 
 describe("Testing the Model class", () => {
@@ -26,7 +28,6 @@ describe("Testing the Model class", () => {
     let model: Model<any>;
     const errorSample = new Error("error");
     let querySample: FilterQuery<any>;
-    //let model2: Model<any>;
     const documentSample = {
         name: "testingSucks"
     };
