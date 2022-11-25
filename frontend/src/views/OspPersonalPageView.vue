@@ -15,7 +15,7 @@
         </h1>
         <img :src=empty class="h-72 ">
       </div>
-      <div v-else class="flex flex-col justify-center items-center content-center ">
+      <div v-if="isLoading" class="flex flex-col justify-center items-center content-center ">
         <img :src="logo" class="h-32 my-20 animate-bounce">
       </div>
 
@@ -52,9 +52,7 @@ const services = manageService.services;
 
 onMounted(async () => {
   await manageService.getAllServices();
-  setTimeout(() => {
     isLoading.value = false;
-  }, 4000);
 });
 
 </script>

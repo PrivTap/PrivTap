@@ -8,12 +8,17 @@ export default interface IManageService extends IAxiosService {
   createService(
     name: string,
     description: string,
-    authUrl: string,
+    authServer: string,
     clientId: string,
     clientSecret: string
   ): Promise<ServiceModel | null>;
   getServiceById(serviceId: string): Promise<ServiceModel | null>;
-  updateService(manage: ServiceModel): Promise<ServiceModel | null>;
+  updateService(servciceId: string,
+    name: string,
+    description: string,
+    authServer: string,
+    clientId: string,
+    clientSecret: string): Promise<ServiceModel | null>;
   deleteService(serviceId: string): Promise<void>;
   getAllServices(): Promise<ServiceModel[] | null>;
 }
@@ -49,7 +54,7 @@ export class ManageService
   /**
    * Path to the api
    */
-  path: string = "/manageServices";
+  path: string = "/manage-services";
 
   /**
    *  Services to reference 
@@ -67,21 +72,32 @@ export class ManageService
     }
   }
 
+  async getServiceById(serviceId: string): Promise<ServiceModel | null> {
+    try {
+      const res = await this.http.get(this.path, { params: { serviceId } });
+      return res.data.data[0] as ServiceModel;
+    } catch (error) {
+      axiosCatch(error);
+      return null;
+    }
+  }
+
   async createService(
     name: string,
     description: string,
-    authURL: string,
+    authServer: string,
     clientId: string,
     clientSecret: string
   ): Promise<ServiceModel | null> {
     const body = {
       name: name,
       description: description,
-      authURL: authURL,
+      authServer: authServer,
       clientId: clientId,
       clientSecret: clientSecret,
     };
     try {
+      console.log(body);
       const res = await this.http.post(this.path, body);
       useToast().success("Service created");
       return res.data.data as ServiceModel;
@@ -91,21 +107,27 @@ export class ManageService
     }
   }
 
-  async getServiceById(serviceId: string): Promise<ServiceModel | null> {
-    try {
-      const res = await this.http.get(this.path, { params: { serviceId } });
-      return res.data.data as ServiceModel;
-    } catch (error) {
-      const err = axiosCatch(error);
-      return null;
-    }
-  }
+
 
   async updateService(
-    manage: ServiceModel
+    serviceId: string,
+    name: string,
+    description: string,
+    authServer: string,
+    clientId: string,
+    clientSecret: string
   ): Promise<ServiceModel | null> {
     try {
-      const res = await this.http.put(this.path, manage);
+      const body = {
+        serviceId: serviceId,
+        name: name,
+        description: description,
+        authServer: authServer,
+        clientId: clientId,
+        clientSecret: clientSecret,
+      }
+      console.log(body);
+      const res = await this.http.put(this.path, body);
       useToast().success("Service updated");
       return res.data.data as ServiceModel;
     } catch (error) {
@@ -115,9 +137,9 @@ export class ManageService
   }
   async deleteService(serviceId: string): Promise<void> {
     try {
-      const res = await this.http.delete(this.path, {
-        params: { serviceID: serviceId },
-      });
+      const body = { "serviceId": serviceId }
+      const res = await this.http.delete(this.path, { data: body });
+      this.services.value = this.services.value.filter((service) => service._id !== serviceId);
       useToast().success("Service deleted");
     } catch (error) {
       axiosCatch(error);
