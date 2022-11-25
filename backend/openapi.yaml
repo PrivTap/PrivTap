@@ -267,7 +267,7 @@ paths:
                     serviceName:
                       type: string
                       example: SensorService
-                    serviceID:
+                    serviceId:
                       type: string
                       example: 025ccd4951hld089ba219okl
                     triggers:
@@ -301,7 +301,7 @@ paths:
                     serviceName:
                       type: string
                       example: NotificationService
-                    serviceID:
+                    serviceId:
                       type: string
                       example: 025ccd4951hld089ba219okl
                     actions:
@@ -645,6 +645,31 @@ components:
       name: __session
 
   schemas:
+    Trigger:
+      properties:
+        id:
+          type: string
+          example: 637ccd4951cdf089ba2123be
+        name:
+          type: string
+          example: Sensor detects movement
+        description:
+          type: string
+          example: Fires when a SensorService sensor detects movement
+
+    Action:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 6489ccd4951cdf089ba21288c
+        name:
+          type: string
+          example: Send notification to mobile app
+        description:
+          type: string
+          example: Send a push notification to the NotificationService mobile app
+
     Rule:
       properties:
         id:
