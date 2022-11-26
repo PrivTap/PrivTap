@@ -647,7 +647,7 @@ components:
   schemas:
     Trigger:
       properties:
-        id:
+        _id:
           type: string
           example: 637ccd4951cdf089ba2123be
         name:
@@ -660,7 +660,7 @@ components:
     Action:
       type: object
       properties:
-        id:
+        _id:
           type: string
           example: 6489ccd4951cdf089ba21288c
         name:
