@@ -46,8 +46,8 @@ class Authorization extends Model<IAuthorization> {
         return this.model.aggregate()
             .match({ userId: new Types.ObjectId(userId) })
             .project({ _id: 0, service: 1 })
-            .lookup({ from: "services", localField: "service", foreignField: "_id", as: "service" })
-            .unwind("service")
+            .lookup({ from: "services", localField: "service", foreignField: "_id", as: "service" })    // Left outer join with services (service == _id)
+            .unwind("service")                                                                          // Deconstruct service array
             .addFields({ serviceId: "$service._id", serviceName: "$service.name" })
             .project({ service: 0 })
             .lookup({ from: operation, localField: "serviceId", foreignField: "serviceId", as: operation })
