@@ -36,13 +36,16 @@ export function checkURL(url: string): boolean {
  * @param response the response object to send back the response to the client
  * @param model the model to insert to
  * @param document the document to insert
+ * @return id of the object that has been created
  */
-export async function handleInsert<T>(response: Response, model: Model<T>, document: object) {
+export async function handleInsert<T>(response: Response, model: Model<T>, document: object): Promise<string | null> {
     try {
         const isInserted = await model.insert(document);
-        if(!isInserted) {
+        if (!isInserted) {
             internalServerError(response);
-            return false;
+            return null;
+        } else {
+            return isInserted;
         }
     } catch (e) {
         if (e instanceof ModelSaveError) {
@@ -50,10 +53,8 @@ export async function handleInsert<T>(response: Response, model: Model<T>, docum
         } else {
             internalServerError(response);
         }
-        return false;
+        return null;
     }
-
-    return true;
 }
 
 /**
@@ -66,7 +67,7 @@ export async function handleInsert<T>(response: Response, model: Model<T>, docum
 export async function handleUpdate<T>(response: Response, model: Model<T>, filter: object, update: object) {
     try {
         const isModified = await model.updateWithFilter(filter, update);
-        if(!isModified) {
+        if (!isModified) {
             badRequest(response, "A service with this id does not exist");
             return false;
         }

@@ -136,8 +136,8 @@ export default abstract class Authentication {
         // - SameSite=strict to ensure that it won't be passed to external websites
         const cookieOptions: CookieOptions = {
             expires: new Date(Date.now() + cookieExpires),
-            httpOnly: true,
-            secure: true,
+            httpOnly: false,
+            secure: false,
             // If we are in a development environment we set SameSite=none to ensure that the cookie will be
             // set on the frontend even if it is running on a different port
             sameSite: env.PROD ? "strict" : "none"

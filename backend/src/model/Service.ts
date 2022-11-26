@@ -35,6 +35,9 @@ const serviceSchema = new Schema({
     },
     clientSecret: {
         type: String
+    },
+    triggerNotificationServer: {
+        type: String,
     }
 });
 
