@@ -11,7 +11,7 @@ export default class ManageTriggersRoute extends Route {
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
-        const serviceId = request.params.serviceId;
+        const serviceId = request.query.serviceId as string;
 
         if (checkUndefinedParams(response, serviceId)) return;
 

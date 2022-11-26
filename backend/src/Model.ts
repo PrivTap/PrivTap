@@ -30,16 +30,16 @@ export default class Model<T> {
      * @param document the new document to insert
      * @protected
      */
-    async insert(document: Partial<T>): Promise<boolean> {
+    async insert(document: Partial<T>): Promise<string | null> {
         const newDocumentModel = new this.model(document);
 
         try {
             await newDocumentModel.save();
-            return true;
+            return newDocumentModel._id;
         } catch (e) {
             this.handleMongooseSavingErrors(e);
         }
-        return false;
+        return null;
     }
 
     /**

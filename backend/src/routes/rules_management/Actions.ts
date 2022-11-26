@@ -14,7 +14,7 @@ export default class ActionsRoute extends Route {
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
         // TODO: If we have time implement search https://www.mongodb.com/docs/atlas/atlas-search/query-syntax/#mongodb-pipeline-pipe.-search
-        // const searchQuery = request.params.search;
+        // const searchQuery = request.query.search;
 
         const data: ServiceActions[]  = [];
 
