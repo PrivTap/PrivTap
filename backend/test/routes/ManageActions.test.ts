@@ -36,18 +36,7 @@ describe("/manage-actions endpoint", () => {
         requester.close();
     });
 
-    function stubLogger() {
-        sandbox.stub(Logger, "error").resolves();
-        sandbox.stub(Logger, "info").resolves();
-        sandbox.stub(Logger, "debug").resolves();
-        sandbox.stub(Logger, "warn").resolves();
-        sandbox.stub(Logger, "log").resolves();
-        sandbox.stub(Logger, "trace").resolves();
-        sandbox.stub(Logger, "fatal").resolves();
-    }
-
     beforeEach(() => {
-        stubLogger();
         checkJWTStub = sandbox.stub(Authentication, "checkJWT");
         checkJWTStub.returns({
             userId: "612g281261gu",

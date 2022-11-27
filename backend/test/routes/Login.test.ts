@@ -29,18 +29,7 @@ describe("/login endpoint", () => {
         requester.close();
     });
 
-    function stubLogger() {
-        sandbox.stub(Logger, "error").resolves();
-        sandbox.stub(Logger, "info").resolves();
-        sandbox.stub(Logger, "debug").resolves();
-        sandbox.stub(Logger, "warn").resolves();
-        sandbox.stub(Logger, "log").resolves();
-        sandbox.stub(Logger, "trace").resolves();
-        sandbox.stub(Logger, "fatal").resolves();
-    }
-
     beforeEach(() => {
-        stubLogger();
         queryUserStub = sandbox.stub(User, "findByUsername");
         compareSyncStub = sandbox.stub(bcrypt, "compareSync");
         setAuthenticationCookieStub = sandbox.stub(Authentication, "setAuthenticationCookie");

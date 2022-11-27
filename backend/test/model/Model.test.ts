@@ -35,18 +35,7 @@ describe("Model class", () => {
     };
     const idSample = "id";
 
-    function stubLogger() {
-        sandbox.stub(Logger, "error").resolves();
-        sandbox.stub(Logger, "info").resolves();
-        sandbox.stub(Logger, "debug").resolves();
-        sandbox.stub(Logger, "warn").resolves();
-        sandbox.stub(Logger, "log").resolves();
-        sandbox.stub(Logger, "trace").resolves();
-        sandbox.stub(Logger, "fatal").resolves();
-    }
-
     beforeEach(() => {
-        stubLogger();
         findStub = sandbox.stub(mongoose.Model, "find");
         findOneStub = sandbox.stub(mongoose.Model, "findOne");
         findByIdStub = sandbox.stub(mongoose.Model, "findById");
