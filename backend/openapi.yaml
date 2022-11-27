@@ -192,6 +192,9 @@ paths:
                 actionId:
                   type: string
                   example: 632e6caa2677ffe654ea9672
+              required:
+                - triggerId
+                - actionId
       responses:
         '200':
           description: Successful operation
@@ -216,6 +219,8 @@ paths:
                 ruleId:
                   type: string
                   example: 6377550e2677ffe654ea9672
+              required:
+                - ruleId
       responses:
         '200':
           description: Successful operation
@@ -250,7 +255,7 @@ paths:
       operationId: triggers
       parameters:
         - name: search
-          description: Search query that will restrict the result to only triggers whose name or description matches it
+          description: Search query that will restrict the result to only triggers whose name or description matches it (NOT YET IMPLEMENTED)
           in: query
           schema:
             type: string
@@ -284,7 +289,7 @@ paths:
       operationId: actions
       parameters:
         - name: search
-          description: Search query that will restrict the result to only actions whose name or description matches it
+          description: Search query that will restrict the result to only actions whose name or description matches it (NOT YET IMPLEMENTED)
           in: query
           schema:
             type: string
@@ -367,17 +372,26 @@ paths:
       tags:
         - Services Management
       summary: The OSP requests a list of already defined services
-      description: The OSP can request a list of defined services in order to view, modify or delete them
+      description: The OSP can request a list of defined services in order to view, modify or delete them. It can pass the id of a service in the query string to request only the detail of that specific one
       operationId: get-manage-services
+      parameters:
+        - in: query
+          name : serviceId
+          schema:
+            type: string
+            example: "637e6c0e2677ffe654ea9672"
       responses:
         '200':
           description: successful operation
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Service'
+                oneOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/Service'
+                  - $ref: '#/components/schemas/Service'
+
         '400':
           description: Bad request
         '500':
@@ -393,23 +407,30 @@ paths:
         content:
           application/json:
             schema:
-                type: object
-                properties:
-                  description:
-                    type: string
-                    example: "Some very nice service description"
-                  name:
-                    type: string
-                    example: "someServiceName"
-                  authServer:
-                    type: string
-                    example: "someAuthorizationServerUrl"
-                  clientId:
-                    type: string
-                    example: "someSecretClientId"
-                  clientSecret:
-                    type: string
-                    example: "someVerySecretSecret"
+              type: object
+              additionalProperties: false
+              properties:
+                name:
+                  type: string
+                  example: "someServiceName"
+                description:
+                  type: string
+                  example: "Some very nice service description"
+                authServer:
+                  type: string
+                  example: "someAuthorizationServerUrl"
+                clientId:
+                  type: string
+                  example: "someSecretClientId"
+                clientSecret:
+                  type: string
+                  example: "someVerySecretSecret"
+                triggerNotificationServer:
+                  type: string
+                  example : "someUrlLinkedToANotificationEndpoint"
+              required:
+                - name
+                - description
       responses:
         '200':
           description: successful operation
@@ -431,27 +452,11 @@ paths:
             schema:
               type: object
               properties:
-                schema:
-                  type: object
-                  properties:
-                    description:
-                      type: string
-                      example: "Some very nice new service description"
-                    name:
-                      type: string
-                      example: "someNewServiceName"
-                    creator:
-                      type: string
-                      example: "632e69a12677ffe654ea9672"
-                    authServer:
-                      type: string
-                      example: "someNewAuthorizationServerUrl"
-                    clientId:
-                      type: string
-                      example: "someNewSecretClientId"
-                    clientSecret:
-                      type: string
-                      example: "someNewVerySecretSecret"
+                serviceId :
+                  type : string
+                  example : "someServiceId"
+              required:
+                - serviceId
       responses:
         '200':
           description: successful operation
@@ -471,6 +476,9 @@ paths:
             schema:
               type: object
               properties:
+                serviceId :
+                  type : string
+                  example : "637ccd4951cdf089ba2123be"
                 description:
                   type: string
                   example: "Some very nice new service description"
@@ -486,6 +494,11 @@ paths:
                 clientSecret:
                   type: string
                   example: "someNewVerySecretSecret"
+                triggerNotificationServer:
+                  type : string
+                  example: "http://example.com/notification"
+              required :
+                - serviceId
       responses:
         '200':
           description: successful operation
@@ -503,7 +516,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TriggerData'
+              $ref: '#/components/schemas/Trigger'
       responses:
         '200':
           description: successful operation
@@ -527,15 +540,16 @@ paths:
     get:
       tags:
         - Services Management
-      summary: The OSP requests the set of already specified triggers
-      description: The OSP requests the set of already specified triggers (TODO)
+      summary: The OSP requests the set of already specified triggers.
+      description: The OSP requests the set of already specified triggers. It must pass the serviceId in the queryString
       operationId: get-manage-triggers
       parameters:
-        - name: triggerId
+        - name: serviceId
           in: query
           required: true
           schema:
             type: string
+            example: "637e6c0e2677ffe654ea9672"
 
       responses:
         '200':
@@ -557,7 +571,28 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Trigger'
+              properties:
+                name:
+                  type: string
+                  example: "SomeTriggerName"
+                description:
+                  type: string
+                  example: "SomeTriggerDescription"
+                serviceId:
+                  type: string
+                  example: "637e6c0e2677ffe654ea9672"
+                permissions:
+                  type: array
+                  items:
+                    type: string
+                    example: "permissionId"
+                resourceServer:
+                  type: string
+                  example: "someUrlToGetAResource"
+              required:
+                - name
+                - description
+                - serviceid
       responses:
         '200':
           description: successful operation
@@ -565,19 +600,20 @@ paths:
       tags:
         - Services Management
       summary: The OSP deletes an already defined trigger
-      description: The OSP deletes an already defined trigger (TODO)
+      description: The OSP deletes an already defined trigger
       operationId: delete-manage-triggers
-      parameters:
-        - name: sessionId
-          in: header
-          required: true
-          schema:
-            type: string
-        - name: triggerId
-          in: header
-          required: true
-          schema:
-            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                triggerId:
+                  type: string
+                  example: "SomeTriggerId"
+              required:
+                - triggerId
+
       responses:
         '200':
           description: successful operation
@@ -587,14 +623,15 @@ paths:
       tags:
         - Services Management
       summary: The OSP requests the set of already specified actions
-      description: The OSP requests the set of already specified actions (TODO)
+      description: The OSP requests the set of already specified actions
       operationId: get-manage-actions
       parameters:
-        - name: sessionId
-          in: header
+        - name: serviceId
+          in: query
           required: true
           schema:
             type: string
+            example: "637e6c0e2677ffe654ea9672"
       responses:
         '200':
           description: successful operation
@@ -604,19 +641,41 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Action"
-
     post:
       tags:
         - Services Management
       summary: The OSP defines a new action service
-      description: The OSP defines a new action service (TODO)
+      description: The OSP defines a new action service
       operationId: post-manage-actions
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewAction'
+              properties:
+                name:
+                  type: string
+                  example: "SomeActionName"
+                description:
+                  type: string
+                  example: "SomeActionDescription"
+                serviceId:
+                  type: string
+                  example: "637e6c0e2677ffe654ea9672"
+                permissions:
+                  type: array
+                  items:
+                    type: string
+                    example: "permissionId"
+                endpoint:
+                  type: string
+                  example: "someUrlToPerformAction"
+              required:
+                - name
+                - description
+                - serviceid
+                - endpoint
+
       responses:
         '200':
           description: successful operation
@@ -624,23 +683,27 @@ paths:
       tags:
         - Services Management
       summary: The OSP deletes an already defined action
-      description: The OSP deletes an already defined action (TODO)
+      description: The OSP deletes an already defined action
       operationId: delete-manage-actions
-      parameters:
-        - name: actionId
-          in: cookie
-          required: true
-          schema:
-            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                actionId:
+                  type: string
+                  example: "6489ccd4951cdf089ba21288c"
+              required:
+                - actionId
       responses:
         '200':
           description: successful operation
-
   /permissions:
     get:
       tags:
         - Services Management
-      summary: The OSP requests the permissions defined for a service
+      summary: The OSP requests the permissions defined for a service (TODO-> implement backend)
       description: Returns the permission defined by the OSP for a specific service
       operationId: get-permissions
       parameters:
@@ -661,7 +724,7 @@ paths:
     post:
       tags:
         - Services Management
-      summary: The OSP creates a new permission for a defined service
+      summary: The OSP creates a new permission for a defined service (TODO-> implement backend)
       description: The OSP can create a new permission for a service he already defined
       operationId: post-permissions
       requestBody:
@@ -677,7 +740,7 @@ paths:
     delete:
       tags:
         - Services Management
-      summary: The OSP deletes permission for a defined service
+      summary: The OSP deletes permission for a defined service (TODO-> implement backend)
       description: The OSP can delete a permission for a service he already defined
       operationId: delete-permissions
       requestBody:
@@ -723,41 +786,55 @@ components:
       properties:
         _id:
           type: string
-          example: 637ccd4951cdf089ba2123be
+          example: "637ccd4951cdf089ba2123be"
         name:
           type: string
-          example: Sensor detects movement
+          example: "Sensor detects movement"
+        serviceId:
+          type: string
+          example : "637e6c0e2677ffe654ea9672"
         description:
           type: string
-          example: Fires when a SensorService sensor detects movement
-
+          example: "Fires when a SensorService sensor detects movement"
+        permission:
+          type : array
+          example: "[{Permission1}, {Permission2}]"
+          items:
+            $ref : '#/components/schemas/Permission'
+        resourceServer:
+          type : array
+          example : "http://service.com/resource"
+      required:
+        - name
+        - description
+        - serviceId
     Action:
       type: object
       properties:
         _id:
           type: string
-          example: 6489ccd4951cdf089ba21288c
+          example: "6489ccd4951cdf089ba21288c"
         name:
           type: string
-          example: Send notification to mobile app
+          example: "Send notification to mobile app"
         description:
           type: string
-          example: Send a push notification to the NotificationService mobile app
+          example: "Send a push notification to the NotificationService mobile app"
 
     Rule:
       properties:
         _id:
           type: string
-          example: 637e6c0e2677ffe654ea9672
+          example: "637e6c0e2677ffe654ea9672"
         userId:
           type: string
-          example: 637e11162677ffe654ea9672
+          example: "637e11162677ffe654ea9672"
         triggerId:
           type: string
-          example: 617e6c0e2677ffe659999672
+          example: "617e6c0e2677ffe659999672"
         actionId:
           type: string
-          example: 632e6c0e2677ffe654ea9672
+          example: "632e6c0e2677ffe654ea9672"
         isAuthorized:
           type: boolean
           example: true
@@ -766,51 +843,48 @@ components:
       properties:
         _id:
           type: string
-          example: 637e6c0e2677ffe654ea9672
+          example: "637e6c0e2677ffe654ea9672"
         description:
           type: string
-          example: This service allow you to interact with your dropbox account!
+          example: "This service allow you to interact with your dropbox account!"
         name:
           type: string
           example: Dropbox
         creator:
           type: string
-          example: 632e69a12677ffe654ea9672
+          example: "632e69a12677ffe654ea9672"
         authServer:
           type: string
-          example: http://www.dropbox_auth_server.com
+          example: "http://www.dropbox_auth_server.com"
         clientId:
           type: string
-          example: very_secret_id
+          example: "very_secret_id"
         clientSecret:
           type: string
-          example: very_secret_secret
+          example: "very_secret_secret"
+        triggerNotificationServer:
+          type: string
+          example: "http://example.com/notification"
+      required:
+        - name
+        - description
+        - _id
 
     Permission:
       properties:
         _id:
           type: string
-          example: 637e6c102677ffe654ea9672
+          example: "637e6c102677ffe654ea9672"
         serviceId:
           type: string
-          example: 137e6c0e2611ffe654ea9672
+          example: "137e6c0e2611ffe654ea9672"
         name:
           type: string
-          example: Account information
+          example: "Account information"
         description:
           type: string
-          example: This permission requires your account information data such as username, email and birth date
+          example: "This permission requires your account information data such as username, email and birth date"
         rarObject:
           type: string
           # TODO: Do "\n" or <br> work?
-          example: "{
-         'type': 'account_information',
-         'actions': [
-            'list_accounts',
-            'read_balances',
-            'read_transactions'
-         ],
-         'locations': [
-            'https://google.com/accounts'
-         ]
-      }"
+          example: "{'type':'account_information','actions':['list_accounts','read_balances','read_transactions'],'locations':['https://google.com/accounts']}"

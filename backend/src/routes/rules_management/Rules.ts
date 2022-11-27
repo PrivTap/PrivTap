@@ -23,12 +23,14 @@ export default class RulesRoute extends Route {
         const userId = request.userId;
         const triggerId = request.body.triggerId;
         const actionId = request.body.actionId;
-
+        //TODO CHECK IF TRIGGER AND ACTION ARE EFFECTIVELY COMPATIBLE AND AUTHORIZED
         if (checkUndefinedParams(response, triggerId, actionId)) return;
-
-        if (!await handleInsert(response, Rule, { userId, triggerId, actionId })) return;
-
+        const ruleId = await handleInsert(response, Rule, { userId, triggerId, actionId });
+        if (!ruleId) return;
         success(response);
+        //every time a rule is created then we should notify the service of the trigger by sending to him
+        //triggerId and user Id
+        console.log("Notifying OSP");
     }
 
     protected async httpDelete(request: Request, response: Response): Promise<void> {
@@ -42,7 +44,7 @@ export default class RulesRoute extends Route {
             return;
         }
 
-        if (!await Rule.delete(ruleId)){
+        if (!await Rule.delete(ruleId)) {
             internalServerError(response);
             return;
         }

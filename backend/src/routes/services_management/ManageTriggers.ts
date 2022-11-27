@@ -30,6 +30,7 @@ export default class ManageTriggersRoute extends Route {
         const description = request.body.description;
         const serviceId = request.body.serviceId;
         const permissions = request.body.permissions;
+        const resourceServer = request.body.resourceServer;
 
         if (checkUndefinedParams(response, name, description, serviceId)) return;
 
@@ -40,7 +41,7 @@ export default class ManageTriggersRoute extends Route {
         }
 
         // Insert the trigger
-        if (!await handleInsert(response, Trigger, { name, description, serviceId, permissions })) return;
+        if (!await handleInsert(response, Trigger, { name, description, serviceId, permissions, resourceServer })) return;
 
         success(response);
     }

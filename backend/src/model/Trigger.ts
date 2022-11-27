@@ -28,6 +28,9 @@ const triggerSchema = new Schema({
         required: true
     },
     permissions: [Schema.Types.ObjectId],
+    resourceServer: {
+        type: String
+    },
     data: [String]
 });
 

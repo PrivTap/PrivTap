@@ -67,6 +67,7 @@ export default class ManageServices extends Route {
     }
 
     protected async httpDelete(request: Request, response: Response): Promise<void> {
+        //TODO propagate the delete
         const serviceId = request.body.serviceId;
 
         if (checkUndefinedParams(response, serviceId)) return;
