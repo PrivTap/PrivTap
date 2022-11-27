@@ -7,6 +7,7 @@ import { beforeEach } from "mocha";
 import { SinonStub } from "sinon";
 import * as sinon from "sinon";
 import sinonChai = require("sinon-chai");
+import Logger from "../../src/helper/logger";
 
 use(chaiHttp);
 use(sinonChai);
@@ -20,7 +21,18 @@ describe("Testing the Service model class", () => {
     const userIdExample = "6373d3b31b03840eb0138708";
     const serviceIdExample = "6373d3b31b03840eb0138708";
 
+    function stubLogger() {
+        sandbox.stub(Logger, "error").resolves();
+        sandbox.stub(Logger, "info").resolves();
+        sandbox.stub(Logger, "debug").resolves();
+        sandbox.stub(Logger, "warn").resolves();
+        sandbox.stub(Logger, "log").resolves();
+        sandbox.stub(Logger, "trace").resolves();
+        sandbox.stub(Logger, "fatal").resolves();
+    }
+
     beforeEach(() => {
+        stubLogger();
         findStub = sandbox.stub(Model.prototype, "find");
         findAllStub = sandbox.stub(Model.prototype, "findAll");
     });

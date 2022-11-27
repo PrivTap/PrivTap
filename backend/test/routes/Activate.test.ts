@@ -5,6 +5,8 @@ import sinonChai = require("sinon-chai");
 
 import app from "../../src/app";
 import User from "../../src/model/User";
+import Logger from "../../src/helper/logger";
+import { beforeEach } from "mocha";
 
 use(chaiHttp);
 use(sinonChai);
@@ -25,7 +27,18 @@ describe("/activate endpoint", () => {
         requester.close();
     });
 
+    function stubLogger() {
+        sandbox.stub(Logger, "error").resolves();
+        sandbox.stub(Logger, "info").resolves();
+        sandbox.stub(Logger, "debug").resolves();
+        sandbox.stub(Logger, "warn").resolves();
+        sandbox.stub(Logger, "log").resolves();
+        sandbox.stub(Logger, "trace").resolves();
+        sandbox.stub(Logger, "fatal").resolves();
+    }
+
     beforeEach(() => {
+        stubLogger();
         activateAccountStub = sandbox.stub(User, "activateAccount");
     });
 

@@ -8,6 +8,7 @@ import * as sinon from "sinon";
 import logger from "../../src/helper/logger";
 import sinonChai = require("sinon-chai");
 import chaiHttp = require("chai-http");
+import Logger from "../../src/helper/logger";
 
 use(chaiHttp);
 use(sinonChai);
@@ -23,7 +24,6 @@ describe("Testing the Model class", () => {
     let updateOneStub: SinonStub;
     let saveStub: SinonStub;
     let handleMongooseSavingErrorsStub: SinonStub;
-    let loggerErrorStub: SinonStub;
     let model: Model<any>;
     const errorSample = new Error("error");
     let querySample: FilterQuery<any>;
@@ -32,7 +32,18 @@ describe("Testing the Model class", () => {
     };
     const idSample = "id";
 
+    function stubLogger() {
+        sandbox.stub(Logger, "error").resolves();
+        sandbox.stub(Logger, "info").resolves();
+        sandbox.stub(Logger, "debug").resolves();
+        sandbox.stub(Logger, "warn").resolves();
+        sandbox.stub(Logger, "log").resolves();
+        sandbox.stub(Logger, "trace").resolves();
+        sandbox.stub(Logger, "fatal").resolves();
+    }
+
     beforeEach(() => {
+        stubLogger();
         findStub = sandbox.stub(mongoose.Model, "find");
         findOneStub = sandbox.stub(mongoose.Model, "findOne");
         findByIdStub = sandbox.stub(mongoose.Model, "findById");
@@ -40,7 +51,6 @@ describe("Testing the Model class", () => {
         deleteOneStub = sandbox.stub(mongoose.Model, "deleteOne");
         updateOneStub = sandbox.stub(mongoose.Model, "updateOne");
         saveStub = sandbox.stub(model["model"].prototype, "save");
-        loggerErrorStub = sandbox.stub(logger, "error");
         handleMongooseSavingErrorsStub = sandbox.stub(Model.prototype, <any>"handleMongooseSavingErrors");
     });
 
@@ -126,7 +136,6 @@ describe("Testing the Model class", () => {
 
     it(" delete should return false if the delete from mongoose fail ", async () => {
         //we only need this because we don't want to print the error
-        loggerErrorStub.resolves(true);
         deleteOneStub.throws(errorSample);
         const res = await model.delete(idSample);
         expect(deleteOneStub).to.have.been.calledOnceWith({ _id: idSample });
@@ -141,7 +150,6 @@ describe("Testing the Model class", () => {
 
     it("find should fail what the findOne from mongoose fail", async () => {
         findOneStub.throws(errorSample);
-        loggerErrorStub.resolves();
         const res = await model.find(querySample);
         expect(res).to.be.eql(null);
         expect(findOneStub).to.have.been.calledOnceWith(querySample);
@@ -155,7 +163,6 @@ describe("Testing the Model class", () => {
     });
     it("findById  should fail what the findById from mongoose fail", async () => {
         findByIdStub.throws(errorSample);
-        loggerErrorStub.resolves();
         const res = await model.findById(idSample);
         expect(res).to.be.eql(null);
         expect(findByIdStub).to.have.been.calledOnceWith(idSample);
@@ -168,7 +175,6 @@ describe("Testing the Model class", () => {
     });
     it("findAndUpdate should fail what the findOneAndUpdate from mongoose fail", async () => {
         findOneAndUpdateStub.throws(errorSample);
-        loggerErrorStub.resolves();
         const res = await model.findAndUpdate(querySample, querySample);
         expect(res).to.be.eql(null);
         expect(findOneAndUpdateStub).to.have.been.calledOnceWith(querySample, querySample);
@@ -181,7 +187,6 @@ describe("Testing the Model class", () => {
     });
     it("findAllshould fail what the find from mongoose fail", async () => {
         findStub.throws();
-        loggerErrorStub.resolves();
         const res = await model.findAll();
         expect(res).to.be.eql(null);
         expect(findStub).to.have.been.calledOnceWith();

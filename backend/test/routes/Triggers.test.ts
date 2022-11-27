@@ -5,6 +5,8 @@ import sinonChai = require("sinon-chai");
 import app from "../../src/app";
 import Authentication, { AuthError } from "../../src/helper/authentication";
 import Authorization from "../../src/model/Authorization";
+import Logger from "../../src/helper/logger";
+import { beforeEach } from "mocha";
 
 use(chaiHttp);
 use(sinonChai);
@@ -46,7 +48,18 @@ describe("/triggers endpoint", () => {
         requester.close();
     });
 
+    function stubLogger() {
+        sandbox.stub(Logger, "error").resolves();
+        sandbox.stub(Logger, "info").resolves();
+        sandbox.stub(Logger, "debug").resolves();
+        sandbox.stub(Logger, "warn").resolves();
+        sandbox.stub(Logger, "log").resolves();
+        sandbox.stub(Logger, "trace").resolves();
+        sandbox.stub(Logger, "fatal").resolves();
+    }
+
     beforeEach(() => {
+        stubLogger();
         checkJWTStub = sandbox.stub(Authentication, "checkJWT")
             .returns({ userId: "test_user_id", active: true }); // User authenticated and account is active
         findAllServicesAuthorizedByUserStub = sandbox.stub(Authorization, "findAllServicesAuthorizedByUserWithTriggers")

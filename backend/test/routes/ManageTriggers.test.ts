@@ -7,6 +7,8 @@ import Authentication, { AuthError } from "../../src/helper/authentication";
 import Trigger from "../../src/model/Trigger";
 import mongoose from "mongoose";
 import Service from "../../src/model/Service";
+import Logger from "../../src/helper/logger";
+import { beforeEach } from "mocha";
 
 use(chaiHttp);
 use(sinonChai);
@@ -34,7 +36,18 @@ describe("/manage-triggers endpoint", () => {
         requester.close();
     });
 
+    function stubLogger() {
+        sandbox.stub(Logger, "error").resolves();
+        sandbox.stub(Logger, "info").resolves();
+        sandbox.stub(Logger, "debug").resolves();
+        sandbox.stub(Logger, "warn").resolves();
+        sandbox.stub(Logger, "log").resolves();
+        sandbox.stub(Logger, "trace").resolves();
+        sandbox.stub(Logger, "fatal").resolves();
+    }
+
     beforeEach(() => {
+        stubLogger();
         checkActivationStub = sandbox.stub(Authentication, "checkActivation");
         checkJWTStub = sandbox.stub(Authentication, "checkJWT").returns({
             userId: "someUserId",
