@@ -99,6 +99,4 @@ class Rule extends Model<IRule> {
     }
 }
 
-export default new
-
-Rule();
+export default new Rule();

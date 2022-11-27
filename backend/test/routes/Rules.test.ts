@@ -18,10 +18,10 @@ describe("/rules endpoint", () => {
     let requester: ChaiHttp.Agent;
     let checkActivationStub: SinonStub;
     let checkJWTStub: SinonStub;
-    let findByUserIdStub: SinonStub;
-    let insertNewRuleStub: SinonStub;
-    let deleteRuleStub: SinonStub;
-    let creatorStub: SinonStub;
+    let findAllForUserStub: SinonStub;
+    let insertStub: SinonStub;
+    let deleteStub: SinonStub;
+    let isCreatorStub: SinonStub;
 
     before(() => {
         requester = request(app.express).keepOpen();
@@ -37,10 +37,10 @@ describe("/rules endpoint", () => {
             userId: "someUserId",
             active: true
         });
-        findByUserIdStub = sandbox.stub(Rule, "findAllForUser");
-        insertNewRuleStub = sandbox.stub(Rule, "insert");
-        deleteRuleStub = sandbox.stub(Rule, "delete");
-        creatorStub = sandbox.stub(Rule, "isCreator");
+        findAllForUserStub = sandbox.stub(Rule, "findAllForUser");
+        insertStub = sandbox.stub(Rule, "insert");
+        deleteStub = sandbox.stub(Rule, "delete");
+        isCreatorStub = sandbox.stub(Rule, "isCreator");
     });
 
     afterEach(() => {
@@ -80,7 +80,7 @@ describe("/rules endpoint", () => {
                 "actionId": "someActionId",
                 "isAuthorized": true
             }];
-            findByUserIdStub.resolves(someRule);
+            findAllForUserStub.resolves(someRule);
             const res = await requester.get("/rules");
             expect(res).to.have.status(200);
             expect(res.body.data).to.be.eql(someRule);
@@ -129,7 +129,7 @@ describe("/rules endpoint", () => {
         });
 
         it ("should fail if a server error occurs", async () => {
-            insertNewRuleStub.resolves(false);
+            insertStub.resolves(false);
             const someRule = {
                 "userId": "someUserId",
                 "triggerId": "someTriggerId",
@@ -141,14 +141,14 @@ describe("/rules endpoint", () => {
         });
 
         it ("should succeed if the jwt is valid and no server error occurs", async () => {
-            insertNewRuleStub.resolves(true);
+            insertStub.resolves(true);
             const someRule = {
                 "userId": "someUserId",
                 "triggerId": "someTriggerId",
                 "actionId": "someActionId",
                 "isAuthorized": true
             };
-            findByUserIdStub.resolves(someRule);
+            findAllForUserStub.resolves(someRule);
             const res = await requester.post("/rules").send(someRule);
             expect(res).to.have.status(200);
         });
@@ -161,7 +161,7 @@ describe("/rules endpoint", () => {
                 userId: "someUserId",
                 active: false
             });
-            creatorStub.resolves(true);
+            isCreatorStub.resolves(true);
             const res = await requester.post("/rules");
             expect(res).to.have.status(403);
         });
@@ -171,7 +171,7 @@ describe("/rules endpoint", () => {
             const someRuleId = {
                 "ruleId" : "someRuleId"
             };
-            creatorStub.resolves(true);
+            isCreatorStub.resolves(true);
             const res = await requester.delete("/rules").send(someRuleId);
             expect(res).to.have.status(500); // Unauthorized
         });
@@ -181,7 +181,7 @@ describe("/rules endpoint", () => {
             const someRuleId = {
                 "ruleId" : "someRuleId"
             };
-            creatorStub.resolves(true);
+            isCreatorStub.resolves(true);
             const res = await requester.delete("/rules").send(someRuleId);
             expect(res).to.have.status(401); // Unauthorized
         });
@@ -192,8 +192,8 @@ describe("/rules endpoint", () => {
         });
 
         it ("should fail if the jwt is valid but the rule has not been created by that specific user", async () => {
-            creatorStub.resolves(false);
-            deleteRuleStub.throws();
+            isCreatorStub.resolves(false);
+            deleteStub.throws();
             const someRuleId = {
                 "ruleId" : "someRuleId"
             };
@@ -202,8 +202,8 @@ describe("/rules endpoint", () => {
         });
 
         it ("should fail if a server error occurs", async () => {
-            deleteRuleStub.resolves(false);
-            creatorStub.resolves(true);
+            deleteStub.resolves(false);
+            isCreatorStub.resolves(true);
             const someRuleId = {
                 "ruleId" : "someRuleId"
             };
@@ -212,8 +212,8 @@ describe("/rules endpoint", () => {
         });
 
         it ("should succeed if the jwt is valid, is associated to the rule creator and no server error occurs", async () => {
-            deleteRuleStub.resolves(true);
-            creatorStub.resolves(true);
+            deleteStub.resolves(true);
+            isCreatorStub.resolves(true);
             const someRuleId = {
                 "ruleId": "someRuleId"
             };

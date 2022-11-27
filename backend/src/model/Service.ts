@@ -3,8 +3,8 @@ import Model from "../Model";
 
 export interface IService {
     _id: string;
-    description: string;
     name: string;
+    description: string;
     creator: string;
     authServer: string;
     clientId: string;
@@ -13,16 +13,16 @@ export interface IService {
 }
 
 const serviceSchema = new Schema({
-    description: {
-        type: String,
-        required: true,
-    },
     name: {
         type: String,
         required: true,
         index: {
             unique: true
         }
+    },
+    description: {
+        type: String,
+        required: true,
     },
     creator: {
         type: Schema.Types.ObjectId,
