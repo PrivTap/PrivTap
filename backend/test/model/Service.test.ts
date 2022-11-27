@@ -14,7 +14,7 @@ use(sinonChai);
 
 const sandbox = sinon.createSandbox();
 
-describe("Testing the Service model class", () => {
+describe("Service model class", () => {
 
     let findAllStub: SinonStub;
     let findStub: SinonStub;

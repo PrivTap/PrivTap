@@ -1,14 +1,13 @@
 import { Schema, Types } from "mongoose";
 import Model from "../Model";
 import logger from "../helper/logger";
-import { IService } from "./Service";
 import { IAction } from "./Action";
 import { ITrigger } from "./Trigger";
 
 export interface IAuthorization {
     _id: string;
     userId: string;
-    service: string | Partial<IService>;
+    service: string;
     oAuthToken: string;
     grantedPermissions?: string[];
 }
@@ -37,22 +36,37 @@ export type ServiceTriggers = { serviceName: string, serviceId: string, triggers
 
 class Authorization extends Model<IAuthorization> {
 
-    private serviceAuthorizedByWith = (userId: string, operation: "actions" | "triggers") => {
+    /**
+     * Builds an aggregation query that finds all the operations for all services authorized by a user.
+     * @param userId the id of the user
+     * @param operation the operation type, can be either 'actions' or 'triggers'
+     */
+    private serviceAuthorizedByWith(userId: string, operation: "actions" | "triggers") {
+        // Create dynamically a projection to remove all non-necessary information from operations
         const operationProjection: Record<string, number> = {};
         for (const key of [`${operation}.endpoint`, `${operation}.serviceId`, `${operation}.__v`, `${operation}.permissions`]) {
             operationProjection[key] = 0;
         }
 
+        // Build the aggregation query
         return this.model.aggregate()
+            // Filter only authorizations given by the user
             .match({ userId: new Types.ObjectId(userId) })
+            // Keep only the field containing the service id
             .project({ _id: 0, service: 1 })
-            .lookup({ from: "services", localField: "service", foreignField: "_id", as: "service" })    // Left outer join with services (service == _id)
-            .unwind("service")                                                                          // Deconstruct service array
+            // Join with services collection on the local service id field (left outer join)
+            .lookup({ from: "services", localField: "service", foreignField: "_id", as: "service" })
+            // Deconstruct the array created by the join to have one document for authorized service
+            .unwind("service")
+            // Set the serviceId and serviceName fields taking data from the service field
             .addFields({ serviceId: "$service._id", serviceName: "$service.name" })
+            // Delete the service field, as it is no longer needed
             .project({ service: 0 })
+            // Join with the operation (triggers or actions) collection on the serviceId field (left outer join)
             .lookup({ from: operation, localField: "serviceId", foreignField: "serviceId", as: operation })
+            // Keep only the necessary fields for each operation
             .project(operationProjection);
-    };
+    }
 
     constructor() {
         super("authorization", authorizationSchema);
@@ -64,7 +78,6 @@ class Authorization extends Model<IAuthorization> {
      */
     async findAllServicesAuthorizedByUserWithActions(userId: string): Promise<ServiceActions[] | null> {
         try {
-            // return await this.model.find({ userId }).select("service").populate("service", "name");
             return await this.serviceAuthorizedByWith(userId, "actions");
         } catch (e) {
             logger.error("Unexpected error while finding services authorized by a user with actions\n", e);

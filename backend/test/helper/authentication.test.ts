@@ -8,7 +8,7 @@ import "../../src/app";
 
 const sandbox = sinon.createSandbox();
 
-describe("Testing authentication helper module", () => {
+describe("Authentication helper module", () => {
 
     const testUser = {
         _id: "ARandomId",

@@ -1,7 +1,7 @@
 import { checkURL } from "../../src/helper/misc";
 import { expect } from "chai";
 
-describe("Testing authentication helper module", () => {
+describe("Misc helper module", () => {
 
     it("should correctly verify a correct URL", () => {
         expect(checkURL("https://www.apple.com/something")).to.be.true;

@@ -5,7 +5,6 @@ import Model from "../../src/Model";
 import { beforeEach } from "mocha";
 import { SinonStub } from "sinon";
 import * as sinon from "sinon";
-import logger from "../../src/helper/logger";
 import sinonChai = require("sinon-chai");
 import chaiHttp = require("chai-http");
 import Logger from "../../src/helper/logger";
@@ -14,7 +13,11 @@ use(chaiHttp);
 use(sinonChai);
 const sandbox = sinon.createSandbox();
 
-describe("Testing the Model class", () => {
+interface ITest {
+    name: string
+}
+
+describe("Model class", () => {
 
     let findStub: SinonStub;
     let findOneStub: SinonStub;
@@ -24,11 +27,11 @@ describe("Testing the Model class", () => {
     let updateOneStub: SinonStub;
     let saveStub: SinonStub;
     let handleMongooseSavingErrorsStub: SinonStub;
-    let model: Model<any>;
+    let model: Model<ITest>;
     const errorSample = new Error("error");
-    let querySample: FilterQuery<any>;
+    let querySample: FilterQuery<ITest>;
     const documentSample = {
-        name: "testingSucks"
+        name: "Test Name"
     };
     const idSample = "id";
 
@@ -50,15 +53,15 @@ describe("Testing the Model class", () => {
         findOneAndUpdateStub = sandbox.stub(mongoose.Model, "findOneAndUpdate");
         deleteOneStub = sandbox.stub(mongoose.Model, "deleteOne");
         updateOneStub = sandbox.stub(mongoose.Model, "updateOne");
-        saveStub = sandbox.stub(model["model"].prototype, "save");
-        handleMongooseSavingErrorsStub = sandbox.stub(Model.prototype, <any>"handleMongooseSavingErrors");
+        saveStub = sandbox.stub(mongoose.Model.prototype, "save"); // model["model"].prototype
+        handleMongooseSavingErrorsStub = sandbox.stub(Model.prototype, <never>"handleMongooseSavingErrors");
     });
 
     afterEach(async () => {
         sandbox.restore();
     });
     before(() => {
-        model = new Model<any>("name", new mongoose.Schema<any>());
+        model = new Model<ITest>("name", new mongoose.Schema<ITest>());
     });
 
     it("should return true when the save function work", async () => {
