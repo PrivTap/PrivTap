@@ -1,4 +1,4 @@
-import mongoose, { Schema} from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import Model from "../Model";
 import logger from "../helper/logger";
 
@@ -55,53 +55,50 @@ class Rule extends Model<IRule> {
         const rule = await this.findById(ruleId);
         if (rule == null)
             return false;
-        return rule.userId ==userId;
+        return rule.userId == userId;
     }
 
     /**
-     * Return the url for notification of the trigger service for the rule
+     * Find the url for notification of the trigger service of a rule
      *
      */
-    async getTriggerNotificationCenter(ruleId: string): Promise<string | null> {
-        interface TriggerNotificationCenter {
-            triggerUrl: string;
+    async getTriggerNotificationServer(ruleId: string): Promise<string | null> {
+        interface triggerNotificationServer {
+            triggerNotificationServer: string;
         }
 
         try {
-            const result = await this.model.aggregate([
-                { $match: { _id: new mongoose.Types.ObjectId(ruleId) } },
-                {
-                    //left outer join with collection trigger -> it will create a field trigger (as) with an
-                    //array containing all the document that match the join
-                    $lookup: {
-                        from: "trigger",
-                        localField: "triggerId",
-                        foreignField: "_id",
-                        as: "trigger"
-                    }
-                },//left outer join with collection service
-                {
-                    $lookup: {
-                        from: "service",
-                        localField: "trigger.serviceId",
-                        foreignField: "_id",
-                        as: "service"
-                    }
-                },
+            const result = await this.model.aggregate()
+                .match({ _id: new mongoose.Types.ObjectId(ruleId) })
+                //keep only the triggerId
+                .project({ _id: 0, "triggerId": 1 })
+                //left outer join with collection trigger -> it will create a field trigger (as) with an
+                //array containing all the document that match the join
+                .lookup({ from: "triggers", localField: "triggerId", foreignField: "_id", as: "trigger" })
+                //keep only the serviceId
+                .unwind({ path: "$trigger" })
+                .addFields({ serviceId: "$trigger.serviceId" })
+                .project(({ "triggerId": 0, "trigger": 0 }))
+                //left outer join with collection service
+                .lookup({ from: "services", localField: "serviceId", foreignField: "_id", as: "service" })
+                .unwind({ path: "$service" })
+                .addFields({ triggerNotificationServer: "$service.triggerNotificationServer" })
                 //remove all the field except the trigger Notification center
-                { $project: { _id: 0, "service.triggerNotificationCenter": 1 } }
-                //this way should return an array of documents and in each document there should be only the
-                //triggerNotificationCenter
-            ]) as TriggerNotificationCenter[];
+                .project({ _id: 0, "triggerNotificationServer": 1 }) as triggerNotificationServer[];
+            //this way should return a list of documents and in each document there should be only the
+            //triggerNotificationServer
             if (result.length > 1) {
                 logger.debug("Should only have one element here");
             }
-            return result[0].triggerUrl;
-        } catch (e) {
-            logger.debug("Error while doing the query for trigger url" + e);
+            return result[0].triggerNotificationServer;
+        } catch
+        (e) {
+            logger.debug("Unexpected error while finding the trigger notification url after creating a rule" + e);
             return null;
         }
     }
 }
 
-export default new Rule();
+export default new
+
+Rule();
