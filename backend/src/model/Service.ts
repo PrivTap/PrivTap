@@ -9,6 +9,7 @@ export interface IService {
     authServer: string;
     clientId: string;
     clientSecret: string;
+    triggerNotificationServer: string
 }
 
 const serviceSchema = new Schema({
