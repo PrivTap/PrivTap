@@ -44,7 +44,7 @@ describe("Testing the Service model class", () => {
         expect(findStub).to.have.been.calledOnceWith({ _id: serviceIdExample, creator: userIdExample });
         expect(res).to.be.false;
     });
-    it("isCreatore should return true if find resolves something different from null", async () => {
+    it("isCreator should return true if find resolves something different from null", async () => {
         findStub.resolves("ciao");
         const res = await Service.isCreator(userIdExample, serviceIdExample);
         expect(findStub).to.have.been.calledOnceWith({ _id: serviceIdExample, creator: userIdExample });

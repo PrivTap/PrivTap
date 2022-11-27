@@ -57,8 +57,8 @@ describe("/manage-triggers endpoint", () => {
             checkActivationStub.resolves(true);
             findTriggersStub.resolves([]);
 
-            const res = await requester.get(endpoint).send({
-                parentId: "612g281261gw"
+            const res = await requester.get(endpoint).query({
+                serviceId: "612g281261gw"
             });
             expect(res).to.have.status(200);
             expect(findTriggersStub).to.have.been.calledWith("612g281261gw");

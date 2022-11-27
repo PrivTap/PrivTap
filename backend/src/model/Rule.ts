@@ -1,4 +1,4 @@
-import mongoose, { Schema} from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import Model from "../Model";
 import logger from "../helper/logger";
 

@@ -1,7 +1,7 @@
 import { use, request, expect } from "chai";
-import chaiHttp from "chai-http";
+import chaiHttp = require("chai-http");
 import { createSandbox, SinonStub } from "sinon";
-import sinonChai from "sinon-chai";
+import sinonChai = require("sinon-chai");
 import app from "../../src/app";
 import Authentication from "../../src/helper/authentication";
 

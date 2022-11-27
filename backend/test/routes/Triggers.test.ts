@@ -93,5 +93,3 @@ describe("/triggers endpoint", () => {
 
     });
 });
-
-

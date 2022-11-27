@@ -15,7 +15,6 @@ const sandbox = sinon.createSandbox();
 
 describe("Testing the Model class", () => {
 
-    let existStub: SinonStub;
     let findStub: SinonStub;
     let findOneStub: SinonStub;
     let findByIdStub: SinonStub;
@@ -34,7 +33,6 @@ describe("Testing the Model class", () => {
     const idSample = "id";
 
     beforeEach(() => {
-        existStub = sandbox.stub(mongoose.Model, "exists");
         findStub = sandbox.stub(mongoose.Model, "find");
         findOneStub = sandbox.stub(mongoose.Model, "findOne");
         findByIdStub = sandbox.stub(mongoose.Model, "findById");
@@ -56,7 +54,7 @@ describe("Testing the Model class", () => {
     it("should return true when the save function work", async () => {
         saveStub.resolves();
         const res = await model.insert(documentSample);
-        expect(res).to.be.true;
+        expect(res).to.be.not.null;
     });
 
     it("should return false when the save function fail", async () => {
@@ -64,7 +62,7 @@ describe("Testing the Model class", () => {
         handleMongooseSavingErrorsStub.resolves();
         const res = await model.insert(documentSample);
         expect(handleMongooseSavingErrorsStub).to.have.been.calledOnceWith(errorSample);
-        expect(res).to.be.false;
+        expect(res).to.be.null;
     });
 
     it("Update should return false if the update from mongoose resolve", async () => {
