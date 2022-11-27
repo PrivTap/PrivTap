@@ -4,7 +4,7 @@ import { createSandbox, SinonStub } from "sinon";
 import sinonChai from "sinon-chai";
 import app from "../../src/app";
 import Authentication, { AuthError } from "../../src/helper/authentication";
-import Permission, { IPermission } from "../../src/model/Permission";
+import Permission from "../../src/model/Permission";
 import Service, { IService } from "../../src/model/Service";
 
 use(chaiHttp);
@@ -15,19 +15,24 @@ const sandbox = createSandbox();
 describe("/permissions endpoint", () => {
 
     const exampleServiceId = "637e66b9d579d489c7d8ec65";
-    //const exampleService : IService = {name: "Google Service", description: "A service to interact with google's APIs", creator: "161e66b9d579d489c7d8ec65", };
-    //const examplePermission: IPermission = {name: "Account details permission", description: "Request access to personal account data", serviceId: "637e66b9d579d489c7d8ec65" };
 
-    const exampleService = {} as IService;
-    const examplePermission = {} as IPermission;
-    const exampleDeleteRequest = {};
+    const examplePermission = {
+        permissionId: "aa7f16b9d579d489c7d8ec65",
+        name: "permissionName",
+        description: "permissionDescription",
+        serviceId: "567f16b9d579d489c7d8ec65",
+        rarObject: {}
+    };
+
+    const exampleDeleteRequest = { serviceId: exampleServiceId, permissionId: "6a71f6b9d579d489c7d8ec65" };
 
     let requester: ChaiHttp.Agent;
     let checkActivationStub: SinonStub;
     let checkJWTStub: SinonStub;
-    let findStub: SinonStub;
+    let findByIdStub: SinonStub;
     let isCreatorStub: SinonStub;
     let insertStub: SinonStub;
+    let belongsToServiceStub: SinonStub;
     let deleteStub: SinonStub;
     let updateStub: SinonStub;
 
@@ -45,9 +50,10 @@ describe("/permissions endpoint", () => {
             userId: "someUserId",
             active: true
         });
-        findStub = sandbox.stub(Service, "find").resolves(exampleService);
+        findByIdStub = sandbox.stub(Service, "findById").resolves({} as IService);
         isCreatorStub = sandbox.stub(Service, "isCreator").resolves(true);
         insertStub = sandbox.stub(Permission, "insert").resolves("someNewDocumentId");
+        belongsToServiceStub = sandbox.stub(Permission, "belongsToService").resolves(true);
         deleteStub = sandbox.stub(Permission, "delete").resolves(true);
         updateStub = sandbox.stub(Permission, "update").resolves(true);
     });
@@ -79,19 +85,18 @@ describe("/permissions endpoint", () => {
         });
 
         it ("should fail if the serviceId is not present in the database", async () => {
-            findStub.resolves(null);
+            findByIdStub.resolves(null);
             const res = await requester.get("/permissions").query({ serviceId: exampleServiceId });
             expect(res).to.have.status(400);
         });
 
         it ("should fail if the serviceId has not been created by the user", async () => {
+            isCreatorStub.resolves(false);
             const res = await requester.get("/permissions").query({ serviceId: exampleServiceId });
             expect(res).to.have.status(403);
         });
 
         it ("should succeed if the serviceId is present in the database and the user is the rightful, correctly authenticated, owner", async () => {
-            findStub.resolves([examplePermission]);
-            isCreatorStub.resolves(false);
             const res = await requester.get("/permissions").query({ serviceId: exampleServiceId });
             expect(res).to.have.status(200);
         });
@@ -117,6 +122,12 @@ describe("/permissions endpoint", () => {
 
         it ("should fail if some of the parameters are undefined", async () => {
             const res = await requester.post("/permissions");
+            expect(res).to.have.status(400);
+        });
+
+        it ("should fail if the serviceId is not present in the database", async () => {
+            findByIdStub.resolves(null);
+            const res = await requester.post("/permissions").send(examplePermission);
             expect(res).to.have.status(400);
         });
 
@@ -166,6 +177,13 @@ describe("/permissions endpoint", () => {
             expect(res).to.have.status(403);
         });
 
+        it ("should fail if the specified permission doesn't belong to the right service", async () => {
+            belongsToServiceStub.resolves(false);
+            const res = await requester.delete("/permissions").send(exampleDeleteRequest);
+            expect(res).to.have.status(403);
+        });
+
+
         it ("should fail if an internal error occurs", async () => {
             deleteStub.resolves(false);
             const res = await requester.delete("/permissions").send(exampleDeleteRequest);
@@ -185,7 +203,7 @@ describe("/permissions endpoint", () => {
                 active: false
             });
             checkActivationStub.resolves(false);
-            const res = await requester.put("/permissions/").send(examplePermission);
+            const res = await requester.put("/permissions").send(examplePermission);
             expect(res).to.have.status(403);
         });
 
@@ -202,6 +220,12 @@ describe("/permissions endpoint", () => {
 
         it ("should fail if the user didn't create the specified service", async () => {
             isCreatorStub.resolves(false);
+            const res = await requester.put("/permissions").send(examplePermission);
+            expect(res).to.have.status(403);
+        });
+
+        it ("should fail if the specified permission doesn't belong to the right service", async () => {
+            belongsToServiceStub.resolves(false);
             const res = await requester.put("/permissions").send(examplePermission);
             expect(res).to.have.status(403);
         });

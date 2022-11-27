@@ -1,7 +1,8 @@
-import { Schema } from "mongoose";
+import { Schema, Types } from "mongoose";
 import Model from "../Model";
 
 export interface IPermission {
+    _id: string;
     name: string;
     description: string
     serviceId: string
@@ -19,6 +20,14 @@ const permissionSchema = new Schema({
     description: {
         type: String,
         required: true
+    },
+    serviceId: {
+        type: Types.ObjectId,
+        required: true
+    },
+    rarObject: {
+        type: Object,
+        required: true
     }
 });
 
@@ -35,8 +44,16 @@ export class Permission extends Model<IPermission> {
      * @param userId The OSP Id
      * @param permissionId The service Id
      */
-    async isCreator(userId: string, permissionId: string) {
+    async isCreator(userId: string, permissionId: string): Promise<boolean> {
+        return false;
+    }
 
+    async findByServiceId(serviceId: string): Promise<IPermission[] | null> {
+        return [];
+    }
+
+    async belongsToService(permissionId: string, serviceId: string): Promise<boolean> {
+        return false;
     }
 }
 
