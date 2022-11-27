@@ -8,6 +8,7 @@ export interface ITrigger {
     description: string;
     serviceId: string;
     permissions?: Types.Array<string>;
+    resourceServer?: string;
     data?: Types.Array<string>; // TO DEFINE
 }
 
