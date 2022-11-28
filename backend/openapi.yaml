@@ -799,7 +799,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Permission'
+              type: object
+              properties:
+                permissionId:
+                  type: string
+                  example: 617aac0e2611ffe654ea9a71
+                name:
+                  type: string
+                  example: Account information
+                description:
+                  type: string
+                  example: This permission requires your account information data such as username, email and birth date
+                rarObject:
+                  type: object
+                  example: { 'type': 'account_information','actions': [ 'list_accounts','read_balances','read_transactions' ],'locations': [ 'https://google.com/accounts' ] }
       responses:
         '200':
           description: successful operation
