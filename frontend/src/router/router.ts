@@ -81,6 +81,11 @@ const router = createRouter({
       },
     },
     {
+      path: RoutingPath.SERVICE_PERMISSION_PAGE,
+      name: "servicepermission",
+      component: () => import("../views/OspManagePermissionView.vue"),
+    },
+    {
       path: "/:pathMatch(.*)*",
       name: "not-found",
       redirect: "/home",

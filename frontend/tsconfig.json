@@ -12,6 +12,6 @@
     }
   ],
   "compilerOptions": {
-    "types": [ "pinia-plugin-persist"]
+    "types": [ "pinia-plugin-persist", "element-plus/global"]
   }
 }
