@@ -5,7 +5,6 @@ import sinonChai = require("sinon-chai");
 import app from "../../src/app";
 import Authentication, { AuthError } from "../../src/helper/authentication";
 import Rule from "../../src/model/Rule";
-import Logger from "../../src/helper/logger";
 import { beforeEach } from "mocha";
 
 use(chaiHttp);
@@ -16,7 +15,6 @@ const sandbox = createSandbox();
 describe("/rules endpoint", () => {
 
     let requester: ChaiHttp.Agent;
-    let checkActivationStub: SinonStub;
     let checkJWTStub: SinonStub;
     let findAllForUserStub: SinonStub;
     let insertStub: SinonStub;
@@ -32,7 +30,6 @@ describe("/rules endpoint", () => {
     });
 
     beforeEach(() => {
-        checkActivationStub = sandbox.stub(Authentication, "checkActivation");
         checkJWTStub = sandbox.stub(Authentication, "checkJWT").returns({
             userId: "someUserId",
             active: true
@@ -54,7 +51,6 @@ describe("/rules endpoint", () => {
                 userId: "someUserId",
                 active: false
             });
-            checkActivationStub.resolves(false);
             const res = await requester.get("/rules");
             expect(res).to.have.status(403); // Forbidden
         });

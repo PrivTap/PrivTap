@@ -27,7 +27,6 @@ export default class ManageActionsRoute extends Route {
         }
 
         if(! await Service.findById(serviceId)){
-            console.log("findById error");
             badRequest(response, "This service doesn't exists");
             return;
         }
