@@ -27,7 +27,7 @@ describe("/permissions endpoint", () => {
     const exampleDeleteRequest = { serviceId: exampleServiceId, permissionId: "6a71f6b9d579d489c7d8ec65" };
 
     let requester: ChaiHttp.Agent;
-    let checkActivationStub: SinonStub;
+    // let checkActivationStub: SinonStub;
     let checkJWTStub: SinonStub;
     let findByIdStub: SinonStub;
     let isCreatorStub: SinonStub;
@@ -45,7 +45,7 @@ describe("/permissions endpoint", () => {
     });
 
     beforeEach(() => {
-        checkActivationStub = sandbox.stub(Authentication, "checkActivation").resolves(true);
+        // checkActivationStub = sandbox.stub(Authentication, "checkActivation").resolves(true);
         checkJWTStub = sandbox.stub(Authentication, "checkJWT").returns({
             userId: "someUserId",
             active: true
@@ -68,7 +68,7 @@ describe("/permissions endpoint", () => {
                 userId: "someUserId",
                 active: false
             });
-            checkActivationStub.resolves(false);
+            // checkActivationStub.resolves(false);
             const res = await requester.get("/permissions/").query({ serviceId: exampleServiceId });
             expect(res).to.have.status(403);
         });
@@ -109,7 +109,6 @@ describe("/permissions endpoint", () => {
                 userId: "someUserId",
                 active: false
             });
-            checkActivationStub.resolves(false);
             const res = await requester.post("/permissions/").send(examplePermission);
             expect(res).to.have.status(403);
         });
@@ -155,7 +154,6 @@ describe("/permissions endpoint", () => {
                 userId: "someUserId",
                 active: false
             });
-            checkActivationStub.resolves(false);
             const res = await requester.delete("/permissions/").send(exampleDeleteRequest);
             expect(res).to.have.status(403);
         });
@@ -202,7 +200,6 @@ describe("/permissions endpoint", () => {
                 userId: "someUserId",
                 active: false
             });
-            checkActivationStub.resolves(false);
             const res = await requester.put("/permissions").send(examplePermission);
             expect(res).to.have.status(403);
         });

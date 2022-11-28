@@ -1,9 +1,15 @@
 import { CookieOptions, NextFunction, Request, Response } from "express";
 import { IUser } from "../model/User";
 import { verify, sign, JwtPayload } from "jsonwebtoken";
-import { forbiddenUserError, internalServerError, unauthorizedUserError } from "./http";
+import {
+    badRequest,
+    forbiddenUserError,
+    internalServerError,
+    unauthorizedUserError
+} from "./http";
 import env from "./env";
 import logger from "./logger";
+import Service from "../model/Service";
 
 export class AuthError extends Error {
     constructor(message?: string) {
@@ -12,6 +18,8 @@ export class AuthError extends Error {
 }
 
 export default abstract class Authentication {
+    static readonly API_KEY_HEADER = "privtap-api-key";
+
     /**
      * Middleware function used to check for a valid JWT authentication token in the cookies of a request.
      * Automatically sends back unauthorized response if the token is not valid.
@@ -50,6 +58,35 @@ export default abstract class Authentication {
     static checkActivation(request: Request, response: Response, next: NextFunction) {
         if (!request.userActive) {
             forbiddenUserError(response, "Your account needs to be activated to do this, check your email");
+            return;
+        }
+
+        next();
+    }
+
+    /**
+     * Middleware function used to check if a certain user has a valid API key for a service.
+     * Automatically sends back unauthorized response if it does not.
+     * @param request the HTTP request
+     * @param response the HTTP response
+     * @param next function to call if the API key is valid
+     */
+    static checkAPIKey(request: Request, response: Response, next: NextFunction) {
+        const serviceId = request.body.serviceId || request.query.serviceId;
+        const apiKey = request.headers[Authentication.API_KEY_HEADER];
+
+        if (!(typeof serviceId == "string")) {
+            badRequest(response, "This endpoint needs a serviceId");
+            return;
+        }
+
+        if(!(typeof apiKey == "string")) {
+            badRequest(response, `This endpoint needs the '${Authentication.API_KEY_HEADER}' header`);
+            return;
+        }
+
+        if (!Service.isValidAPIKey(serviceId, apiKey)) {
+            forbiddenUserError(response, "Your API key is not valid");
             return;
         }
 

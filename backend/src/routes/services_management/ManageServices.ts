@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import Route from "../../Route";
 import { badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
 import { checkURL, handleInsert, handleUpdate } from "../../helper/misc";
+import { randomBytes } from "crypto";
 
 
 
@@ -50,17 +51,23 @@ export default class ManageServices extends Route {
         const triggerNotificationServer = request.body.triggerNotificationServer;
 
         if (checkUndefinedParams(response, name, description)) return;
+
         if (authServer != undefined) {
+            // TODO: why is this checked here? We agreed on putting all checks into the model
             if (!checkURL(authServer)) {
                 badRequest(response);
                 return;
             }
         }
+
+        // Generate the service API key
+        const serviceAPIKey = randomBytes(256).toString("hex");
+
         // Insert the service
         if (!await handleInsert(response, Service,
             {
                 name, description, creator: request.userId, authServer, clientId, clientSecret,
-                triggerNotificationServer
+                triggerNotificationServer, apiKey: serviceAPIKey
             })) return;
 
         success(response);

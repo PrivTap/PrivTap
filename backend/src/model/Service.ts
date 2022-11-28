@@ -9,7 +9,8 @@ export interface IService {
     authServer: string;
     clientId: string;
     clientSecret: string;
-    triggerNotificationServer: string
+    triggerNotificationServer: string;
+    apiKey: string;
 }
 
 const serviceSchema = new Schema({
@@ -39,6 +40,10 @@ const serviceSchema = new Schema({
     },
     triggerNotificationServer: {
         type: String,
+    },
+    apiKey: {
+        type: String,
+        required: true
     }
 });
 
@@ -57,6 +62,17 @@ class Service extends Model<IService> {
      */
     async findAllCreatedByUser(userId: string): Promise<IService[] | null> {
         return await this.findAll({ creator: userId });
+    }
+
+    /**
+     * Checks if an API key is valid for a service.
+     * @param serviceId the id of the service
+     * @param apiKey the api key to check
+     */
+    async isValidAPIKey(serviceId: string, apiKey: string): Promise<boolean> {
+        const service = await this.findById(serviceId, "-_id apiKey");
+        // TODO: do we need a timing safe compare here?
+        return service?.apiKey == apiKey;
     }
 
     /**

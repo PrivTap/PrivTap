@@ -835,7 +835,7 @@ components:
           example: Fires when a SensorService sensor detects movement
         permission:
           type : array
-          example: [{Permission1}, {Permission2}]
+          example: "[{Permission1}, {Permission2}]"
           items:
             $ref : '#/components/schemas/Permission'
         resourceServer:

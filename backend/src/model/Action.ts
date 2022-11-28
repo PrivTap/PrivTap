@@ -1,6 +1,7 @@
 import { Schema, Types } from "mongoose";
 import Service from "./Service";
 import Model from "../Model";
+import { OperationDataType } from "../helper/rule_execution";
 
 export interface IAction {
     _id: string;
@@ -8,6 +9,7 @@ export interface IAction {
     description: string;
     serviceId: string;
     endpoint: string;
+    inputs: OperationDataType[];
     permissions?: Types.Array<string>;
 }
 
@@ -30,6 +32,10 @@ const actionSchema = new Schema({
     endpoint: {
         type: String,
         required: true
+    },
+    inputs: {
+        type: [String]
+        // required?
     },
     permissions: [Schema.Types.ObjectId]
 });

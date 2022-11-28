@@ -1,12 +1,14 @@
 import { Schema, Types } from "mongoose";
 import Service from "./Service";
 import Model from "../Model";
+import { OperationDataType } from "../helper/rule_execution";
 
 export interface ITrigger {
     _id: string;
     name: string;
     description: string;
     serviceId: string;
+    outputs: OperationDataType[];
     permissions?: Types.Array<string>;
     resourceServer?: string;
     data?: Types.Array<string>; // TO DEFINE
@@ -27,6 +29,10 @@ const triggerSchema = new Schema({
     serviceId: {
         type: Schema.Types.ObjectId,
         required: true
+    },
+    outputs: {
+        type: [String]
+        // required?
     },
     permissions: [Schema.Types.ObjectId],
     resourceServer: {
