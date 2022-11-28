@@ -47,7 +47,7 @@ export default abstract class Authentication {
      * @param response the HTTP response
      * @param next function to call if the request authentication is valid
      */
-    static checkActivation(request: Request, response: Response, next: NextFunction){
+    static checkActivation(request: Request, response: Response, next: NextFunction) {
         if (!request.userActive) {
             forbiddenUserError(response, "Your account needs to be activated to do this, check your email");
             return;
@@ -136,8 +136,8 @@ export default abstract class Authentication {
         // - SameSite=strict to ensure that it won't be passed to external websites
         const cookieOptions: CookieOptions = {
             expires: new Date(Date.now() + cookieExpires),
-            httpOnly: false,
-            secure: false,
+            httpOnly: true,
+            secure: true,
             // If we are in a development environment we set SameSite=none to ensure that the cookie will be
             // set on the frontend even if it is running on a different port
             sameSite: env.PROD ? "strict" : "none"
