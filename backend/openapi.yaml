@@ -10,11 +10,11 @@ info:
     ```typescript
     {
       // Flag indicating if the request has been executed successfully
-      "status": boolean,
+      status: boolean,
       // Optional message, this is usually used for error messages
-      "message": string,
+      message: string,
       // Optional data, this is usually used in successful requests to return the results
-      "data": object | array
+      data: object | array
     }
     ```
     This external structure will not be represented in this document to avoid clutter:
@@ -24,7 +24,7 @@ info:
     Common errors will not be specified in endpoints description, keep in mind that:
     - endpoints that needs authentication can respond with *401 unauthorized*, if the authentication cookie is not valid
     - all endpoints can respond with *5xx internal server error*, if something unexpected happens on the server
-    - all endpoints can respons with *400 bad request*, if the required parameters/body fields are not present
+    - all endpoints can response with *400 bad request*, if the required parameters/body fields are not present
     
     Only errors specific to the single endpoints will be specified in this document.
   termsOfService: https://privtap.it/terms/
@@ -67,13 +67,13 @@ paths:
               properties:
                 username:
                   type: string
-                  example: "John71"
+                  example: John71
                 email:
                   type: string
-                  example: "Jhon71@gmail.com"
+                  example: Jhon71@gmail.com
                 password:
                   type: string
-                  example: "MyPrivatePassword"
+                  example: MyPrivatePassword
       responses:
         '200':
           description: Successful operation
@@ -99,10 +99,10 @@ paths:
               properties:
                 username:
                   type: string
-                  example: "John71"
+                  example: John71
                 password:
                   type: string
-                  example: "MyPrivatePassword"
+                  example: MyPrivatePassword
       responses:
         '200':
           description: Successful operation
@@ -320,7 +320,7 @@ paths:
         - OSP Authorization
       summary: The end-user request a set of authorization already granted
       description: The end-user request a set of authorization already granted (TODO)
-      operationId: get-service-autorization
+      operationId: get-service-authorization
       parameters:
         - name: serviceId
           in: query
@@ -341,7 +341,7 @@ paths:
         - OSP Authorization
       summary: The end-user grants a new authorization
       description: The end-user grants a new authorization (TODO)
-      operationId: post-service-autorization
+      operationId: post-service-authorization
 
       requestBody:
         required: true
@@ -357,7 +357,7 @@ paths:
         - OSP Authorization
       summary: The end-user deletes all the permissions associated to an OSP
       description: The end-user deletes all the permissions associated to an OSP (TODO)
-      operationId: delete-service-autorization
+      operationId: delete-service-authorization
       parameters:
         - name: serviceId
           in: query
@@ -379,7 +379,7 @@ paths:
           name : serviceId
           schema:
             type: string
-            example: "637e6c0e2677ffe654ea9672"
+            example: 637e6c0e2677ffe654ea9672
       responses:
         '200':
           description: successful operation
@@ -412,22 +412,22 @@ paths:
               properties:
                 name:
                   type: string
-                  example: "someServiceName"
+                  example: Dropbox service
                 description:
                   type: string
-                  example: "Some very nice service description"
+                  example: This service allows the interaction with Dropbox's APIs
                 authServer:
                   type: string
-                  example: "someAuthorizationServerUrl"
+                  example: http://www.dropboxauth.com
                 clientId:
                   type: string
-                  example: "someSecretClientId"
+                  example: very_secret_id
                 clientSecret:
                   type: string
-                  example: "someVerySecretSecret"
+                  example: very_secret_secret
                 triggerNotificationServer:
                   type: string
-                  example : "someUrlLinkedToANotificationEndpoint"
+                  example : http://www.triggerserver.com
               required:
                 - name
                 - description
@@ -454,7 +454,7 @@ paths:
               properties:
                 serviceId :
                   type : string
-                  example : "someServiceId"
+                  example : 637ccd4951cdf089ba2123be
               required:
                 - serviceId
       responses:
@@ -478,25 +478,25 @@ paths:
               properties:
                 serviceId :
                   type : string
-                  example : "637ccd4951cdf089ba2123be"
+                  example : 637ccd4951cdf089ba2123be
                 description:
                   type: string
-                  example: "Some very nice new service description"
+                  example: Some very nice new service description
                 name:
                   type: string
-                  example: "someNewServiceName"
+                  example: someNewServiceName
                 authServer:
                   type: string
-                  example: "someNewAuthorizationServerUrl"
+                  example: someNewAuthorizationServerUrl
                 clientId:
                   type: string
-                  example: "someNewSecretClientId"
+                  example: someNewSecretClientId
                 clientSecret:
                   type: string
-                  example: "someNewVerySecretSecret"
+                  example: someNewVerySecretSecret
                 triggerNotificationServer:
                   type : string
-                  example: "http://example.com/notification"
+                  example: http://example.com/notification
               required :
                 - serviceId
       responses:
@@ -549,7 +549,7 @@ paths:
           required: true
           schema:
             type: string
-            example: "637e6c0e2677ffe654ea9672"
+            example: 637e6c0e2677ffe654ea9672
 
       responses:
         '200':
@@ -574,25 +574,25 @@ paths:
               properties:
                 name:
                   type: string
-                  example: "SomeTriggerName"
+                  example: SomeTriggerName
                 description:
                   type: string
-                  example: "SomeTriggerDescription"
+                  example: SomeTriggerDescription
                 serviceId:
                   type: string
-                  example: "637e6c0e2677ffe654ea9672"
+                  example: 637e6c0e2677ffe654ea9672
                 permissions:
                   type: array
                   items:
                     type: string
-                    example: "permissionId"
+                    example: permissionId
                 resourceServer:
                   type: string
-                  example: "someUrlToGetAResource"
+                  example: someUrlToGetAResource
               required:
                 - name
                 - description
-                - serviceid
+                - serviceId
       responses:
         '200':
           description: successful operation
@@ -610,7 +610,7 @@ paths:
               properties:
                 triggerId:
                   type: string
-                  example: "SomeTriggerId"
+                  example: SomeTriggerId
               required:
                 - triggerId
 
@@ -631,7 +631,7 @@ paths:
           required: true
           schema:
             type: string
-            example: "637e6c0e2677ffe654ea9672"
+            example: 637e6c0e2677ffe654ea9672
       responses:
         '200':
           description: successful operation
@@ -640,7 +640,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Action"
+                  $ref: '#/components/schemas/Action'
     post:
       tags:
         - Services Management
@@ -655,25 +655,25 @@ paths:
               properties:
                 name:
                   type: string
-                  example: "SomeActionName"
+                  example: SomeActionName
                 description:
                   type: string
-                  example: "SomeActionDescription"
+                  example: SomeActionDescription
                 serviceId:
                   type: string
-                  example: "637e6c0e2677ffe654ea9672"
+                  example: 637e6c0e2677ffe654ea9672
                 permissions:
                   type: array
                   items:
                     type: string
-                    example: "permissionId"
+                    example: permissionId
                 endpoint:
                   type: string
-                  example: "someUrlToPerformAction"
+                  example: someUrlToPerformAction
               required:
                 - name
                 - description
-                - serviceid
+                - serviceId
                 - endpoint
 
       responses:
@@ -693,7 +693,7 @@ paths:
               properties:
                 actionId:
                   type: string
-                  example: "6489ccd4951cdf089ba21288c"
+                  example: 6489ccd4951cdf089ba21288c
               required:
                 - actionId
       responses:
@@ -703,7 +703,7 @@ paths:
     get:
       tags:
         - Services Management
-      summary: The OSP requests the permissions defined for a service (TODO-> implement backend)
+      summary: The OSP requests the permissions defined for a service
       description: Returns the permission defined by the OSP for a specific service
       operationId: get-permissions
       parameters:
@@ -720,11 +720,17 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Permission"
+                  $ref: '#/components/schemas/Permission'
+        '400':
+          description: This service doesn't exits, One of the parameters is missing
+        '403':
+          description: You don't have enough privileges to modify this service
+        '500':
+          description: Internal server error
     post:
       tags:
         - Services Management
-      summary: The OSP creates a new permission for a defined service (TODO-> implement backend)
+      summary: The OSP creates a new permission for a defined service
       description: The OSP can create a new permission for a service he already defined
       operationId: post-permissions
       requestBody:
@@ -732,15 +738,34 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Permission'
+              type: object
+              properties:
+                serviceId:
+                  type: string
+                  example: 137e6c0e2611ffe654ea9672
+                name:
+                  type: string
+                  example: Account information
+                description:
+                  type: string
+                  example: This permission requires your account information data such as username, email and birth date
+                rarObject:
+                  type: object
+                  example: { 'type': 'account_information','actions': [ 'list_accounts','read_balances','read_transactions' ],'locations': [ 'https://google.com/accounts' ] }
       responses:
         '200':
           description: successful operation
+        '400':
+          description: This service doesn't exits, One of the parameters is missing
+        '403':
+          description: You don't have enough privileges to modify this service
+        '500':
+          description: Internal server error
 
     delete:
       tags:
         - Services Management
-      summary: The OSP deletes permission for a defined service (TODO-> implement backend)
+      summary: The OSP deletes permission for a defined service
       description: The OSP can delete a permission for a service he already defined
       operationId: delete-permissions
       requestBody:
@@ -752,10 +777,16 @@ paths:
               properties:
                 permissionId:
                   type: string
-                  example: "637e6c102677ffe654ea9672"
+                  example: 637e6c102677ffe654ea9672
       responses:
         '200':
           description: successful operation
+        '400':
+          description: This service doesn't exits, One of the parameters is missing
+        '403':
+          description: You don't have enough privileges to modify this service, You don't have enough privileges to modify this permission
+        '500':
+          description: Internal server error
 
     put:
       tags:
@@ -772,12 +803,18 @@ paths:
       responses:
         '200':
           description: successful operation
+        '400':
+          description: This service doesn't exits, One of the parameters is missing
+        '403':
+          description: You don't have enough privileges to modify this service, You don't have enough privileges to modify this permission
+        '500':
+          description: Internal server error'
 
 components:
   securitySchemes:
     auth:
       type: apiKey
-      description: The cookie that is set after a succesfull call to the /login endpoint
+      description: The cookie that is set after a succesful call to the /login endpoint
       in: cookie
       name: __session
 
@@ -786,24 +823,24 @@ components:
       properties:
         _id:
           type: string
-          example: "637ccd4951cdf089ba2123be"
+          example: 637ccd4951cdf089ba2123be
         name:
           type: string
-          example: "Sensor detects movement"
+          example: Sensor detects movement
         serviceId:
           type: string
-          example : "637e6c0e2677ffe654ea9672"
+          example : 637e6c0e2677ffe654ea9672
         description:
           type: string
-          example: "Fires when a SensorService sensor detects movement"
+          example: Fires when a SensorService sensor detects movement
         permission:
           type : array
-          example: "[{Permission1}, {Permission2}]"
+          example: [{Permission1}, {Permission2}]
           items:
             $ref : '#/components/schemas/Permission'
         resourceServer:
           type : array
-          example : "http://service.com/resource"
+          example : http://service.com/resource
       required:
         - name
         - description
@@ -813,28 +850,28 @@ components:
       properties:
         _id:
           type: string
-          example: "6489ccd4951cdf089ba21288c"
+          example: 6489ccd4951cdf089ba21288c
         name:
           type: string
-          example: "Send notification to mobile app"
+          example: Send notification to mobile app
         description:
           type: string
-          example: "Send a push notification to the NotificationService mobile app"
+          example: Send a push notification to the NotificationService mobile app
 
     Rule:
       properties:
         _id:
           type: string
-          example: "637e6c0e2677ffe654ea9672"
+          example: 637e6c0e2677ffe654ea9672
         userId:
           type: string
-          example: "637e11162677ffe654ea9672"
+          example: 637e11162677ffe654ea9672
         triggerId:
           type: string
-          example: "617e6c0e2677ffe659999672"
+          example: 617e6c0e2677ffe659999672
         actionId:
           type: string
-          example: "632e6c0e2677ffe654ea9672"
+          example: 632e6c0e2677ffe654ea9672
         isAuthorized:
           type: boolean
           example: true
@@ -843,28 +880,28 @@ components:
       properties:
         _id:
           type: string
-          example: "637e6c0e2677ffe654ea9672"
-        description:
-          type: string
-          example: "This service allow you to interact with your dropbox account!"
+          example: 637e6c0e2677ffe654ea9672
         name:
           type: string
           example: Dropbox
+        description:
+          type: string
+          example: This service allow you to interact with your dropbox account!
         creator:
           type: string
-          example: "632e69a12677ffe654ea9672"
+          example: 632e69a12677ffe654ea9672
         authServer:
           type: string
-          example: "http://www.dropbox_auth_server.com"
+          example: http://www.dropbox_auth_server.com
         clientId:
           type: string
-          example: "very_secret_id"
+          example: very_secret_id
         clientSecret:
           type: string
-          example: "very_secret_secret"
+          example: very_secret_secret
         triggerNotificationServer:
           type: string
-          example: "http://example.com/notification"
+          example: http://example.com/notification
       required:
         - name
         - description
@@ -874,17 +911,16 @@ components:
       properties:
         _id:
           type: string
-          example: "637e6c102677ffe654ea9672"
+          example: 637e6c102677ffe654ea9672
         serviceId:
           type: string
-          example: "137e6c0e2611ffe654ea9672"
+          example: 137e6c0e2611ffe654ea9672
         name:
           type: string
-          example: "Account information"
+          example: Account information
         description:
           type: string
-          example: "This permission requires your account information data such as username, email and birth date"
+          example: This permission requires your account information data such as username, email and birth date
         rarObject:
-          type: string
-          # TODO: Do "\n" or <br> work?
-          example: "{'type':'account_information','actions':['list_accounts','read_balances','read_transactions'],'locations':['https://google.com/accounts']}"
+          type: object
+          example: {'type':'account_information','actions':['list_accounts','read_balances','read_transactions'],'locations':['https://google.com/accounts']}
