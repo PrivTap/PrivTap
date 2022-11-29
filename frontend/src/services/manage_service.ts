@@ -1,10 +1,11 @@
 import axiosCatch from "@/helpers/axios_catch";
+import { http } from "@/helpers/axios_service";
 import type ServiceModel from "@/model/service_model";
+import type { AxiosInstance } from "axios";
 import { ref } from "vue";
 import { useToast } from "vue-toastification";
-import IAxiosService from "../helpers/axios_service";
 
-export default interface IManageService extends IAxiosService {
+export interface IManageService {
   createService(
     name: string,
     description: string,
@@ -24,7 +25,6 @@ export default interface IManageService extends IAxiosService {
 }
 
 export class ManageService
-  extends IAxiosService
   implements IManageService {
 
   /// Singelton intance
@@ -35,7 +35,7 @@ export class ManageService
    * construction calls with the `new` operator.
    */
   private constructor() {
-    super();
+    this.http = http();
   }
 
   /**
@@ -43,13 +43,19 @@ export class ManageService
   * This implementation let you subclass the Singleton class while keeping
   * just one instance of each subclass around.
   */
-  public static getInstance(): ManageService {
+  static get getInstance(): ManageService {
     if (!ManageService._instance) {
       ManageService._instance = new ManageService();
     }
 
     return ManageService._instance;
   }
+
+
+  /*
+  * Axios instance
+  */
+  http: AxiosInstance;
 
   /**
    * Path to the api
@@ -75,7 +81,7 @@ export class ManageService
   async getServiceById(serviceId: string): Promise<ServiceModel | null> {
     try {
       const res = await this.http.get(this.path, { params: { serviceId } });
-      return res.data.data[0] as ServiceModel;
+      return res.data.data as ServiceModel;
     } catch (error) {
       axiosCatch(error);
       return null;
@@ -97,7 +103,6 @@ export class ManageService
       clientSecret: clientSecret,
     };
     try {
-      console.log(body);
       const res = await this.http.post(this.path, body);
       useToast().success("Service created");
       return res.data.data as ServiceModel;
@@ -126,7 +131,6 @@ export class ManageService
         clientId: clientId,
         clientSecret: clientSecret,
       }
-      console.log(body);
       const res = await this.http.put(this.path, body);
       useToast().success("Service updated");
       return res.data.data as ServiceModel;

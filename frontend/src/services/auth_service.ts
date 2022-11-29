@@ -1,6 +1,7 @@
 import axiosCatch from "@/helpers/axios_catch";
+import { http } from "@/helpers/axios_service";
 import type { UserModel } from "@/model/user_model";
-import AxiosService from "../helpers/axios_service";
+import type { AxiosInstance } from "axios";
 import type { StandartRepsonse } from "../model/response_model";
 
 interface IAuthService {
@@ -14,9 +15,11 @@ interface IAuthService {
   ): Promise<boolean>;
 }
 
-export default class AuthService extends AxiosService implements IAuthService {
+export default class AuthService implements IAuthService {
+  http: AxiosInstance;
+
   constructor() {
-    super();
+    this.http = http();
   }
 
   async register(
@@ -61,6 +64,7 @@ export default class AuthService extends AxiosService implements IAuthService {
   async logout(): Promise<boolean> {
     try {
       const res = await this.http.get<StandartRepsonse<Object>>("/logout");
+      console.log(res, "logout\n\n");
       if (res.data.status) return true
       return false;
     } catch (error) {

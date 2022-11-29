@@ -48,7 +48,7 @@ const router = createRouter({
       },
     },
     {
-      path: "/publishservice/:id?",
+      path: `${RoutingPath.PUBLISH_SERVICE_PAGE}/:id?`,
       name: "publishservice",
       component: () => import("../views/PublishServiceView.vue"),
       meta: {
@@ -76,6 +76,14 @@ const router = createRouter({
       path: RoutingPath.MODIFY_AUTH_PAGE,
       name: "modifyauth",
       component: () => import("../views/ModifyAuth.vue"),
+      meta: {
+        requireAuth: true,
+      },
+    },
+    {
+      path: `${RoutingPath.SERVICE_PERMISSION_PAGE}/:id?`,
+      name: "servicepermission",
+      component: () => import("../views/OspManagePermissionView.vue"),
       meta: {
         requireAuth: true,
       },
