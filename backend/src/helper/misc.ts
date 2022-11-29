@@ -32,6 +32,22 @@ export function checkURL(url: string): boolean {
 }
 
 /**
+ * Recursively replaces all resource URLs with new URLs corresponding to DB items
+ * @param object The object where URLs need to be replaced
+ */
+export function replaceResourceURLs<K extends string>(object: Record<K, unknown>) {
+    for (const key in object) {
+        if ((typeof object[key]) === "object" && object[key] != null && object[key] != undefined) {
+            replaceResourceURLs(object[key] as Record<K, unknown>);
+        } else {
+            if ((typeof object[key]) == "string" && checkURL(object[key] as string)) {
+                object[key] = "INSERT_NEW_URL_HERE";
+            }
+        }
+    }
+}
+
+/**
  * Handles an insertion from a route to a model. If an error occurs send back the associated response to the client.
  * @param response the response object to send back the response to the client
  * @param model the model to insert to
