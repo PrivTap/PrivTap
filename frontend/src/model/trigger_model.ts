@@ -1,18 +1,19 @@
 import type { List } from "postcss/lib/list";
+import type PermissionModel from "./permission_model";
 
 export default class TriggerModel {
     _id: string;
     name: string;
     serviceId: string;
     description: string;
-    premission: string[];
-    
+    premission: PermissionModel[];
+
     constructor(
         triggerId: string,
         name: string,
         serviceId: string,
         description: string,
-        premission: string[],
+        premission: PermissionModel[],
 
     ) {
 
@@ -22,4 +23,4 @@ export default class TriggerModel {
         this.serviceId = serviceId;
         this.premission = premission;
     }
-  }
+}

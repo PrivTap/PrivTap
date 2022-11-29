@@ -115,11 +115,6 @@ const resetForm = (formEl: FormInstance | undefined) => {
     formEl.resetFields()
 }
 
-const options = Array.from({ length: 10000 }).map((_, idx) => ({
-    value: `${idx + 1}`,
-    label: `${idx + 1}`,
-}))
-
 const actionInput = ref('')
 const dynamicActions = ref<string[]>(ruleForm.actions);
 const actionInputVisible = ref(false)

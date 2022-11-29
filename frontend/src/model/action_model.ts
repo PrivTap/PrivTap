@@ -4,7 +4,7 @@ export default class ActionModel {
     description: string;
     serviceName: string;
     serviceId: string;
-  
+
     constructor(
         actionId: string,
         name: string,
@@ -16,6 +16,6 @@ export default class ActionModel {
         this.name = name;
         this.description = description;
         this.serviceName = serviceName;
-        this.serviceId =serviceId;
+        this.serviceId = serviceId;
     }
-  }
+}
