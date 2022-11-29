@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import Model from "../Model";
 import axios from "axios";
-import { GridFsStorage } from "multer-gridfs-storage";
+
 
 
 /*const storage = new GridFsStorage({
@@ -62,8 +62,7 @@ class dataRuleExecution extends Model<IDataRuleExecution> {
         const writeStream = gridFsBucket.openUploadStream("file_" + Date.now(), { contentType: response.data.contentType });
         response.data.pipe(writeStream);
         const fileId = writeStream.id.toString();
-        const dataId= await this.insert({ apiKey, fileId });
-        return dataId;
+        return await this.insert({ apiKey, fileId });
     }
 }
 

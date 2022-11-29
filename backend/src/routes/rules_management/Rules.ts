@@ -5,6 +5,7 @@ import Rule from "../../model/Rule";
 import { deleteHttp, getHttp, handleInsert } from "../../helper/misc";
 import Authorization from "../../model/Authorization";
 import logger from "../../helper/logger";
+import Trigger from "../../model/Trigger";
 
 export default class RulesRoute extends Route {
     constructor() {
@@ -33,13 +34,13 @@ export default class RulesRoute extends Route {
         success(response);
         //every time a rule is created then we should notify the service of the trigger by sending to him
         //triggerId and user Id
-        const triggerService = await Rule.getTriggerServiceNotificationServer(ruleId);
-
+        const triggerService = await Trigger.getTriggerServiceNotificationServer(triggerId);
         if (triggerService != null) {
-            const token = await Authorization.findToken(userId, triggerService.serviceId);
+            const token = triggerService.serviceId != undefined ? await Authorization.findToken(userId, triggerService.serviceId) : null;
             if (token != null)
-                //TODO should respond to the user that he can't create this rule because he didn't authorize the service (do this also for action)
-                await getHttp(triggerService.triggerNotificationServer, token);
+                if (triggerService.triggerNotificationServer != undefined)
+                    //TODO should respond to the user that he can't create this rule because he didn't authorize the service (do this also for action)
+                    await getHttp(triggerService.triggerNotificationServer, token, { userId, triggerId });
         } else
             logger.error("Error while");
         return;
@@ -47,7 +48,7 @@ export default class RulesRoute extends Route {
 
     protected async httpDelete(request: Request, response: Response): Promise<void> {
         const ruleId = request.body.ruleId;
-
+        const userId = request.userId;
         if (checkUndefinedParams(response, ruleId)) return;
 
         // Checks if the rule is associated to the user
@@ -55,25 +56,26 @@ export default class RulesRoute extends Route {
             forbiddenUserError(response, "You are not the owner of this rule");
             return;
         }
+        const triggerService = await Rule.getTriggerServiceNotificationServer(ruleId);
 
+        //deleting the rule
         if (!await Rule.delete(ruleId)) {
             internalServerError(response);
             return;
         }
         success(response);
-        //notifying the OSP that he doesn't need to notify us for the trigger anymore
-        const triggerService = await Rule.getTriggerServiceNotificationServer(ruleId);
 
+        //notifying the OSP that he doesn't need to notify us for the trigger anymore
         if (triggerService != null) {
-            const token = await Authorization.findToken(request.userId, triggerService.serviceId);
-            if (token != null)
-                //TODO should respond to the user that he can't create this rule because he didn't authorize the service (do this also for action)
-                await deleteHttp(triggerService.triggerNotificationServer, token);
-            else {
+            const token = triggerService.serviceId != undefined ? await Authorization.findToken(userId, triggerService.serviceId) : null;
+            if (token != null) {
+                const triggerId = triggerService.triggerId;
+                if (triggerService.triggerNotificationServer != undefined)
+                    await deleteHttp(triggerService.triggerNotificationServer, token, { userId, triggerId });
+            } else {
                 //TODO do a generic error when a user doesn't have the token for a service?
             }
-            return;
         }
-
+        return;
     }
 }

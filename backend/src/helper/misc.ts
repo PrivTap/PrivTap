@@ -2,7 +2,7 @@ import { readdirSync, statSync } from "fs";
 import Model, { ModelSaveError } from "../Model";
 import { badRequest, internalServerError } from "./http";
 import { Response } from "express";
-import axios, {AxiosResponse } from "axios";
+import axios, { AxiosResponse } from "axios";
 
 
 /**
