@@ -43,7 +43,7 @@ export class ManageService
   * This implementation let you subclass the Singleton class while keeping
   * just one instance of each subclass around.
   */
-  public static getInstance(): ManageService {
+  static get getInstance(): ManageService {
     if (!ManageService._instance) {
       ManageService._instance = new ManageService();
     }

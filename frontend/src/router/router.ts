@@ -48,7 +48,7 @@ const router = createRouter({
       },
     },
     {
-      path: "/publishservice/:id?",
+      path: `${RoutingPath.PUBLISH_SERVICE_PAGE}/:id?`,
       name: "publishservice",
       component: () => import("../views/PublishServiceView.vue"),
       meta: {
@@ -81,9 +81,12 @@ const router = createRouter({
       },
     },
     {
-      path: RoutingPath.SERVICE_PERMISSION_PAGE,
+      path: `${RoutingPath.SERVICE_PERMISSION_PAGE}/:id?`,
       name: "servicepermission",
       component: () => import("../views/OspManagePermissionView.vue"),
+      meta: {
+        requireAuth: true,
+      },
     },
     {
       path: "/:pathMatch(.*)*",
