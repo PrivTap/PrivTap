@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
 import Service from "../../model/Service";
 import Permission from "../../model/Permission";
+import {handleInsert} from "../../helper/misc";
 
 export default class ManageActionsRoute extends Route {
     constructor() {
@@ -65,11 +66,8 @@ export default class ManageActionsRoute extends Route {
             return;
         }
 
-        const permissionId = await Permission.insert({ name, description, serviceId, rarObject });
-        if (!permissionId){
-            internalServerError(response);
-            return;
-        }
+        const permissionId = await handleInsert(response, Permission, { name, description, serviceId, rarObject });
+        if (!permissionId) return;
 
         success(response);
     }

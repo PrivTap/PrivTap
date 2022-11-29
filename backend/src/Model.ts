@@ -32,7 +32,6 @@ export default class Model<T> {
      */
     async insert(document: Partial<T>): Promise<string | null> {
         const newDocumentModel = new this.model(document);
-
         try {
             await newDocumentModel.save();
             return newDocumentModel._id;
