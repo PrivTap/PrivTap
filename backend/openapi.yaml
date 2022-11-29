@@ -778,6 +778,9 @@ paths:
                 permissionId:
                   type: string
                   example: 637e6c102677ffe654ea9672
+                serviceId:
+                  type: string
+                  example: 617a6c102677ffe654ea9aa2
       responses:
         '200':
           description: successful operation

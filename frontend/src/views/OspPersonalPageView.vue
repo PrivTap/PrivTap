@@ -27,10 +27,9 @@
       <div v-if="services?.length" class="py-10">
         <div class=" px-10 grid  lg:grid-cols-2 xl:grid-cols-3 gap-10">
           <ServiceCard v-for="(item, index) in services" :key="index" :service="item" />
-
         </div>
       </div>
-      </div>
+    </div>
   </div>
 </template>
 
@@ -46,13 +45,13 @@ import radial from '@/assets/images/radial.svg';
 import logo from '@/assets/images/logo_dark.svg';
 const router = useRouter();
 const isLoading = ref(true);
-const manageService = ManageService.getInstance();
+const manageService = ManageService.getInstance;
 const services = manageService.services;
 
 
 onMounted(async () => {
   await manageService.getAllServices();
-    isLoading.value = false;
+  isLoading.value = false;
 });
 
 </script>

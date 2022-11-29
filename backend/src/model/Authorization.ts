@@ -106,6 +106,17 @@ class Authorization extends Model<IAuthorization> {
         return await this.findAll({ userId });
     }
 
+    /**
+     * Get the OAuth token for the userId and the ServiceId
+     */
+    async findToken(userId: string, serviceId: string): Promise<string | null> {
+        const res = await this.find({ userId: userId, service: serviceId });
+        if (res != null) {
+            return res.oAuthToken;
+        }
+        return null;
+    }
+
 }
 
 export default new Authorization();

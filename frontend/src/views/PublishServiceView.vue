@@ -63,7 +63,7 @@ import RoutingPath from "@/router/routing_path";
 const route = useRoute();
 const isValidUrl = ref<boolean>(true);
 const isLoading = ref<boolean>(false);
-const manageService = ManageService.getInstance()
+const manageService = ManageService.getInstance;
 let newService = ref({
   name: "",
   description: "",

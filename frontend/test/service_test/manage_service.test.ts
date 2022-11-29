@@ -5,7 +5,7 @@ import MockAdapter from "axios-mock-adapter";
 
 describe("Manage Service Tests", () => {
   let mock: MockAdapter;
-  const _manageService = ManageService.getInstance();
+  const _manageService = ManageService.getInstance;
   let testServiceModel: ServiceModel = new ServiceModel(
     "Test Service id",
     "Test Service Name",

@@ -1,7 +1,6 @@
 <template>
     <button
       type="button"
-      @click="onClick()"
       class="lg:rounded-lg py-4 px-16 font-normal text-blue-500 ring-blue-500 ring-[4px] hover:text-blue-400 hover:ring-blue-400"
     >
       {{ text }}
@@ -13,10 +12,6 @@
     text: {
       type: String,
       required: true,
-    },
-    onClick: {
-      required: true,
-      type: Function,
     },
   });
   </script>

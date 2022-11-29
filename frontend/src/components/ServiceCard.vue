@@ -1,6 +1,6 @@
 <template>
   <div
-    class=" w-full flex flex-col justify-between h-[50vh] my-auto mx-auto min-w-md max-w-lg text-gray-200 rounded-xl shadow-xl hover:shadow-2xl p-10  bg-gradient-to-tr from-blue-600 to-blue-400 hover:-translate-y-6 hover:ring-4 ring-white hover:ring-offset-2 ring-offset-white transition ease-in-out duration-700">
+    class=" w-full flex flex-col justify-between h-[50vh] my-auto mx-auto min-w-md max-w-lg text-gray-200 rounded-xl shadow-xl hover:shadow-2xl p-10  bg-gradient-to-tr from-blue-600 to-blue-400 hover:-translate-y-6 hover:ring-4 transition ease-in-out duration-700">
     <div>
 
       <p class="text-3xl font-medium">{{ service.name }}</p>
@@ -35,21 +35,33 @@
           </button>
         </div>
       </div>
-
+      <div class="pt-4">
+        <el-button color="#24262C" @click="router.push(`${RoutingPath.SERVICE_PERMISSION_PAGE}/${props.service._id}`)">
+          View Permission
+        </el-button>
+        <el-button color="#88C796">
+          View Triggers
+        </el-button>
+        <el-button color="#F2C24F">
+          View Actions
+        </el-button>
+      </div>
 
     </div>
-    <hr class="border-[1] border-white rounded-full " />
+    <hr class="border-white/50 rounded-full " />
 
-    <!-- BUTTONS -->
     <div class="flex justify-between w-full">
-     
-      <button class="flex items-center rounded-lg bg-blue-700 py-2 px-12 text-lg font-medium text-white hover:bg-blue-900" @click="edit">
+
+      <button
+        class="flex items-center rounded-lg bg-blue-700 py-2 px-12 text-lg font-medium text-white hover:bg-blue-900"
+        @click="edit">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="white">
-                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-              </svg>
+          <path
+            d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+        </svg>
         Edit
       </button>
-      
+
       <button
         class="inline-flex items-center px-10 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md"
         @click="showModal = true">
@@ -66,6 +78,7 @@
     <ModalComponent title="Are you sure?" subTitle="You are deleting the service permanently"
       :onPressed="onModalClose" />
   </div>
+
 </template>
 
 <script setup lang="ts">
@@ -77,9 +90,11 @@ import router from "@/router/router";
 import RoutingPath from "@/router/routing_path";
 import { ManageService } from "@/services/manage_service";
 
+const activeName = ref('1')
+
 const showPass = ref(false);
 const showModal = ref(false);
-const manageService = ManageService.getInstance();
+const manageService = ManageService.getInstance;
 
 function edit() {
   router.replace(`${RoutingPath.PUBLISH_SERVICE_PAGE}/${props.service._id}`);
