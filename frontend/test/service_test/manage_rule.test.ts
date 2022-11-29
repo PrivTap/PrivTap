@@ -25,8 +25,8 @@ describe("Manage Rule Tests", () => {
       data: ruleModel,
     });
     const res = await manageRuleStub.createRule(
-        "Test Trigger id",
-        "Test Action id",
+      "Test Trigger id",
+      "Test Action id",
     );
     expect(res.status).toBe(true);
     expect(res.message).to.empty;
@@ -61,18 +61,18 @@ describe("Manage Rule Tests", () => {
 
 
 
-//   test("Should return the updated rule", async () => {
-//     manageRuleStub.updateRule.resolves(
-//       ruleModel
-//     );
-//     const res = await manageRuleStub.updateRule(
-//     "Test Rule id",
-//     "Test User id",
-//     "Test Trigger id",
-//     "Test Action id",
-//     true,
-//     );
-//     expect(res).not.toBe(null);
-//     expect(res).toBeInstanceOf(RuleModel);
-//   });
- });
+  //   test("Should return the updated rule", async () => {
+  //     manageRuleStub.updateRule.resolves(
+  //       ruleModel
+  //     );
+  //     const res = await manageRuleStub.updateRule(
+  //     "Test Rule id",
+  //     "Test User id",
+  //     "Test Trigger id",
+  //     "Test Action id",
+  //     true,
+  //     );
+  //     expect(res).not.toBe(null);
+  //     expect(res).toBeInstanceOf(RuleModel);
+  //   });
+});

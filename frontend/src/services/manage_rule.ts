@@ -36,7 +36,7 @@ export class ManageRule implements IManageRule {
   //   throw new Error("Method not implemented.");
   // }
 
-  public static getInstance(): ManageRule {
+  static get getInstance(): ManageRule {
     if (!ManageRule._instance) {
       ManageRule._instance = new ManageRule();
     }

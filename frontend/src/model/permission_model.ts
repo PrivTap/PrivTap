@@ -1,4 +1,6 @@
-export class PermissionModel {
+import type RarObjectModel from "./rar_model";
+
+export default class PermissionModel {
     _id: string;
     serviceId: string;
     name: string;
@@ -17,17 +19,5 @@ export class PermissionModel {
         this.name = name;
         this.description = description;
         this.rarObject = rarObject;
-    }
-}
-
-export class RarObjectModel {
-    type: string;
-    actions: string[];
-    locations: string[];
-
-    constructor(type: string, actions: string[], locations: string[]) {
-        this.type = type;
-        this.actions = actions;
-        this.locations = locations;
     }
 }
