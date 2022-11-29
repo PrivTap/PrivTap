@@ -2,7 +2,9 @@ import Route from "../../Route";
 import { Request, Response } from "express";
 import { checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
 import Rule from "../../model/Rule";
-import { handleInsert } from "../../helper/misc";
+import { deleteHttp, getHttp, handleInsert } from "../../helper/misc";
+import Authorization from "../../model/Authorization";
+import logger from "../../helper/logger";
 
 export default class RulesRoute extends Route {
     constructor() {
@@ -25,12 +27,22 @@ export default class RulesRoute extends Route {
         const actionId = request.body.actionId;
         //TODO CHECK IF TRIGGER AND ACTION ARE EFFECTIVELY COMPATIBLE AND AUTHORIZED
         if (checkUndefinedParams(response, triggerId, actionId)) return;
+        //TODO the response should go down after the control of the token
         const ruleId = await handleInsert(response, Rule, { userId, triggerId, actionId });
         if (!ruleId) return;
         success(response);
         //every time a rule is created then we should notify the service of the trigger by sending to him
         //triggerId and user Id
-        console.log("Notifying OSP");
+        const triggerService = await Rule.getTriggerServiceNotificationServer(ruleId);
+
+        if (triggerService != null) {
+            const token = await Authorization.findToken(userId, triggerService.serviceId);
+            if (token != null)
+                //TODO should respond to the user that he can't create this rule because he didn't authorize the service (do this also for action)
+                await getHttp(triggerService.triggerNotificationServer, token);
+        } else
+            logger.error("Error while");
+        return;
     }
 
     protected async httpDelete(request: Request, response: Response): Promise<void> {
@@ -48,8 +60,20 @@ export default class RulesRoute extends Route {
             internalServerError(response);
             return;
         }
-
         success(response);
-    }
+        //notifying the OSP that he doesn't need to notify us for the trigger anymore
+        const triggerService = await Rule.getTriggerServiceNotificationServer(ruleId);
 
+        if (triggerService != null) {
+            const token = await Authorization.findToken(request.userId, triggerService.serviceId);
+            if (token != null)
+                //TODO should respond to the user that he can't create this rule because he didn't authorize the service (do this also for action)
+                await deleteHttp(triggerService.triggerNotificationServer, token);
+            else {
+                //TODO do a generic error when a user doesn't have the token for a service?
+            }
+            return;
+        }
+
+    }
 }

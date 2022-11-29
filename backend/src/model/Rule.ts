@@ -59,14 +59,10 @@ class Rule extends Model<IRule> {
     }
 
     /**
-     * Find the url for notification of the trigger service of a rule
+     * Find the url for notification of the trigger service of a rule and the id of the service
      *
      */
-    async getTriggerNotificationServer(ruleId: string): Promise<string | null> {
-        interface triggerNotificationServer {
-            triggerNotificationServer: string;
-        }
-
+    async getTriggerServiceNotificationServer(ruleId: string): Promise<triggerServiceNotificationServer | null> {
         try {
             const result = await this.model.aggregate()
                 .match({ _id: new mongoose.Types.ObjectId(ruleId) })
@@ -83,14 +79,15 @@ class Rule extends Model<IRule> {
                 .lookup({ from: "services", localField: "serviceId", foreignField: "_id", as: "service" })
                 .unwind({ path: "$service" })
                 .addFields({ triggerNotificationServer: "$service.triggerNotificationServer" })
+                .addFields({ serviceId: "$service._id" })
                 //remove all the field except the trigger Notification center
-                .project({ _id: 0, "triggerNotificationServer": 1 }) as triggerNotificationServer[];
+                .project({ _id: 0, "triggerNotificationServer": 1, "serviceId": 1 }) as triggerServiceNotificationServer[];
             //this way should return a list of documents and in each document there should be only the
             //triggerNotificationServer
             if (result.length > 1) {
                 logger.debug("Should only have one element here");
             }
-            return result[0].triggerNotificationServer;
+            return result[0];
         } catch
         (e) {
             logger.debug("Unexpected error while finding the trigger notification url after creating a rule" + e);
@@ -100,3 +97,8 @@ class Rule extends Model<IRule> {
 }
 
 export default new Rule();
+
+export interface triggerServiceNotificationServer {
+    serviceId: string
+    triggerNotificationServer: string;
+}

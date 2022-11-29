@@ -2,6 +2,8 @@ import { readdirSync, statSync } from "fs";
 import Model, { ModelSaveError } from "../Model";
 import { badRequest, internalServerError } from "./http";
 import { Response } from "express";
+import axios, {AxiosResponse } from "axios";
+
 
 /**
  * Gets all files recursively from a directory.
@@ -80,4 +82,35 @@ export async function handleUpdate<T>(response: Response, model: Model<T>, filte
         }
     }
     return true;
+}
+
+
+/**
+ * Make a get http request to a specific url
+ * @param url the url of the request
+ * @param token use this if you want to put an auth token
+ * @param queryString the object containing the field and the value of the query string
+ */
+export async function getHttp(url: string, token?: string, queryString?: object): Promise<AxiosResponse> {
+    const config = {};
+    if (token != undefined)
+        Object.assign(config, { headers: { "Authorization": `Bearer ${token}` } });
+    if (queryString != undefined)
+        Object.assign(config, { params: queryString });
+    return await axios.get(url, config);
+}
+
+/**
+ * Make a delete http request to a specific url
+ * @param url the url of the request
+ * @param token use this if you want to put an auth token
+ * @param body the object containing the field and the value of the query string
+ */
+export async function deleteHttp(url: string, token?: string, body?: object): Promise<AxiosResponse> {
+    const config = {};
+    if (token != undefined)
+        Object.assign(config, { headers: { "Authorization": `Bearer ${token}` } });
+    if (body != undefined)
+        Object.assign(config, { data: body });
+    return await axios.delete(url, config);
 }
