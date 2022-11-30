@@ -9,16 +9,8 @@ export default interface IManageRule {
   createRule(
     triggerId: string,
     actionId: string,
-    // Does anything else gets filled up from backend here ?
-    //Test 
   ): Promise<RuleModel | null>;
   getRuleById(ruleId: string): Promise<RuleModel | null>;
-  // updateRule(ruleId: string,
-  //   userId: string,
-  //   triggerId: string,
-  //   actionId: string,
-  //   isAuthorized: boolean
-  //   ): Promise<RuleModel | null>;
   deleteRule(ruleId: string): Promise<RuleModel[] | null>;
   getAllRules(): Promise<RuleModel[] | null>;
 }
@@ -31,10 +23,6 @@ export class ManageRule implements IManageRule {
   private constructor() {
     this.http = http();
   }
-
-  // deleteRule(ruleId: string): Promise<RuleModel[] | null> {
-  //   throw new Error("Method not implemented.");
-  // }
 
   static get getInstance(): ManageRule {
     if (!ManageRule._instance) {
@@ -69,7 +57,6 @@ export class ManageRule implements IManageRule {
     }
   }
 
-
   async createRule(
     triggerId: string,
     actionId: string,
@@ -79,7 +66,6 @@ export class ManageRule implements IManageRule {
       actionId: actionId,
     };
     try {
-      // console.log(body);
       const res = await this.http.post(this.path, body);
       useToast().success("Rule created");
       return res.data.data as RuleModel;
@@ -88,30 +74,6 @@ export class ManageRule implements IManageRule {
       return null;
     }
   }
-
-
-  // async updateRule(ruleId: string, 
-  //   userId: string, 
-  //   triggerId: string, 
-  //   actionId: string, 
-  //   isAuthorized: boolean
-  //   ): Promise<RuleModel | null> {
-  //     try {
-  //       const body = {
-  //         userId: userId,
-  //         triggerId: triggerId,
-  //         actionId: actionId,
-  //         isAuthorized: isAuthorized,
-  //       }
-  //       console.log(body);
-  //       const res = await this.http.put(this.path, body);
-  //       useToast().success("Rule updated");
-  //       return res.data.data as RuleModel;
-  //     } catch (error){
-  //       axiosCatch(error);
-  //       return null;
-  //     }
-  // }
 
   async deleteRule(ruleId: string): Promise<Array<RuleModel> | null> {
     try {

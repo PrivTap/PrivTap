@@ -1,4 +1,4 @@
-/// Build class for the rule
+// Build class for the rule
 
 export default class RuleModel {
     _id: string;
