@@ -54,17 +54,25 @@ export function replaceResourceURLs<K extends string>(object: Record<K, unknown>
  * @param response the response object to send back the response to the client
  * @param model the model to insert to
  * @param document the document to insert
- * @return id of the object that has been created
+ * @param returnObject flag used to specify if the whole object has to be returned
+ * @return id of the object that has been created or the whole object if specified
  */
-export async function handleInsert<T>(response: Response, model: Model<T>, document: object): Promise<string | null> {
+export async function handleInsert<T>(response: Response, model: Model<T>, document: object, returnObject = false): Promise<string | null | T> {
     try {
-        const isInserted = await model.insert(document);
-        if (!isInserted) {
+        let insertResult;
+        if (returnObject)
+            // The whole object
+            insertResult = await model.insertAndReturn(document);
+        else
+            // Just the _id
+            insertResult = await model.insert(document);
+        if (!insertResult) {
             internalServerError(response);
             return null;
-        } else {
-            return isInserted;
         }
+        if (returnObject)
+            return insertResult as T;
+        return insertResult;
     } catch (e) {
         if (e instanceof ModelSaveError) {
             badRequest(response, e.message);
@@ -80,15 +88,25 @@ export async function handleInsert<T>(response: Response, model: Model<T>, docum
  * @param response the response object to send back the response to the client
  * @param model the model to insert to
  * @param filter the filter to find the document to update
+ * @param returnObject flag used to specify if the whole object has to be returned
  * @param update the document containing the updates
  */
-export async function handleUpdate<T>(response: Response, model: Model<T>, filter: object, update: object) {
+export async function handleUpdate<T>(response: Response, model: Model<T>, filter: object, update: object, returnObject = false): Promise<boolean | T> {
     try {
-        const isModified = await model.updateWithFilter(filter, update);
-        if (!isModified) {
+        let updateResult;
+        if (returnObject)
+            // The whole object
+            updateResult = await model.updateWithFilterAndReturn(filter, update);
+        else
+            // true if no error occurred. false otherwise
+            updateResult = await model.updateWithFilter(filter, update);
+        if (!updateResult) {
             badRequest(response, "A service with this id does not exist");
             return false;
         }
+        if (returnObject)
+            return updateResult as T;
+        return updateResult;
     } catch (e) {
         if (e instanceof ModelSaveError) {
             badRequest(response, e.message);
@@ -97,7 +115,7 @@ export async function handleUpdate<T>(response: Response, model: Model<T>, filte
             return false;
         }
     }
-    return true;
+    return false;
 }
 
 

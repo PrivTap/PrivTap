@@ -2,7 +2,7 @@ import Route from "../../Route";
 import { Request, Response } from "express";
 import { badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
 import Service from "../../model/Service";
-import Permission from "../../model/Permission";
+import Permission, { IPermission } from "../../model/Permission";
 import { handleInsert, handleUpdate } from "../../helper/misc";
 
 export default class ManageActionsRoute extends Route {
@@ -59,10 +59,10 @@ export default class ManageActionsRoute extends Route {
             return;
         }
 
-        const permissionId = await handleInsert(response, Permission, { name, description, serviceId, rarObject });
-        if (!permissionId) return;
+        const permission = await handleInsert(response, Permission, { name, description, serviceId, rarObject }, true) as IPermission;
+        if (!permission) return;
 
-        success(response);
+        success(response,  permission);
     }
 
     protected async httpDelete(request: Request, response: Response): Promise<void> {
@@ -124,9 +124,9 @@ export default class ManageActionsRoute extends Route {
             return;
         }
 
-        const queriedPermissionId = await handleUpdate(response, Permission, { permissionId }, { name, description, serviceId, rarObject });
-        if (!queriedPermissionId) return;
+        const queriedPermission = await handleUpdate(response, Permission, { permissionId }, { name, description, serviceId, rarObject }, true) as IPermission;
+        if (!queriedPermission) return;
 
-        success(response);
+        success(response, queriedPermission);
     }
 }

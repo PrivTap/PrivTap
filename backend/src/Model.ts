@@ -42,6 +42,21 @@ export default class Model<T> {
     }
 
     /**
+     * Inserts a new document into the database and returns it
+     * @param document
+     */
+    async insertAndReturn(document: Partial<T>): Promise<T | null> {
+        const newDocumentModel = new this.model(document);
+        try {
+            await newDocumentModel.save();
+            return newDocumentModel;
+        } catch (e) {
+            this.handleMongooseSavingErrors(e);
+        }
+        return null;
+    }
+
+    /**
      * Updates a document in the database. Only the parameters that are defined will be updated, others will be not modified.
      * @param id the id of the document to update
      * @param documentUpdate the properties of the document to update
@@ -70,6 +85,21 @@ export default class Model<T> {
             this.handleMongooseSavingErrors(e);
         }
         return false;
+    }
+
+    /**
+     * Updates the first document in the database that matches the filter query and returns it
+     * Only the parameters that are defined will be updated, others will be not modified.
+     * @param filter the query to find the document to update
+     * @param documentUpdate the document containing the updates
+     */
+    async updateWithFilterAndReturn(filter: FilterQuery<T>, documentUpdate: Partial<T>): Promise<T | null> {
+        try {
+            return  await this.model.findOneAndUpdate(filter, documentUpdate, { new: true });
+        } catch (e) {
+            this.handleMongooseSavingErrors(e);
+        }
+        return null;
     }
 
     /**

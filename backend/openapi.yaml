@@ -119,7 +119,7 @@ paths:
     get:
       tags:
         - Authentication
-      summary: OSP and end-user log-out from the platform
+      summary: OSP and user log-out from the platform
       description: The user has the possibility to logout from his account
       operationId: logout
       responses:
@@ -233,9 +233,16 @@ paths:
     get:
       tags:
         - OSP Authorization
-      summary: The end-user requests a list of OSP
-      description: The end-user requests a list of OSP (TODO)
+      summary: The user requests a list of OSP
+      description: Returns a list of all the OSP registered to the platform. If specified in the authorized query parameters, only the authorized OSPs will be returned
       operationId: services
+      parameters:
+        - name: authorized
+          description: Filters the returned list including only the OSPs authorized by the user
+          in: query
+          schema:
+            type: boolean
+          example: true
       responses:
         '200':
           description: successful operation
@@ -244,7 +251,18 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/UserService'
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: Dropbox
+                    description:
+                      type: string
+                      example: This service allow you to interact with your dropbox account!
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
 
   /triggers:
     get:
@@ -279,6 +297,10 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/Trigger'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
 
   /actions:
     get:
@@ -313,13 +335,17 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/Action'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
 
   /service-authorization:
     get:
       tags:
         - OSP Authorization
-      summary: The end-user request a set of authorization already granted
-      description: The end-user request a set of authorization already granted (TODO)
+      summary: The user request a set of authorization already granted
+      description: Returns all the authorization granted to the specified service
       operationId: get-service-authorization
       parameters:
         - name: serviceId
@@ -336,37 +362,58 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Permission'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
     post:
       tags:
         - OSP Authorization
-      summary: The end-user grants a new authorization
-      description: The end-user grants a new authorization (TODO)
+      summary: The user grants a new authorization
+      description: The user can grant a new authorization specifying the different permissions
       operationId: post-service-authorization
-
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewAuthorization'
+              type: object
+              properties:
+                permissionId:
+                  type: array
+                  example: [637ccd4951cdf089ba2123be, a1ccd1951cdf080ba2123a3]
       responses:
         '200':
           description: successful operation
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
     delete:
       tags:
         - OSP Authorization
-      summary: The end-user deletes all the permissions associated to an OSP
-      description: The end-user deletes all the permissions associated to an OSP (TODO)
+      summary: The user deletes one or more of the permissions precedently granted to a OSP
+      description: The user deletes one or more of the permissions precedently granted to a OSP
       operationId: delete-service-authorization
-      parameters:
-        - name: serviceId
-          in: query
-          required: true
-          schema:
-            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                permissionId:
+                  type: array
+                  example: [ 637ccd4951cdf089ba2123be, a1ccd1951cdf080ba2123a3 ]
       responses:
         '200':
           description: successful operation
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
   /manage-services:
     get:
       tags:
@@ -524,8 +571,8 @@ paths:
     get:
       tags:
         - OSP Authorization
-      summary: The end-user gets redirected to the specified uri
-      description: The end-user gets redirected to the specified uri (TODO)
+      summary: The user gets redirected to the specified uri
+      description: The user gets redirected to the specified uri (TODO)
       operationId: get-oauth-redirect
       parameters:
         - name: oauth-param
@@ -622,7 +669,7 @@ paths:
         - Services Management
       summary: The OSP modify an already defined trigger
       description: The OSP modify an already defined trigger
-      operationId: delete-manage-triggers
+      operationId: put-manage-triggers
       requestBody:
         required: true
         content:
@@ -866,7 +913,7 @@ paths:
         - Services Management
       summary: The OSP modifies a permission for a defined service
       description: The OSP can modify a permission for a service he already defined
-      operationId: post-permissions
+      operationId: put-permissions
       requestBody:
         required: true
         content:
@@ -934,15 +981,28 @@ components:
     Action:
       type: object
       properties:
-        _id:
-          type: string
-          example: 6489ccd4951cdf089ba21288c
         name:
           type: string
-          example: Send notification to mobile app
+          example: SomeActionName
         description:
           type: string
-          example: Send a push notification to the NotificationService mobile app
+          example: SomeActionDescription
+        serviceId:
+          type: string
+          example: 637e6c0e2677ffe654ea9672
+        permissions:
+          type: array
+          items:
+            type: string
+            example: permissionId
+        endpoint:
+          type: string
+          example: someUrlToPerformAction
+      required:
+        - name
+        - description
+        - serviceId
+        - endpoint
 
     Rule:
       properties:
