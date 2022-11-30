@@ -12,7 +12,7 @@ export interface IManagePermission {
     updatePermission(permissionId: string, name: string, description: string, rarObject: RarObjectModel): Promise<PermissionModel | null>;
 }
 
-export default class ManagePermission {
+export default class ManagePermission implements IManagePermission {
 
     private static _instance: ManagePermission;
     http: AxiosInstance;
