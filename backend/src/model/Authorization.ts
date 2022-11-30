@@ -28,6 +28,7 @@ const authorizationSchema = new Schema({
     },
     grantedPermissions: [Schema.Types.ObjectId]
 });
+
 // Build an unique index on tuple <userId, service> to prevent duplicates
 authorizationSchema.index({ userId: 1, service: 1 }, { unique: true });
 

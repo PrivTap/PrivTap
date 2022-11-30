@@ -1,6 +1,6 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
-import { success } from "../../helper/http";
+import { internalServerError, success } from "../../helper/http";
 import Authorization, { ServiceActions } from "../../model/Authorization";
 
 export default class ActionsRoute extends Route {
@@ -14,11 +14,15 @@ export default class ActionsRoute extends Route {
 
         let data: ServiceActions[]  = [];
 
+        // TODO: query only compatible actions
+        // const triggerId = request.query.triggerId;
         const authorizedServices = await Authorization.findAllServicesAuthorizedByUserWithActions(request.userId);
-        if (authorizedServices) {
-            data = authorizedServices;
+        if (!authorizedServices) {
+            internalServerError(response);
+            return;
         }
 
+        data = authorizedServices;
         success(response, data);
     }
 }

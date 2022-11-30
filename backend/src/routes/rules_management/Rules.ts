@@ -26,6 +26,7 @@ export default class RulesRoute extends Route {
         const userId = request.userId;
         const triggerId = request.body.triggerId;
         const actionId = request.body.actionId;
+        //TODO: Check if the triggerId and actionId actually exist
         //TODO CHECK IF TRIGGER AND ACTION ARE EFFECTIVELY COMPATIBLE AND AUTHORIZED
         if (checkUndefinedParams(response, triggerId, actionId)) return;
         //TODO the response should go down after the control of the token

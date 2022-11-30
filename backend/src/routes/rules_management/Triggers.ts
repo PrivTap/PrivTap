@@ -1,6 +1,6 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
-import { success } from "../../helper/http";
+import { internalServerError, success } from "../../helper/http";
 import Authorization, { ServiceTriggers } from "../../model/Authorization";
 
 export default class TriggersRoute extends Route {
@@ -15,11 +15,12 @@ export default class TriggersRoute extends Route {
         let data: ServiceTriggers[]  = [];
 
         const authorizedServices = await Authorization.findAllServicesAuthorizedByUserWithTriggers(request.userId);
-        if (authorizedServices) {
-            data = authorizedServices;
+        if (!authorizedServices) {
+            internalServerError(response);
+            return;
         }
 
+        data = authorizedServices;
         success(response, data);
     }
-
 }

@@ -17,10 +17,13 @@ export default class ManageActionsRoute extends Route {
 
         let actions: Partial<IAction>[] = [];
 
-        const res = await Action.findAllForService(serviceId);
-        if (res)
-            actions = res;
+        const services = await Action.findAllForService(serviceId);
+        if (!services){
+            internalServerError(response);
+            return;
+        }
 
+        actions = services;
         success(response, actions);
     }
 
