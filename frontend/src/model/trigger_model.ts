@@ -1,4 +1,4 @@
-import type { List } from "postcss/lib/list";
+ 
 import type PermissionModel from "./permission_model";
 
 export default class TriggerModel {
