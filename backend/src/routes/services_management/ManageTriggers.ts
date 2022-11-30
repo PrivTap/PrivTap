@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { badRequest, checkUndefinedParams, forbiddenUserError, success } from "../../helper/http";
 import Trigger from "../../model/Trigger";
 import Service from "../../model/Service";
-import { handleInsert } from "../../helper/misc";
+import { handleInsert, handleUpdate } from "../../helper/misc";
 
 export default class ManageTriggersRoute extends Route {
     constructor() {
@@ -62,5 +62,25 @@ export default class ManageTriggersRoute extends Route {
         } else {
             badRequest(response, "This trigger doesn't exists");
         }
+    }
+
+    protected async httpPut(request: Request, response: Response): Promise<void> {
+        const triggerId = request.body.triggerId;
+        const name = request.body.name;
+        const description = request.body.description;
+        const permissions = request.body.permissions;
+        const resourceServer = request.body.resourceServer;
+
+        if (checkUndefinedParams(response, triggerId)) return;
+
+        if (!await Trigger.isCreator(request.userId, triggerId)) {
+            forbiddenUserError(response, "You are not the owner of this trigger");
+            return;
+        }
+
+        const queriedTriggerId = handleUpdate(response, Trigger, { triggerId }, { name, description, permissions, resourceServer });
+        if(!queriedTriggerId) return;
+
+        success(response);
     }
 }

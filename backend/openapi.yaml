@@ -613,7 +613,41 @@ paths:
                   example: SomeTriggerId
               required:
                 - triggerId
+      responses:
+        '200':
+          description: successful operation
 
+    put:
+      tags:
+        - Services Management
+      summary: The OSP modify an already defined trigger
+      description: The OSP modify an already defined trigger
+      operationId: delete-manage-triggers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                triggerId:
+                  type: string
+                  example: 637e6c0e2677ffe654ea9672
+                name:
+                  type: string
+                  example: SomeTriggerName
+                description:
+                  type: string
+                  example: SomeTriggerDescription
+                permissions:
+                  type: array
+                  items:
+                    type: string
+                    example: permissionId
+                resourceServer:
+                  type: string
+                  example: someUrlToGetAResource
+              required:
+                - triggerId
       responses:
         '200':
           description: successful operation
@@ -699,6 +733,42 @@ paths:
       responses:
         '200':
           description: successful operation
+
+    put:
+      tags:
+        - Services Management
+      summary: The OSP modify an already defined action
+      description: The OSP modify an already defined action
+      operationId: put-manage-actions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                actionId:
+                  type: string
+                  example: 637e6c0e2677ffe654ea9672
+                name:
+                  type: string
+                  example: SomeActionName
+                description:
+                  type: string
+                  example: SomeActionDescription
+                permissions:
+                  type: array
+                  items:
+                    type: string
+                    example: permissionId
+                endpoint:
+                  type: string
+                  example: someUrlToPerformAction
+              required:
+                - actionId
+      responses:
+        '200':
+          description: successful operation
+
   /permissions:
     get:
       tags:

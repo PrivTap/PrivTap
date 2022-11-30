@@ -3,19 +3,12 @@ import { Request, Response } from "express";
 import { badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
 import Service from "../../model/Service";
 import Permission from "../../model/Permission";
-import {handleInsert} from "../../helper/misc";
+import { handleInsert, handleUpdate } from "../../helper/misc";
 
 export default class ManageActionsRoute extends Route {
     constructor() {
         super("permissions");
     }
-
-    // We have to decide if we want to make an extra query and send a more accurate
-    // response message or save one query and send forbidden even if the service
-    // does not exist, since Service.isCreator query will return false even in case the
-    // serviceId is not present in the DB
-    // For the moment I checked both the existence and the creator, this can be
-    // easily modified deleting the findById check
 
     // Suggestion: middleware for creator check
 
@@ -131,10 +124,8 @@ export default class ManageActionsRoute extends Route {
             return;
         }
 
-        if (! await Permission.update(permissionId, { name, description, rarObject })){
-            internalServerError(response);
-            return;
-        }
+        const queriedPermissionId = await handleUpdate(response, Permission, { permissionId }, { name, description, serviceId, rarObject });
+        if (!queriedPermissionId) return;
 
         success(response);
     }

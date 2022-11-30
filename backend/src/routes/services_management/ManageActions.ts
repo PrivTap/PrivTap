@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
 import Action, { IAction } from "../../model/Action";
 import Service from "../../model/Service";
-import { handleInsert } from "../../helper/misc";
+import { handleInsert, handleUpdate } from "../../helper/misc";
 
 export default class ManageActionsRoute extends Route {
     constructor() {
@@ -61,5 +61,25 @@ export default class ManageActionsRoute extends Route {
         } else {
             internalServerError(response);
         }
+    }
+
+    protected async httpPut(request: Request, response: Response): Promise<void> {
+        const actionId = request.body.actionId;
+        const name = request.body.name;
+        const description = request.body.description;
+        const permissions = request.body.permissions;
+        const endpoint = request.body.endpoint;
+
+        if (checkUndefinedParams(response, actionId)) return;
+
+        if (!await Action.isCreator(request.userId, actionId)) {
+            forbiddenUserError(response, "You are not the owner of this action");
+            return;
+        }
+
+        const queriedActionId = handleUpdate(response, Action, { actionId }, { name, description, permissions, endpoint });
+        if(!queriedActionId) return;
+
+        success(response);
     }
 }
