@@ -45,7 +45,7 @@ export class ManageRule implements IManageRule {
 
   path: string = "/manage-rules";
 
-  rules = ref<RuleModel[]>([]); //What did I make here
+  rules = ref<RuleModel[]>([]); 
 
   async getAllRules(): Promise<RuleModel[] | null> {
     try {
@@ -62,7 +62,7 @@ export class ManageRule implements IManageRule {
   async getRuleById(ruleId: string): Promise<RuleModel | null> {
     try {
       const res = await this.http.get(this.path, { params: { ruleId } });
-      return res.data.data[0] as RuleModel;
+      return res.data.data as RuleModel;
     } catch (error) {
       axiosCatch(error);
       return null;
@@ -79,7 +79,7 @@ export class ManageRule implements IManageRule {
       actionId: actionId,
     };
     try {
-      console.log(body);
+      // console.log(body);
       const res = await this.http.post(this.path, body);
       useToast().success("Rule created");
       return res.data.data as RuleModel;
