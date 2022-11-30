@@ -24,13 +24,14 @@ export default class RulesRoute extends Route {
 
     protected async httpPost(request: Request, response: Response): Promise<void> {
         const userId = request.userId;
+        const name = request.body.name;
         const triggerId = request.body.triggerId;
         const actionId = request.body.actionId;
         //TODO: Check if the triggerId and actionId actually exist
         //TODO CHECK IF TRIGGER AND ACTION ARE EFFECTIVELY COMPATIBLE AND AUTHORIZED
-        if (checkUndefinedParams(response, triggerId, actionId)) return;
+        if (checkUndefinedParams(response, triggerId, actionId, name)) return;
         //TODO the response should go down after the control of the token
-        const ruleId = await handleInsert(response, Rule, { userId, triggerId, actionId });
+        const ruleId = await handleInsert(response, Rule, { userId, name, triggerId, actionId });
         if (!ruleId) return;
         success(response);
         //every time a rule is created then we should notify the service of the trigger by sending to him
