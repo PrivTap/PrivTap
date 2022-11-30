@@ -12,7 +12,7 @@ use(sinonChai);
 
 const sandbox = createSandbox();
 
-describe("/permissions endpoint", () => {
+describe("/api/permissions endpoint", () => {
 
     const exampleServiceId = "637e66b9d579d489c7d8ec65";
 
@@ -30,10 +30,10 @@ describe("/permissions endpoint", () => {
     let checkJWTStub: SinonStub;
     let findByIdStub: SinonStub;
     let isCreatorStub: SinonStub;
-    let insertStub: SinonStub;
+    let insertAndReturnStub: SinonStub;
     let belongsToServiceStub: SinonStub;
     let deleteStub: SinonStub;
-    let updateStub: SinonStub;
+    let updateWithFilterAndReturnStub: SinonStub;
     let findByServiceIdStub: SinonStub;
 
     before(() => {
@@ -51,10 +51,10 @@ describe("/permissions endpoint", () => {
         });
         findByIdStub = sandbox.stub(Service, "findById").resolves({} as IService);
         isCreatorStub = sandbox.stub(Service, "isCreator").resolves(true);
-        insertStub = sandbox.stub(Permission, "insert").resolves("someNewDocumentId");
+        insertAndReturnStub = sandbox.stub(Permission, "insertAndReturn").resolves({} as IPermission);
         belongsToServiceStub = sandbox.stub(Permission, "belongsToService").resolves(true);
         deleteStub = sandbox.stub(Permission, "delete").resolves(true);
-        updateStub = sandbox.stub(Permission, "update").resolves(true);
+        updateWithFilterAndReturnStub = sandbox.stub(Permission, "updateWithFilterAndReturn").resolves({} as IPermission);
         findByServiceIdStub = sandbox.stub(Permission, "findByServiceId").resolves([{}] as IPermission[]);
     });
 
@@ -68,42 +68,41 @@ describe("/permissions endpoint", () => {
                 userId: "someUserId",
                 active: false
             });
-            // checkActivationStub.resolves(false);
-            const res = await requester.get("/permissions").query({ serviceId: exampleServiceId });
+            const res = await requester.get("/api/permissions").query({ serviceId: exampleServiceId });
             expect(res).to.have.status(403);
         });
 
         it ("should fail if the user doesn't have valid jwt", async () => {
             checkJWTStub.throws(new AuthError());
-            const res = await requester.get("/permissions").query({ serviceId: exampleServiceId });
+            const res = await requester.get("/api/permissions").query({ serviceId: exampleServiceId });
             expect(res).to.have.status(401);
         });
 
         it ("should fail if the serviceId is not specified in the query", async () => {
-            const res = await requester.get("/permissions");
+            const res = await requester.get("/api/permissions");
             expect(res).to.have.status(400);
         });
 
         it ("should fail if the serviceId is not present in the database", async () => {
             findByIdStub.resolves(null);
-            const res = await requester.get("/permissions").query({ serviceId: exampleServiceId });
+            const res = await requester.get("/api/permissions").query({ serviceId: exampleServiceId });
             expect(res).to.have.status(400);
         });
 
         it ("should fail if the serviceId has not been created by the user", async () => {
             isCreatorStub.resolves(false);
-            const res = await requester.get("/permissions").query({ serviceId: exampleServiceId });
+            const res = await requester.get("/api/permissions").query({ serviceId: exampleServiceId });
             expect(res).to.have.status(403);
         });
 
         it ("should fail if an internal error occurs", async () => {
             findByServiceIdStub.resolves(null);
-            const res = await requester.get("/permissions").query({ serviceId: exampleServiceId });
+            const res = await requester.get("/api/permissions").query({ serviceId: exampleServiceId });
             expect(res).to.have.status(500);
         });
 
         it ("should succeed if the serviceId is present in the database and the user is the rightful, correctly authenticated, owner", async () => {
-            const res = await requester.get("/permissions").query({ serviceId: exampleServiceId });
+            const res = await requester.get("/api/permissions").query({ serviceId: exampleServiceId });
             expect(res).to.have.status(200);
         });
 
@@ -115,41 +114,41 @@ describe("/permissions endpoint", () => {
                 userId: "someUserId",
                 active: false
             });
-            const res = await requester.post("/permissions/").send(examplePermission);
+            const res = await requester.post("/api/permissions/").send(examplePermission);
             expect(res).to.have.status(403);
         });
 
         it ("should fail if the user doesn't have valid jwt", async () => {
             checkJWTStub.throws(new AuthError());
-            const res = await requester.post("/permissions").send(examplePermission);
+            const res = await requester.post("/api/permissions").send(examplePermission);
             expect(res).to.have.status(401);
         });
 
         it ("should fail if some of the parameters are undefined", async () => {
-            const res = await requester.post("/permissions");
+            const res = await requester.post("/api/permissions");
             expect(res).to.have.status(400);
         });
 
         it ("should fail if the serviceId is not present in the database", async () => {
             findByIdStub.resolves(null);
-            const res = await requester.post("/permissions").send(examplePermission);
+            const res = await requester.post("/api/permissions").send(examplePermission);
             expect(res).to.have.status(400);
         });
 
         it ("should fail if the user didn't create the specified service", async () => {
             isCreatorStub.resolves(false);
-            const res = await requester.post("/permissions").send(examplePermission);
+            const res = await requester.post("/api/permissions").send(examplePermission);
             expect(res).to.have.status(403);
         });
 
         it ("should fail if an internal error occurs", async () => {
-            insertStub.resolves(null);
-            const res = await requester.post("/permissions").send(examplePermission);
+            insertAndReturnStub.resolves(null);
+            const res = await requester.post("/api/permissions").send(examplePermission);
             expect(res).to.have.status(500);
         });
 
         it ("should succeed if the rightful creator of the service, correctly authenticated, provides all the required fields", async () => {
-            const res = await requester.post("/permissions").send(examplePermission);
+            const res = await requester.post("/api/permissions").send(examplePermission);
             expect(res).to.have.status(200);
         });
     });
@@ -160,42 +159,42 @@ describe("/permissions endpoint", () => {
                 userId: "someUserId",
                 active: false
             });
-            const res = await requester.delete("/permissions/").send(exampleDeleteRequest);
+            const res = await requester.delete("/api/permissions/").send(exampleDeleteRequest);
             expect(res).to.have.status(403);
         });
 
         it ("should fail if the user doesn't have valid jwt", async () => {
             checkJWTStub.throws(new AuthError());
-            const res = await requester.delete("/permissions").send(exampleDeleteRequest);
+            const res = await requester.delete("/api/permissions").send(exampleDeleteRequest);
             expect(res).to.have.status(401);
         });
 
         it ("should fail if some of the parameters are undefined", async () => {
-            const res = await requester.delete("/permissions");
+            const res = await requester.delete("/api/permissions");
             expect(res).to.have.status(400);
         });
 
         it ("should fail if the user didn't create the specified service", async () => {
             isCreatorStub.resolves(false);
-            const res = await requester.delete("/permissions").send(exampleDeleteRequest);
+            const res = await requester.delete("/api/permissions").send(exampleDeleteRequest);
             expect(res).to.have.status(403);
         });
 
         it ("should fail if the specified permission doesn't belong to the right service", async () => {
             belongsToServiceStub.resolves(false);
-            const res = await requester.delete("/permissions").send(exampleDeleteRequest);
+            const res = await requester.delete("/api/permissions").send(exampleDeleteRequest);
             expect(res).to.have.status(403);
         });
 
 
         it ("should fail if an internal error occurs", async () => {
             deleteStub.resolves(false);
-            const res = await requester.delete("/permissions").send(exampleDeleteRequest);
+            const res = await requester.delete("/api/permissions").send(exampleDeleteRequest);
             expect(res).to.have.status(500);
         });
 
         it ("should succeed if the rightful creator of the service, correctly authenticated, provides all the required fields", async () => {
-            const res = await requester.delete("/permissions").send(exampleDeleteRequest);
+            const res = await requester.delete("/api/permissions").send(exampleDeleteRequest);
             expect(res).to.have.status(200);
         });
     });
@@ -206,41 +205,41 @@ describe("/permissions endpoint", () => {
                 userId: "someUserId",
                 active: false
             });
-            const res = await requester.put("/permissions").send(examplePermission);
+            const res = await requester.put("/api/permissions").send(examplePermission);
             expect(res).to.have.status(403);
         });
 
         it ("should fail if the user doesn't have valid jwt", async () => {
             checkJWTStub.throws(new AuthError());
-            const res = await requester.put("/permissions").send(examplePermission);
+            const res = await requester.put("/api/permissions").send(examplePermission);
             expect(res).to.have.status(401);
         });
 
         it ("should fail if some of the mandatory parameters are undefined", async () => {
-            const res = await requester.put("/permissions");
+            const res = await requester.put("/api/permissions");
             expect(res).to.have.status(400);
         });
 
         it ("should fail if the user didn't create the specified service", async () => {
             isCreatorStub.resolves(false);
-            const res = await requester.put("/permissions").send(examplePermission);
+            const res = await requester.put("/api/permissions").send(examplePermission);
             expect(res).to.have.status(403);
         });
 
         it ("should fail if the specified permission doesn't belong to the right service", async () => {
             belongsToServiceStub.resolves(false);
-            const res = await requester.put("/permissions").send(examplePermission);
+            const res = await requester.put("/api/permissions").send(examplePermission);
             expect(res).to.have.status(403);
         });
 
         it ("should fail if an internal error occurs", async () => {
-            updateStub.resolves(false);
-            const res = await requester.put("/permissions").send(examplePermission);
+            updateWithFilterAndReturnStub.throws();
+            const res = await requester.put("/api/permissions").send(examplePermission);
             expect(res).to.have.status(500);
         });
 
         it ("should succeed if the rightful creator of the service, correctly authenticated, provides all the required fields", async () => {
-            const res = await requester.put("/permissions").send(examplePermission);
+            const res = await requester.put("/api/permissions").send(examplePermission);
             expect(res).to.have.status(200);
         });
     });
