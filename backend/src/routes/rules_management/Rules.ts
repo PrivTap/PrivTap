@@ -79,4 +79,6 @@ export default class RulesRoute extends Route {
         }
         return;
     }
+
+    // TODO: Implement PUT
 }
