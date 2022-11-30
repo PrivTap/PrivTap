@@ -5,6 +5,7 @@ import { triggerServiceNotificationServer } from "./Trigger";
 
 export interface IRule {
     _id: string;
+    name: string,
     userId: string;
     triggerId: string;
     actionId: string;
@@ -14,6 +15,10 @@ export interface IRule {
 const ruleSchema = new Schema({
     userId: {
         type: Schema.Types.ObjectId,
+        required: true
+    },
+    name: {
+        type: String,
         required: true
     },
     triggerId: {
