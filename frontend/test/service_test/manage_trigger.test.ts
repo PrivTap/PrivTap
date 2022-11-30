@@ -1,4 +1,3 @@
-// import { StubbedInstance, stubInterface } from "ts-sinon";
 import { beforeAll, beforeEach, describe, expect, test } from "vitest";
 import {ManageTrigger} from "../../src/services/manage_trigger";
 import TriggerModel from "../../src/model/trigger_model";
@@ -23,7 +22,6 @@ let PermissionModel1: PermissionModel = new PermissionModel(
  
 
 describe("Manage Trigger Test", () => {
-  // let manageTriggerStub: StubbedInstance<IManageTrigger>;
   let mock: MockAdapter;
   const _manageTrigger = ManageTrigger.getInstance;
   let testTriggerModel: TriggerModel = new TriggerModel(
@@ -42,18 +40,6 @@ describe("Manage Trigger Test", () => {
   beforeEach(() => {
     mock.reset();
   })
-
-
-  
-  // test("Should return a list of triggers", async () => {
-  //   manageTriggerStub.getAllTriggers.resolves(
-  //     [triggerModel]
-  //   );
-  //   const res = await manageTriggerStub.getAllTriggers();
-  //   expect(res).not.toBe(null);
-  //   expect(res?.length).toBe(1);
-  //   expect(res).toBeInstanceOf(Array<TriggerModel>);
-  // });
 
 
   //TEST CreateTrigger
