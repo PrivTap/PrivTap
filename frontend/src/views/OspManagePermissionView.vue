@@ -1,6 +1,11 @@
 <template>
-    <div class="flex flex-col items-center justify-center content-start place-items-center " v-if="!showCreatePermission">
-            <CreatePermissionVue v-if="service" :service-id=service!._id />
+    <!-- <CreatePermissionVue v-if="service" :service-id=service!._id /> -->
+    <div class="flex flex-col items-center justify-center content-start place-items-center "
+        v-if="!showCreatePermission">
+        <div v-for="(item, index) in permissions" :key="index" :permission="item">
+            {{ item.name }}
+            {{ item.description }}
+        </div>
     </div>
 </template>
 
@@ -11,7 +16,6 @@ import ManagePermission from '@/services/manage_permission';
 import { ManageService } from '@/services/manage_service';
 import type ServiceModel from '@/model/service_model';
 import type PermissionModel from '@/model/permission_model';
-import CreatePermissionVue from '@/components/CreatePermission.vue';
 
 const showCreatePermission = ref(false);
 const route = useRoute();

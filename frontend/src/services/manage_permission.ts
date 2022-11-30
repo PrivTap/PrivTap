@@ -3,12 +3,13 @@ import { http } from "@/helpers/axios_service";
 import type PermissionModel from "@/model/permission_model";
 import type RarObjectModel from "@/model/rar_model";
 import type { AxiosInstance } from "axios";
+import { ref } from "vue";
 import { useToast } from "vue-toastification";
 
 export interface IManagePermission {
-    getPermissions(serviceId: string): Promise<PermissionModel[] | null>;
+    getPermissions(serviceId: string): Promise<PermissionModel[]>;
     createPermission(serviceId: string, name: string, description: string, rarObject: RarObjectModel): Promise<PermissionModel | null>;
-    deletePermission(permissionId: string): Promise<PermissionModel[] | null>;
+    deletePermission(serviceId: string, permissionId: string): Promise<PermissionModel[]>;
     updatePermission(permissionId: string, name: string, description: string, rarObject: RarObjectModel): Promise<PermissionModel | null>;
 }
 
@@ -17,6 +18,7 @@ export default class ManagePermission implements IManagePermission {
     private static _instance: ManagePermission;
     http: AxiosInstance;
     path: string = "/permissions";
+    permissions = ref<PermissionModel[]>([]);
 
     private toast = useToast();
 
@@ -49,25 +51,28 @@ export default class ManagePermission implements IManagePermission {
                 description,
                 rarObject
             });
+            const newPermission = response.data.data as PermissionModel;
             this.toast.success("Permission created successfully");
-            /// TODO: Here we should return the permission object but from backend the permission object is not returned
-            return response.data.data as PermissionModel;
+            this.permissions.value.push(newPermission);
+            return newPermission;
         } catch (error) {
             axiosCatch(error);
             return null;
         }
     }
 
-    async deletePermission(permissionId: string): Promise<PermissionModel[] | null> {
+    async deletePermission(serviceId: string, permissionId: string): Promise<PermissionModel[]> {
         try {
-            ///TODO: Check where pass the permissionId
-            const response = await this.http.delete(this.path);
+            const body = {
+                "serviceId": serviceId,
+                "permissionId": permissionId
+            }
+            const response = await this.http.delete(this.path, { data: body });
             this.toast.success("Permission deleted successfully");
-            ///TODO: Should be better to have as response the list of permissions
-            return response.data.data as PermissionModel[];
+            return this.permissions.value.filter((permission) => permission._id !== permissionId);
         } catch (error) {
             axiosCatch(error);
-            return null;
+            return this.permissions.value;
         }
     }
 
@@ -80,8 +85,10 @@ export default class ManagePermission implements IManagePermission {
                 rarObject
             });
             this.toast.success("Permission updated successfully");
-            ///TODO: Should be better to have as response the list of permissions or the updated permission
-            return response.data.data as PermissionModel;
+            const updatedPermission = response.data.data as PermissionModel;
+            const index = this.permissions.value.findIndex((permission) => permission._id === permissionId);
+            this.permissions.value[index] = updatedPermission;
+            return updatedPermission;
         } catch (error) {
             axiosCatch(error);
             return null;
