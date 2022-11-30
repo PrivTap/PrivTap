@@ -186,6 +186,9 @@ paths:
             schema:
               type: object
               properties:
+                name:
+                  type: string
+                  example: ruleNameExample
                 triggerId:
                   type: string
                   example: 63446c0e2677ffe654ea9672
@@ -195,6 +198,7 @@ paths:
               required:
                 - triggerId
                 - actionId
+                - name
       responses:
         '200':
           description: Successful operation
@@ -1009,6 +1013,9 @@ components:
         _id:
           type: string
           example: 637e6c0e2677ffe654ea9672
+        name:
+          type: string
+          example : ruleNameExample
         userId:
           type: string
           example: 637e11162677ffe654ea9672
