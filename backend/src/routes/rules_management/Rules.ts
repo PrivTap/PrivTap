@@ -29,11 +29,12 @@ export default class RulesRoute extends Route {
         const actionId = request.body.actionId;
         //TODO: Check if the triggerId and actionId actually exist
         //TODO CHECK IF TRIGGER AND ACTION ARE EFFECTIVELY COMPATIBLE AND AUTHORIZED
-        if (checkUndefinedParams(response, triggerId, actionId, name)) return;
+        if (checkUndefinedParams(response, name, triggerId, actionId)) return;
         //TODO the response should go down after the control of the token
         const ruleId = await handleInsert(response, Rule, { userId, name, triggerId, actionId });
         if (!ruleId) return;
         success(response);
+
         //every time a rule is created then we should notify the service of the trigger by sending to him
         //triggerId and user Id
         const triggerService = await Trigger.getTriggerServiceNotificationServer(triggerId);
