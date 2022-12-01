@@ -72,6 +72,7 @@ describe("/rules endpoint", () => {
         it ("should succeed if the jwt is valid and no server error occurs", async () => {
             const someRule = [{
                 "userId": "someUserId",
+                "name":"sampleName",
                 "triggerId": "someTriggerId",
                 "actionId": "someActionId",
                 "isAuthorized": true
@@ -204,7 +205,7 @@ describe("/rules endpoint", () => {
                 "ruleId" : "someRuleId"
             };
             const res = await requester.delete("/rules").send(someRuleId);
-            expect(res).to.have.status(500);
+            expect(res).to.have.status(400);
         });
 
         it ("should succeed if the jwt is valid, is associated to the rule creator and no server error occurs", async () => {

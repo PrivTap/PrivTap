@@ -33,7 +33,7 @@ export class APIResponse {
 
 export function checkUndefinedParams(response: Response, ...params: (string | undefined)[]): boolean {
     for (const param of params) {
-        if (param == undefined) {
+        if (param === undefined) {
             badRequest(response, "One of the parameters is missing");
             return true;
         }
