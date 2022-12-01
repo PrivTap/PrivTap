@@ -1,7 +1,8 @@
-/// Build class for the rule
+// Build class for the rule
 
 export default class RuleModel {
     _id: string;
+    name: string;
     userId: string;
     triggerId: string;
     actionId: string;
@@ -9,6 +10,7 @@ export default class RuleModel {
   
     constructor(
       ruleId: string,
+      name: string,
       userId: string,
       triggerId: string,
       actionId: string,
@@ -16,6 +18,7 @@ export default class RuleModel {
   
     ) {
       this._id = ruleId;
+      this.name = name;
       this.userId = userId;
       this.triggerId = triggerId;
       this.actionId = actionId;

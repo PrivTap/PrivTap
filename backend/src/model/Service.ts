@@ -84,6 +84,7 @@ class Service extends Model<IService> {
         const queryResult = await this.find({ _id: serviceId, creator: userId });
         return queryResult != null;
     }
+
 }
 
 export default new Service();

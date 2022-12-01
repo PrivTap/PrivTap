@@ -36,13 +36,16 @@ export type ServiceActions = { serviceName: string, serviceId: string, actions: 
 export type ServiceTriggers = { serviceName: string, serviceId: string, triggers: Partial<ITrigger>[] }
 
 class Authorization extends Model<IAuthorization> {
+    constructor() {
+        super("authorization", authorizationSchema);
+    }
 
     /**
      * Builds an aggregation query that finds all the operations for all services authorized by a user.
      * @param userId the id of the user
      * @param operation the operation type, can be either 'actions' or 'triggers'
      */
-    private serviceAuthorizedByWith(userId: string, operation: "actions" | "triggers") {
+    private servicesAuthorizedByWith(userId: string, operation: "actions" | "triggers") {
         // Create dynamically a projection to remove all non-necessary information from operations
         const operationProjection: Record<string, number> = {};
         for (const key of [`${operation}.endpoint`, `${operation}.serviceId`, `${operation}.__v`, `${operation}.permissions`]) {
@@ -69,8 +72,12 @@ class Authorization extends Model<IAuthorization> {
             .project(operationProjection);
     }
 
-    constructor() {
-        super("authorization", authorizationSchema);
+    /**
+     * Returns all the services with at leas an authorization from the user
+     * @param userId
+     */
+    async findAllAuthorizedServices(userId: string){
+        return await this.findAll({ userId }, "serviceId");
     }
 
     /**
@@ -79,7 +86,7 @@ class Authorization extends Model<IAuthorization> {
      */
     async findAllServicesAuthorizedByUserWithActions(userId: string): Promise<ServiceActions[] | null> {
         try {
-            return await this.serviceAuthorizedByWith(userId, "actions");
+            return await this.servicesAuthorizedByWith(userId, "actions");
         } catch (e) {
             logger.error("Unexpected error while finding services authorized by a user with actions\n", e);
         }
@@ -92,7 +99,7 @@ class Authorization extends Model<IAuthorization> {
      */
     async findAllServicesAuthorizedByUserWithTriggers(userId: string): Promise<ServiceTriggers[] | null> {
         try {
-            return await this.serviceAuthorizedByWith(userId, "triggers");
+            return await this.servicesAuthorizedByWith(userId, "triggers");
         } catch (e) {
             logger.error("Unexpected error while finding services authorized by a user with triggers\n", e);
         }

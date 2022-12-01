@@ -9,16 +9,8 @@ export default interface IManageRule {
   createRule(
     triggerId: string,
     actionId: string,
-    // Does anything else gets filled up from backend here ?
-    //Test 
   ): Promise<RuleModel | null>;
   getRuleById(ruleId: string): Promise<RuleModel | null>;
-  // updateRule(ruleId: string,
-  //   userId: string,
-  //   triggerId: string,
-  //   actionId: string,
-  //   isAuthorized: boolean
-  //   ): Promise<RuleModel | null>;
   deleteRule(ruleId: string): Promise<RuleModel[] | null>;
   getAllRules(): Promise<RuleModel[] | null>;
 }
@@ -32,10 +24,6 @@ export class ManageRule implements IManageRule {
     this.http = http();
   }
 
-  // deleteRule(ruleId: string): Promise<RuleModel[] | null> {
-  //   throw new Error("Method not implemented.");
-  // }
-
   static get getInstance(): ManageRule {
     if (!ManageRule._instance) {
       ManageRule._instance = new ManageRule();
@@ -45,7 +33,7 @@ export class ManageRule implements IManageRule {
 
   path: string = "/manage-rules";
 
-  rules = ref<RuleModel[]>([]); //What did I make here
+  rules = ref<RuleModel[]>([]); 
 
   async getAllRules(): Promise<RuleModel[] | null> {
     try {
@@ -62,13 +50,12 @@ export class ManageRule implements IManageRule {
   async getRuleById(ruleId: string): Promise<RuleModel | null> {
     try {
       const res = await this.http.get(this.path, { params: { ruleId } });
-      return res.data.data[0] as RuleModel;
+      return res.data.data as RuleModel;
     } catch (error) {
       axiosCatch(error);
       return null;
     }
   }
-
 
   async createRule(
     triggerId: string,
@@ -79,7 +66,6 @@ export class ManageRule implements IManageRule {
       actionId: actionId,
     };
     try {
-      console.log(body);
       const res = await this.http.post(this.path, body);
       useToast().success("Rule created");
       return res.data.data as RuleModel;
@@ -88,30 +74,6 @@ export class ManageRule implements IManageRule {
       return null;
     }
   }
-
-
-  // async updateRule(ruleId: string, 
-  //   userId: string, 
-  //   triggerId: string, 
-  //   actionId: string, 
-  //   isAuthorized: boolean
-  //   ): Promise<RuleModel | null> {
-  //     try {
-  //       const body = {
-  //         userId: userId,
-  //         triggerId: triggerId,
-  //         actionId: actionId,
-  //         isAuthorized: isAuthorized,
-  //       }
-  //       console.log(body);
-  //       const res = await this.http.put(this.path, body);
-  //       useToast().success("Rule updated");
-  //       return res.data.data as RuleModel;
-  //     } catch (error){
-  //       axiosCatch(error);
-  //       return null;
-  //     }
-  // }
 
   async deleteRule(ruleId: string): Promise<Array<RuleModel> | null> {
     try {

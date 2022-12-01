@@ -5,7 +5,6 @@ import sinonChai = require("sinon-chai");
 import app from "../../src/app";
 import Authentication, { AuthError } from "../../src/helper/authentication";
 import Authorization from "../../src/model/Authorization";
-import Logger from "../../src/helper/logger";
 import { beforeEach } from "mocha";
 
 use(chaiHttp);
@@ -21,22 +20,22 @@ describe("/actions endpoint", () => {
     let checkJWTStub: SinonStub;
     let findAllServicesAuthorizedByUserWithActionsStub: SinonStub;
 
-    const service1 = { _id: "8380b79b38dda0d2f6be3746", name: "Service 1" };
-    const service2 = { _id: "9380b79b38dda0d2f6be3746", name: "Service 2" };
+    const exampleService1 = { _id: "8380b79b38dda0d2f6be3746", name: "Service 1" };
+    const exampleService2 = { _id: "9380b79b38dda0d2f6be3746", name: "Service 2" };
 
-    const action1 = { _id: "0380b79b38dda0d2f6be3746", name: "Action 1", description: "Action 1 desc" };
-    const action2 = { _id: "1380b79b38dda0d2f6be3746", name: "Action 2", description: "Action 2 desc" };
+    const exampleAction1 = { _id: "0380b79b38dda0d2f6be3746", name: "Action 1", description: "Action 1 desc" };
+    const exampleAction2 = { _id: "1380b79b38dda0d2f6be3746", name: "Action 2", description: "Action 2 desc" };
 
     const serviceWithActions = [
         {
-            serviceName: service1.name,
-            serviceId: service1._id,
-            actions: [action1]
+            serviceName: exampleService1.name,
+            serviceId: exampleService1._id,
+            actions: [exampleAction1]
         },
         {
-            serviceName: service2.name,
-            serviceId: service2._id,
-            actions: [action2]
+            serviceName: exampleService2.name,
+            serviceId: exampleService2._id,
+            actions: [exampleAction2]
         }
     ];
 
@@ -85,7 +84,7 @@ describe("/actions endpoint", () => {
         });
 
         it("should return an empty list if the user has not authorized any service", async () => {
-            findAllServicesAuthorizedByUserWithActionsStub.resolves(null);
+            findAllServicesAuthorizedByUserWithActionsStub.resolves([]);
 
             const res = await requester.get(endpoint);
             expect(res).to.have.status(200);

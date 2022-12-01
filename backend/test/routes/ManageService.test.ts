@@ -4,10 +4,8 @@ import { createSandbox, SinonStub } from "sinon";
 import sinonChai = require("sinon-chai");
 import app from "../../src/app";
 import Service from "../../src/model/Service";
-import mongoose from "mongoose";
 import Model from "../../src/Model";
 import Authentication from "../../src/helper/authentication";
-import Logger from "../../src/helper/logger";
 import { beforeEach } from "mocha";
 
 
@@ -52,7 +50,7 @@ describe("/manageService endpoint", () => {
         findServicesCreatedByUserStub = sandbox.stub(Service, "findAllCreatedByUser");
         findServiceCreatedByUserStub = sandbox.stub(Service, "findById");
         deleteServiceStub = sandbox.stub(Service, "delete");
-        isCreatorStub = sandbox.stub(Service, "isCreator");
+        isCreatorStub = sandbox.stub(Service, "isCreator").resolves(true);
         updateStub = sandbox.stub(Model.prototype, "updateWithFilter");
     });
 
@@ -175,7 +173,7 @@ describe("/manageService endpoint", () => {
     });
 
     describe("DELETE /", () => {
-        
+
         it("Should fail when there are wrong parameter", async () => {
             const res = await requester.delete("/manage-services");
             expect(res).to.have.status(400);
