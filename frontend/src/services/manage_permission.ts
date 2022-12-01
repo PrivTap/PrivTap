@@ -10,7 +10,7 @@ export interface IManagePermission {
     getPermissions(serviceId: string): Promise<PermissionModel[]>;
     createPermission(serviceId: string, name: string, description: string, rarObject: RarObjectModel): Promise<PermissionModel | null>;
     deletePermission(serviceId: string, permissionId: string): Promise<PermissionModel[]>;
-    updatePermission(permissionId: string, name: string, description: string, rarObject: RarObjectModel): Promise<PermissionModel | null>;
+    updatePermission(serviceId: string, permissionId: string, name: string, description: string, rarObject: RarObjectModel): Promise<PermissionModel | null>;
 }
 
 export default class ManagePermission implements IManagePermission {
@@ -36,10 +36,11 @@ export default class ManagePermission implements IManagePermission {
     async getPermissions(serviceId: string): Promise<PermissionModel[]> {
         try {
             const response = await this.http.get(this.path, { params: { serviceId } });
-            return response.data.data as PermissionModel[];
+            this.permissions.value = response.data.data as PermissionModel[];
+            return this.permissions.value;
         } catch (error) {
             axiosCatch(error);
-            return [];
+            return this.permissions.value;
         }
     }
 
@@ -69,21 +70,24 @@ export default class ManagePermission implements IManagePermission {
             }
             const response = await this.http.delete(this.path, { data: body });
             this.toast.success("Permission deleted successfully");
-            return this.permissions.value.filter((permission) => permission._id !== permissionId);
+            this.permissions.value = this.permissions.value.filter((permission) => permission._id !== permissionId);
+            return this.permissions.value;
         } catch (error) {
             axiosCatch(error);
             return this.permissions.value;
         }
     }
 
-    async updatePermission(permissionId: string, name: string, description: string, rarObject: RarObjectModel): Promise<PermissionModel | null> {
+    async updatePermission(serviceId: string, permissionId: string, name: string, description: string, rarObject: RarObjectModel): Promise<PermissionModel | null> {
         try {
-            const response = await this.http.put(this.path, {
-                permissionId,
-                name,
-                description,
-                rarObject
-            });
+            const body = {
+                "serviceId": serviceId,
+                "permissionId": permissionId,
+                "name": name,
+                "description": description,
+                "rarObject": rarObject
+            }
+            const response = await this.http.put(this.path, body);
             this.toast.success("Permission updated successfully");
             const updatedPermission = response.data.data as PermissionModel;
             const index = this.permissions.value.findIndex((permission) => permission._id === permissionId);

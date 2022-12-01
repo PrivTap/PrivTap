@@ -6,14 +6,32 @@ import "./assets/style.css";
 import Toast, { type PluginOptions, POSITION } from "vue-toastification";
 import "vue-toastification/dist/index.css";
 import piniaPersist from "pinia-plugin-persist";
-import ElementPlus from 'element-plus'
-import 'element-plus/dist/index.css'
+import 'vuetify/styles'
+import { createVuetify, type ThemeDefinition } from 'vuetify'
+import '@mdi/font/css/materialdesignicons.css'
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives'
+
+const darkTheme: ThemeDefinition = {
+  dark: true,
+}
+
+const vuetify = createVuetify({
+  components,
+  directives,
+  theme: {
+    defaultTheme: 'darkTheme',
+    themes: {
+      darkTheme
+    }
+  }
+})
 
 const pinia = createPinia();
 pinia.use(piniaPersist);
 
 const app = createApp(App);
-app.use(ElementPlus)
+app.use(vuetify)
 app.use(pinia);
 app.use(router);
 const options: PluginOptions = {
