@@ -925,6 +925,9 @@ paths:
             schema:
               type: object
               properties:
+                serviceId:
+                  type: string
+                  example: 617aac0e2611ffe654ea9a71
                 permissionId:
                   type: string
                   example: 617aac0e2611ffe654ea9a71

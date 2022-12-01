@@ -64,7 +64,6 @@ export default class AuthService implements IAuthService {
   async logout(): Promise<boolean> {
     try {
       const res = await this.http.get<StandartRepsonse<Object>>("/logout");
-      console.log(res, "logout\n\n");
       if (res.data.status) return true
       return false;
     } catch (error) {
