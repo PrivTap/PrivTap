@@ -60,8 +60,8 @@ export class Permission extends Model<IPermission> {
         return filteredPermissions.length == 1;
     }
 
-    async findByServiceId(serviceId: string): Promise<IPermission[] | null> {
-        return await this.findAll({ serviceId });
+    async findByServiceId(serviceId: string, select?: string): Promise<IPermission[] | null> {
+        return await this.findAll({ serviceId }, select);
     }
 
     async belongsToService(permissionId: string, serviceId: string): Promise<boolean> {

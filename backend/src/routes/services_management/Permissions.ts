@@ -25,12 +25,13 @@ export default class ManageActionsRoute extends Route {
             return;
         }
 
-        if (! await Service.isCreator(userId, serviceId)){
-            forbiddenUserError(response, "You don't have enough privileges to modify this service");
-            return;
-        }
+        let permissions;
 
-        const permissions = await Permission.findByServiceId(serviceId);
+        if ( await Service.isCreator(userId, serviceId) ){
+            permissions = await Permission.findByServiceId(serviceId);
+        } else {
+            permissions = await Permission.findByServiceId(serviceId, "-rarObject");
+        }
         if (!permissions) {
             internalServerError(response);
             return;
