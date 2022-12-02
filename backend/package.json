@@ -7,7 +7,7 @@
     "start": "node dist/app.js",
     "dev": "nodemon src/app.ts",
     "lint": "eslint **/*.ts --fix",
-    "run": "npx tsc && node dist/app.js",
+    "run": "npx tsc && node dist/app.js --experimental-global-webcrypto --experimental-fetch",
     "test": "mocha --require ts-node/register --require test/prepare.ts 'test/**/*.ts'",
     "coverage": "nyc --reporter=html npm test"
   },
@@ -23,6 +23,7 @@
     "mongoose": "^6.7.2",
     "morgan": "~1.9.1",
     "node-mailjet": "^5.1.1",
+    "oauth4webapi": "^2.0.4",
     "promisified-pipe": "^1.0.0",
     "swagger-jsdoc": "^6.2.5",
     "swagger-ui-express": "^4.6.0",
@@ -61,3 +62,5 @@
     "typescript": "^4.8.4"
   }
 }
+
+
