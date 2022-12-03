@@ -101,7 +101,7 @@ export async function handleUpdate<T>(response: Response, model: Model<T>, filte
             // true if no error occurred. false otherwise
             updateResult = await model.updateWithFilter(filter, update);
         if (!updateResult) {
-            badRequest(response, "A service with this id does not exist");
+            badRequest(response, "An object with this id does not exist");
             return false;
         }
         if (returnObject)

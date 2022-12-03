@@ -43,9 +43,10 @@ export default class ManageActionsRoute extends Route {
         }
 
         // Insert the action
-        if (!await handleInsert(response, Action, { name, description, serviceId, endpoint, permissions })) return;
+        const action = await handleInsert(response, Action, { name, description, serviceId, endpoint, permissions }, true) as IAction;
+        if (!action) return;
 
-        success(response);
+        success(response, action);
     }
 
     protected async httpDelete(request: Request, response: Response): Promise<void> {
@@ -80,9 +81,9 @@ export default class ManageActionsRoute extends Route {
             return;
         }
 
-        const queriedActionId = handleUpdate(response, Action, { actionId }, { name, description, permissions, endpoint });
-        if(!queriedActionId) return;
+        const queriedAction = await handleUpdate(response, Action, { "_id": actionId }, { name, description, permissions, endpoint }, true) as IAction;
+        if(!queriedAction) return;
 
-        success(response);
+        success(response, queriedAction);
     }
 }
