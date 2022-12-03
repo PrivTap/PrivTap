@@ -1,7 +1,7 @@
 <template>
-  <div class="flex flex-col items-center justify-center relative h-screen">
-    <img :src="radial" class="w-1/2">
-    <div class="absolute top-2 w-full overflow-y-auto overscroll-contain h-5/6">
+  <div class="flex flex-col items-center justify-center relative h-full">
+    <img :src="radial" alt  class="w-1/2">
+    <div class="absolute top-2 w-full h-5/6">
       <h1 class="text-5xl text-blue-100 text-center pb-12 font-medium">
         OSP Personal Page
       </h1>
@@ -13,10 +13,10 @@
         <h1 class="text-lg text-stone-400 text-center pt-4 pb-10 font-medium">
           Create a service by clicking the button below
         </h1>
-        <img :src=empty class="h-72 ">
+        <img :src=empty alt class="h-72 ">
       </div>
       <div v-if="isLoading" class="flex flex-col justify-center items-center content-center ">
-        <img :src="logo" class="h-32 my-20 animate-bounce">
+        <img :src="logo" alt class="h-32 my-20 animate-bounce">
       </div>
 
       <div class="flex flex-row justify-center py-10">
@@ -50,6 +50,7 @@ const services = manageService.services;
 
 
 onMounted(async () => {
+  console.log("here");
   await manageService.getAllServices();
   isLoading.value = false;
 });

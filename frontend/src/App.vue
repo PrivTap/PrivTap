@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { storeToRefs } from "pinia";
-import { watch } from "vue";
-import { RouterView, useRouter } from "vue-router";
-import { useAuthStore } from "./stores/auth_store";
+import {storeToRefs} from "pinia";
+import {watch} from "vue";
+import {RouterView, useRouter} from "vue-router";
+import {useAuthStore} from "./stores/auth_store";
 import NavBar from "./components/NavBar.vue";
 import RoutingPath from "./router/routing_path";
+import GoTopButton from "./components/GoTopButton.vue"
 
 /// Used to access the store variables and functions
 const authStore = useAuthStore();
@@ -21,6 +22,9 @@ watch(userStore.isAutheticated, (val) => {
 </script>
 
 <template>
-  <NavBar class="flex" />
-  <RouterView class="h-[calc(100vh-116px)]" />
+  <NavBar class="flex"/>
+  <RouterView class="h-[calc(100vh-116px)]">
+  </RouterView>
+  <GoTopButton class="position-sticky bottom-0 right-0"/>
+
 </template>

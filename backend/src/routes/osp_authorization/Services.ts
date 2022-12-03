@@ -18,7 +18,7 @@ export default class ServicesRoute extends Route {
         if(authorized){
             services =  await Authorization.findAllAuthorizedServices(userId);
         } else {
-            services = await Service.findAll({}, "name description");
+            services = await Service.findAll({}, "_id name description");
         }
 
         if (services)

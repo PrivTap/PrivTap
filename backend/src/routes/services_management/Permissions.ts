@@ -114,7 +114,7 @@ export default class ManageActionsRoute extends Route {
             badRequest(response, "This service doesn't exists");
             return;
         }
-
+        //improve this with just a single query
         if (! await Service.isCreator(userId, serviceId)){
             forbiddenUserError(response, "You don't have enough privileges to modify this service");
             return;
@@ -123,7 +123,7 @@ export default class ManageActionsRoute extends Route {
         if (! await Permission.belongsToService(permissionId, serviceId)){
             forbiddenUserError(response, "You don't have enough privileges to modify this permission");
             return;
-        }
+        }   
 
         const queriedPermission = await handleUpdate(response, Permission, { permissionId }, { name, description, serviceId, rarObject }, true) as IPermission;
         if (!queriedPermission) return;
