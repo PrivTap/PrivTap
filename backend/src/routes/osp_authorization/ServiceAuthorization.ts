@@ -1,56 +1,56 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
 import { success } from "../../helper/http";
-import * as oauth from "../../helper/oauth";
+import { AuthorizationCode, AuthorizationTokenConfig, ModuleOptions } from "simple-oauth2";
+import env from "../../helper/env";
 
 export default class ServiceAuthorizationRoute extends Route {
+    static config: ModuleOptions;
+    static client: AuthorizationCode;
+
     constructor() {
         super("service-authorization", false, false);
+        ServiceAuthorizationRoute.config = {
+            client: {
+                id: env.CLIENT_ID,
+                secret: env.CLIENT_SECRET
+            },
+            auth: {
+                tokenHost: "https://github.com",
+                tokenPath: "/login/oauth/access_token",
+                authorizePath: "/login/oauth/authorize",
+            }
+        };
+        ServiceAuthorizationRoute.client = new AuthorizationCode(ServiceAuthorizationRoute.config);
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
+        const { code } = request.query;
+        const options = {
+            code,
+        };
+        console.log(code);
+
+        console.log(options);
+        try {
+            const accessToken = await ServiceAuthorizationRoute.client.getToken(options as AuthorizationTokenConfig);
+            console.log("The resulting token: ", accessToken.token);
+        } catch (e) {
+            console.error("Access Token Error");
+        }
+
         success(response, {}, "Not implemented");
     }
 
     protected async httpPost(request: Request, response: Response): Promise<void> {
-        const issuer = new URL("https://accounts.google.com");
-        const authServerMetaData = await oauth
-            .discoveryRequest(issuer, { algorithm: "oidc" });
+        const authorizationUri = ServiceAuthorizationRoute.client.authorizeURL({
+            redirect_uri: "http://127.0.0.1:8000/api/service-authorization",
+            scope: "user",
+        });
 
-        const redirect_uri = "http:/127.0.0.1:8000/service-authorization";
-        const code_verifier = oauth.generateRandomCodeVerifier();
-        const code_challenge = await oauth.calculatePKCECodeChallenge(code_verifier);
-        const code_challenge_method = "S256";
+        console.log(authorizationUri);
 
-        const client: oauth.Client = {
-            client_id: "116309827086-k1i6vtu7r26f6a0pr0vp2nf005uen4b2.apps.googleusercontent.com",
-            client_secret:
-                "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",
-            token_endpoint_auth_method: "client_secret_basic",
-        };
-        let discoveryResponse;
-
-        if (authServerMetaData) {
-            discoveryResponse = await oauth.processDiscoveryResponse(issuer, authServerMetaData);
-        } else {
-            console.log("error during the discovery process");
-        }
-
-        if (!discoveryResponse){
-            return;
-        }
-
-        const authorizationUrl = new URL(discoveryResponse.authorization_endpoint!);
-        authorizationUrl.searchParams.set("client_id", client.client_id);
-        authorizationUrl.searchParams.set("code_challenge", code_challenge);
-        authorizationUrl.searchParams.set("code_challenge_method", code_challenge_method);
-        authorizationUrl.searchParams.set("redirect_uri", redirect_uri);
-        authorizationUrl.searchParams.set("response_type", "code");
-        authorizationUrl.searchParams.set("scope", "api:read");
-
-        console.log(authorizationUrl);
-
-        success(response, {}, "Not implemented");
+        success(response, { "redirectUri": authorizationUri });
     }
 
     protected async httpDelete(request: Request, response: Response): Promise<void> {
