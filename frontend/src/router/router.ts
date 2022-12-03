@@ -88,6 +88,19 @@ const router = createRouter({
         requireAuth: true,
       },
     },
+
+    {
+      path: `${RoutingPath.SERVICE_TRIGGER_PAGE}/:id?`,
+      name: "servicetrigger",
+      component: () => import("../views/OspManageTriggerView.vue"),
+      meta: {
+        requireAuth: true,
+      },
+    },
+
+
+
+
     {
       path: "/:pathMatch(.*)*",
       name: "not-found",

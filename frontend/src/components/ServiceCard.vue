@@ -40,7 +40,8 @@
           @click="router.push(`${RoutingPath.SERVICE_PERMISSION_PAGE}/${props.service._id}`)">
           View Permission
         </v-btn>
-        <v-btn color="green" size="small" variant="flat">
+        <v-btn color="green" size="small" variant="flat"
+          @click="router.push(`${RoutingPath.SERVICE_TRIGGER_PAGE}/${props.service._id}`)">
           View Triggers
         </v-btn>
         <v-btn color="yellow" size="small" variant="flat">
