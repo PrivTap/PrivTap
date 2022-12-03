@@ -2,13 +2,13 @@
     <div class="bg-slate-800 rounded-lg py-8 px-8 shadow-lg">
         <p class="text-2xl font-medium"> {{ trigger.name }} </p>
         <p class="text-lg font-medium text-white/60"> {{ trigger.description }} </p>
-        <p class="text-lg font-medium text-white/90 py-5"> Service id: {{ trigger.serviceId }} </p>
+        <p class="text-lg font-medium text-white/90 py-5"> Service id: {{ trigger.serviceId + "AAAAAAA" }} </p>
         <br>
         <h1 class="pt-4 pb-2">Permissions: </h1>
 
-        <!-- <v-chip v-for="a in trigger.permissions" :tag="a" size="small" class="mr-2" color="green">
+        <v-chip v-for="a in trigger.permissions" :tag="a" size="small" class="mr-2" color="green">
             {{ a }}
-        </v-chip> -->
+        </v-chip>
         <div class="flex justify-end mt-5 space-x-5">
             <v-dialog v-model="dialog" persistent>
                 <template v-slot:activator="{ props }">
@@ -16,7 +16,7 @@
                         Edit
                     </v-btn>
                 </template>
-                <CreateTrigger :serviceId=props.trigger.serviceId :onCancel="() => dialog = false" :onEdit="true" :trigger="props.trigger" />
+                <CreateTriggerVue :serviceId=props.trigger.serviceId :onCancel="() => dialog = false" :onEdit="true" :trigger="props.trigger"/>
             </v-dialog>
             <v-btn color="error" @click="(showDialog = true)">
                 Delete
@@ -29,12 +29,19 @@
     </div>
 </template>
 
+
+
+
+
+
 <script setup lang="ts">
 import type TriggerModel from '@/model/trigger_model';
 import ManageTrigger from '@/services/manage_trigger';
 import { defineProps, ref } from 'vue';
 import ModalComponent from './ModalComponent.vue';
-import type { trigger } from '@vue/reactivity';
+import CreateTriggerVue from './CreateTrigger.vue';
+
+
 const props = defineProps<{
     trigger: TriggerModel;
 }>();
@@ -48,9 +55,17 @@ function onModalClose(res: boolean) {
     if (!res) return;
     manageTrigger.deleteTrigger(props.trigger._id);
 }
-
 </script>
 
+
+
+
+
+
+
+
+
 <style scoped>
+
 
 </style>

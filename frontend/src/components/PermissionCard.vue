@@ -51,6 +51,7 @@ function onModalClose(res: boolean) {
     managePermission.deletePermission(props.permission.serviceId, props.permission._id);
 }
 
+
 </script>
 
 <style scoped>

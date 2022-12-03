@@ -39,7 +39,7 @@ export interface IManageAction {
 
   }
   
-  export class ManageAction
+  export default class ManageAction
    implements IManageAction {
   
 

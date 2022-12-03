@@ -106,6 +106,7 @@ const form = reactive({
 
 const managePermission = ManagePermission.getInstance;
 
+
 async function validate() {
     const { valid } = await formRef.value.validate();
     console.log(valid);
@@ -119,6 +120,12 @@ async function validate() {
         props.onCancel();
     }
 }
+
+
+
+
+
+
 function resetValidation() {
     formRef.value.resetValidation()
 }

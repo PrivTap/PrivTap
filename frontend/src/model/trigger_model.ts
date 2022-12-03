@@ -1,19 +1,17 @@
  
-import type PermissionModel from "./permission_model";
-
 export default class TriggerModel {
     _id: string;
     name: string;
-    serviceId: string;
     description: string;
-    premission: PermissionModel[];
+    serviceId: string;
+    permissions: string[];
 
     constructor(
         triggerId: string,
         name: string,
-        serviceId: string,
         description: string,
-        premission: PermissionModel[],
+        serviceId: string,
+        permissions: string[],
 
     ) {
 
@@ -21,6 +19,6 @@ export default class TriggerModel {
         this.name = name;
         this.description = description;
         this.serviceId = serviceId;
-        this.premission = premission;
+        this.permissions = permissions;
     }
 }

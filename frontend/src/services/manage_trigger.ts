@@ -1,6 +1,5 @@
 import axiosCatch from "@/helpers/axios_catch";
 import { http } from "@/helpers/axios_service";
-import type PermissionModel from "@/model/permission_model";
 import type TriggerModel from "@/model/trigger_model";
 import type { AxiosInstance } from "axios";
 import { ref } from "vue";
@@ -11,11 +10,10 @@ import { useToast } from "vue-toastification";
 export interface IManageTrigger {
 
   createTrigger(
-    triggerId: string,
     name: string,
-    serviceId: string,
     description: string,
-    premission: PermissionModel[],
+    serviceId: string,
+    permission: string[],
   ): Promise<TriggerModel | null>;
 
   getTriggerById(
@@ -23,11 +21,10 @@ export interface IManageTrigger {
     ): Promise<TriggerModel | null>;
 
   updateTrigger(
-    triggerId: string,
     name: string,
     serviceId: string,
     description: string,
-    premission: PermissionModel[],
+    permission: string[],
     ): Promise<TriggerModel | null>;
 
   deleteTrigger(
@@ -35,7 +32,7 @@ export interface IManageTrigger {
     ): Promise<TriggerModel[] | null>;
 
   getAllTriggers(
-
+  serviceId: string,
   ): Promise<TriggerModel[] | null>;
   }
   
@@ -43,8 +40,9 @@ export interface IManageTrigger {
    implements IManageTrigger {
 
     private static _instance: ManageTrigger;
-
     http: AxiosInstance;
+    path: string = "/manage-triggers";
+    toast: any;
   
     private constructor() {
       this.http = http();
@@ -59,20 +57,22 @@ export interface IManageTrigger {
       return ManageTrigger._instance;
     }
   
-    path: string = "/manage-triggers";
   
     triggers = ref<TriggerModel[]>([]); 
-  
-    async getAllTriggers(): Promise<TriggerModel[] | null> {
+
+
+    async getAllTriggers(serviceId: string): Promise<TriggerModel[]> {
       try {
-        const res = await this.http.get(this.path);
-        this.triggers.value = res.data.data as TriggerModel[];
-        return res.data.data;
+          const response = await this.http.get(this.path, { params: { serviceId } });
+          this.triggers.value = response.data.data as TriggerModel[];
+          return this.triggers.value;
       } catch (error) {
-        axiosCatch(error);
-        return null;
+          axiosCatch(error);
+          return this.triggers.value;
       }
-    }
+  }
+
+
 
     async getTriggerById(triggerId: string): Promise<TriggerModel | null> {
       try {
@@ -86,18 +86,16 @@ export interface IManageTrigger {
 
 
     async createTrigger(
-      triggerId: string,
       name: string,
-      serviceId: string,
       description: string,
-      premission: PermissionModel[],
+      serviceId: string,
+      permission: string[],
     ): Promise<TriggerModel | null> {
       const body = {
-        triggerId: triggerId,
         name: name,
-        serviceId: serviceId,
         description: description,
-        premission: premission,
+        serviceId: serviceId,
+        permission: permission,
       };
       try {
         const res = await this.http.post(this.path, body);
@@ -111,19 +109,17 @@ export interface IManageTrigger {
 
     
   async updateTrigger(
-    triggerId: string,
     name: string,
     serviceId: string,
     description: string,
-    premission: PermissionModel[],
+    permission: string[],
 ): Promise<TriggerModel | null> {
   try {
     const body = {
-      triggerId: triggerId,
       name: name,
       serviceId: serviceId,
       description: description,
-      premission: premission,
+      permission: permission,
     }
     const res = await this.http.put(this.path, body);
     useToast().success("Trigger updated");
@@ -133,6 +129,9 @@ export interface IManageTrigger {
     return null;
   }
 }
+
+
+
 
 async deleteTrigger(triggerId: string): Promise<Array<TriggerModel> | null> {
   try {
