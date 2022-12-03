@@ -8,7 +8,7 @@ import { useToast } from "vue-toastification";
  
 
 
-export default interface IManageTrigger {
+export interface IManageTrigger {
 
   createTrigger(
     triggerId: string,
@@ -39,7 +39,7 @@ export default interface IManageTrigger {
   ): Promise<TriggerModel[] | null>;
   }
   
-  export class ManageTrigger
+  export default class ManageTrigger
    implements IManageTrigger {
 
     private static _instance: ManageTrigger;
