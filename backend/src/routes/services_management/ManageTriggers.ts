@@ -78,7 +78,7 @@ export default class ManageTriggersRoute extends Route {
             return;
         }
 
-        const queriedTriggerId = handleUpdate(response, Trigger, { triggerId }, { name, description, permissions, resourceServer });
+        const queriedTriggerId = await handleUpdate(response, Trigger, { triggerId }, { name, description, permissions, resourceServer });
         if(!queriedTriggerId) return;
 
         success(response);
