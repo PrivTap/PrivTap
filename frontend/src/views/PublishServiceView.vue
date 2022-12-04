@@ -59,6 +59,7 @@ import { useRoute } from "vue-router";
 import { ManageService } from "@/services/manage_service";
 import router from "@/router/router";
 import RoutingPath from "@/router/routing_path";
+import { isValidUrlRegex } from "@/helpers/validators";
 
 const route = useRoute();
 const isValidUrl = ref<boolean>(true);
@@ -103,9 +104,7 @@ watch(
 
 /// function that check if a string is a valid url
 function checkUrl(url: string): boolean {
-  return /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?$/i.test(
-    url
-  );
+  return isValidUrlRegex(url);
 }
 
 async function onSubmitted() {

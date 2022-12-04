@@ -11,4 +11,5 @@ export default class RoutingPath {
   static readonly MODIFY_AUTH_PAGE = "/modifyauth";
   static readonly SERVICE_PERMISSION_PAGE = "/servicepermission";
   static readonly SERVICE_TRIGGER_PAGE = "/servicetrigger";
+  static readonly SERVICE_ACTION_PAGE = "/serviceaction";
 }

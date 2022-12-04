@@ -37,7 +37,7 @@
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import RoutingPath from "@/router/routing_path";
-import ServiceCard from "@/components/ServiceCard.vue";
+import ServiceCard from "@/components/ServiceComponents/ServiceCard.vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
 import { ManageService } from "@/services/manage_service";
 import empty from '@/assets/images/empty.svg';

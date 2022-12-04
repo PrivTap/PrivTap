@@ -35,8 +35,8 @@
 import type PermissionModel from '@/model/permission_model';
 import ManagePermission from '@/services/manage_permission';
 import { defineProps, ref } from 'vue';
-import ModalComponent from './ModalComponent.vue';
-import CreatePermissionVue from './CreatePermission.vue';
+import ModalComponent from '@/components/ModalComponent.vue';
+import CreatePermissionVue from './PermissionForm.vue';
 const props = defineProps<{
     permission: PermissionModel;
 }>();

@@ -102,6 +102,14 @@ const router = createRouter({
 
 
     {
+      path: `${RoutingPath.SERVICE_ACTION_PAGE}/:id?`,
+      name: "serviceaction",
+      component: () => import("../views/OspManageActionView.vue"),
+      meta: {
+        requireAuth: true,
+      },
+    },
+    {
       path: "/:pathMatch(.*)*",
       name: "not-found",
       redirect: "/home",

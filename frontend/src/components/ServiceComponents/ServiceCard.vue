@@ -38,14 +38,14 @@
       <div class="pt-4 space-x-2">
         <v-btn size="small" variant="flat" color="primary"
           @click="router.push(`${RoutingPath.SERVICE_PERMISSION_PAGE}/${props.service._id}`)">
-          View Permission
+          Permission
         </v-btn>
-        <v-btn color="green" size="small" variant="flat"
-          @click="router.push(`${RoutingPath.SERVICE_TRIGGER_PAGE}/${props.service._id}`)">
-          View Triggers
+        <v-btn color="green" size="small" variant="flat">
+          Triggers
         </v-btn>
-        <v-btn color="yellow" size="small" variant="flat">
-          View Actions
+        <v-btn color="indigo" size="small" variant="flat"
+          @click="router.push(`${RoutingPath.SERVICE_ACTION_PAGE}/${props.service._id}`)">
+          Actions
         </v-btn>
       </div>
 
@@ -78,8 +78,6 @@ import ModalComponent from "@/components/ModalComponent.vue";
 import router from "@/router/router";
 import RoutingPath from "@/router/routing_path";
 import { ManageService } from "@/services/manage_service";
-
-const activeName = ref('1')
 
 const showPass = ref(false);
 const showModal = ref(false);

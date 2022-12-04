@@ -4,138 +4,111 @@ import type ActionModel from "@/model/action_model";
 import type { AxiosInstance } from "axios";
 import { ref } from "vue";
 import { useToast } from "vue-toastification";
- 
+
 
 
 export interface IManageAction {
-
-  createAction(
-    actionId: string,
+  getAllActions(serviceId: string): Promise<ActionModel[]>;
+  createAction(name: string, description: string, serviceId: string, permissions: string[], endpoint: string): Promise<ActionModel | null>;
+  deleteAction(actionId: string): Promise<ActionModel[]>;
+  updateAction(actionId: string,
     name: string,
     description: string,
-    serviceName: string,
-    serviceId: string,
-  ): Promise<ActionModel | null>;
+    permissions: string[],
+    endpoint: string): Promise<ActionModel | null>;
+}
 
-  getActionById(
-    actionId: string
-    ): Promise<ActionModel | null>;
+export class ManageAction implements IManageAction {
 
-  updateAction(
-    actionId: string,
-    name: string,
-    description: string,
-    serviceName: string,
-    serviceId: string,
-    ): Promise<ActionModel | null>;
+  private static _instance: ManageAction;
 
-  deleteAction(
-    actionId: string
-    ): Promise<ActionModel[] | null>;
-
-  getAllActions(
-
-    ): Promise<ActionModel[] | null>;
-
+  http: AxiosInstance;
+  private constructor() {
+    this.http = http();
   }
-  
-  export default class ManageAction
-   implements IManageAction {
-  
 
-    private static _instance: ManageAction;
-    
-    http: AxiosInstance; 
-    private constructor() {
-      this.http = http();
+
+  static get getInstance(): ManageAction {
+    if (!ManageAction._instance) {
+      ManageAction._instance = new ManageAction();
     }
+    return ManageAction._instance;
+  }
 
-  
-     static get getInstance(): ManageAction {
-      if (!ManageAction._instance) {
-        ManageAction._instance = new ManageAction();
-      }
-      return ManageAction._instance;
+
+  path: string = "/manage-actions";
+
+  actions = ref<ActionModel[]>([]);
+
+  async getAllActions(serviceId: string): Promise<ActionModel[]> {
+    try {
+      const res = await this.http.get(this.path, { params: { serviceId } });
+      this.actions.value = res.data.data as ActionModel[];
+      return res.data.data;
+    } catch (error) {
+      axiosCatch(error);
+      return this.actions.value;
     }
- 
+  }
 
-    path: string = "/manage-actions";
-  
-    actions = ref<ActionModel[]>([]); 
-  
-    async getAllActions(): Promise<ActionModel[] | null> {
-      try {
-        const res = await this.http.get(this.path);
-        this.actions.value = res.data.data as ActionModel[];
-        return res.data.data;
-      } catch (error) {
-        axiosCatch(error);
-        return null;
-      }
+  async createAction(
+    name: string,
+    description: string,
+    serviceId: string,
+    permissions: string[],
+    endpoint: string,
+  ): Promise<ActionModel | null> {
+    const body = {
+      name: name,
+      description: description,
+      serviceId: serviceId,
+      permissions: permissions,
+      endpoint: endpoint,
+    };
+    try {
+      const res = await this.http.post(this.path, body);
+      useToast().success("Action created");
+      const action = res.data.data as ActionModel;
+      this.actions.value.push(action);
+      return action;
+    } catch (error) {
+      axiosCatch(error);
+      return null;
     }
+  }
 
-
-    async getActionById(actionId: string): Promise<ActionModel | null> {
-      try {
-        const res = await this.http.get(this.path, { params: { actionId } });
-        return res.data.data as ActionModel;
-      } catch (error) {
-        axiosCatch(error);
-        return null;
-      }
-    }
-
-    async createAction(
-      actionId: string,
-      name: string,
-      description: string,
-      serviceName: string,
-      serviceId: string,
-    ): Promise<ActionModel | null> {
-      const body = {
-        actionId: actionId,
-        name: name,
-        description: description,
-        serviceName: serviceName,
-        serviceId: serviceId,
-      };
-      try {
-        const res = await this.http.post(this.path, body);
-        useToast().success("Action created");
-        return res.data.data as ActionModel;
-      } catch (error) {
-        axiosCatch(error);
-        return null;
-      }
-    }
-  
-    
   async updateAction(
-      actionId: string,
-      name: string,
-      description: string,
-      serviceName: string,
-      serviceId: string,
+    actionId: string,
+    name: string,
+    description: string,
+    permissions: string[],
+    endpoint: string,
   ): Promise<ActionModel | null> {
     try {
       const body = {
         actionId: actionId,
         name: name,
         description: description,
-        serviceName: serviceName,
-        serviceId: serviceId,
+        permissions: permissions,
+        endpoint: endpoint,
       }
       const res = await this.http.put(this.path, body);
       useToast().success("Action updated");
-      return res.data.data as ActionModel;
+      const updatedAction = res.data.data as ActionModel;
+      this.actions.value = this.actions.value.map((action) => {
+        if (action._id === updatedAction._id) {
+          return updatedAction;
+        }
+        return action;
+      });
+      return updatedAction
     } catch (error) {
       axiosCatch(error);
       return null;
     }
   }
-  
 
-  async deleteAction(actionId: string): Promise<Array<ActionModel> | null> {
+  async deleteAction(actionId: string): Promise<ActionModel[]> {
     try {
       const body = { "actionId": actionId }
       const res = await this.http.delete(this.path, { data: body });
@@ -144,7 +117,7 @@ export interface IManageAction {
       return this.actions.value;
     } catch (error) {
       axiosCatch(error);
-      return null;
+      return this.actions.value;
     }
   }
 }

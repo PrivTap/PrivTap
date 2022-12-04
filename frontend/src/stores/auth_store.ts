@@ -69,6 +69,17 @@ export const useAuthStore = defineStore("auth_store", (): IAuthStoreState => {
   async function activate(token: String) {
     const res = await _authService.activate(token);
     if (!res) return;
+    const stringUser = localStorage.getItem("user");
+    if (!stringUser) {
+      if (user.value) {
+        user.value.isConfirmed = true;
+        setUser(user.value);
+      }
+    } else {
+      const app = JSON.parse(stringUser) as UserModel;
+      app.isConfirmed = true;
+      setUser(app);
+    }
     toast.success("Account activated successfully!");
   }
 

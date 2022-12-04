@@ -2,20 +2,22 @@ export default class ActionModel {
     _id: string;
     name: string;
     description: string;
-    serviceName: string;
-    serviceId: string;
+    serviceId?: string;
+    permissions: string[];
+    inputs: string[];
+    endpoint?: string;
 
     constructor(
         actionId: string,
         name: string,
         description: string,
-        serviceName: string,
-        serviceId: string,
+        permissions: string[],
+        inputs: string[],
     ) {
         this._id = actionId;
         this.name = name;
         this.description = description;
-        this.serviceName = serviceName;
-        this.serviceId = serviceId;
+        this.permissions = permissions;
+        this.inputs = inputs;
     }
 }
