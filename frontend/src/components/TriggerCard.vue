@@ -30,10 +30,6 @@
 </template>
 
 
-
-
-
-
 <script setup lang="ts">
 import type TriggerModel from '@/model/trigger_model';
 import ManageTrigger from '@/services/manage_trigger';
