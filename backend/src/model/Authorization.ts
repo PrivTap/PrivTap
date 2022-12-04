@@ -3,6 +3,7 @@ import Model from "../Model";
 import logger from "../helper/logger";
 import { IAction } from "./Action";
 import { ITrigger } from "./Trigger";
+import { IService } from "./Service";
 
 export interface IAuthorization {
     _id: string;
@@ -77,7 +78,21 @@ class Authorization extends Model<IAuthorization> {
      * @param userId
      */
     async findAllAuthorizedServices(userId: string){
-        return await this.findAll({ userId }, "serviceId");
+        return await this.model.aggregate()
+            .match({ userId: new Types.ObjectId(userId) })
+            //keep only the serviceId
+            .project({ _id: 0, "service": 1 })
+            //left outer join with collection service
+            .lookup({ from: "services", localField: "service", foreignField: "_id", as: "service" })
+            .unwind({ path: "$service" })
+            .addFields({ _id:"$service._id", name: "$service.name", description: "$service.description" })
+            //remove all the field except the relevant service data
+            .project({
+                "_id": 1,
+                "name": 1,
+                "description": 1
+            }) as Partial<IService>[];
+        //return await this.findAll({ userId }, "serviceId", "service", "name description");
     }
 
     /**
