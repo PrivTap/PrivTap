@@ -133,7 +133,7 @@ async function validate() {
     }
 }
 function resetValidation() {
-    formRef.value.resetValidation()
+    formRef.value.resetValidation() 
 }
 
 </script>

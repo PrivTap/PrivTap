@@ -30,7 +30,7 @@
             <v-spacer></v-spacer>
             <v-btn color="error" variant="text" text @click="props.onCancel()">Cancel</v-btn>
         </v-row>
-        <v-card-triggers></v-card-triggers>
+        <v-card-actions></v-card-actions>
     </v-card>
 </template>
   
@@ -123,7 +123,7 @@ async function validate() {
     if (valid) {
         const permissionIds = selectedPermissions.value.map(p => p._id);
         if (props.onEdit) {
-            await manageTrigger.updateTrigger(form.name, props.trigger._id, form.description, permissionIds, form.resourceServer);
+            await manageTrigger.updateTrigger(props.trigger._id, form.name, form.description, permissionIds, form.resourceServer);
         } else {
             await manageTrigger.createTrigger(form.name, form.description, props.serviceId, permissionIds, form.resourceServer);
            
