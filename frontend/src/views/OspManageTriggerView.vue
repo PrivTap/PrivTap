@@ -6,7 +6,7 @@
                     Create New Trigger
                 </v-btn>
             </template>
-            <CreateTrigger v-if="service" :serviceId=service!._id :onCancel="() => (dialog = false)"/>
+            <TriggerForm v-if="service" :serviceId=service!._id :onCancel="() => (dialog = false)"/>
         </v-dialog>
     </div>
     <div class="px-10 grid lg:grid-cols-2 xl:grid-cols-3 gap-10 py-10">
@@ -21,10 +21,10 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import ManageTrigger from '@/services/manage_trigger';
+import {ManageTrigger} from '@/services/manage_trigger';
 import { ManageService } from '@/services/manage_service';
 import type ServiceModel from '@/model/service_model';
-import CreateTrigger from '@/components/CreateTrigger.vue';
+import TriggerForm from '@/components/ServiceComponents/TriggerForm.vue';
 import TriggerCard from '@/components/ServiceComponents/TriggerCard.vue';
 
 const dialog = ref(false);

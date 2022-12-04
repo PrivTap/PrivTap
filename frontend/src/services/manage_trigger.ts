@@ -8,38 +8,24 @@ import { useToast } from "vue-toastification";
 
 
 export interface IManageTrigger {
-
-  createTrigger(
+  getAllTriggers(serviceId: string): Promise<TriggerModel[]>;
+  createTrigger(name: string, description: string, serviceId: string, permissions: string[], endpoint: string): Promise<TriggerModel | null>;
+  deleteTrigger(actionId: string): Promise<TriggerModel[]>;
+  updateTrigger(triggerId: string,
     name: string,
     description: string,
-    serviceId: string,
-    permission: string[],
-  ): Promise<TriggerModel | null>;
-
-  getTriggerById(
-    triggerId: string
-    ): Promise<TriggerModel | null>;
-
-  updateTrigger(
-    name: string,
-    serviceId: string,
-    description: string,
-    permission: string[],
-    ): Promise<TriggerModel | null>;
-
-  deleteTrigger(
-    triggerId: string
-    ): Promise<TriggerModel[] | null>;
-
-  getAllTriggers(
-  serviceId: string,
-  ): Promise<TriggerModel[] | null>;
-  }
+    permissions: string[],
+    endpoint: string): Promise<TriggerModel | null>;
+}
   
-  export default class ManageTrigger
+
+
+  export class ManageTrigger
    implements IManageTrigger {
 
     private static _instance: ManageTrigger;
+
+
     http: AxiosInstance;
     path: string = "/manage-triggers";
     toast: any;
@@ -58,19 +44,7 @@ export interface IManageTrigger {
     }
   
   
-    triggers = ref<TriggerModel[]>([]); 
-
-
-    async getAllTriggers(serviceId: string): Promise<TriggerModel[]> {
-      try {
-          const response = await this.http.get(this.path, { params: { serviceId } });
-          this.triggers.value = response.data.data as TriggerModel[];
-          return this.triggers.value;
-      } catch (error) {
-          axiosCatch(error);
-          return this.triggers.value;
-      }
-  }
+    triggers = ref<TriggerModel[]>([]);
 
 
 
@@ -85,55 +59,82 @@ export interface IManageTrigger {
     }
 
 
+    async getAllTriggers(serviceId: string): Promise<TriggerModel[]> {
+      try {
+        const res = await this.http.get(this.path, { params: { serviceId } });
+        this.triggers.value = res.data.data as TriggerModel[];
+        return res.data.data;
+      } catch (error) {
+        axiosCatch(error);
+        return this.triggers.value;
+      }
+    }
+
+
     async createTrigger(
       name: string,
       description: string,
       serviceId: string,
-      permission: string[],
+      permissions: string[],
+      endpoint: string,
     ): Promise<TriggerModel | null> {
       const body = {
         name: name,
         description: description,
         serviceId: serviceId,
-        permission: permission,
+        permissions: permissions,
+        endpoint: endpoint,
       };
       try {
         const res = await this.http.post(this.path, body);
         useToast().success("Trigger created");
-        return res.data.data as TriggerModel;
+        const trgger = res.data.data as TriggerModel;
+        this.triggers.value.push(trgger);
+        return trgger;
       } catch (error) {
         axiosCatch(error);
         return null;
       }
     }
 
-    
-  async updateTrigger(
-    name: string,
-    serviceId: string,
-    description: string,
-    permission: string[],
-): Promise<TriggerModel | null> {
-  try {
-    const body = {
-      name: name,
-      serviceId: serviceId,
-      description: description,
-      permission: permission,
+
+
+
+    async updateTrigger(
+      triggerId: string,
+      name: string,
+      description: string,
+      permissions: string[],
+      endpoint: string,
+    ): Promise<TriggerModel | null> {
+      try {
+        const body = {
+          triggerId: triggerId,
+          name: name,
+          description: description,
+          permissions: permissions,
+          endpoint: endpoint,
+        }
+        const res = await this.http.put(this.path, body);
+        useToast().success("Trigger updated");
+        const updateTrigger = res.data.data as TriggerModel;
+        this.triggers.value = this.triggers.value.map((trigger) => {
+          if (trigger._id === updateTrigger._id) {
+            return updateTrigger;
+          }
+          return trigger;
+        });
+        return updateTrigger
+      } catch (error) {
+        axiosCatch(error);
+        return null;
+      }
     }
-    const res = await this.http.put(this.path, body);
-    useToast().success("Trigger updated");
-    return res.data.data as TriggerModel;
-  } catch (error) {
-    axiosCatch(error);
-    return null;
-  }
-}
 
 
 
-
-async deleteTrigger(triggerId: string): Promise<Array<TriggerModel> | null> {
+//DELETE TRIGGER METHOD
+async deleteTrigger(triggerId: string): Promise<TriggerModel[]> {
   try {
     const body = { "triggerId": triggerId }
     const res = await this.http.delete(this.path, { data: body });
@@ -142,9 +143,10 @@ async deleteTrigger(triggerId: string): Promise<Array<TriggerModel> | null> {
     return this.triggers.value;
   } catch (error) {
     axiosCatch(error);
-    return null;
+    return this.triggers.value;
   }
 }
+
 
 
 
