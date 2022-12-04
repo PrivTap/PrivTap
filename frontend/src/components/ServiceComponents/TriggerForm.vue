@@ -126,6 +126,7 @@ async function validate() {
             await manageTrigger.updateTrigger(form.name, props.trigger._id, form.description, permissionIds, form.endpoint);
         } else {
             await manageTrigger.createTrigger(form.name, form.description, props.serviceId, permissionIds, form.endpoint);
+           
         }
         props.onCancel();
     }
