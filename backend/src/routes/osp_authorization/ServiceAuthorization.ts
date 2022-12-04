@@ -1,54 +1,45 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
-import { success } from "../../helper/http";
-import { AuthorizationCode, AuthorizationTokenConfig, ModuleOptions } from "simple-oauth2";
-import env from "../../helper/env";
+import { checkUndefinedParams, success } from "../../helper/http";
+import OAuth from "../../helper/oauth";
 
 export default class ServiceAuthorizationRoute extends Route {
-    static config: ModuleOptions;
-    static client: AuthorizationCode;
+
 
     constructor() {
         super("service-authorization", false, false);
-        ServiceAuthorizationRoute.config = {
-            client: {
-                id: env.CLIENT_ID,
-                secret: env.CLIENT_SECRET
-            },
-            auth: {
-                tokenHost: "https://github.com",
-                tokenPath: "/login/oauth/access_token",
-                authorizePath: "/login/oauth/authorize",
-            }
-        };
-        ServiceAuthorizationRoute.client = new AuthorizationCode(ServiceAuthorizationRoute.config);
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
         const { code } = request.query;
+        const state = request.query.state;
         const options = {
             code,
         };
-        console.log(code);
 
-        console.log(options);
-        try {
-            const accessToken = await ServiceAuthorizationRoute.client.getToken(options as AuthorizationTokenConfig);
-            console.log("The resulting token: ", accessToken.token);
-        } catch (e) {
-            console.error("Access Token Error");
-        }
+        console.log(code, state, options);
 
         success(response, {}, "Not implemented");
     }
 
     protected async httpPost(request: Request, response: Response): Promise<void> {
-        const authorizationUri = ServiceAuthorizationRoute.client.authorizeURL({
-            redirect_uri: "http://127.0.0.1:8000/api/service-authorization",
-            scope: "user",
-        });
+        const userId = request.userId;
+        const serviceId = request.body.serviceId;
+        const permissionIds = request.body.permissionId as string[];
+
+        if (checkUndefinedParams(response, serviceId, permissionIds))
+            return;
+
+        const state = "someState";
+
+        const authorizationUri = await OAuth.newAuthorizationUri(response, serviceId, permissionIds, state);
+
+        if(!authorizationUri){
+            return;
+        }
 
         console.log(authorizationUri);
+        // https://github.com/login/oauth/authorize?response_type=code&client_id=c468f4e8010a3623b430&redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2Fapi%2Fservice-authorization&scope=user
 
         success(response, { "redirectUri": authorizationUri });
     }

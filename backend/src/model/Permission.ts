@@ -6,7 +6,7 @@ export interface IPermission {
     name: string;
     description: string
     serviceId: string
-    rarObject: object
+    authorization_details: object
 }
 
 const permissionSchema = new Schema({
@@ -25,7 +25,7 @@ const permissionSchema = new Schema({
         type: Types.ObjectId,
         required: true
     },
-    rarObject: {
+    authorization_details: {
         type: Object,
         required: true
     }

@@ -44,9 +44,9 @@ export default class ManageActionsRoute extends Route {
         const name = request.body.name;
         const description = request.body.description;
         const serviceId = request.body.serviceId;
-        const rarObject = request.body.rarObject;
+        const authorization_details = request.body.authorization_details;
 
-        if(checkUndefinedParams(response, name, description, serviceId, rarObject)){
+        if(checkUndefinedParams(response, name, description, serviceId, authorization_details)){
             return;
         }
 
@@ -60,7 +60,7 @@ export default class ManageActionsRoute extends Route {
             return;
         }
 
-        const permission = await handleInsert(response, Permission, { name, description, serviceId, rarObject }, true) as IPermission;
+        const permission = await handleInsert(response, Permission, { name, description, serviceId, authorization_details }, true) as IPermission;
         if (!permission) return;
 
         success(response,  permission);
@@ -103,7 +103,7 @@ export default class ManageActionsRoute extends Route {
         const name = request.body.name;
         const description = request.body.description;
         const serviceId = request.body.serviceId;
-        const rarObject = request.body.rarObject;
+        const authorization_details = request.body.authorization_details;
         const permissionId = request.body.permissionId;
 
         if(checkUndefinedParams(response, serviceId, permissionId)){
@@ -125,7 +125,7 @@ export default class ManageActionsRoute extends Route {
             return;
         }
 
-        const queriedPermission = await handleUpdate(response, Permission, { permissionId }, { name, description, serviceId, rarObject }, true) as IPermission;
+        const queriedPermission = await handleUpdate(response, Permission, { permissionId }, { name, description, serviceId, authorization_details }, true) as IPermission;
         if (!queriedPermission) return;
 
         success(response, queriedPermission);
