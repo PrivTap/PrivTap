@@ -16,7 +16,7 @@
         <v-card-actions  >
           <v-btn size="small" variant="tonal"
                  @click="router.push(`${RoutingPath.MODIFY_AUTH_PAGE}/${props.service._id}`)">
-            Authorize
+            {{authorization? 'Permission': 'Authorized'}}
           </v-btn>
 
           <v-btn size="small" variant="tonal" >
@@ -34,6 +34,7 @@ import {defineProps, ref} from 'vue';
 
 const props = defineProps<{
   service: SimpleServiceModel;
+  authorization : boolean;
 }>();
 import {useRouter} from "vue-router";
 import RoutingPath from "@/router/routing_path";

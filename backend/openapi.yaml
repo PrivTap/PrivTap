@@ -257,6 +257,9 @@ paths:
                 items:
                   type: object
                   properties:
+                    _id:
+                      type: string
+                      example: exampleId
                     name:
                       type: string
                       example: Dropbox
