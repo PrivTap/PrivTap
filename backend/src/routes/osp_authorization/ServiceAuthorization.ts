@@ -2,7 +2,10 @@ import Route from "../../Route";
 import { Request, Response } from "express";
 import { checkUndefinedParams, success } from "../../helper/http";
 import OAuth from "../../helper/oauth";
-
+import crypto from "bcrypt";
+import env from "../../helper/env";
+import { handleInsert } from "../../helper/misc";
+import State from "../../model/State";
 export default class ServiceAuthorizationRoute extends Route {
 
 
@@ -17,6 +20,8 @@ export default class ServiceAuthorizationRoute extends Route {
             code,
         };
 
+        // Check state value and retrieve info
+
         console.log(code, state, options);
 
         success(response, {}, "Not implemented");
@@ -30,9 +35,12 @@ export default class ServiceAuthorizationRoute extends Route {
         if (checkUndefinedParams(response, serviceId, permissionIds))
             return;
 
-        const state = "someState";
+        const stateValue = await crypto.genSalt(env.SALT_ROUNDS);
 
-        const authorizationUri = await OAuth.newAuthorizationUri(response, serviceId, permissionIds, state);
+        if (!await handleInsert(response, State, { value: stateValue, userId, permissionId: permissionIds }))
+            return;
+
+        const authorizationUri = await OAuth.newAuthorizationUri(response, serviceId, permissionIds, stateValue);
 
         if(!authorizationUri){
             return;
