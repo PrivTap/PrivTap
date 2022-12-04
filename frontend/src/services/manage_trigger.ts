@@ -10,7 +10,7 @@ import { useToast } from "vue-toastification";
 export interface IManageTrigger {
   getAllTriggers(serviceId: string): Promise<TriggerModel[]>;
   createTrigger(name: string, description: string, serviceId: string, permissions: string[], endpoint: string): Promise<TriggerModel | null>;
-  deleteTrigger(actionId: string): Promise<TriggerModel[]>;
+  deleteTrigger(triggerId: string): Promise<TriggerModel[]>;
   updateTrigger(triggerId: string,
     name: string,
     description: string,
