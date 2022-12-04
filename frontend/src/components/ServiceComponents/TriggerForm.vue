@@ -8,7 +8,7 @@
                 <v-text-field v-model="form.name" :rules="form.nameRule" label="Name" required></v-text-field>
                 <v-textarea :rules="form.descriptionRule" v-model="form.description" label="Description"
                     required></v-textarea>
-                    <v-text-field v-if="!onEdit" v-model="form.endpoint" :rules="form.endpointRule" label="Endpoint"
+                    <v-text-field v-if="!onEdit" v-model="form.resourceServer" :rules="form.resourceServerRule" label="ResourceServer"
                     required></v-text-field>
                     <v-label class="mb-2 mt-4">Choose Permissions</v-label>
 
@@ -107,10 +107,10 @@ const form = reactive({
     nameRule: [(v: string) => !!v || 'Name is required'],
     description: '',
     descriptionRule: [(v: string) => !!v || 'Description is required'],
-    endpoint: '',
-    endpointRule: [
-        (v: string) => !!v || 'Endpoint is required',
-        (v: string) => isValidUrlRegex(v) || 'Endpoint is not valid'
+    resourceServer: '',
+    resourceServerRule: [
+        (v: string) => !!v || 'Resource Server is required',
+        (v: string) => isValidUrlRegex(v) || 'Resource Server is not valid'
     ],
 });
 
@@ -123,9 +123,9 @@ async function validate() {
     if (valid) {
         const permissionIds = selectedPermissions.value.map(p => p._id);
         if (props.onEdit) {
-            await manageTrigger.updateTrigger(form.name, props.trigger._id, form.description, permissionIds, form.endpoint);
+            await manageTrigger.updateTrigger(form.name, props.trigger._id, form.description, permissionIds, form.resourceServer);
         } else {
-            await manageTrigger.createTrigger(form.name, form.description, props.serviceId, permissionIds, form.endpoint);
+            await manageTrigger.createTrigger(form.name, form.description, props.serviceId, permissionIds, form.resourceServer);
            
         }
         props.onCancel();
