@@ -30,7 +30,7 @@
             <v-spacer></v-spacer>
             <v-btn color="error" variant="text" text @click="props.onCancel()">Cancel</v-btn>
         </v-row>
-        <v-card-actions></v-card-actions>
+        <v-card-triggers></v-card-triggers>
     </v-card>
 </template>
   
