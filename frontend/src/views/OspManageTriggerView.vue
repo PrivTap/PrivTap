@@ -11,9 +11,8 @@
     </div>
     <div class="px-10 grid lg:grid-cols-2 xl:grid-cols-3 gap-10 py-10">
        
-        <div v-for="trigger in triggers" :tag="trigger._id">
-           <TriggerCard :trigger="trigger"></TriggerCard>
-        </div>
+        <TriggerCard v-if="service" v-for="trigger in triggers" :tag="trigger._id" :trigger="trigger"
+            :serviceId="service?._id" />
         
     </div>
 </template>
@@ -26,7 +25,7 @@ import ManageTrigger from '@/services/manage_trigger';
 import { ManageService } from '@/services/manage_service';
 import type ServiceModel from '@/model/service_model';
 import CreateTrigger from '@/components/CreateTrigger.vue';
-import TriggerCard from '@/components/TriggerCard.vue';
+import TriggerCard from '@/components/ServiceComponents/TriggerCard.vue';
 
 const dialog = ref(false);
 
