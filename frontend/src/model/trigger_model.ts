@@ -6,7 +6,7 @@ export default class TriggerModel {
     serviceId?: string;
     permissions: string[];
     inputs: string[];
-    endpoint?: string;
+    resourceServer?: string;
 
     constructor(
         triggerId: string,

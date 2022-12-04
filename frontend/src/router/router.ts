@@ -98,9 +98,6 @@ const router = createRouter({
       },
     },
 
-
-
-
     {
       path: `${RoutingPath.SERVICE_ACTION_PAGE}/:id?`,
       name: "serviceaction",

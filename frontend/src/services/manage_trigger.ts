@@ -9,13 +9,13 @@ import { useToast } from "vue-toastification";
 
 export interface IManageTrigger {
   getAllTriggers(serviceId: string): Promise<TriggerModel[]>;
-  createTrigger(name: string, description: string, serviceId: string, permissions: string[], endpoint: string): Promise<TriggerModel | null>;
+  createTrigger(name: string, description: string, serviceId: string, permissions: string[], resourceServer: string): Promise<TriggerModel | null>;
   deleteTrigger(triggerId: string): Promise<TriggerModel[]>;
   updateTrigger(triggerId: string,
     name: string,
     description: string,
     permissions: string[],
-    endpoint: string): Promise<TriggerModel | null>;
+    resourceServer: string): Promise<TriggerModel | null>;
 }
   
 
@@ -76,14 +76,14 @@ export interface IManageTrigger {
       description: string,
       serviceId: string,
       permissions: string[],
-      endpoint: string,
+      resourceServer: string,
     ): Promise<TriggerModel | null> {
       const body = {
         name: name,
         description: description,
         serviceId: serviceId,
         permissions: permissions,
-        endpoint: endpoint,
+        resourceServer: resourceServer,
       };
       try {
         const res = await this.http.post(this.path, body);
@@ -105,7 +105,7 @@ export interface IManageTrigger {
       name: string,
       description: string,
       permissions: string[],
-      endpoint: string,
+      resourceServer: string,
     ): Promise<TriggerModel | null> {
       try {
         const body = {
@@ -113,18 +113,18 @@ export interface IManageTrigger {
           name: name,
           description: description,
           permissions: permissions,
-          endpoint: endpoint,
+          resourceServer: resourceServer,
         }
         const res = await this.http.put(this.path, body);
         useToast().success("Trigger updated");
-        const updateTrigger = res.data.data as TriggerModel;
+        const updatedTrigger = res.data.data as TriggerModel;
         this.triggers.value = this.triggers.value.map((trigger) => {
-          if (trigger._id === updateTrigger._id) {
-            return updateTrigger;
+          if (trigger._id === updatedTrigger._id) {
+            return updatedTrigger;
           }
           return trigger;
         });
-        return updateTrigger
+        return updatedTrigger
       } catch (error) {
         axiosCatch(error);
         return null;
