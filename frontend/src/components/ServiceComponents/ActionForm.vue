@@ -35,7 +35,7 @@
             </v-form>
         </v-card-text>
         <v-row class="px-8 space-x-6">
-            <v-btn color="info" text @click="validate"> {{ props.onEdit ? 'Edit' : 'Create' }}</v-btn>
+            <v-btn color="indigo" text @click="validate"> {{ props.onEdit ? 'Edit' : 'Create' }}</v-btn>
             <v-btn color="red" variant="outlined" text @click="resetValidation">Reset</v-btn>
             <v-spacer></v-spacer>
             <v-btn color="error" variant="text" text @click="props.onCancel()">Cancel</v-btn>

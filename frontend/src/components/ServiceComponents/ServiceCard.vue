@@ -1,6 +1,6 @@
 <template>
   <div
-    class=" w-full flex flex-col justify-between h-[50vh] my-auto mx-auto min-w-md max-w-lg text-gray-200 rounded-xl shadow-xl hover:shadow-2xl p-10  bg-gradient-to-tr from-blue-600 to-blue-400 hover:-translate-y-6 hover:ring-4 transition ease-in-out duration-700">
+    class=" w-full flex flex-col justify-between h-[50vh] my-auto mx-auto min-w-md max-w-lg text-gray-200 rounded-lg shadow-lg hover:shadow-2xl p-10  bg-gradient-to-tr from-blue-600 to-blue-400 hover:-translate-y-6 hover:ring-4 transition ease-in-out duration-700">
     <div>
 
       <p class="text-3xl font-medium">{{ service.name }}</p>
