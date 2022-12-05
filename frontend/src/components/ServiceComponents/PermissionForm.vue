@@ -8,18 +8,9 @@
                 <v-text-field v-model="form.name" :rules="form.nameRule" label="Name" required></v-text-field>
                 <v-textarea :rules="form.descriptionRule" v-model="form.description" label="Description"
                     required></v-textarea>
-                <v-text-field v-model="form.type" :rules="form.typeRule" label="Type" required></v-text-field>
-                <v-input :rules="actionRule" v-model="actions" :readonly="true"> Actions
-                </v-input>
-                <div>
-                    <v-chip v-if="actions.length > 0" v-for="action in actions" :key="action" class="mr-2" color="green"
-                        closable @click:close="removeAction(action)">
-                        {{ action }}
-                    </v-chip>
-                    <v-btn color="primary" @click="addAction" variant="outlined" rounded="pill" size="small">Add</v-btn>
-                    <v-text-field class="max-w-sm mt-5" v-if="showInput" v-model="newAction" label="Action"
-                        required></v-text-field>
-                </div>
+                <v-textarea required hint="Paste a valid JSON object" :rules="form.authorization_detailsRurl"
+                    v-model="form.authorization_details" label="Authorization Details"></v-textarea>
+                <vue-json-pretty :data="form.authorization_details"/>
                 <v-divider class="my-5"></v-divider>
             </v-form>
         </v-card-text>
@@ -36,8 +27,9 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue'
 import ManagePermission from '@/services/manage_permission';
-import RarObjectModel from '@/model/rar_model';
 import PermissionModel from '@/model/permission_model';
+import VueJsonPretty from 'vue-json-pretty';
+import 'vue-json-pretty/lib/styles.css';
 
 const props = defineProps(
     {
@@ -68,8 +60,7 @@ onMounted(() => {
         console.log(perm);
         form.name = perm.name;
         form.description = perm.description;
-        form.type = perm.rarObject.type;
-        actions.value = perm.rarObject.actions;
+        form.authorization_details = JSON.stringify(perm.authorization_details);
     }
 });
 
@@ -102,6 +93,18 @@ const form = reactive({
     descriptionRule: [(v: string) => !!v || 'Description is required'],
     type: '',
     typeRule: [(v: string) => !!v || 'Type is required'],
+    authorization_details: '',
+    authorization_detailsRurl: [
+        (v: string) => !!v || 'Authorization Details Object is required',
+        (v: string) => {
+            try {
+                JSON.parse(v);
+                return true;
+            } catch (error) {
+                return "Authorization Details Object is not valid";
+            }
+        }
+    ]
 });
 
 const managePermission = ManagePermission.getInstance;
@@ -111,11 +114,11 @@ async function validate() {
     const { valid } = await formRef.value.validate();
     console.log(valid);
     if (valid) {
-        const rar = new RarObjectModel(form.type, actions.value, []);
+        const object = JSON.parse(form.authorization_details);
         if (props.onEdit) {
-            await managePermission.updatePermission(props.permission.serviceId, props.permission._id, form.name, form.description, rar);
+            await managePermission.updatePermission(props.permission.serviceId, props.permission._id, form.name, form.description, object);
         } else {
-            await managePermission.createPermission(props.serviceId, form.name, form.description, rar);
+            await managePermission.createPermission(props.serviceId, form.name, form.description, object);
         }
         props.onCancel();
     }

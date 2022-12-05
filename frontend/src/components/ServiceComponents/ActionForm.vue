@@ -25,7 +25,7 @@
                 <v-input :rules="permissionRule" v-model="selectedPermissions" :readonly="true">
                     <v-row align-content="start" no-gutters class="-translate-x-3 h-14"
                         >
-                        <v-col cols="1" align-self="start" v-for="choosablePerm in choosablePermissions" :key="choosablePerm._id">
+                        <v-col cols="2" align-self="start" v-for="choosablePerm in choosablePermissions" :key="choosablePerm._id">
                             <v-checkbox v-model="selectedPermissions" :label="choosablePerm.name" :value="choosablePerm"
                                 color="success"></v-checkbox>
                         </v-col>

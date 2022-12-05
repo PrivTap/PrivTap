@@ -8,9 +8,9 @@ import { useToast } from "vue-toastification";
 
 export interface IManagePermission {
     getPermissions(serviceId: string): Promise<PermissionModel[]>;
-    createPermission(serviceId: string, name: string, description: string, rarObject: RarObjectModel): Promise<PermissionModel | null>;
+    createPermission(serviceId: string, name: string, description: string, authorization_details: object): Promise<PermissionModel | null>;
     deletePermission(serviceId: string, permissionId: string): Promise<PermissionModel[]>;
-    updatePermission(serviceId: string, permissionId: string, name: string, description: string, rarObject: RarObjectModel): Promise<PermissionModel | null>;
+    updatePermission(serviceId: string, permissionId: string, name: string, description: string, authorization_details: object): Promise<PermissionModel | null>;
 }
 
 export default class ManagePermission implements IManagePermission {
@@ -44,13 +44,13 @@ export default class ManagePermission implements IManagePermission {
         }
     }
 
-    async createPermission(serviceId: string, name: string, description: string, rarObject: RarObjectModel): Promise<PermissionModel | null> {
+    async createPermission(serviceId: string, name: string, description: string, authorization_details: object): Promise<PermissionModel | null> {
         try {
             const response = await this.http.post(this.path, {
                 serviceId,
                 name,
                 description,
-                rarObject
+                "authorization_details": authorization_details
             });
             const newPermission = response.data.data as PermissionModel;
             this.toast.success("Permission created successfully");
@@ -78,14 +78,14 @@ export default class ManagePermission implements IManagePermission {
         }
     }
 
-    async updatePermission(serviceId: string, permissionId: string, name: string, description: string, rarObject: RarObjectModel): Promise<PermissionModel | null> {
+    async updatePermission(serviceId: string, permissionId: string, name: string, description: string, authorization_details: object): Promise<PermissionModel | null> {
         try {
             const body = {
                 "serviceId": serviceId,
                 "permissionId": permissionId,
                 "name": name,
                 "description": description,
-                "rarObject": rarObject
+                "authorization_details": authorization_details
             }
             const response = await this.http.put(this.path, body);
             this.toast.success("Permission updated successfully");

@@ -81,7 +81,7 @@ import empty from '@/assets/images/empty1.svg';
 import radial from '@/assets/images/radial.svg';
 import logo from '@/assets/images/logo_dark.svg';
 import showServices from "@/services/show-services";
-import SimpleServiceModel from "@/model/simple_service_model";
+import type SimpleServiceModel from "@/model/simple_service_model";
 
 const router = useRouter();
 const isLoading = ref(true);
