@@ -17,9 +17,6 @@ const actionSchema = new Schema({
     name: {
         type: String,
         required: true,
-        index: {
-            unique: true
-        }
     },
     description: {
         type: String,
