@@ -68,18 +68,16 @@ const props = defineProps(
     }
 );
 
-
 onMounted(async () => {
     choosablePermissions.value = await ManagePermission.getInstance.getPermissions(props.serviceId);
     if (props.onEdit && props.trigger) {
         const trigger = props.trigger;
         form.name = trigger.name;
         form.description = trigger.description;
+        form.resourceServer = trigger.resourceServer ?? '';
         _getSelectedPermissions(trigger);
     }
 });
-
-
 
 let choosablePermissions = ref<PermissionModel[]>([]);
 const selectedPermissions = ref<PermissionModel[]>([]);
@@ -112,8 +110,6 @@ const form = reactive({
     ],
 });
 
-
-
 const manageTrigger = ManageTrigger.getInstance;
 async function validate() {
     const { valid } = await formRef.value.validate();
@@ -123,7 +119,7 @@ async function validate() {
         if (props.onEdit) {
             await manageTrigger.updateTrigger(props.trigger._id, form.name, form.description, permissionIds, form.resourceServer);
         } else {
-            await manageTrigger.createTrigger(form.name, form.description, props.serviceId, permissionIds, form.resourceServer); 
+            await manageTrigger.createTrigger(form.name, form.description, props.serviceId, permissionIds, form.resourceServer);
         }
         props.onCancel(); 
     }

@@ -36,10 +36,10 @@
                         <v-dialog v-model="dialog" class="flex flex-col justify-center items-center center">
                             <template v-slot:activator="{ props }">
                                 <div v-bind="props"
-                                    class="ring-2 rounded-lg flex items-center justify-center bg-green-900/10 ring-green-900 hover:ring-green-700">
+                                    class="ring-2 rounded-lg flex items-center justify-center bg-indigo-900/10 ring-indigo-900 hover:ring-indigo-700">
                                     <div class="flex flex-col items-center space-y-5 my-10">
                                         <v-icon size="60">mdi-plus</v-icon>
-                                        <v-btn color="green" v-bind="props" elevation="0" variant="text">
+                                        <v-btn color="indigo" v-bind="props" elevation="0" variant="text">
                                             Create New Action
                                         </v-btn>
                                     </div>

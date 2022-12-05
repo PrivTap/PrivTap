@@ -116,8 +116,6 @@ const form = reactive({
     ],
 });
 
-
-
 const manageAction = ManageAction.getInstance;
 async function validate() {
     const { valid } = await formRef.value.validate();
