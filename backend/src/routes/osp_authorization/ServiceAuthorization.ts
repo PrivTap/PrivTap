@@ -6,11 +6,10 @@ import crypto from "bcrypt";
 import env from "../../helper/env";
 import { handleInsert } from "../../helper/misc";
 import State from "../../model/State";
+
 export default class ServiceAuthorizationRoute extends Route {
-
-
     constructor() {
-        super("service-authorization", false, false);
+        super("service-authorization");
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
