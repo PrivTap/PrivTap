@@ -17,5 +17,4 @@ export default class PermissionAuthorized extends Route {
         const permissionsAuthorized = await Authorization.findAllPermissionsAddingAuthorizationTag(serviceId, userId);
         success(response, permissionsAuthorized);
     }
-
 }

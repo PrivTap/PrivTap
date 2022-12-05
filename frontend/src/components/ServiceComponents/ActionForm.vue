@@ -8,7 +8,7 @@
                 <v-text-field v-model="form.name" :rules="form.nameRule" label="Name" required></v-text-field>
                 <v-textarea :rules="form.descriptionRule" v-model="form.description" label="Description"
                     required></v-textarea>
-                <v-text-field v-if="!onEdit" v-model="form.endpoint" :rules="form.endpointRule" label="Endpoint"
+                <v-text-field v-model="form.endpoint" :rules="form.endpointRule" label="Endpoint"
                     required></v-text-field>
                 <v-label class="mb-2 mt-4">Choose Permissions</v-label>
 
@@ -25,7 +25,7 @@
                 <v-input :rules="permissionRule" v-model="selectedPermissions" :readonly="true">
                     <v-row align-content="start" no-gutters class="-translate-x-3 h-14"
                         >
-                        <v-col cols="1" align-self="start" v-for="choosablePerm in choosablePermissions" :key="choosablePerm._id">
+                        <v-col cols="2" align-self="start" v-for="choosablePerm in choosablePermissions" :key="choosablePerm._id">
                             <v-checkbox v-model="selectedPermissions" :label="choosablePerm.name" :value="choosablePerm"
                                 color="success"></v-checkbox>
                         </v-col>
@@ -81,6 +81,7 @@ onMounted(async () => {
         const action = props.action;
         form.name = action.name;
         form.description = action.description;
+        form.endpoint = action.endpoint ?? '';
         _getSelectedPermissions(action);
     }
 });
@@ -115,8 +116,6 @@ const form = reactive({
         (v: string) => isValidUrlRegex(v) || 'Endpoint is not valid'
     ],
 });
-
-
 
 const manageAction = ManageAction.getInstance;
 async function validate() {

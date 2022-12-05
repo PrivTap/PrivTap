@@ -12,8 +12,6 @@
             label="Description" required></v-textarea>
           <v-text-field variant="outlined" v-model="form.endpoint" :rules="form.endpointRule" label="Endpoint Url"
             hint="www.example.com" required></v-text-field>
-          <v-text-field variant="outlined" required v-model="form.triggerUrl" :rules="form.triggerUrlRule" label="Trigger Url"
-            hint="www.example.com" ></v-text-field>
           <v-text-field variant="outlined" v-model="form.clientId" :rules="form.idRule" label="Client ID"
             required></v-text-field>
           <v-text-field variant="outlined" v-model="form.secret" :rules="form.secretRule" label="Client Secret"
@@ -54,7 +52,6 @@ async function checkEdit() {
       form.endpoint = serviceToEdit.authServer;
       form.clientId = serviceToEdit.clientId;
       form.secret = serviceToEdit.clientSecret;
-      form.triggerUrl = serviceToEdit.triggerUrl;
     }
   }
 }
@@ -71,11 +68,6 @@ const form = reactive({
   endpointRule: [
     (v: string) => !!v || 'Endpoint is required',
     (v: string) => isValidUrlRegex(v) || 'Endpoint is not valid'
-  ],
-  triggerUrl: '',
-  triggerUrlRule: [
-    (v: string) => !!v || 'Trigger Url is required',
-    (v: string) => isValidUrlRegex(v) || 'Trigger Url is not valid'
   ],
   clientId: '',
   idRule: [(v: string) => !!v || 'Client Id is required'],
@@ -100,7 +92,6 @@ async function validate() {
         form.endpoint,
         form.clientId,
         form.secret,
-        form.triggerUrl,
       )
     } else {
       await manageService.createService(
@@ -109,7 +100,6 @@ async function validate() {
         form.endpoint,
         form.clientId,
         form.secret,
-        form.triggerUrl,
       );
     }
     isLoading.value = false;

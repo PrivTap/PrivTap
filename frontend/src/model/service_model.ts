@@ -8,7 +8,6 @@ export default class ServiceModel {
   authServer: string;
   clientId: string;
   clientSecret: string;
-  triggerUrl: string;
 
   constructor(
     serviceId: string,
@@ -18,7 +17,6 @@ export default class ServiceModel {
     authServer: string,
     clientId: string,
     clientSecret: string,
-    triggerUrl: string,
   ) {
     this._id = serviceId;
     this.name = name;
@@ -27,6 +25,5 @@ export default class ServiceModel {
     this.authServer = authServer;
     this.clientId = clientId;
     this.clientSecret = clientSecret;
-    this.triggerUrl = triggerUrl;
   }
 }

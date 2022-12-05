@@ -1,7 +1,7 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
 import { badRequest, checkUndefinedParams, forbiddenUserError, success } from "../../helper/http";
-import Trigger from "../../model/Trigger";
+import Trigger, { ITrigger } from "../../model/Trigger";
 import Service from "../../model/Service";
 import { handleInsert, handleUpdate } from "../../helper/misc";
 
@@ -41,9 +41,10 @@ export default class ManageTriggersRoute extends Route {
         }
 
         // Insert the trigger
-        if (!await handleInsert(response, Trigger, { name, description, serviceId, permissions, resourceServer })) return;
+        const insertedTrigger = await handleInsert(response, Trigger, { name, description, serviceId, permissions, resourceServer }, true) as ITrigger;
+        if (!insertedTrigger) return;
 
-        success(response);
+        success(response, insertedTrigger);
     }
 
     protected async httpDelete(request: Request, response: Response): Promise<void> {
@@ -78,9 +79,9 @@ export default class ManageTriggersRoute extends Route {
             return;
         }
 
-        const queriedTriggerId = await handleUpdate(response, Trigger, { triggerId }, { name, description, permissions, resourceServer });
-        if(!queriedTriggerId) return;
+        const modifiedTrigger = await handleUpdate(response, Trigger, { triggerId }, { name, description, permissions, resourceServer }, true) as ITrigger;
+        if (!modifiedTrigger) return;
 
-        success(response);
+        success(response, modifiedTrigger);
     }
 }

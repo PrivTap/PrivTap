@@ -5,19 +5,19 @@ export default class PermissionModel {
     serviceId: string;
     name: string;
     description: string;
-    rarObject: RarObjectModel;
+    authorization_details: string;
 
     constructor(
         permissionId: string,
         serviceId: string,
         name: string,
         description: string,
-        rarObject: RarObjectModel
+        authorization_details: string,
     ) {
         this._id = permissionId;
         this.serviceId = serviceId;
         this.name = name;
         this.description = description;
-        this.rarObject = rarObject;
+        this.authorization_details = authorization_details;
     }
 }

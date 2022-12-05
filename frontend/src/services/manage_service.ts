@@ -97,7 +97,6 @@ export class ManageService
     authServer: string,
     clientId: string,
     clientSecret: string,
-    triggerUrl: string
   ): Promise<ServiceModel | null> {
     const body = {
       "name": name,
@@ -105,7 +104,6 @@ export class ManageService
       "authServer": authServer,
       "clientId": clientId,
       "clientSecret": clientSecret,
-      "triggerNotificationServer": triggerUrl,
     };
     try {
       const res = await this.http.post(this.path, body);
@@ -126,7 +124,6 @@ export class ManageService
     authServer: string,
     clientId: string,
     clientSecret: string,
-    triggerUrl: string
   ): Promise<ServiceModel | null> {
     try {
       const body = {
@@ -136,7 +133,6 @@ export class ManageService
         "authServer": authServer,
         "clientId": clientId,
         "clientSecret": clientSecret,
-        "triggerNotificationServer": triggerUrl,
       }
       const res = await this.http.put(this.path, body);
       useToast().success("Service updated");

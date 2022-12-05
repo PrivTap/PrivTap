@@ -2,7 +2,9 @@
 <template>
     <div class="bg-green-900/40 rounded-lg py-8 px-8 shadow-lg">
         <p class="text-2xl font-medium"> {{ trigger.name }} </p>
+        <!-- <p class="text-2xl font-medium"> {{ trigger._id }} </p> -->
         <p class="text-lg font-medium text-white/60"> {{ trigger.description }} </p>
+        <p class="text-lg font-medium text-white/60"> {{ trigger._id }} </p>
         <v-label class="pt-4 pb-2">Selected Permissions </v-label>
         <div>
             <v-chip v-for="permission in permissions" :key="permission._id" class="mr-2" color="success"

@@ -30,7 +30,6 @@
             <v-spacer></v-spacer>
             <v-btn color="error" variant="text" text @click="props.onCancel()">Cancel</v-btn>
         </v-row>
-        <v-card-actions></v-card-actions>
     </v-card>
 </template>
   
@@ -44,7 +43,6 @@ import {ManageTrigger} from '@/services/manage_trigger'; //MOZDA OVOOOOOOOOOOOOO
 import { isValidUrlRegex } from '@/helpers/validators';
 import type PermissionModel from '@/model/permission_model';
 import ManagePermission from '@/services/manage_permission';
-import { trigger } from '@vue/reactivity';
 
 
 const props = defineProps(
@@ -70,18 +68,16 @@ const props = defineProps(
     }
 );
 
-
 onMounted(async () => {
     choosablePermissions.value = await ManagePermission.getInstance.getPermissions(props.serviceId);
     if (props.onEdit && props.trigger) {
         const trigger = props.trigger;
         form.name = trigger.name;
         form.description = trigger.description;
+        form.resourceServer = trigger.resourceServer ?? '';
         _getSelectedPermissions(trigger);
     }
 });
-
-
 
 let choosablePermissions = ref<PermissionModel[]>([]);
 const selectedPermissions = ref<PermissionModel[]>([]);
@@ -114,8 +110,6 @@ const form = reactive({
     ],
 });
 
-
-
 const manageTrigger = ManageTrigger.getInstance;
 async function validate() {
     const { valid } = await formRef.value.validate();
@@ -126,11 +120,11 @@ async function validate() {
             await manageTrigger.updateTrigger(props.trigger._id, form.name, form.description, permissionIds, form.resourceServer);
         } else {
             await manageTrigger.createTrigger(form.name, form.description, props.serviceId, permissionIds, form.resourceServer);
-           
         }
-        props.onCancel();
+        props.onCancel(); 
     }
 }
+
 function resetValidation() {
     formRef.value.resetValidation()
 }
