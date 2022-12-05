@@ -3,6 +3,7 @@ import { Response } from "express";
 import Permission, { IPermission } from "../model/Permission";
 import { badRequest } from "./http";
 import Service from "../model/Service";
+import env from "../helper/env";
 
 export default class OAuth {
     static async newAuthorizationUri(response: Response, serviceId: string, permissionIds: string[] | string, state: string): Promise<string | null>{
@@ -31,11 +32,15 @@ export default class OAuth {
             return null;
         }
 
+        let redirectUri;
+        if (env.PROD){
+            redirectUri = "https://privtap.it/modifyauth";
+        } else {
+            redirectUri = "https://127.0.0.1:5173/modifyauth";
+        }
+
         let authorizationUri = client.authorizeURL({
-            // This uri has to be front-end
-            redirect_uri: "http://127.0.0.1:8000/api/service-authorization",
-            // I don't think we actually need the scope field
-            scope: "user",
+            redirect_uri: redirectUri,
             state: state
         });
 
@@ -57,10 +62,9 @@ export default class OAuth {
         return authorizationUri + "&" + encodeURI(authorizationUriStringify);
     }
 
-    private static async buildClient(serviceId: string, ): Promise<AuthorizationCode | null>{
+    private static async buildClient(serviceId: string, resourceServer = ""): Promise<AuthorizationCode | null>{
         const service = await Service.findById(serviceId);
         if (!service){
-            console.log("service not found");
             return null;
         }
         const path = OAuth.splitURL(service.authServer);
@@ -72,7 +76,8 @@ export default class OAuth {
             auth: {
                 tokenHost: path.tokenHost,
                 authorizePath: path.authorizePath,
-                tokenPath: "/login/oauth/access_token"
+                // This is the resource server, has to be modified
+                tokenPath: resourceServer
             }
         };
         return new AuthorizationCode(config);

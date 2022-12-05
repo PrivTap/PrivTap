@@ -6,8 +6,6 @@ import crypto from "bcrypt";
 import env from "../../helper/env";
 import { handleInsert } from "../../helper/misc";
 import State from "../../model/State";
-import { AuthorizationTokenConfig } from "simple-oauth2";
-import Authorization from "../../model/Authorization";
 export default class ServiceAuthorizationRoute extends Route {
 
 
@@ -16,41 +14,7 @@ export default class ServiceAuthorizationRoute extends Route {
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
-        //const userId = request.userId;
-        // Dummy user
-        const userId = "6383fa049c03ea9ac5f2477a";
-        const { code } = request.query;
-        const stateValue = request.query.state as string;
-        const options = {
-            code,
-        };
-
-        const state = await State.findByValue(stateValue);
-        if (!state){
-            badRequest(response);
-            return;
-        }
-        if (state.userId != userId){
-            badRequest(response);
-            return;
-        }
-
-        const serviceId = state.serviceId;
-        const permissions = state.permissionId;
-        const oAuthToken = await OAuth.retrieveToken(serviceId, options as AuthorizationTokenConfig);
-        if (!oAuthToken){
-            badRequest(response);
-            return;
-        }
-
-        if (!await handleInsert(response, Authorization, { userId, serviceId, oAuthToken, grantedPermissions: permissions })){
-            badRequest(response);
-            return;
-        }
-
-        // Delete state (should be a transaction)
-
-        success(response);
+        success(response, {}, "Not implemented");
     }
 
     protected async httpPost(request: Request, response: Response): Promise<void> {

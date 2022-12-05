@@ -29,5 +29,4 @@ export default class PermissionAuthorized extends Route {
         });
         success(response, data);
     }
-
 }
