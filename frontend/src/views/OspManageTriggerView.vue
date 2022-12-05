@@ -27,16 +27,16 @@ import TriggerForm from '@/components/ServiceComponents/TriggerForm.vue';
 const dialog = ref(false);
 
 const route = useRoute();
-const managePermission = ManageTrigger.getInstance;
+const manageTrigger = ManageTrigger.getInstance;
 const manageService = ManageService.getInstance;
 let service = ref<ServiceModel | null>(null);
-let triggers = managePermission.triggers;
+let triggers = manageTrigger.triggers;
 
 // On Mounted page, check if the Service has already defined permissions
 onMounted(async () => {
     const serviceId = route.params.id as string;
     service.value = await manageService.getServiceById(serviceId);
-    await managePermission.getAllTriggers(serviceId);
+    await manageTrigger.getAllTriggers(serviceId);
 });
 
 </script>

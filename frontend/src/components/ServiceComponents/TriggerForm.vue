@@ -30,7 +30,6 @@
             <v-spacer></v-spacer>
             <v-btn color="error" variant="text" text @click="props.onCancel()">Cancel</v-btn>
         </v-row>
-        <v-card-actions></v-card-actions>
     </v-card>
 </template>
   
@@ -44,7 +43,6 @@ import {ManageTrigger} from '@/services/manage_trigger'; //MOZDA OVOOOOOOOOOOOOO
 import { isValidUrlRegex } from '@/helpers/validators';
 import type PermissionModel from '@/model/permission_model';
 import ManagePermission from '@/services/manage_permission';
-import { trigger } from '@vue/reactivity';
 
 
 const props = defineProps(
@@ -125,12 +123,12 @@ async function validate() {
         if (props.onEdit) {
             await manageTrigger.updateTrigger(props.trigger._id, form.name, form.description, permissionIds, form.resourceServer);
         } else {
-            await manageTrigger.createTrigger(form.name, form.description, props.serviceId, permissionIds, form.resourceServer);
-           
+            await manageTrigger.createTrigger(form.name, form.description, props.serviceId, permissionIds, form.resourceServer); 
         }
-        props.onCancel();
+        props.onCancel(); 
     }
 }
+
 function resetValidation() {
     formRef.value.resetValidation()
 }

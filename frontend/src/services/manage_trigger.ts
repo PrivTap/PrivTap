@@ -63,6 +63,7 @@ export interface IManageTrigger {
       try {
         const res = await this.http.get(this.path, { params: { serviceId } });
         this.triggers.value = res.data.data as TriggerModel[];
+        console.log(this.triggers.value);
         return res.data.data;
       } catch (error) {
         axiosCatch(error);
@@ -88,9 +89,9 @@ export interface IManageTrigger {
       try {
         const res = await this.http.post(this.path, body);
         useToast().success("Trigger created");
-        const trgger = res.data.data as TriggerModel;
-        this.triggers.value.push(trgger);
-        return trgger;
+        const trigger = res.data.data as TriggerModel;
+        this.triggers.value.push(trigger);
+        return trigger;
       } catch (error) {
         axiosCatch(error);
         return null;
