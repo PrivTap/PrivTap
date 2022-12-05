@@ -5,7 +5,8 @@ export interface IState {
     _id: string;
     value: string;
     userId: string;
-    permissionId: string[];
+    serviceId: string;
+    permissionId: Types.Array<string>;
 }
 
 const stateSchema = new Schema({
@@ -17,11 +18,15 @@ const stateSchema = new Schema({
         }
     },
     userId: {
-        type: Types.ObjectId,
+        type: Schema.Types.ObjectId,
+        required: true
+    },
+    serviceId: {
+        type: Schema.Types.ObjectId,
         required: true
     },
     permissionId: {
-        type: [Types.ObjectId],
+        type: [Schema.Types.ObjectId],
         required: true
     }
 });

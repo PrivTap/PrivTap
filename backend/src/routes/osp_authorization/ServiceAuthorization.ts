@@ -1,11 +1,13 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
-import { checkUndefinedParams, success } from "../../helper/http";
+import { badRequest, checkUndefinedParams, success } from "../../helper/http";
 import OAuth from "../../helper/oauth";
 import crypto from "bcrypt";
 import env from "../../helper/env";
 import { handleInsert } from "../../helper/misc";
 import State from "../../model/State";
+import { AuthorizationTokenConfig } from "simple-oauth2";
+import Authorization from "../../model/Authorization";
 export default class ServiceAuthorizationRoute extends Route {
 
 
@@ -14,21 +16,47 @@ export default class ServiceAuthorizationRoute extends Route {
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
+        //const userId = request.userId;
+        // Dummy user
+        const userId = "6383fa049c03ea9ac5f2477a";
         const { code } = request.query;
-        const state = request.query.state;
+        const stateValue = request.query.state as string;
         const options = {
             code,
         };
 
-        // Check state value and retrieve info
+        const state = await State.findByValue(stateValue);
+        if (!state){
+            badRequest(response);
+            return;
+        }
+        if (state.userId != userId){
+            badRequest(response);
+            return;
+        }
 
-        console.log(code, state, options);
+        const serviceId = state.serviceId;
+        const permissions = state.permissionId;
+        const oAuthToken = await OAuth.retrieveToken(serviceId, options as AuthorizationTokenConfig);
+        if (!oAuthToken){
+            badRequest(response);
+            return;
+        }
 
-        success(response, {}, "Not implemented");
+        if (!await handleInsert(response, Authorization, { userId, serviceId, oAuthToken, grantedPermissions: permissions })){
+            badRequest(response);
+            return;
+        }
+
+        // Delete state (should be a transaction)
+
+        success(response);
     }
 
     protected async httpPost(request: Request, response: Response): Promise<void> {
-        const userId = request.userId;
+        //const userId = request.userId;
+        // Dummy userId
+        const userId = "6383fa049c03ea9ac5f2477a";
         const serviceId = request.body.serviceId;
         const permissionIds = request.body.permissionId as string[];
 
@@ -37,17 +65,17 @@ export default class ServiceAuthorizationRoute extends Route {
 
         const stateValue = await crypto.genSalt(env.SALT_ROUNDS);
 
-        if (!await handleInsert(response, State, { value: stateValue, userId, permissionId: permissionIds }))
+        if (!await handleInsert(response, State, { value: stateValue, userId, serviceId, permissionId: permissionIds }))
             return;
 
         const authorizationUri = await OAuth.newAuthorizationUri(response, serviceId, permissionIds, stateValue);
 
         if(!authorizationUri){
+            badRequest(response);
             return;
         }
 
         console.log(authorizationUri);
-        // https://github.com/login/oauth/authorize?response_type=code&client_id=c468f4e8010a3623b430&redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2Fapi%2Fservice-authorization&scope=user
 
         success(response, { "redirectUri": authorizationUri });
     }
