@@ -3,6 +3,7 @@
         <p class="text-2xl font-medium"> {{ permission.name }} </p>
         <p class="text-lg font-medium text-white/60"> {{ permission.description }} </p>
         <p class="text-lg font-medium text-white/90 py-5"> Service id: {{ permission.serviceId }} </p>
+        <p class="text-lg font-medium text-white/90 py-5"> Permission id: {{ permission._id }} </p>
         <br>
         <div class="flex justify-end mt-5 space-x-5">
             <v-dialog v-model="dialog" persistent>

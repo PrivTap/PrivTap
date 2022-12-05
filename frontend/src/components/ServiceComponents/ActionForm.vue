@@ -8,7 +8,7 @@
                 <v-text-field v-model="form.name" :rules="form.nameRule" label="Name" required></v-text-field>
                 <v-textarea :rules="form.descriptionRule" v-model="form.description" label="Description"
                     required></v-textarea>
-                <v-text-field v-if="!onEdit" v-model="form.endpoint" :rules="form.endpointRule" label="Endpoint"
+                <v-text-field v-model="form.endpoint" :rules="form.endpointRule" label="Endpoint"
                     required></v-text-field>
                 <v-label class="mb-2 mt-4">Choose Permissions</v-label>
 
@@ -81,6 +81,7 @@ onMounted(async () => {
         const action = props.action;
         form.name = action.name;
         form.description = action.description;
+        form.endpoint = action.endpoint ?? '';
         _getSelectedPermissions(action);
     }
 });
