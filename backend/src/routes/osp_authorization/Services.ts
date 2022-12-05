@@ -15,8 +15,8 @@ export default class ServicesRoute extends Route {
         const userId = request.userId;
 
         let services;
-        if(authorized){
-            services =  await Authorization.findAllAuthorizedServices(userId);
+        if (authorized){
+            services = await Authorization.findAllAuthorizedServices(userId);
         } else {
             services = await Service.findAll({}, "_id name description");
         }

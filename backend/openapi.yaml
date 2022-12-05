@@ -257,6 +257,9 @@ paths:
                 items:
                   type: object
                   properties:
+                    _id:
+                      type: string
+                      example: exampleId
                     name:
                       type: string
                       example: Dropbox
@@ -374,7 +377,7 @@ paths:
       tags:
         - OSP Authorization
       summary: The user grants a new authorization
-      description: The user can grant a new authorization specifying the different permissions
+      description: The user can grant a new authorization specifying the different permissions. The OAuth flow begins and a redirect URI is returned.
       operationId: post-service-authorization
       requestBody:
         required: true
@@ -383,12 +386,23 @@ paths:
             schema:
               type: object
               properties:
+                serviceId:
+                  type: string
+                  example: 025ccd4951hld089ba219okl
                 permissionId:
                   type: array
-                  example: [637ccd4951cdf089ba2123be, a1ccd1951cdf080ba2123a3]
+                  example: [ 637ccd4951cdf089ba2123be, a1ccd1951cdf080ba2123a3 ]
       responses:
         '200':
           description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  redirectUri:
+                    type: string
+                    example: https://github.com/login/oauth/authorize?response_type=code&client_id=client_id&redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2Fapi%2Fservice-authorization&scope=user&state=%242b%2408%244scfB3bTo%2FGEPvoh0bAtue&%5B%22%7Bsomething:%20random%7D%22%5D
         '400':
           description: Bad request
         '500':
@@ -571,22 +585,30 @@ paths:
       responses:
         '200':
           description: successful operation
-  /oauth-redirect:
+  /oauth:
     get:
       tags:
         - OSP Authorization
-      summary: The user gets redirected to the specified uri
-      description: The user gets redirected to the specified uri (TODO)
-      operationId: get-oauth-redirect
+      summary: Manages the oAuth flow redirect
+      description: Manages the oAuth flow redirect
+      operationId: get-oauth
       parameters:
-        - name: oauth-param
-          in: cookie
+        - name: code
+          in: query
           required: true
           schema:
             type: string
+            example: 6648fa09a97a03d89cb4
+        - name: state
+          in: query
+          required: true
+          schema:
+            type: string
+            example: $2b$08$4scfB3bTo/GEPvoh0bAtue
       responses:
         '200':
           description: successful operation
+
   /manage-triggers:
     get:
       tags:
@@ -601,7 +623,6 @@ paths:
           schema:
             type: string
             example: 637e6c0e2677ffe654ea9672
-
       responses:
         '200':
           description: successful operation
@@ -870,7 +891,7 @@ paths:
                 description:
                   type: string
                   example: This permission requires your account information data such as username, email and birth date
-                rarObject:
+                authorization_details:
                   type: object
                   example: { 'type': 'account_information','actions': [ 'list_accounts','read_balances','read_transactions' ],'locations': [ 'https://google.com/accounts' ] }
       responses:
@@ -937,7 +958,7 @@ paths:
                 description:
                   type: string
                   example: This permission requires your account information data such as username, email and birth date
-                rarObject:
+                authorization_details:
                   type: object
                   example: { 'type': 'account_information','actions': [ 'list_accounts','read_balances','read_transactions' ],'locations': [ 'https://google.com/accounts' ] }
       responses:
@@ -1077,6 +1098,6 @@ components:
         description:
           type: string
           example: This permission requires your account information data such as username, email and birth date
-        rarObject:
+        authorization_details:
           type: object
           example: {'type':'account_information','actions':['list_accounts','read_balances','read_transactions'],'locations':['https://google.com/accounts']}

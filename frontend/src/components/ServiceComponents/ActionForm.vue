@@ -25,7 +25,7 @@
                 <v-input :rules="permissionRule" v-model="selectedPermissions" :readonly="true">
                     <v-row align-content="start" no-gutters class="-translate-x-3 h-14"
                         >
-                        <v-col cols="1" align-self="start" v-for="choosablePerm in choosablePermissions" :key="choosablePerm._id">
+                        <v-col cols="2" align-self="start" v-for="choosablePerm in choosablePermissions" :key="choosablePerm._id">
                             <v-checkbox v-model="selectedPermissions" :label="choosablePerm.name" :value="choosablePerm"
                                 color="success"></v-checkbox>
                         </v-col>
@@ -35,7 +35,7 @@
             </v-form>
         </v-card-text>
         <v-row class="px-8 space-x-6">
-            <v-btn color="info" text @click="validate"> {{ props.onEdit ? 'Edit' : 'Create' }}</v-btn>
+            <v-btn color="indigo" text @click="validate"> {{ props.onEdit ? 'Edit' : 'Create' }}</v-btn>
             <v-btn color="red" variant="outlined" text @click="resetValidation">Reset</v-btn>
             <v-spacer></v-spacer>
             <v-btn color="error" variant="text" text @click="props.onCancel()">Cancel</v-btn>

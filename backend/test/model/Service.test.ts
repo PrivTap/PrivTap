@@ -7,7 +7,6 @@ import { beforeEach } from "mocha";
 import { SinonStub } from "sinon";
 import * as sinon from "sinon";
 import sinonChai = require("sinon-chai");
-import Logger from "../../src/helper/logger";
 
 use(chaiHttp);
 use(sinonChai);
@@ -31,10 +30,10 @@ describe("Service model class", () => {
     });
 
     it("findAllForUser should return the results of findAll", async () => {
-        findAllStub.resolves([{ service: "service" }]);
+        findAllStub.resolves([{ serviceId: "service" }]);
         const res = await Service.findAllCreatedByUser(userIdExample);
         expect(findAllStub).to.be.calledOnceWith({ creator: userIdExample });
-        expect(res).to.be.eql([{ service: "service" }]);
+        expect(res).to.be.eql([{ serviceId: "service" }]);
 
     });
 

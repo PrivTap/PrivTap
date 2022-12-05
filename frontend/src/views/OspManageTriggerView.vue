@@ -1,17 +1,19 @@
 <template>
-    <div class="flex flex-col justify-start items-center mt-20">
-        <v-dialog v-model="dialog">
-            <template v-slot:activator="{ props }">
-                <v-btn color="indigo" v-bind="props">
-                    Create New Trigger
-                </v-btn>
-            </template>
-            <TriggerForm v-if="service" :serviceId=service!._id :onCancel="() => (dialog = false)" />
-        </v-dialog>
-    </div>
-    <div class="px-10 grid lg:grid-cols-3 xl:grid-cols-3 gap-10 py-10">
-        <TriggerCard v-if="service" v-for="trigger in triggers" :tag="trigger._id" :trigger="trigger"
-            :serviceId="service?._id" />
+    <div class="h-full">
+        <div class="flex flex-col justify-start items-center mt-20">
+            <v-dialog v-model="dialog">
+                <template v-slot:activator="{ props }">
+                    <v-btn color="indigo" v-bind="props">
+                        Create New Trigger
+                    </v-btn>
+                </template>
+                <TriggerForm v-if="service" :serviceId=service!._id :onCancel="() => (dialog = false)" />
+            </v-dialog>
+        </div>
+        <div class="px-10 grid lg:grid-cols-3 xl:grid-cols-3 gap-10 py-10">
+            <TriggerCard v-if="service" v-for="trigger in triggers" :tag="trigger._id" :trigger="trigger"
+                :serviceId="service?._id" />
+        </div>
     </div>
 </template>
 

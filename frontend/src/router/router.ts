@@ -73,7 +73,7 @@ const router = createRouter({
       },
     },
     {
-      path: RoutingPath.MODIFY_AUTH_PAGE,
+      path: `${RoutingPath.MODIFY_AUTH_PAGE}/:id?`,
       name: "modifyauth",
       component: () => import("../views/ModifyAuth.vue"),
       meta: {

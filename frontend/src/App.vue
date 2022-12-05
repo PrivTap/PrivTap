@@ -22,9 +22,10 @@ watch(userStore.isAutheticated, (val) => {
 </script>
 
 <template>
-  <NavBar class="flex"/>
-  <RouterView class="h-[calc(100vh-116px)]">
-  </RouterView>
-  <GoTopButton class="position-sticky bottom-0 right-0"/>
-
+  <v-app >
+    <NavBar class="flex bg-[#232323]/90"/>
+    <RouterView class="min-h-screen bg-[#232323]/90">
+    </RouterView>
+    <GoTopButton class="fixed bottom-20 right-20"/>
+  </v-app>
 </template>

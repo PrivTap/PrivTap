@@ -3,11 +3,13 @@ import Model from "../Model";
 import logger from "../helper/logger";
 import { IAction } from "./Action";
 import { ITrigger } from "./Trigger";
+import { IService } from "./Service";
+import { permissionAuthorized } from "./Permission";
 
 export interface IAuthorization {
     _id: string;
     userId: string;
-    service: string;
+    serviceId: string;
     oAuthToken: string;
     grantedPermissions?: string[];
 }
@@ -17,7 +19,7 @@ const authorizationSchema = new Schema({
         type: Schema.Types.ObjectId,
         required: true
     },
-    service: {
+    serviceId: {
         type: Schema.Types.ObjectId,
         ref: "service",
         required: true
@@ -57,7 +59,7 @@ class Authorization extends Model<IAuthorization> {
             // Filter only authorizations given by the user
             .match({ userId: new Types.ObjectId(userId) })
             // Keep only the field containing the service id
-            .project({ _id: 0, service: 1 })
+            .project({ _id: 0, serviceId: 1 })
             // Join with services collection on the local service id field (left outer join)
             .lookup({ from: "services", localField: "service", foreignField: "_id", as: "service" })
             // Deconstruct the array created by the join to have one document for authorized service
@@ -65,7 +67,7 @@ class Authorization extends Model<IAuthorization> {
             // Set the serviceId and serviceName fields taking data from the service field
             .addFields({ serviceId: "$service._id", serviceName: "$service.name" })
             // Delete the service field, as it is no longer needed
-            .project({ service: 0 })
+            .project({ serviceId: 0 })
             // Join with the operation (triggers or actions) collection on the serviceId field (left outer join)
             .lookup({ from: operation, localField: "serviceId", foreignField: "serviceId", as: operation })
             // Keep only the necessary fields for each operation
@@ -73,11 +75,52 @@ class Authorization extends Model<IAuthorization> {
     }
 
     /**
-     * Returns all the services with at leas an authorization from the user
+     * Returns all the services with at least an authorization from the user
      * @param userId
      */
-    async findAllAuthorizedServices(userId: string){
-        return await this.findAll({ userId }, "serviceId");
+    async findAllAuthorizedServices(userId: string) {
+        return await this.model.aggregate()
+            .match({ userId: new Types.ObjectId(userId) })
+            //keep only the serviceId
+            .project({ _id: 0, "service": 1 })
+            //left outer join with collection service
+            .lookup({ from: "services", localField: "service", foreignField: "_id", as: "service" })
+            .unwind({ path: "$service" })
+            .addFields({ _id: "$service._id", name: "$service.name", description: "$service.description" })
+            //remove all the field except the relevant service data
+            .project({
+                "_id": 1,
+                "name": 1,
+                "description": 1
+            }) as Partial<IService>[];
+        //return await this.findAll({ userId }, "serviceId", "service", "name description");
+    }
+
+    /**
+     * Returns all the permission of a service and also the one granted by a user with an extra field
+     */
+    async findAllPermission(serviceId: string, userId: string) {
+        return await this.model.aggregate()
+            .match(({
+                userId: new Types.ObjectId(userId),
+                service: new Types.ObjectId(serviceId)
+            }))
+            .project({ _id: 0, "grantedPermission": 1 })
+            .unwind({ path: "$grantedPermission" })
+            .lookup({
+                from: "permissions",
+                localField: "grantedPermission",
+                foreignField: "_id",
+                as: "authPermissions"
+            })
+            .unwind({ path: "$authPermissions" })
+            .addFields({
+                _id: "$authPermissions._id",
+                name: "$authPermissions.name",
+                description: "$authPermissions.description",
+                authorized: true
+            })
+            .project({ _id: 1, "name": 1, "description": 1, "authorized": 1 }) as Partial<permissionAuthorized>[];
     }
 
     /**
@@ -118,7 +161,7 @@ class Authorization extends Model<IAuthorization> {
      * Get the OAuth token for the userId and the ServiceId
      */
     async findToken(userId: string, serviceId: string): Promise<string | null> {
-        const res = await this.find({ userId: userId, service: serviceId });
+        const res = await this.find({ userId: userId, serviceId: serviceId });
         if (res != null) {
             return res.oAuthToken;
         }

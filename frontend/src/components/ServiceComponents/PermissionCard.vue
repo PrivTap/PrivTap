@@ -3,14 +3,7 @@
         <p class="text-2xl font-medium"> {{ permission.name }} </p>
         <p class="text-lg font-medium text-white/60"> {{ permission.description }} </p>
         <p class="text-lg font-medium text-white/90 py-5"> Service id: {{ permission.serviceId }} </p>
-        <a class="text-lg font-medium text-white/90"> Type: </a>
-        <a class="text-lg font-medium text-white/60"> {{ permission.rarObject.type }} </a>
         <br>
-        <h1 class="pt-4 pb-2">Actions: </h1>
-
-        <v-chip v-for="a in permission.rarObject.actions" :tag="a" size="small" class="mr-2" color="green">
-            {{ a }}
-        </v-chip>
         <div class="flex justify-end mt-5 space-x-5">
             <v-dialog v-model="dialog" persistent>
                 <template v-slot:activator="{ props }">
@@ -18,7 +11,8 @@
                         Edit
                     </v-btn>
                 </template>
-                <CreatePermissionVue :serviceId=props.permission.serviceId :onCancel="() => dialog = false" :onEdit="true" :permission="props.permission" />
+                <CreatePermissionVue :serviceId=props.permission.serviceId :onCancel="() => dialog = false"
+                    :onEdit="true" :permission="props.permission" />
             </v-dialog>
             <v-btn color="error" @click="(showDialog = true)">
                 Delete

@@ -1,4 +1,4 @@
-import { model as mongooseModel, Schema, Error as MongooseError, FilterQuery, UpdateQuery } from "mongoose";
+import { model as mongooseModel, Schema, Error as MongooseError, FilterQuery, UpdateQuery, Query } from "mongoose";
 import { MongoServerError } from "mongodb";
 import logger from "./helper/logger";
 
@@ -169,12 +169,17 @@ export default class Model<T> {
      * Finds all the documents that match the query.
      * @param query a key-value pair to be used as a query
      * @param select a selection string to include/exclude fields from the result (see Mongoose select())
+     * @param populateRef a selection string that represents which fields you want to populate with external objects
+     * @param populateSelect a selection string that represents which fields to include when populating objects
      */
-    async findAll(query: FilterQuery<T> = {}, select?: string): Promise<T[] | null> {
+    async findAll(query: FilterQuery<T> = {}, select?: string, populateRef?: string, populateSelect?: string): Promise<T[] | null> {
         try {
-            const findQuery = this.model.find(query);
+            let findQuery: Query<unknown, unknown> = this.model.find(query);
             if (select)
-                findQuery.select(select);
+                findQuery = findQuery.select(select);
+            if (populateRef) {
+                findQuery = findQuery.populate(populateRef, populateSelect);
+            }
             return (await findQuery) as T[];
         } catch (e) {
             logger.error(`Unexpected error while finding multiple ${this.name}s\n`, e);

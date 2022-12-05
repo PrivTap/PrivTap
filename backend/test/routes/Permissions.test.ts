@@ -21,7 +21,7 @@ describe("/permissions endpoint", () => {
         name: "permissionName",
         description: "permissionDescription",
         serviceId: "567f16b9d579d489c7d8ec65",
-        rarObject: {}
+        authorization_details: {}
     };
 
     const exampleDeleteRequest = { serviceId: exampleServiceId, permissionId: "6a71f6b9d579d489c7d8ec65" };
