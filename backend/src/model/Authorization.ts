@@ -9,7 +9,7 @@ import { permissionAuthorized } from "./Permission";
 export interface IAuthorization {
     _id: string;
     userId: string;
-    service: string;
+    serviceId: string;
     oAuthToken: string;
     grantedPermissions?: string[];
 }
@@ -19,7 +19,7 @@ const authorizationSchema = new Schema({
         type: Schema.Types.ObjectId,
         required: true
     },
-    service: {
+    serviceId: {
         type: Schema.Types.ObjectId,
         ref: "service",
         required: true
@@ -59,7 +59,7 @@ class Authorization extends Model<IAuthorization> {
             // Filter only authorizations given by the user
             .match({ userId: new Types.ObjectId(userId) })
             // Keep only the field containing the service id
-            .project({ _id: 0, service: 1 })
+            .project({ _id: 0, serviceId: 1 })
             // Join with services collection on the local service id field (left outer join)
             .lookup({ from: "services", localField: "service", foreignField: "_id", as: "service" })
             // Deconstruct the array created by the join to have one document for authorized service
@@ -67,7 +67,7 @@ class Authorization extends Model<IAuthorization> {
             // Set the serviceId and serviceName fields taking data from the service field
             .addFields({ serviceId: "$service._id", serviceName: "$service.name" })
             // Delete the service field, as it is no longer needed
-            .project({ service: 0 })
+            .project({ serviceId: 0 })
             // Join with the operation (triggers or actions) collection on the serviceId field (left outer join)
             .lookup({ from: operation, localField: "serviceId", foreignField: "serviceId", as: operation })
             // Keep only the necessary fields for each operation
@@ -161,7 +161,7 @@ class Authorization extends Model<IAuthorization> {
      * Get the OAuth token for the userId and the ServiceId
      */
     async findToken(userId: string, serviceId: string): Promise<string | null> {
-        const res = await this.find({ userId: userId, service: serviceId });
+        const res = await this.find({ userId: userId, serviceId: serviceId });
         if (res != null) {
             return res.oAuthToken;
         }

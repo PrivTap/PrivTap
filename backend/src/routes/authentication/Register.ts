@@ -3,7 +3,6 @@ import { Request, Response } from "express";
 import User from "../../model/User";
 import { badRequest, checkUndefinedParams, internalServerError, success } from "../../helper/http";
 import Mailer from "../../helper/mailer";
-
 import { hashSync } from "bcrypt";
 import { randomBytes } from "crypto";
 import env from "../../helper/env";

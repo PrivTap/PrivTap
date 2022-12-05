@@ -74,6 +74,7 @@ export async function handleInsert<T>(response: Response, model: Model<T>, docum
             return insertResult as T;
         return insertResult;
     } catch (e) {
+        console.log(e);
         if (e instanceof ModelSaveError) {
             badRequest(response, e.message);
         } else {
