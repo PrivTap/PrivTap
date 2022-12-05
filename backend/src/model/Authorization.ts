@@ -99,11 +99,11 @@ class Authorization extends Model<IAuthorization> {
     /**
      * Returns all the permission of a service and also the one granted by a user with an extra field
      */
-    async findAllPermission(serviceId: string, userId: string) {
-        return await this.model.aggregate()
+    async findAllPermissionsAddingAuthorizationTag(serviceId: string, userId: string) {
+        const collection = this.model.aggregate()
             .match(({
                 userId: new Types.ObjectId(userId),
-                service: new Types.ObjectId(serviceId)
+                serviceId: new Types.ObjectId(serviceId)
             }))
             .project({ _id: 0, "grantedPermission": 1 })
             .unwind({ path: "$grantedPermission" })
@@ -119,8 +119,24 @@ class Authorization extends Model<IAuthorization> {
                 name: "$authPermissions.name",
                 description: "$authPermissions.description",
                 authorized: true
-            })
-            .project({ _id: 1, "name": 1, "description": 1, "authorized": 1 }) as Partial<permissionAuthorized>[];
+            }).project({ _id: 1, "name": 1, "description": 1, "authorized": 1 });
+        const IDCollection = await collection.project({ _id: 1 });
+        return await collection.unionWith({ coll: "permissions", pipeline: [
+            {
+                $match: {
+                    serviceId: new Types.ObjectId(serviceId),
+                    _id: { $not: { $in: IDCollection } }
+                }
+            },
+            {
+                $addFields: {
+                    authorized: false
+                }
+            },
+            {
+                $project: { _id: 1, "name": 1, "description": 1, "authorized": 1 }
+            }
+        ] }) as Partial<permissionAuthorized>[];
     }
 
     /**
