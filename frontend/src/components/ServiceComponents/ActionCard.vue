@@ -1,6 +1,6 @@
 
 <template>
-    <div class="bg-green-900/40 rounded-lg py-8 px-8 shadow-lg">
+    <div class="bg-indigo-900/40 rounded-lg py-8 px-8 shadow-lg">
         <p class="text-2xl font-medium"> {{ action.name }} </p>
         <p class="text-lg font-medium text-white/60"> {{ action.description }} </p>
         <p class="text-lg font-medium text-white/60"> {{ action.endpoint }} </p>
