@@ -31,7 +31,7 @@
                 </div>
                 <div v-if="triggers.length" class="py-10">
                     <div class=" px-10 grid lg:grid-cols-2 xl:grid-cols-3 gap-10">
-                        <TriggerCard v-if="service" v-for="trigger in triggers" :trigger="trigger"
+                        <TriggerCard v-if="service" v-for="trigger in triggers" :tag="trigger._id" :trigger="trigger"
                             :serviceId="service?._id" />
                         <v-dialog v-model="dialog" class="flex flex-col justify-center items-center center">
                             <template v-slot:activator="{ props }">

@@ -8,14 +8,14 @@
                 <v-text-field v-model="form.name" :rules="form.nameRule" label="Name" required></v-text-field>
                 <v-textarea :rules="form.descriptionRule" v-model="form.description" label="Description"
                     required></v-textarea>
-                    <v-text-field v-if="!onEdit" v-model="form.resourceServer" :rules="form.resourceServerRule" label="ResourceServer"
+                    <v-text-field v-model="form.resourceServer" :rules="form.resourceServerRule" label="ResourceServer"
                     required></v-text-field>
                     <v-label class="mb-2 mt-4">Choose Permissions</v-label>
 
                     <v-input :rules="permissionRule" v-model="selectedPermissions" :readonly="true">
                     <v-row align-content="start" no-gutters class="-translate-x-3 h-14"
                         >
-                        <v-col cols="1" align-self="start" v-for="choosablePerm in choosablePermissions" :key="choosablePerm._id">
+                        <v-col cols="2" align-self="start" v-for="choosablePerm in choosablePermissions" :key="choosablePerm._id">
                             <v-checkbox v-model="selectedPermissions" :label="choosablePerm.name" :value="choosablePerm"
                                 color="success"></v-checkbox>
                         </v-col>
@@ -43,6 +43,7 @@ import {ManageTrigger} from '@/services/manage_trigger'; //MOZDA OVOOOOOOOOOOOOO
 import { isValidUrlRegex } from '@/helpers/validators';
 import type PermissionModel from '@/model/permission_model';
 import ManagePermission from '@/services/manage_permission';
+// import { trigger } from '@vue/reactivity';
 
 
 const props = defineProps(
@@ -118,6 +119,8 @@ async function validate() {
         const permissionIds = selectedPermissions.value.map(p => p._id);
         if (props.onEdit) {
             await manageTrigger.updateTrigger(props.trigger._id, form.name, form.description, permissionIds, form.resourceServer);
+            console.log(permissionIds);
+            console.log(form.name);
         } else {
             await manageTrigger.createTrigger(form.name, form.description, props.serviceId, permissionIds, form.resourceServer);
         }
