@@ -67,6 +67,59 @@ export class Permission extends Model<IPermission> {
     async belongsToService(permissionId: string, serviceId: string): Promise<boolean> {
         return await this.find({ _id: permissionId, serviceId }) != null;
     }
+
+    /*async findAllPermission(serviceId: string, userId: string) {
+        const result = await this.model.aggregate()
+            .match({serviceId: new Types.ObjectId(serviceId)})
+            .lookup({
+                from: "permissions",
+                pipeline: [
+                    {
+                        $match: {
+                            name: "new perm"
+                            // userId: new Types.ObjectId(userId),
+                            // service: new Types.ObjectId(serviceId)
+                        }
+                    }],
+                /*{$project: {_id: 0, "grantedPermission": 1}},
+                {$unwind: {path: "$grantedPermission"}},
+                {$lookup: {
+                        from: "permissions",
+                        localField: "grantedPermission",
+                        foreignField: "_id",
+                        as: "authPermissions"
+                    }
+                },
+                {$unwind: {path: "$authPermissions"}},
+                {$addFields: {
+                        _id: "$authPermissions._id",
+                        name: "$authPermissions.name",
+                        description: "$authPermissions.description",
+                        authorized: true
+                    }
+                },
+                {$project: {_id: 1, "name": 1, "description": 1, "authorized": 1}
+                }],
+                as: "permissions",
+                localField: "name",
+                foreignField: "name"
+            }).unwind({path: "$permissions"})
+        console.log(result)
+    }*/
 }
 
 export default new Permission();
+
+export class permissionAuthorized {
+    _id: string
+    name: string
+    description: string
+    authorized?: boolean
+
+    constructor(_id: string, name: string, description: string, authorized?: boolean) {
+        this._id = _id;
+        this.name = name;
+        this.description = description;
+        this.authorized = authorized;
+    }
+}

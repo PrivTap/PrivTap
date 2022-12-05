@@ -53,46 +53,33 @@
 
 import {onMounted, ref} from "vue";
 import {useRoute} from "vue-router";
-import SimplePermissionModel from "@/model/simple_permission_model";
 import radial from "@/assets/images/radial.svg"
+import showPermissions from "@/services/show-permission";
 
 const route = useRoute();
 
-let permission = ref<SimplePermissionModel[]>();
+let permission = showPermissions.getRef();
 const serviceName = ref("service");
 const arrayAuthorized = ref<String[]>([]);
 const authorizationChanged = ref(false);
 
-function print() {
-  console.log(arrayAuthorized.value)
-}
 
 onMounted(async () => {
-  await checkEdit();
-  permission.value?.forEach(function (permission) {
-    if (permission.authorized) {
-      arrayAuthorized.value?.push(permission._id);
+  await getHttp();
+  permission.value?.forEach(function (p) {
+    if (p.authorized) {
+      arrayAuthorized.value?.push(p._id);
     }
   })
+  console.log(arrayAuthorized.value);
 })
 
-async function checkEdit() {
-  const serviceId = route.params.id
+async function getHttp() {
+  const serviceId = route.params.id as string
   if (serviceId)
     if (route.params.id) {
       /// Means that we are editing a service
-      permission.value = [{
-        _id: "id1",
-        name: "permission1",
-        description: "This permission will use a",
-        authorized: true
-      },
-        {
-          _id: "id2",
-          name: "permission2",
-          description: "This permission will use b",
-          authorized: false
-        },] //await getPermission({params:serviceId});
+      permission = await showPermissions.getAllPermissions(serviceId);
     }
 }
 </script>
