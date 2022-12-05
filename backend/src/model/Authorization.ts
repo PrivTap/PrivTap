@@ -61,7 +61,7 @@ class Authorization extends Model<IAuthorization> {
             // Keep only the field containing the service id
             .project({ _id: 0, serviceId: 1 })
             // Join with services collection on the local service id field (left outer join)
-            .lookup({ from: "services", localField: "service", foreignField: "_id", as: "service" })
+            .lookup({ from: "services", localField: "serviceId", foreignField: "_id", as: "service" })
             // Deconstruct the array created by the join to have one document for authorized service
             .unwind("service")
             // Set the serviceId and serviceName fields taking data from the service field
@@ -82,9 +82,9 @@ class Authorization extends Model<IAuthorization> {
         return await this.model.aggregate()
             .match({ userId: new Types.ObjectId(userId) })
             //keep only the serviceId
-            .project({ _id: 0, "service": 1 })
+            .project({ _id: 0, "serviceId": 1 })
             //left outer join with collection service
-            .lookup({ from: "services", localField: "service", foreignField: "_id", as: "service" })
+            .lookup({ from: "services", localField: "serviceId", foreignField: "_id", as: "service" })
             .unwind({ path: "$service" })
             .addFields({ _id: "$service._id", name: "$service.name", description: "$service.description" })
             //remove all the field except the relevant service data
