@@ -38,7 +38,7 @@ class State extends Model<IState> {
     }
 
     async findByValue(value: string): Promise<IState | null> {
-        return await this.find({ value });
+        return await this.find({ value: value });
     }
 
 }
