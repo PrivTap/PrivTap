@@ -11,7 +11,8 @@ export interface IManageService {
     description: string,
     authServer: string,
     clientId: string,
-    clientSecret: string
+    clientSecret: string,
+    triggerUrl: string
   ): Promise<ServiceModel | null>;
   getServiceById(serviceId: string): Promise<ServiceModel | null>;
   updateService(servciceId: string,
@@ -19,7 +20,9 @@ export interface IManageService {
     description: string,
     authServer: string,
     clientId: string,
-    clientSecret: string): Promise<ServiceModel | null>;
+    clientSecret: string,
+    triggerUrl: string
+  ): Promise<ServiceModel | null>;
   deleteService(serviceId: string): Promise<ServiceModel[] | null>;
   getAllServices(): Promise<ServiceModel[] | null>;
 }
@@ -93,14 +96,16 @@ export class ManageService
     description: string,
     authServer: string,
     clientId: string,
-    clientSecret: string
+    clientSecret: string,
+    triggerUrl: string
   ): Promise<ServiceModel | null> {
     const body = {
-      name: name,
-      description: description,
-      authServer: authServer,
-      clientId: clientId,
-      clientSecret: clientSecret,
+      "name": name,
+      "description": description,
+      "authServer": authServer,
+      "clientId": clientId,
+      "clientSecret": clientSecret,
+      "triggerNotificationServer": triggerUrl,
     };
     try {
       const res = await this.http.post(this.path, body);
@@ -120,16 +125,18 @@ export class ManageService
     description: string,
     authServer: string,
     clientId: string,
-    clientSecret: string
+    clientSecret: string,
+    triggerUrl: string
   ): Promise<ServiceModel | null> {
     try {
       const body = {
-        serviceId: serviceId,
-        name: name,
-        description: description,
-        authServer: authServer,
-        clientId: clientId,
-        clientSecret: clientSecret,
+        "serviceId": serviceId,
+        "name": name,
+        "description": description,
+        "authServer": authServer,
+        "clientId": clientId,
+        "clientSecret": clientSecret,
+        "triggerNotificationServer": triggerUrl,
       }
       const res = await this.http.put(this.path, body);
       useToast().success("Service updated");

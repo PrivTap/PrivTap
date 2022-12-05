@@ -1,59 +1,37 @@
 <template>
-  <div class="text-center h-screen">
-    <h1 class="text-5xl text-blue-100 font-medium py-20">
+  <div class="h-screen">
+    <h1 class="text-5xl text-center text-blue-100 font-medium py-10">
       {{ route.params.id ? "Edit" : "Publish" }} Service
     </h1>
-    <form @submit.prevent="onSubmitted">
-      <div class="mb-6 mx-auto w-96">
-        <label for="text" class="block mb-2 text-sm font-semibold text-white dark:text-gray-300">Name</label>
-        <input type="text" id="text"
-          class="border-2 border-gray-600 text-white text-md rounded-lg block w-full p-2.5 dark:bg-gray-700 focus:outline-none focus:border-blue-500"
-          placeholder="..." v-model="newService.name" required />
-      </div>
+    <div class="items-center justify-center flex flex-col">
+      <div class="min-w-[400px] w-2xl">
+        <v-form ref="formRef" v-model="form.valid" lazy-validation class="space-y-4">
+          <v-text-field variant="outlined" v-model="form.name" :rules="form.nameRule" label="Name"
+            required></v-text-field>
+          <v-textarea variant="outlined" no-resize v-model="form.description" :rules="form.descriptionRule"
+            label="Description" required></v-textarea>
+          <v-text-field variant="outlined" v-model="form.endpoint" :rules="form.endpointRule" label="Endpoint Url"
+            hint="www.example.com" required></v-text-field>
+          <v-text-field variant="outlined" required v-model="form.triggerUrl" :rules="form.triggerUrlRule" label="Trigger Url"
+            hint="www.example.com" ></v-text-field>
+          <v-text-field variant="outlined" v-model="form.clientId" :rules="form.idRule" label="Client ID"
+            required></v-text-field>
+          <v-text-field variant="outlined" v-model="form.secret" :rules="form.secretRule" label="Client Secret"
+            required></v-text-field>
+        </v-form>
 
-      <div class="mb-6 mx-auto w-96">
-        <label for="text" class="block mb-2 text-sm font-semibold text-white dark:text-gray-300"
-          required>Description</label>
-        <input type="text" id="text"
-          class="border-2 border-gray-600 text-white text-md rounded-lg block w-full p-2.5 dark:bg-gray-700 focus:outline-none focus:border-blue-500"
-          placeholder="..." v-model="newService.description" required />
       </div>
+      <PrimaryButton @click="validate" class="mt-5"
+        :text="route.params.id ? 'Edit API endpoint' : 'Create API endpoint'" />
+    </div>
 
-      <div class="mb-6 mx-auto w-96">
-        <label for="text" class="block mb-2 text-sm font-semibold text-white dark:text-gray-300">Endpoint Url</label>
-        <input type="text" id="text"
-          class="border-2 border-gray-600 text-white text-md rounded-lg block w-full p-2.5 dark:bg-gray-700 focus:outline-none focus:border-blue-500"
-          placeholder="http://example.com:8080" v-model="newService.authServer" required />
-        <div v-show="!isValidUrl" class="animate-fade-in mt-2">
-          <span :class="{
-            'text-green-400': isValidUrl,
-            'text-red-200': !isValidUrl,
-          }" class="font-medium text-sm ml-3" v-text="isValidUrl ? '' : 'Insert a valid url'"></span>
-        </div>
-      </div>
-
-      <div class="mb-6 mx-auto w-96">
-        <label type="url" class="block mb-2 text-sm font-semibold text-white dark:text-gray-300">Client ID</label>
-        <input type="text" id="text"
-          class="border-2 border-gray-600 text-white text-md rounded-lg block w-full p-2.5 dark:bg-gray-700 focus:outline-none focus:border-blue-500"
-          placeholder="..." v-model="newService.clientId" required />
-      </div>
-
-      <div class="mb-6 mx-auto w-96">
-        <label type="url" class="block mb-2 text-sm font-semibold text-white dark:text-gray-300">Client Secret</label>
-        <input type="text" id="text"
-          class="border-2 border-gray-600 text-white text-md rounded-lg block w-full p-2.5 dark:bg-gray-700 focus:outline-none focus:border-blue-500"
-          placeholder="..." v-model="newService.clientSecret" required />
-      </div>
-      <PrimaryButton class="mt-5" :text="route.params.id ? 'Edit API endpoint' : 'Create API endpoint'" />
-    </form>
   </div>
 </template>
 >
 
 <script setup lang="ts">
 // import { useOspServiceStore } from "@/stores/osp_service_store";
-import { onMounted, ref, watch } from "vue";
+import { onMounted, reactive, ref, watch } from "vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
 import { useRoute } from "vue-router";
 import { ManageService } from "@/services/manage_service";
@@ -65,74 +43,79 @@ const route = useRoute();
 const isValidUrl = ref<boolean>(true);
 const isLoading = ref<boolean>(false);
 const manageService = ManageService.getInstance;
-let newService = ref({
-  name: "",
-  description: "",
-  authServer: "",
-  clientId: "",
-  clientSecret: "",
-});
 
 async function checkEdit() {
   if (route.params.id) {
     /// Means that we are editing a service
     let serviceToEdit = await manageService.getServiceById(route.params.id as string);
     if (serviceToEdit) {
-      newService.value = {
-        name: serviceToEdit.name,
-        description: serviceToEdit.description,
-        authServer: serviceToEdit.authServer,
-        clientId: serviceToEdit.clientId,
-        clientSecret: serviceToEdit.clientSecret,
-      };
+      form.name = serviceToEdit.name;
+      form.description = serviceToEdit.description;
+      form.endpoint = serviceToEdit.authServer;
+      form.clientId = serviceToEdit.clientId;
+      form.secret = serviceToEdit.clientSecret;
+      form.triggerUrl = serviceToEdit.triggerUrl;
     }
   }
 }
+
+/// Form part
+const formRef = ref();
+const form = reactive({
+  valid: true,
+  name: '',
+  nameRule: [(v: string) => !!v || 'Name is required'],
+  description: '',
+  descriptionRule: [(v: string) => !!v || 'Description is required'],
+  endpoint: '',
+  endpointRule: [
+    (v: string) => !!v || 'Endpoint is required',
+    (v: string) => isValidUrlRegex(v) || 'Endpoint is not valid'
+  ],
+  triggerUrl: '',
+  triggerUrlRule: [
+    (v: string) => !!v || 'Trigger Url is required',
+    (v: string) => isValidUrlRegex(v) || 'Trigger Url is not valid'
+  ],
+  clientId: '',
+  idRule: [(v: string) => !!v || 'Client Id is required'],
+  secret: '',
+  secretRule: [(v: string) => !!v || 'Client secret is required'],
+});
 
 onMounted(async () => {
   await checkEdit();
 });
 
-watch(
-  () => newService.value.authServer,
-  (newValue) => {
-    !newValue.length
-      ? (isValidUrl.value = true)
-      : (isValidUrl.value = checkUrl(newValue));
-  }
-);
-
-/// function that check if a string is a valid url
-function checkUrl(url: string): boolean {
-  return isValidUrlRegex(url);
-}
-
-async function onSubmitted() {
+async function validate() {
   isLoading.value = true;
-  if(!isValidUrl.value) return;
-  if (route.params.id) {
-    const serviceId = route.params.id as string;
-    console.log("Editing service with id: ", serviceId);
-    await manageService.updateService(
-      serviceId,
-      newService.value.name,
-      newService.value.description,
-      newService.value.authServer,
-      newService.value.clientId,
-      newService.value.clientSecret
-    )
+  const { valid } = await formRef.value.validate();
+  if (valid) {
+    if (route.params.id) {
+      const serviceId = route.params.id as string;
+      await manageService.updateService(
+        serviceId,
+        form.name,
+        form.description,
+        form.endpoint,
+        form.clientId,
+        form.secret,
+        form.triggerUrl,
+      )
+    } else {
+      await manageService.createService(
+        form.name,
+        form.description,
+        form.endpoint,
+        form.clientId,
+        form.secret,
+        form.triggerUrl,
+      );
+    }
     isLoading.value = false;
-  }else{
-    await manageService.createService(
-      newService.value.name,
-      newService.value.description,
-      newService.value.authServer,
-      newService.value.clientId,
-      newService.value.clientSecret
-    );
-    isLoading.value = false;
+    return router.replace(RoutingPath.OSP_PERSONAL_PAGE);
   }
-  return router.replace(RoutingPath.OSP_PERSONAL_PAGE);
+
 }
 </script>
 
