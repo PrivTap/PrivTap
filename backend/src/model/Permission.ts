@@ -111,10 +111,10 @@ export class Permission extends Model<IPermission> {
 export default new Permission();
 
 export class permissionAuthorized {
-    _id: string
-    name: string
-    description: string
-    authorized?: boolean
+    _id: string;
+    name: string;
+    description: string;
+    authorized?: boolean;
 
     constructor(_id: string, name: string, description: string, authorized?: boolean) {
         this._id = _id;
