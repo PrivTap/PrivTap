@@ -1,5 +1,5 @@
-import { model as mongooseModel, Schema, Error as MongooseError, FilterQuery, UpdateQuery, Query } from "mongoose";
-import { MongoServerError } from "mongodb";
+import {model as mongooseModel, Schema, Error as MongooseError, FilterQuery, UpdateQuery, Query} from "mongoose";
+import {MongoServerError} from "mongodb";
 import logger from "./helper/logger";
 
 const MONGODB_DUPLICATE_KEY_ERROR_CODE = 11000;
@@ -64,8 +64,8 @@ export default class Model<T> {
      */
     async update(id: string, documentUpdate: Partial<T>, upsert = false): Promise<boolean> {
         try {
-            const updateResult = await this.model.updateOne({ _id: id }, documentUpdate, { upsert: upsert });
-            return updateResult.modifiedCount == 1;
+            const updateResult = await this.model.updateOne({_id: id}, documentUpdate, {upsert: upsert});
+            return updateResult.upsertedId != null || updateResult.modifiedCount == 1;
         } catch (e) {
             this.handleMongooseSavingErrors(e);
         }
@@ -77,12 +77,12 @@ export default class Model<T> {
      * Only the parameters that are defined will be updated, others will be not modified.
      * @param filter the query to find the document to update
      * @param documentUpdate the document containing the updates
-     * @param uupsert if you also want to insert the document. Default false
+     * @param upsert if you also want to insert the document. Default false
      */
     async updateWithFilter(filter: FilterQuery<T>, documentUpdate: Partial<T>, upsert = false): Promise<boolean> {
         try {
-            const updateResult = await this.model.updateOne(filter, documentUpdate, { upsert: upsert });
-            return updateResult.modifiedCount == 1;
+            const updateResult = await this.model.updateOne(filter, documentUpdate, {upsert: upsert});
+            return updateResult.upsertedId != null || updateResult.modifiedCount == 1;
         } catch (e) {
             this.handleMongooseSavingErrors(e);
         }
@@ -98,7 +98,7 @@ export default class Model<T> {
      */
     async updateWithFilterAndReturn(filter: FilterQuery<T>, documentUpdate: Partial<T>, upsert = false): Promise<T | null> {
         try {
-            return await this.model.findOneAndUpdate(filter, documentUpdate, { new: true, upsert: upsert });
+            return await this.model.findOneAndUpdate(filter, documentUpdate, {new: true, upsert: upsert});
         } catch (e) {
             this.handleMongooseSavingErrors(e);
         }
@@ -111,7 +111,7 @@ export default class Model<T> {
      */
     async delete(id: string): Promise<boolean> {
         try {
-            const res = await this.model.deleteOne({ _id: id });
+            const res = await this.model.deleteOne({_id: id});
             return res.deletedCount == 1;
         } catch (e) {
             logger.error(`Unexpected error while deleting ${this.name}\n`, e);
