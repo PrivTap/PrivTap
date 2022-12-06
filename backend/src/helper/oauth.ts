@@ -36,12 +36,12 @@ export default class OAuth {
         if (env.PROD){
             redirectUri = "https://privtap.it/modifyauth";
         } else {
-            redirectUri = "https://127.0.0.1:5173/modifyauth";
+            redirectUri = "http://127.0.0.1:8000/api/oauth";
         }
 
         let authorizationUri = client.authorizeURL({
             redirect_uri: redirectUri,
-            state: state
+            state: state,
         });
 
         authorizationUri = OAuth.appendAuthDetails(authorizationUri, authorization_details);
@@ -62,7 +62,8 @@ export default class OAuth {
         return authorizationUri + "&" + encodeURI(authorizationUriStringify);
     }
 
-    private static async buildClient(serviceId: string, resourceServer = ""): Promise<AuthorizationCode | null>{
+    // TODO: Specify the token path in the Service model
+    private static async buildClient(serviceId: string, tokenPath = "/login/oauth/access_token"): Promise<AuthorizationCode | null>{
         const service = await Service.findById(serviceId);
         if (!service){
             return null;
@@ -71,13 +72,15 @@ export default class OAuth {
         const config = {
             client: {
                 id: service.clientId,
-                secret: service.clientSecret
+                secret: service.clientSecret,
             },
             auth: {
                 tokenHost: path.tokenHost,
                 authorizePath: path.authorizePath,
                 // This is the resource server, has to be modified
-                tokenPath: resourceServer
+                // TODO: Service needs a little refactor
+                // This token path is a separate url which can differ from the auth path
+                tokenPath: tokenPath
             }
         };
         return new AuthorizationCode(config);
@@ -93,6 +96,7 @@ export default class OAuth {
             return accessToken.token.access_token;
         } catch (e) {
             console.error("Access Token Error");
+            console.log(e);
         }
         return null;
     }

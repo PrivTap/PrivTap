@@ -1,7 +1,7 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
 import { checkUndefinedParams, forbiddenUserError } from "../../helper/http";
-import dataRuleExecution from "../../model/DataRuleExecution";
+
 
 export default class ActionData extends Route {
     // TODO: figure out how to restrict this to only authorized services
@@ -10,6 +10,7 @@ export default class ActionData extends Route {
         super("action-data",false,false);
     }
 
+    /*
     protected async httpGet(request: Request, response: Response): Promise<void> {
         const dataId = request.query.dataId as string;
         const apiKey = request.query.apiKey as string;
@@ -28,4 +29,7 @@ export default class ActionData extends Route {
             response.send();
         }
     }
+
+     */
 }
+

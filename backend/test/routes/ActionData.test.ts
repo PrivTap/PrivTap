@@ -1,3 +1,4 @@
+/*
 import { use, expect, request } from "chai";
 import chaiHttp = require("chai-http");
 import { createSandbox, SinonStub } from "sinon";
@@ -69,5 +70,7 @@ describe("/services endpoint", () => {
     });
 
 });
+
+ */
 
 

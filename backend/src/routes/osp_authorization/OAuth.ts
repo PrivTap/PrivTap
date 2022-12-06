@@ -9,7 +9,7 @@ import Authorization from "../../model/Authorization";
 
 export default class OAuthRoute extends Route {
     constructor() {
-        super("oauth");
+        super("oauth", false, false);
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
@@ -25,14 +25,19 @@ export default class OAuthRoute extends Route {
             badRequest(response);
             return;
         }
+        /*
         if (state.userId != userId){
             badRequest(response);
             return;
         }
 
+         */
+
         const serviceId = state.serviceId;
         const permissions = state.permissionId;
+        console.log(request.query);
         const oAuthToken = await OAuth.retrieveToken(serviceId, options as AuthorizationTokenConfig);
+        console.log(oAuthToken);
         if (!oAuthToken){
             badRequest(response);
             return;

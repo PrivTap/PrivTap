@@ -1,3 +1,4 @@
+/*
 import mongoose, { Schema, Types } from "mongoose";
 import Model from "../Model";
 import axios from "axios";
@@ -37,6 +38,7 @@ class dataRuleExecution extends Model<IDataRuleExecution> {
      * @param token: the bearer token to use in the request
      * @param apiKeyAction: the key of the action service
      */
+/*
     async storeData(url: string, token: string, apiKeyAction: string): Promise<string | null> {
         const bucket = await app.getBucket();
         if (bucket === undefined) {
@@ -62,6 +64,7 @@ class dataRuleExecution extends Model<IDataRuleExecution> {
         /*if (process.env.PROD) {
             urlResource = app.deploymentURL;
         }*/
+/*
         try {
             const dataId = await this.insert({ apiKey: apiKeyAction, fileId });
             if (dataId == null) return null;
@@ -103,3 +106,4 @@ class dataRuleExecution extends Model<IDataRuleExecution> {
 export default new
 
 dataRuleExecution();
+*/
