@@ -64,6 +64,8 @@ import {useRoute} from "vue-router";
 import radial from "@/assets/images/radial.svg"
 import showPermissions from "@/services/show-permission";
 import empty from '@/assets/images/empty1.svg';
+import router from "@/router/router";
+import RoutingPath from "@/router/routing_path";
 
 const route = useRoute();
 
@@ -80,27 +82,27 @@ onMounted(async () => {
   const state = route.query.state as string;
   if (code != undefined && state != undefined) {
     await showPermissions.sendCodeOAuth(code, state);
+    await router.replace(`${RoutingPath.MODIFY_AUTH_PAGE}/${serviceId}`)
   }
-  await getHttp();
-  permission.value?.forEach(function (p) {
-    if (p.authorized) {
-      originalAuthorized.push(p._id)
-      arrayAuthorized.value?.push(p._id);
-    }
-  })
+
+  await savePermissions();
 })
 
 function onSwitch() {
   authorizationChanged.value = JSON.stringify(originalAuthorized) != JSON.stringify(arrayAuthorized.value);
 }
 
-async function getHttp() {
-
-  if (serviceId)
-    if (route.params.id) {
-      permission = await showPermissions.getAllPermissions(serviceId);
-      isLoading.value = false;
+async function savePermissions() {
+  if (route.params.id) {
+    permission = await showPermissions.getAllPermissions(serviceId);
+    isLoading.value = false;
+  }
+  permission.value?.forEach(function (p) {
+    if (p.authorized) {
+      originalAuthorized.push(p._id)
+      arrayAuthorized.value?.push(p._id);
     }
+  })
 }
 
 async function oAuthAuthorization() {

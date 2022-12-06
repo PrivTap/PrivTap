@@ -4,7 +4,7 @@ import { badRequest, internalServerError, success } from "../../helper/http";
 import State from "../../model/State";
 import OAuth from "../../helper/oauth";
 import { AuthorizationTokenConfig } from "simple-oauth2";
-import { handleInsert } from "../../helper/misc";
+import { handleUpdate } from "../../helper/misc";
 import Authorization from "../../model/Authorization";
 
 export default class OAuthRoute extends Route {
@@ -43,7 +43,7 @@ export default class OAuthRoute extends Route {
 
         // This should be an atomic transaction
 
-        if (!await handleInsert(response, Authorization, { userId, serviceId, oAuthToken, grantedPermissions: permissions })){
+        if (!await handleUpdate(response, Authorization, { userId:userId, serviceId:serviceId },{ userId,serviceId, oAuthToken, grantedPermissions: permissions }, false, true)){
             return;
         }
 

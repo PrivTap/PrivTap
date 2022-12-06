@@ -16,7 +16,7 @@
         <v-card-actions  >
           <v-btn size="small" variant="tonal"
                  @click="router.push(`${RoutingPath.MODIFY_AUTH_PAGE}/${props.service._id}`)">
-            {{authorization? 'Permission': 'Authorized'}}
+            {{authorization? 'Permission': 'Authorize'}}
           </v-btn>
 
           <v-btn size="small" variant="tonal" >

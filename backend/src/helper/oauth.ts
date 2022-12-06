@@ -1,7 +1,7 @@
-import {AuthorizationCode, AuthorizationTokenConfig} from "simple-oauth2";
-import {Response} from "express";
-import Permission, {IPermission} from "../model/Permission";
-import {badRequest} from "./http";
+import { AuthorizationCode, AuthorizationTokenConfig } from "simple-oauth2";
+import { Response } from "express";
+import Permission, { IPermission } from "../model/Permission";
+import { badRequest } from "./http";
 import Service from "../model/Service";
 import env from "../helper/env";
 
@@ -52,7 +52,7 @@ export default class OAuth {
 
     private static splitURL(authURL: string): { tokenHost: string, authorizePath: string } {
         const splitURL = authURL.split(/^(.*\/\/[a-z.-]*)/);
-        return {tokenHost: splitURL[1], authorizePath: splitURL[2]};
+        return { tokenHost: splitURL[1], authorizePath: splitURL[2] };
     }
 
 

@@ -7,11 +7,11 @@
 
 
       <p class="text-base font-normal text-slate-800 mb-8">
-        {{ service.description }} lorem ispus ipsus lorem...
+        {{ service.description }}
       </p>
 
       <p class="text-xl font-medium">
-        Endpoint URL:
+        Authorization Server:
         <label class="text-lg font-normal">{{ service.authServer }} </label>
       </p>
       <p class="text-xl font-medium my-2">
