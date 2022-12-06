@@ -1,24 +1,24 @@
-import { AuthorizationCode, AuthorizationTokenConfig } from "simple-oauth2";
-import { Response } from "express";
-import Permission, { IPermission } from "../model/Permission";
-import { badRequest } from "./http";
+import {AuthorizationCode, AuthorizationTokenConfig} from "simple-oauth2";
+import {Response} from "express";
+import Permission, {IPermission} from "../model/Permission";
+import {badRequest} from "./http";
 import Service from "../model/Service";
 import env from "../helper/env";
 
 export default class OAuth {
-    static async newAuthorizationUri(response: Response, serviceId: string, permissionIds: string[] | string, state: string): Promise<string | null>{
+    static async newAuthorizationUri(response: Response, serviceId: string, permissionIds: string[] | string, state: string): Promise<string | null> {
         const authorization_details = [];
 
-        if(typeof permissionIds == "string")
+        if (typeof permissionIds == "string")
             permissionIds = [permissionIds];
 
-        for await (const permissionId of permissionIds){
+        for await (const permissionId of permissionIds) {
             const permission = await Permission.findById(permissionId) as IPermission;
-            if (!permission){
+            if (!permission) {
                 badRequest(response);
                 return null;
             }
-            if (permission.serviceId != serviceId){
+            if (permission.serviceId != serviceId) {
                 badRequest(response, "This permission is not associated to the specified OSP");
                 return null;
             }
@@ -27,16 +27,16 @@ export default class OAuth {
 
         const client = await OAuth.buildClient(serviceId);
 
-        if (!client){
+        if (!client) {
             badRequest(response);
             return null;
         }
 
         let redirectUri;
-        if (env.PROD){
-            redirectUri = "https://privtap.it/modifyauth";
+        if (env.PROD) {
+            redirectUri = "https://privtap.it/modifyauth/" + serviceId;
         } else {
-            redirectUri = "http://127.0.0.1:8000/api/oauth";
+            redirectUri = "http://127.0.0.1:5173/modifyauth/" + serviceId;
         }
 
         let authorizationUri = client.authorizeURL({
@@ -50,13 +50,13 @@ export default class OAuth {
     }
 
 
-    private static splitURL(authURL: string): {tokenHost: string, authorizePath: string} {
+    private static splitURL(authURL: string): { tokenHost: string, authorizePath: string } {
         const splitURL = authURL.split(/^(.*\/\/[a-z.-]*)/);
-        return { tokenHost: splitURL[1], authorizePath: splitURL[2] };
+        return {tokenHost: splitURL[1], authorizePath: splitURL[2]};
     }
 
 
-    private static appendAuthDetails(authorizationUri: string, authorization_details: object): string{
+    private static appendAuthDetails(authorizationUri: string, authorization_details: object): string {
         const authorizationUriStringify = JSON.stringify(authorization_details);
         console.log(authorizationUriStringify);
         return authorizationUri + "&" + encodeURI(authorizationUriStringify);
@@ -65,7 +65,7 @@ export default class OAuth {
     // TODO: Specify the token path in the Service model
     private static async buildClient(serviceId: string, tokenPath = "/login/oauth/access_token"): Promise<AuthorizationCode | null>{
         const service = await Service.findById(serviceId);
-        if (!service){
+        if (!service) {
             return null;
         }
         const path = OAuth.splitURL(service.authServer);
@@ -86,9 +86,9 @@ export default class OAuth {
         return new AuthorizationCode(config);
     }
 
-    static async retrieveToken(serviceId: string, authConfig: AuthorizationTokenConfig): Promise<string | null>{
+    static async retrieveToken(serviceId: string, authConfig: AuthorizationTokenConfig): Promise<string | null> {
         const client = await OAuth.buildClient(serviceId);
-        if (!client){
+        if (!client) {
             return null;
         }
         try {

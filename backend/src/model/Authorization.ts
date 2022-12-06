@@ -57,19 +57,19 @@ class Authorization extends Model<IAuthorization> {
         // Build the aggregation query
         return this.model.aggregate()
             // Filter only authorizations given by the user
-            .match({ userId: new Types.ObjectId(userId) })
+            .match({userId: new Types.ObjectId(userId)})
             // Keep only the field containing the service id
-            .project({ _id: 0, serviceId: 1 })
+            .project({_id: 0, serviceId: 1})
             // Join with services collection on the local service id field (left outer join)
-            .lookup({ from: "services", localField: "serviceId", foreignField: "_id", as: "service" })
+            .lookup({from: "services", localField: "serviceId", foreignField: "_id", as: "service"})
             // Deconstruct the array created by the join to have one document for authorized service
             .unwind("service")
             // Set the serviceId and serviceName fields taking data from the service field
-            .addFields({ serviceId: "$service._id", serviceName: "$service.name" })
+            .addFields({serviceId: "$service._id", serviceName: "$service.name"})
             // Delete the service field, as it is no longer needed
-            .project({ serviceId: 0 })
+            .project({serviceId: 0})
             // Join with the operation (triggers or actions) collection on the serviceId field (left outer join)
-            .lookup({ from: operation, localField: "serviceId", foreignField: "serviceId", as: operation })
+            .lookup({from: operation, localField: "serviceId", foreignField: "serviceId", as: operation})
             // Keep only the necessary fields for each operation
             .project(operationProjection);
     }
@@ -80,13 +80,13 @@ class Authorization extends Model<IAuthorization> {
      */
     async findAllAuthorizedServices(userId: string) {
         return await this.model.aggregate()
-            .match({ userId: new Types.ObjectId(userId) })
+            .match({userId: new Types.ObjectId(userId)})
             //keep only the serviceId
-            .project({ _id: 0, "serviceId": 1 })
+            .project({_id: 0, "serviceId": 1})
             //left outer join with collection service
-            .lookup({ from: "services", localField: "serviceId", foreignField: "_id", as: "service" })
-            .unwind({ path: "$service" })
-            .addFields({ _id: "$service._id", name: "$service.name", description: "$service.description" })
+            .lookup({from: "services", localField: "serviceId", foreignField: "_id", as: "service"})
+            .unwind({path: "$service"})
+            .addFields({_id: "$service._id", name: "$service.name", description: "$service.description"})
             //remove all the field except the relevant service data
             .project({
                 "_id": 1,
@@ -100,43 +100,51 @@ class Authorization extends Model<IAuthorization> {
      * Returns all the permission of a service and also the one granted by a user with an extra field
      */
     async findAllPermissionsAddingAuthorizationTag(serviceId: string, userId: string) {
+        console.log("user", userId, "\nservice", serviceId, "\n");
         const collection = this.model.aggregate()
             .match(({
                 userId: new Types.ObjectId(userId),
                 serviceId: new Types.ObjectId(serviceId)
             }))
-            .project({ _id: 0, "grantedPermission": 1 })
-            .unwind({ path: "$grantedPermission" })
+            .project({_id: 0, "grantedPermissions": 1})
+            .unwind({path: "$grantedPermissions"})
             .lookup({
                 from: "permissions",
-                localField: "grantedPermission",
+                localField: "grantedPermissions",
                 foreignField: "_id",
                 as: "authPermissions"
             })
-            .unwind({ path: "$authPermissions" })
+            .unwind({path: "$authPermissions"})
             .addFields({
                 _id: "$authPermissions._id",
                 name: "$authPermissions.name",
                 description: "$authPermissions.description",
                 authorized: true
-            }).project({ _id: 1, "name": 1, "description": 1, "authorized": 1 });
-        const IDCollection = await collection.project({ _id: 1 });
-        return await collection.unionWith({ coll: "permissions", pipeline: [
-            {
-                $match: {
-                    serviceId: new Types.ObjectId(serviceId),
-                    _id: { $not: { $in: IDCollection } }
+            }).project({_id: 1, "name": 1, "description": 1, "authorized": 1});
+        console.log(await collection);
+        const IDCollection: string[] = [];
+        (await collection).forEach((p) => {
+            IDCollection.push(p._id);
+        });
+        console.log(IDCollection);
+        return await collection.unionWith({
+            coll: "permissions", pipeline: [
+                {
+                    $match: {
+                        serviceId: new Types.ObjectId(serviceId),
+                        _id: {$nin: IDCollection}
+                    }
+                },
+                {
+                    $addFields: {
+                        authorized: false
+                    }
+                },
+                {
+                    $project: {_id: 1, "name": 1, "description": 1, "authorized": 1}
                 }
-            },
-            {
-                $addFields: {
-                    authorized: false
-                }
-            },
-            {
-                $project: { _id: 1, "name": 1, "description": 1, "authorized": 1 }
-            }
-        ] }) as Partial<permissionAuthorized>[];
+            ]
+        }) as Partial<permissionAuthorized>[];
     }
 
     /**
@@ -170,14 +178,14 @@ class Authorization extends Model<IAuthorization> {
      * @param userId the id of the user
      */
     async findAllForUser(userId: string): Promise<IAuthorization[] | null> {
-        return await this.findAll({ userId });
+        return await this.findAll({userId});
     }
 
     /**
      * Get the OAuth token for the userId and the ServiceId
      */
     async findToken(userId: string, serviceId: string): Promise<string | null> {
-        const res = await this.find({ userId: userId, serviceId: serviceId });
+        const res = await this.find({userId: userId, serviceId: serviceId});
         if (res != null) {
             return res.oAuthToken;
         }

@@ -19,7 +19,7 @@ export default class ServiceAuthorizationRoute extends Route {
     protected async httpPost(request: Request, response: Response): Promise<void> {
         //const userId = request.userId;
         // Dummy userId
-        const userId = "6383fa049c03ea9ac5f2477a";
+        const userId = request.userId;
         const serviceId = request.body.serviceId;
         const permissionIds = request.body.permissionId as string[];
 

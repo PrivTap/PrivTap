@@ -9,7 +9,7 @@ import Authorization from "../../model/Authorization";
 
 export default class OAuthRoute extends Route {
     constructor() {
-        super("oauth", false, false);
+        super("oauth");
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
@@ -25,13 +25,11 @@ export default class OAuthRoute extends Route {
             badRequest(response);
             return;
         }
-        /*
+
         if (state.userId != userId){
             badRequest(response);
             return;
         }
-
-         */
 
         const serviceId = state.serviceId;
         const permissions = state.permissionId;
@@ -46,7 +44,6 @@ export default class OAuthRoute extends Route {
         // This should be an atomic transaction
 
         if (!await handleInsert(response, Authorization, { userId, serviceId, oAuthToken, grantedPermissions: permissions })){
-            badRequest(response);
             return;
         }
 
