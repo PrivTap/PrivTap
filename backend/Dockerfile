@@ -38,5 +38,6 @@ RUN npm ci --omit=dev
 
 # Copy compiled Javascript and run
 COPY --from=0 /usr/src/app/dist .
+COPY openapi.yaml .
 
 CMD ["node","app.js"]

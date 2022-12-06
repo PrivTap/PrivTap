@@ -1,29 +1,35 @@
+import "./mongoose.config";
 import express, { Express } from "express";
 import { getFilesInDir } from "./helper/misc";
 import { join } from "path";
 import requestLogger from "morgan";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import mongoose, { ConnectOptions } from "mongoose";
+import mongoose, { connect, ConnectOptions } from "mongoose";
 import Route from "./Route";
 import env from "./helper/env";
 import logger from "./helper/logger";
 import YAML from "yamljs";
 import swaggerUI from "swagger-ui-express";
+import { GridFSBucket } from "mongodb";
 
 // Expand the Express request definition to include the userId
 declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace Express {
-    interface Request {
-      /**
-       * The id of the user that sent this request.
-       * Optionally set by PrivTAP authentication middleware if JWT cookie is provided and valid.  Can be used by other middleware.
-       * [Declaration merging](https://www.typescriptlang.org/docs/handbook/declaration-merging.html) can be used to add your own properties.
-       */
-      userId: string;
+    // eslint-disable-next-line @typescript-eslint/no-namespace
+    namespace Express {
+        interface Request {
+            /**
+             * The id of the user that sent this request.
+             * Optionally set by PrivTAP authentication middleware if JWT cookie is provided and valid. Can be used by other middleware.
+             */
+            userId: string;
+            /**
+             * The activation status of the user that sent this request.
+             * Optionally set by PrivTAP authentication middleware if JWT cookie is provided and valid. Can be used by other middleware.
+             */
+            userActive: boolean;
+        }
     }
-  }
 }
 
 /**
@@ -44,11 +50,11 @@ class BackendApp {
     readonly express: Express;
 
     /**
-   * Creates a new BackendApp instance, initializing the configuration data and configuring the app server
-   * with all the routes.
-   */
+     * Creates a new BackendApp instance, initializing the configuration data and configuring the app server
+     * with all the routes.
+     */
     constructor() {
-    // Load environment variables defaults
+        // Load environment variables defaults
         this.deploymentURL = env.DEPLOYMENT_URL;
         this.port = env.PORT;
         this.baseURL = env.BASE_URL;
@@ -62,10 +68,10 @@ class BackendApp {
     }
 
     /**
-   * Creates a new Express application server and configures all the needed extensions.
-   * @private
-   * @return the newly created application server
-   */
+     * Creates a new Express application server and configures all the needed extensions.
+     * @private
+     * @return the newly created application server
+     */
     protected createExpressApp() {
         const app = express();
 
@@ -94,25 +100,25 @@ class BackendApp {
         app.use(express.urlencoded({ extended: false }));
         app.use(cookieParser());
 
+        // Host API docs through Swagger UI
+        const swaggerDocument = YAML.load("./openapi.yaml");
+        app.use(this.baseURL + "docs", swaggerUI.serve, swaggerUI.setup(swaggerDocument));
+
         // If we are in a development environment
         if (env.DEV) {
             // Log all requests to console
             app.use(requestLogger("dev"));
-
-            // Host API docs through Swagger UI
-            const swaggerDocument = YAML.load("../openapi.yaml");
-            app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocument));
         }
 
         return app;
     }
 
     /**
-   * Registers a new route from a TypeScript file. The file should export as default a class declaration
-   * that extends Route.
-   * @param filePath the path from where to import the route class
-   * @protected
-   */
+     * Registers a new route from a TypeScript file. The file should export as default a class declaration
+     * that extends Route.
+     * @param filePath the path from where to import the route class
+     * @protected
+     */
     protected async registerRoute(filePath: string) {
         const routeClass = (await import(filePath)).default as typeof Route;
         const routeInstance = new routeClass();
@@ -123,9 +129,9 @@ class BackendApp {
     }
 
     /**
-   * Registers all the routes defines in the 'routes/' directory to the Express app server.
-   * @private
-   */
+     * Registers all the routes defines in the 'routes/' directory to the Express app server.
+     * @private
+     */
     protected registerAllRoutes() {
         const routeFiles = getFilesInDir(join(__dirname, "routes")).map(
             (filePath) => filePath.slice(0, -3)
@@ -136,19 +142,26 @@ class BackendApp {
     }
 
     /**
-   * Connects to a MongoDB database instance.
-   * @param dbString the connection string to use
-   */
+     * Connects to a MongoDB database instance.
+     * @param dbString the connection string to use
+     */
     async connectToDB(dbString: string) {
-        await mongoose.connect(dbString, {
+        await connect(dbString, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         } as ConnectOptions);
+        this.#bucket = new GridFSBucket(mongoose.connection.db, { bucketName: "dataRule" });
+    }
+
+    #bucket: GridFSBucket| undefined;
+
+    async getBucket() {
+        return this.#bucket;
     }
 
     /**
-   * Starts the Express application server on the configured port.
-   */
+     * Starts the Express application server on the configured port.
+     */
     async startApp() {
         await this.express.listen(this.port);
     }
@@ -162,7 +175,7 @@ const app = new BackendApp();
 if (require.main === module) {
     // Connect to the database
     app.connectToDB(app.dbString).then(() => {
-    // Once connected to the database, start the application server
+        // Once connected to the database, start the application server
         app.startApp().then(() => {
             // Print to console the URL of the application server
             let url = `http://127.0.0.1:${app.port}`;

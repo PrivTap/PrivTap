@@ -1,13 +1,57 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
-import { success } from "../../helper/http";
+import { badRequest, internalServerError, success } from "../../helper/http";
+import State from "../../model/State";
+import OAuth from "../../helper/oauth";
+import { AuthorizationTokenConfig } from "simple-oauth2";
+import { handleInsert } from "../../helper/misc";
+import Authorization from "../../model/Authorization";
 
 export default class OAuthRoute extends Route {
     constructor() {
-        super("oauth", true);
+        super("oauth");
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
-        success(response, {}, "Not implemented");
+        const userId = request.userId;
+        const { code } = request.query;
+        const stateValue = request.query.state as string;
+        const options = {
+            code,
+        };
+
+        const state = await State.findByValue(stateValue);
+        if (!state){
+            badRequest(response);
+            return;
+        }
+
+        if (state.userId != userId){
+            badRequest(response);
+            return;
+        }
+
+        const serviceId = state.serviceId;
+        const permissions = state.permissionId;
+        console.log(request.query);
+        const oAuthToken = await OAuth.retrieveToken(serviceId, options as AuthorizationTokenConfig);
+        console.log(oAuthToken);
+        if (!oAuthToken){
+            badRequest(response);
+            return;
+        }
+
+        // This should be an atomic transaction
+
+        if (!await handleInsert(response, Authorization, { userId, serviceId, oAuthToken, grantedPermissions: permissions })){
+            return;
+        }
+
+        if (! await State.delete(state._id)){
+            internalServerError(response);
+            return;
+        }
+
+        success(response);
     }
 }

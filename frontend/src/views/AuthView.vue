@@ -21,7 +21,7 @@
                 name="username"
                 required="true"
                 v-model="username"
-                class="relative w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-base"
+                class="relative w-full appearance-none rounded-none rounded-t-md bg-white border border-gray-300 px-3 py-2 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-base"
                 placeholder="Username"
               />
             </div>
@@ -41,7 +41,7 @@
                 }"
                 v-model="email"
                 placeholder="Email address"
-                class="relative w-full appearance-none rounded-none border border-gray-300 px-3 py-2 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-base"
+                class="relative w-full appearance-none rounded-none border bg-white border-gray-300 px-3 py-2 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-base"
               />
             </div>
 

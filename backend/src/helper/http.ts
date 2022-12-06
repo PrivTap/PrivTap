@@ -24,9 +24,16 @@ export class APIResponse {
     }
 }
 
-export function checkUndefinedParams(response: Response, ...params: (string | undefined)[]): boolean {
+/**
+ * Checks if the specified parameters are undefined. Sends 400 BAD REQUEST response if so.
+ * @param response the provided response
+ * @param params the parameters to checjk
+ * @returns true if one of the parameters is undefined, false otherwise
+ */
+
+export function checkUndefinedParams(response: Response, ...params: (string | string[] | undefined)[]): boolean {
     for (const param of params) {
-        if (param == undefined) {
+        if (param === undefined) {
             badRequest(response, "One of the parameters is missing");
             return true;
         }
@@ -64,6 +71,7 @@ export function forbiddenUserError(response: Response, message = "Forbidden") {
 /**
  * Sends to the client a response signalling "401 Unauthorized".
  * @param response The Express response used to send the error to
+ * @param message The message to send to the client along with the error
  */
 export function unauthorizedUserError(response: Response, message = "Unauthorized") {
     response.status(401).json(new APIResponse(false, message));
