@@ -10,7 +10,7 @@
             required></v-text-field>
           <v-textarea variant="outlined" no-resize v-model="form.description" :rules="form.descriptionRule"
             label="Description" required></v-textarea>
-          <v-text-field variant="outlined" v-model="form.endpoint" :rules="form.endpointRule" label="Endpoint Url"
+          <v-text-field variant="outlined" v-model="form.endpoint" :rules="form.endpointRule" label="Authorization Server"
             hint="www.example.com" required></v-text-field>
           <v-text-field variant="outlined" v-model="form.clientId" :rules="form.idRule" label="Client ID"
             required></v-text-field>

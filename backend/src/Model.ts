@@ -60,10 +60,11 @@ export default class Model<T> {
      * Updates a document in the database. Only the parameters that are defined will be updated, others will be not modified.
      * @param id the id of the document to update
      * @param documentUpdate the properties of the document to update
+     * @param upsert if you also want to insert the document. Default false
      */
-    async update(id: string, documentUpdate: Partial<T>): Promise<boolean> {
+    async update(id: string, documentUpdate: Partial<T>, upsert = false): Promise<boolean> {
         try {
-            const updateResult = await this.model.updateOne({ _id: id }, documentUpdate);
+            const updateResult = await this.model.updateOne({ _id: id }, documentUpdate, { upsert: upsert });
             return updateResult.modifiedCount == 1;
         } catch (e) {
             this.handleMongooseSavingErrors(e);
@@ -76,10 +77,11 @@ export default class Model<T> {
      * Only the parameters that are defined will be updated, others will be not modified.
      * @param filter the query to find the document to update
      * @param documentUpdate the document containing the updates
+     * @param uupsert if you also want to insert the document. Default false
      */
-    async updateWithFilter(filter: FilterQuery<T>, documentUpdate: Partial<T>): Promise<boolean> {
+    async updateWithFilter(filter: FilterQuery<T>, documentUpdate: Partial<T>, upsert = false): Promise<boolean> {
         try {
-            const updateResult = await this.model.updateOne(filter, documentUpdate);
+            const updateResult = await this.model.updateOne(filter, documentUpdate, { upsert: upsert });
             return updateResult.modifiedCount == 1;
         } catch (e) {
             this.handleMongooseSavingErrors(e);
@@ -92,10 +94,11 @@ export default class Model<T> {
      * Only the parameters that are defined will be updated, others will be not modified.
      * @param filter the query to find the document to update
      * @param documentUpdate the document containing the updates
+     * @param upsert if you want to insert the document. Default false
      */
-    async updateWithFilterAndReturn(filter: FilterQuery<T>, documentUpdate: Partial<T>): Promise<T | null> {
+    async updateWithFilterAndReturn(filter: FilterQuery<T>, documentUpdate: Partial<T>, upsert = false): Promise<T | null> {
         try {
-            return  await this.model.findOneAndUpdate(filter, documentUpdate, { new: true });
+            return await this.model.findOneAndUpdate(filter, documentUpdate, { new: true, upsert: upsert });
         } catch (e) {
             this.handleMongooseSavingErrors(e);
         }

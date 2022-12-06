@@ -20,7 +20,7 @@
       </div>
 
       <div class="flex flex-row justify-center py-10">
-        <PrimaryButton :onClick="() => router.push(RoutingPath.PUBLISH_SERVICE_PAGE)" text="Create New API enpoint"
+        <PrimaryButton :onClick="() => router.push(RoutingPath.PUBLISH_SERVICE_PAGE)" text="Create New Service"
           class="min-w-fit" />
       </div>
 

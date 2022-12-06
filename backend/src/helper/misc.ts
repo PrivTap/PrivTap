@@ -91,16 +91,17 @@ export async function handleInsert<T>(response: Response, model: Model<T>, docum
  * @param filter the filter to find the document to update
  * @param returnObject flag used to specify if the whole object has to be returned
  * @param update the document containing the updates
+ * @param upsert if you want also to insert the document if it doesn't exist in the database. Default false
  */
-export async function handleUpdate<T>(response: Response, model: Model<T>, filter: object, update: object, returnObject = false): Promise<boolean | T> {
+export async function handleUpdate<T>(response: Response, model: Model<T>, filter: object, update: object, returnObject = false, upsert = false): Promise<boolean | T> {
     try {
         let updateResult;
         if (returnObject)
             // The whole object
-            updateResult = await model.updateWithFilterAndReturn(filter, update);
+            updateResult = await model.updateWithFilterAndReturn(filter, update,upsert);
         else
             // true if no error occurred. false otherwise
-            updateResult = await model.updateWithFilter(filter, update);
+            updateResult = await model.updateWithFilter(filter, update, upsert);
         if (!updateResult) {
             badRequest(response, "An object with this id does not exist");
             return false;
