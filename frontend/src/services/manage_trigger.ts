@@ -133,6 +133,7 @@ export class ManageTrigger
 
 
 
+
   //DELETE TRIGGER METHOD
   async deleteTrigger(triggerId: string): Promise<TriggerModel[]> {
     try {

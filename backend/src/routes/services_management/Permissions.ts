@@ -16,18 +16,18 @@ export default class ManageActionsRoute extends Route {
         const serviceId = request.query.serviceId as string;
         const userId = request.userId;
 
-        if(checkUndefinedParams(response, serviceId)) {
+        if (checkUndefinedParams(response, serviceId)) {
             return;
         }
 
-        if(! await Service.findById(serviceId)){
+        if (!await Service.findById(serviceId)) {
             badRequest(response, "This service doesn't exists");
             return;
         }
 
         let permissions;
 
-        if ( await Service.isCreator(userId, serviceId) ){
+        if (await Service.isCreator(userId, serviceId)) {
             permissions = await Permission.findByServiceId(serviceId);
         } else {
             permissions = await Permission.findByServiceId(serviceId, "-rarObject");
@@ -46,24 +46,29 @@ export default class ManageActionsRoute extends Route {
         const serviceId = request.body.serviceId;
         const authorization_details = request.body.authorization_details;
 
-        if(checkUndefinedParams(response, name, description, serviceId, authorization_details)){
+        if (checkUndefinedParams(response, name, description, serviceId, authorization_details)) {
             return;
         }
 
-        if(! await Service.findById(serviceId)){
+        if (!await Service.findById(serviceId)) {
             badRequest(response, "This service doesn't exists");
             return;
         }
 
-        if (! await Service.isCreator(userId, serviceId)){
+        if (!await Service.isCreator(userId, serviceId)) {
             forbiddenUserError(response, "You don't have enough privileges to modify this service");
             return;
         }
 
-        const permission = await handleInsert(response, Permission, { name, description, serviceId, authorization_details }, true) as IPermission;
+        const permission = await handleInsert(response, Permission, {
+            name,
+            description,
+            serviceId,
+            authorization_details
+        }, true) as IPermission;
         if (!permission) return;
 
-        success(response,  permission);
+        success(response, permission);
     }
 
     protected async httpDelete(request: Request, response: Response): Promise<void> {
@@ -71,26 +76,26 @@ export default class ManageActionsRoute extends Route {
         const serviceId = request.body.serviceId;
         const permissionId = request.body.permissionId;
 
-        if(checkUndefinedParams(response, serviceId, permissionId)){
+        if (checkUndefinedParams(response, serviceId, permissionId)) {
             return;
         }
 
-        if(! await Service.findById(serviceId)){
+        if (!await Service.findById(serviceId)) {
             badRequest(response, "This service doesn't exists");
             return;
         }
 
-        if (! await Service.isCreator(userId, serviceId)){
+        if (!await Service.isCreator(userId, serviceId)) {
             forbiddenUserError(response, "You don't have enough privileges to modify this service");
             return;
         }
 
-        if (! await Permission.belongsToService(permissionId, serviceId)){
+        if (!await Permission.belongsToService(permissionId, serviceId)) {
             forbiddenUserError(response, "You don't have enough privileges to modify this permission");
             return;
         }
 
-        if (! await Permission.delete(permissionId)){
+        if (!await Permission.delete(permissionId)) {
             internalServerError(response);
             return;
         }
@@ -106,26 +111,31 @@ export default class ManageActionsRoute extends Route {
         const authorization_details = request.body.authorization_details;
         const permissionId = request.body.permissionId;
 
-        if(checkUndefinedParams(response, serviceId, permissionId)){
+        if (checkUndefinedParams(response, serviceId, permissionId)) {
             return;
         }
 
-        if(! await Service.findById(serviceId)){
+        if (!await Service.findById(serviceId)) {
             badRequest(response, "This service doesn't exists");
             return;
         }
         //improve this with just a single query
-        if (! await Service.isCreator(userId, serviceId)){
+        if (!await Service.isCreator(userId, serviceId)) {
             forbiddenUserError(response, "You don't have enough privileges to modify this service");
             return;
         }
 
-        if (! await Permission.belongsToService(permissionId, serviceId)){
+        if (!await Permission.belongsToService(permissionId, serviceId)) {
             forbiddenUserError(response, "You don't have enough privileges to modify this permission");
             return;
-        }   
+        }
 
-        const queriedPermission = await handleUpdate(response, Permission, { permissionId }, { name, description, serviceId, authorization_details }, true) as IPermission;
+        const queriedPermission = await handleUpdate(response, Permission, { permissionId }, {
+            name,
+            description,
+            serviceId,
+            authorization_details
+        }, true) as IPermission;
         if (!queriedPermission) return;
 
         success(response, queriedPermission);

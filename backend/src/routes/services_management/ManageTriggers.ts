@@ -42,7 +42,7 @@ export default class ManageTriggersRoute extends Route {
 
         // Insert the trigger
         const insertedTrigger = await handleInsert(response, Trigger, { name, description, serviceId, permissions, resourceServer }, true) as ITrigger;
-        if (! insertedTrigger) return;
+        if (!insertedTrigger) return;
 
         success(response, insertedTrigger);
     }
@@ -79,8 +79,8 @@ export default class ManageTriggersRoute extends Route {
             return;
         }
 
-        const modifiedTrigger = await handleUpdate(response, Trigger, { triggerId }, { name, description, permissions, resourceServer }, true) as ITrigger;
-        if(!modifiedTrigger) return;
+        const modifiedTrigger = await handleUpdate(response, Trigger, { "_id": triggerId }, { name, description, permissions, resourceServer }, true) as ITrigger;
+        if (!modifiedTrigger) return;
 
         success(response, modifiedTrigger);
     }
