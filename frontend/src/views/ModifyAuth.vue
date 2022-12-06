@@ -15,7 +15,7 @@
         </button>
       </div>
       <div class="flex relative justify-center ">
-        <img :src="radial" alt class="w-1/2">
+        <img :src="radial" class="w-1/2">
         <table class="w-1/3 absolute top-20 table-fixed bg-transparent border-spacing-y-2">
           <thead class="border-b-md">
           <tr>
