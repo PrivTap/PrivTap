@@ -31,13 +31,13 @@
 <script setup lang="ts">
 import type SimpleServiceModel from '@/model/simple_service_model';
 import {defineProps, ref} from 'vue';
-
+import {useRouter} from "vue-router";
+import RoutingPath from "@/router/routing_path";
 const props = defineProps<{
   service: SimpleServiceModel;
   authorization : boolean;
 }>();
-import {useRouter} from "vue-router";
-import RoutingPath from "@/router/routing_path";
+
 
 const router = useRouter();
 const flipped = ref(false);
