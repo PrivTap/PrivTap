@@ -58,30 +58,27 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { ManageService } from '@/services/manage_service';
 import type ServiceModel from '@/model/service_model';
-import { ManageAction } from '@/services/manage_action';
 import ActionCard from '@/components/ServiceComponents/ActionCard.vue';
 import ActionForm from '@/components/ServiceComponents/ActionForm.vue';
 import radial from '@/assets/images/radial.svg';
 import logo from '@/assets/images/logo_dark.svg';
 import empty from '@/assets/images/empty.svg';
+import manage_action from '@/controllers/manage_action';
+import { manage_service } from '@/controllers/manage_service';
 
 const dialog = ref(false);
 const isLoading = ref(true);
 
 const route = useRoute();
-const managePermission = ManageAction.getInstance;
-const manageService = ManageService.getInstance;
 let service = ref<ServiceModel | null>(null);
-let actions = managePermission.actions;
+let actions = manage_action.getRef();
 
-// On Mounted page, check if the Service has already defined permissions
 onMounted(async () => {
     isLoading.value = true;
     const serviceId = route.params.id as string;
-    service.value = await manageService.getServiceById(serviceId);
-    await managePermission.getAllActions(serviceId);
+    service.value = await manage_service.getServiceById(serviceId);
+    await manage_action.getAllActions(serviceId);
     isLoading.value = false;
 });
 

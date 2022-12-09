@@ -58,31 +58,29 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { ManageService } from '@/services/manage_service';
 import type ServiceModel from '@/model/service_model';
-import { ManageTrigger } from '@/services/manage_trigger';
 import TriggerCard from '@/components/ServiceComponents/TriggerCard.vue';
 import TriggerForm from '@/components/ServiceComponents/TriggerForm.vue';
 import radial from '@/assets/images/radial.svg';
 import logo from '@/assets/images/logo_dark.svg';
 import empty from '@/assets/images/empty.svg';
+import manage_trigger from '@/controllers/manage_trigger';
+import { manage_service } from '@/controllers/manage_service';
 
 
 const dialog = ref(false);
 const isLoading = ref(true);
 
 const route = useRoute();
-const manageTrigger = ManageTrigger.getInstance;
-const manageService = ManageService.getInstance;
 let service = ref<ServiceModel | null>(null);
-let triggers = manageTrigger.triggers;
+let triggers = manage_trigger.getRef();
 
 // On Mounted page, check if the Service has already defined permissions
 onMounted(async () => {
     isLoading.value = true;
     const serviceId = route.params.id as string;
-    service.value = await manageService.getServiceById(serviceId);
-    await manageTrigger.getAllTriggers(serviceId);
+    service.value = await manage_service.getServiceById(serviceId);
+    await manage_trigger.getAllTriggers(serviceId);
     isLoading.value = false;
 });
 

@@ -24,7 +24,7 @@
           class="min-w-fit" />
       </div>
 
-      <div v-if="services?.length" class="py-10">
+      <div v-if="services?.length && !isLoading" class="py-10">
         <div class=" px-10 grid  lg:grid-cols-2 xl:grid-cols-3 gap-10">
           <ServiceCard v-for="(item, index) in services" :key="index" :service="item" />
         </div>
@@ -39,19 +39,19 @@ import { useRouter } from "vue-router";
 import RoutingPath from "@/router/routing_path";
 import ServiceCard from "@/components/ServiceComponents/ServiceCard.vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
-import { ManageService } from "@/services/manage_service";
 import empty from '@/assets/images/empty.svg';
 import radial from '@/assets/images/radial.svg';
 import logo from '@/assets/images/logo_dark.svg';
+import { manage_service } from "@/controllers/manage_service";
+
 const router = useRouter();
 const isLoading = ref(true);
-const manageService = ManageService.getInstance;
-const services = manageService.services;
+const services = manage_service.getRef();
 
 
 onMounted(async () => {
-  console.log("here");
-  await manageService.getAllServices();
+  isLoading.value = true;
+  await manage_service.getAllServices();
   isLoading.value = false;
 });
 

@@ -62,7 +62,7 @@
 import {onMounted, ref} from "vue";
 import {useRoute} from "vue-router";
 import radial from "@/assets/images/radial.svg"
-import showPermissions from "@/services/show-permission";
+import showPermissions from "@/controllers/show-permission";
 import empty from '@/assets/images/empty1.svg';
 import router from "@/router/router";
 import RoutingPath from "@/router/routing_path";

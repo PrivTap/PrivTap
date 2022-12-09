@@ -32,7 +32,7 @@
 import { onMounted, reactive, ref, watch } from "vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
 import { useRoute } from "vue-router";
-import { ManageService } from "@/services/manage_service";
+import { manage_service } from "@/controllers/manage_service";
 import router from "@/router/router";
 import RoutingPath from "@/router/routing_path";
 import { isValidUrlRegex } from "@/helpers/validators";
@@ -40,12 +40,11 @@ import { isValidUrlRegex } from "@/helpers/validators";
 const route = useRoute();
 const isValidUrl = ref<boolean>(true);
 const isLoading = ref<boolean>(false);
-const manageService = ManageService.getInstance;
 
 async function checkEdit() {
   if (route.params.id) {
     /// Means that we are editing a service
-    let serviceToEdit = await manageService.getServiceById(route.params.id as string);
+    let serviceToEdit = await manage_service.getServiceById(route.params.id as string);
     if (serviceToEdit) {
       form.name = serviceToEdit.name;
       form.description = serviceToEdit.description;
@@ -85,7 +84,7 @@ async function validate() {
   if (valid) {
     if (route.params.id) {
       const serviceId = route.params.id as string;
-      await manageService.updateService(
+      await manage_service.updateService(
         serviceId,
         form.name,
         form.description,
@@ -94,7 +93,7 @@ async function validate() {
         form.secret,
       )
     } else {
-      await manageService.createService(
+      await manage_service.createService(
         form.name,
         form.description,
         form.endpoint,

@@ -5,7 +5,7 @@
         <p class="text-lg font-medium text-white/60"> {{ trigger.description }} </p>
         <v-label class="pt-4 pb-2">Selected Permissions </v-label>
         <div>
-            <v-chip v-for="permission in permissions" :key="permission._id" class="mr-2" color="success"
+            <v-chip v-for="permission in selectedPermission" :key="permission._id" class="mr-2" color="success"
                 variant="outlined" appendIcon="mdi-check-circle-outline">
                 {{ permission.name }}
             </v-chip>
@@ -37,44 +37,38 @@
 import { defineProps, onMounted, ref } from 'vue';
 import ModalComponent from '@/components/ModalComponent.vue';
 import type TriggerModel from '@/model/trigger_model';
-import { ManageTrigger } from '@/services/manage_trigger';
-import ManagePermission from '@/services/manage_permission';
 import type PermissionModel from '@/model/permission_model';
 import TriggerForm from './TriggerForm.vue';
+import manage_permission from '@/controllers/manage_permission';
+import manage_trigger from '@/controllers/manage_trigger';
 const props = defineProps<{
     trigger: TriggerModel;
     serviceId: string;
 }>();
 
-const permissions = ref<PermissionModel[]>([]);
+const selectedPermission = ref<PermissionModel[]>([]);
 
 onMounted(async () => {
     _fetchPermissions();
 });
 
 function onFormClose() {
-    permissions.value = [];
+    selectedPermission.value = [];
     _fetchPermissions();
     formDialog.value = false;
 }
 
 async function _fetchPermissions() {
-    const perms = await ManagePermission.getInstance.getPermissions(props.serviceId);
-    perms.map((perm) => {
-        if (props.trigger.permissions.includes(perm._id)) {
-            permissions.value.push(perm);
-        }
-    });
+    selectedPermission.value = await manage_permission.getSelectedPermission(props.serviceId, props.trigger.permissions);
 }
 
 const showDialog = ref(false);
 const formDialog = ref(false);
 
-const manageTrigger = ManageTrigger.getInstance;
 function onModalClose(res: boolean) {
     showDialog.value = false;
     if (!res) return;
-    manageTrigger.deleteTrigger(props.trigger._id);
+    manage_trigger.deleteTrigger(props.trigger._id);
 }
 
 </script>

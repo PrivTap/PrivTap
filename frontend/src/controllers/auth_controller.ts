@@ -4,7 +4,7 @@ import type { UserModel } from "@/model/user_model";
 import type { AxiosInstance } from "axios";
 import type { StandartRepsonse } from "../model/response_model";
 
-interface IAuthService {
+interface IAuthController {
   login(username: string, password: string): Promise<UserModel | null>;
   logout(): Promise<boolean>;
   activate(token: String): Promise<boolean>;
@@ -15,7 +15,7 @@ interface IAuthService {
   ): Promise<boolean>;
 }
 
-export default class AuthService implements IAuthService {
+export default class AuthController implements IAuthController {
   http: AxiosInstance;
 
   constructor() {

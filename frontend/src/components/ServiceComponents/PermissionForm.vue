@@ -26,7 +26,7 @@
   
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue'
-import managePermission from '@/services/manage_permission';
+import managePermission from '@/controllers/manage_permission';
 import PermissionModel from '@/model/permission_model';
 import VueJsonPretty from 'vue-json-pretty';
 import 'vue-json-pretty/lib/styles.css';

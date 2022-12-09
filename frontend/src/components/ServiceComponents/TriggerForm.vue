@@ -39,10 +39,11 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue'
 import TriggerModel from '@/model/trigger_model';
-import {ManageTrigger} from '@/services/manage_trigger'; //MOZDA OVOOOOOOOOOOOOOOOOOOOOOOOOOO
 import { isValidUrlRegex } from '@/helpers/validators';
 import type PermissionModel from '@/model/permission_model';
-import ManagePermission from '@/services/manage_permission';
+import ManagePermission from '@/controllers/manage_permission';
+import manage_permission from '@/controllers/manage_permission';
+import manage_trigger from '@/controllers/manage_trigger';
 // import { trigger } from '@vue/reactivity';
 
 
@@ -70,7 +71,8 @@ const props = defineProps(
 );
 
 onMounted(async () => {
-    choosablePermissions.value = await ManagePermission.getInstance.getPermissions(props.serviceId);
+    await manage_permission.getPermissions(props.serviceId);
+    choosablePermissions.value = manage_permission.getRef().value; 
     if (props.onEdit && props.trigger) {
         const trigger = props.trigger;
         form.name = trigger.name;
@@ -111,18 +113,17 @@ const form = reactive({
     ],
 });
 
-const manageTrigger = ManageTrigger.getInstance;
 async function validate() {
     const { valid } = await formRef.value.validate();
     console.log(valid);
     if (valid) {
         const permissionIds = selectedPermissions.value.map(p => p._id);
         if (props.onEdit) {
-            await manageTrigger.updateTrigger(props.trigger._id, form.name, form.description, permissionIds, form.resourceServer);
+            await manage_trigger.updateTrigger(props.trigger._id, form.name, form.description, permissionIds, form.resourceServer);
             console.log(permissionIds);
             console.log(form.name);
         } else {
-            await manageTrigger.createTrigger(form.name, form.description, props.serviceId, permissionIds, form.resourceServer);
+            await manage_trigger.createTrigger(form.name, form.description, props.serviceId, permissionIds, form.resourceServer);
         }
         props.onCancel(); 
     }

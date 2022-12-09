@@ -1,10 +1,10 @@
 import axiosInstance from "@/helpers/axios_service";
 import axiosCatch from "@/helpers/axios_catch";
-import {useToast} from "vue-toastification";
+import { useToast } from "vue-toastification";
 import type Ref from "vue";
 
 
-export abstract class GenericServices<T> {
+export abstract class GenericController<T> {
     /**
      * A generic get of the function.
      * @param path the path of the url. So if the url is http://local.com/service-trigger then you will need to pass "service-trigger"
@@ -17,7 +17,7 @@ export abstract class GenericServices<T> {
      */
     protected async get<T>(path: string, config?: { query?: object, headers?: object, message?: string }): Promise<T> {
         try {
-            const res = await axiosInstance.get(path, {params: config?.query, headers: config?.headers});
+            const res = await axiosInstance.get(path, { params: config?.query, headers: config?.headers });
             if (config?.message != undefined)
                 useToast().success(config.message);
             return res.data.data as T;
@@ -29,7 +29,7 @@ export abstract class GenericServices<T> {
 
     protected async delete(path: string, config?: { body?: object, message?: string }) {
         try {
-            await axiosInstance.delete(path, {data: config?.body});
+            await axiosInstance.delete(path, { data: config?.body });
             if (config?.message != undefined)
                 useToast().success(config.message);
         } catch (error) {

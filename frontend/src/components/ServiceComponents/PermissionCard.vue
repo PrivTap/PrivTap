@@ -26,10 +26,10 @@
 
 <script setup lang="ts">
 import type PermissionModel from '@/model/permission_model';
-import ManagePermission from '@/services/manage_permission';
 import { defineProps, ref } from 'vue';
 import ModalComponent from '@/components/ModalComponent.vue';
 import CreatePermissionVue from './PermissionForm.vue';
+import manage_permission from '@/controllers/manage_permission';
 const props = defineProps<{
     permission: PermissionModel;
 }>();
@@ -37,11 +37,10 @@ const props = defineProps<{
 const showDialog = ref(false);
 const dialog = ref(false);
 
-const managePermission = ManagePermission.getInstance;
 function onModalClose(res: boolean) {
     showDialog.value = false;
     if (!res) return;
-    managePermission.deletePermission(props.permission.serviceId, props.permission._id);
+    manage_permission.deletePermission(props.permission.serviceId, props.permission._id);
 }
 
 

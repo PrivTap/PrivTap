@@ -78,11 +78,13 @@ import { EyeSlashIcon, EyeIcon } from "@heroicons/vue/24/solid";
 import ModalComponent from "@/components/ModalComponent.vue";
 import router from "@/router/router";
 import RoutingPath from "@/router/routing_path";
-import { ManageService } from "@/services/manage_service";
+import { manage_service } from "@/controllers/manage_service";
+const props = defineProps<{
+  service: ServiceModel;
+}>();
 
 const showPass = ref(false);
 const showModal = ref(false);
-const manageService = ManageService.getInstance;
 
 function edit() {
   router.replace(`${RoutingPath.PUBLISH_SERVICE_PAGE}/${props.service._id}`);
@@ -91,13 +93,11 @@ function edit() {
 function onModalClose(res: boolean | null) {
   showModal.value = false;
   if (res) {
-    manageService.deleteService(props.service._id);
+    manage_service.deleteService(props.service._id);
   }
 }
 
-const props = defineProps<{
-  service: ServiceModel;
-}>();
+
 </script>
 
 <style scoped>

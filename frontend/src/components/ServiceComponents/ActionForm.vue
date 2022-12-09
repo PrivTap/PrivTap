@@ -47,11 +47,10 @@
 <script lang="ts" setup>
 import {onMounted, reactive, ref} from 'vue'
 import ActionModel from '@/model/action_model';
-import {ManageAction} from '@/services/manage_action';
-import {isValidUrlRegex} from '@/helpers/validators';
+import { isValidUrlRegex } from '@/helpers/validators';
+import manage_action from '@/controllers/manage_action';
+import manage_permission from '@/controllers/manage_permission';
 import type PermissionModel from '@/model/permission_model';
-import managePermission from '@/services/manage_permission';
-import {ManagePermission} from "@/services/manage_permission";
 
 const props = defineProps(
     {
@@ -75,13 +74,12 @@ const props = defineProps(
       }
     }
 );
-let chooseManagePermission = new ManagePermission();
-let choosablePermissions = chooseManagePermission.getRef();
-let selectManagePermission = new ManagePermission();
-const selectedPermissions = selectManagePermission.getRef();
+
+let choosablePermissions = manage_permission.getRef();
+let selectedPermissions = ref<PermissionModel[]>([]);
 
 onMounted(async () => {
-  await chooseManagePermission.getPermissions(props.serviceId);
+  await manage_permission.getPermissions(props.serviceId);
   if (props.onEdit && props.action) {
     const action = props.action;
     form.name = action.name;
@@ -90,7 +88,6 @@ onMounted(async () => {
     _getSelectedPermissions(action);
   }
 });
-
 
 function _getSelectedPermissions(action: ActionModel) {
   for (const permId of action.permissions) {
@@ -120,17 +117,15 @@ const form = reactive({
   ],
 });
 
-const manageAction = ManageAction.getInstance;
-
 async function validate() {
   const {valid} = await formRef.value.validate();
   console.log(valid);
   if (valid) {
     const permissionIds = selectedPermissions.value.map(p => p._id);
     if (props.onEdit) {
-      await manageAction.updateAction(props.action._id, form.name, form.description, permissionIds, form.endpoint);
+      await manage_action.updateAction(props.action._id, form.name, form.description, permissionIds, form.endpoint);
     } else {
-      await manageAction.createAction(form.name, form.description, props.serviceId, permissionIds, form.endpoint);
+      await manage_action.createAction(form.name, form.description, props.serviceId, permissionIds, form.endpoint);
     }
     props.onCancel();
   }
