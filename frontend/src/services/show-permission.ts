@@ -14,7 +14,7 @@ export interface IShowPermissions {
 
 }
 
-export class ShowPermissions extends GenericServices<SimplePermissionModel> implements IShowPermissions {
+export class ShowPermissions extends GenericServices<SimplePermissionModel[]> implements IShowPermissions {
 
     async getAllPermissions(serviceId: string) {
         const result = await super.get<SimplePermissionModel[]>(path, {query: {serviceId: serviceId}})

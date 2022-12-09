@@ -15,15 +15,13 @@ export default class ManageActionsRoute extends Route {
 
         if (checkUndefinedParams(response, serviceId)) return;
 
-        let actions: Partial<IAction>[] = [];
-
-        const services = await Action.findAllForService(serviceId);
-        if (!services){
+        const actions = await Action.findAllForService(serviceId);
+        console.log(actions);
+        if (!actions) {
             internalServerError(response);
             return;
         }
 
-        actions = services;
         success(response, actions);
     }
 
@@ -43,7 +41,13 @@ export default class ManageActionsRoute extends Route {
         }
 
         // Insert the action
-        const action = await handleInsert(response, Action, { name, description, serviceId, endpoint, permissions }, true) as IAction;
+        const action = await handleInsert(response, Action, {
+            name,
+            description,
+            serviceId,
+            endpoint,
+            permissions
+        }, true) as IAction;
         if (!action) return;
 
         success(response, action);
@@ -81,8 +85,13 @@ export default class ManageActionsRoute extends Route {
             return;
         }
 
-        const queriedAction = await handleUpdate(response, Action, { "_id": actionId }, { name, description, permissions, endpoint }, true) as IAction;
-        if(!queriedAction) return;
+        const queriedAction = await handleUpdate(response, Action, { "_id": actionId }, {
+            name,
+            description,
+            permissions,
+            endpoint
+        }, true) as IAction;
+        if (!queriedAction) return;
 
         success(response, queriedAction);
     }

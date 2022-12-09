@@ -26,7 +26,7 @@
   
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue'
-import ManagePermission from '@/services/manage_permission';
+import managePermission from '@/services/manage_permission';
 import PermissionModel from '@/model/permission_model';
 import VueJsonPretty from 'vue-json-pretty';
 import 'vue-json-pretty/lib/styles.css';
@@ -107,7 +107,6 @@ const form = reactive({
     ]
 });
 
-const managePermission = ManagePermission.getInstance;
 
 
 async function validate() {

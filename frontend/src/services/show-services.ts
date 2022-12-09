@@ -1,33 +1,28 @@
+import type Ref from "vue";
 import {ref} from "vue";
 import type SimpleServiceModel from "@/model/simple_service_model";
-import type Ref from "vue";
 import {GenericServices} from "@/services/generic-services";
 
 const path = "/services";
 let services = ref<SimpleServiceModel[]>([]);
 
 export interface IShowServices {
-    getAllServices(): Promise<Ref.Ref<SimpleServiceModel[]>>;
-
-    getAuthorizedServices(): Promise<Ref.Ref<SimpleServiceModel[]>>;
+    getAllServices(): Promise<void>;
+    getAuthorizedServices(): Promise<void>;
 }
 
-export class ShowServices extends GenericServices<SimpleServiceModel> implements IShowServices {
+class ShowServices extends GenericServices<SimpleServiceModel[]> implements IShowServices {
 
 
-    async getAllServices(): Promise<Ref.Ref<SimpleServiceModel[]>> {
-        const result = await super.get<SimpleServiceModel[]>(path)
-        services.value = !!result ? result : [];
-        return services;
+    async getAllServices(): Promise<void> {
+        services.value = await super.get<SimpleServiceModel[]>(path);
     }
 
-    async getAuthorizedServices(): Promise<Ref.Ref<SimpleServiceModel[]>> {
-        const result = await super.get<SimpleServiceModel[]>(path, {query: {authorized: true}})
-        services.value = !!result ? result : [];
-        return services;
+    async getAuthorizedServices(): Promise<void> {
+        services.value = await super.get<SimpleServiceModel[]>(path, {query: {authorized: true}});
     }
 
-    getRef() {
+    getRef(): Ref.Ref<SimpleServiceModel[]> {
         return services;
     }
 }

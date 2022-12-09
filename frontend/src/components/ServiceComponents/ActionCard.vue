@@ -39,18 +39,17 @@ import { defineProps, onMounted, ref } from 'vue';
 import ModalComponent from '@/components/ModalComponent.vue';
 import type ActionModel from '@/model/action_model';
 import { ManageAction } from '@/services/manage_action';
-import ManagePermission from '@/services/manage_permission';
-import type PermissionModel from '@/model/permission_model';
+import managePermission from '@/services/manage_permission';
 import ActionForm from './ActionForm.vue';
 const props = defineProps<{
     action: ActionModel;
     serviceId: string;
 }>();
 
-const permissions = ref<PermissionModel[]>([]);
+const permissions = managePermission.getRef();
 
 onMounted(async () => {
-    _fetchPermissions();
+    await _fetchPermissions();
 });
 
 function onFormClose() {
@@ -60,12 +59,7 @@ function onFormClose() {
 }
 
 async function _fetchPermissions() {
-    const perms = await ManagePermission.getInstance.getPermissions(props.serviceId);
-    perms.map((perm) => {
-        if (props.action.permissions.includes(perm._id)) {
-            permissions.value.push(perm);
-        }
-    });
+    await managePermission.fetchPermissions(props.serviceId, props.action.permissions)
 }
 
 const showDialog = ref(false);

@@ -48,7 +48,7 @@ class Action extends Model<IAction> {
      * @param serviceId the id of the service
      */
     async findAllForService(serviceId: string): Promise<Partial<IAction>[] | null> {
-        return await this.findAll({ serviceId }, "-serviceId -endpoint");
+        return await this.findAll({ serviceId }, "-serviceId ");
     }
 
     /**
