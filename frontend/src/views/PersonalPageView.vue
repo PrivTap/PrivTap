@@ -1,6 +1,7 @@
 
 
 <template>
+  <div class="h-full">
   <!-- <link rel="stylesheet" href="/dist/output.css" />
 
   <title>Persnal Page</title> -->
@@ -193,7 +194,7 @@ class="container mx-auto grid grid-cols-1 bg-gray-800 rounded-md px-5 py-5 borde
 
     </div>
   </div>
-
+</div>
 
 
 </template>
