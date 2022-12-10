@@ -20,6 +20,10 @@ interface EnvVariables {
     DEPLOYMENT_URL: string,
     // The minimum level of messages to log
     LOG_LEVEL: "log"|"trace"|"debug"|"info"|"warn"|"error"|"fatal",
+    // The database connection string for a MongoDB database
+    DB_STRING: string
+    // The api key provided by privTap
+    API_KEY: string
 }
 
 // Default values for some of the env variables
@@ -61,6 +65,14 @@ function loadEnvVariables(): EnvVariables {
 
     // Check if we are in a development environment
     res.DEV = process.env.NODE_ENV == "development";
+
+    // Check if the DB connection string is set, if not throw an error
+    res.DB_STRING = process.env.DB_STRING || "";
+    if (res.DB_STRING == "")
+        throw Error("Database connection string environment variable is not set");
+    res.API_KEY = process.env.API_KEY || "";
+    if (res.API_KEY == "")
+        throw Error("API key string environment variable is not set");
 
     return res as unknown as EnvVariables;
 }

@@ -5,6 +5,8 @@ import {getFilesInDir} from "./helper/misc";
 import { join } from "path";
 import logger from "./helper/logger";
 import env from "./helper/env";
+import mongoose, { connect, ConnectOptions } from "mongoose";
+
 
 /**
  * Represents the PrivTAP backend application. Contains useful configuration data and exposes methods to connect
@@ -17,6 +19,8 @@ class OSP {
     readonly port: number;
     // Base url where REST endpoints will be registered, relative to the address, default is '/'
     readonly baseURL: string;
+    // Connection string for a MongoDB database instance
+    readonly dbString: string;
     // Express application server
     readonly express: Express;
 
@@ -29,6 +33,7 @@ class OSP {
         this.deploymentURL = env.DEPLOYMENT_URL;
         this.port = env.PORT;
         this.baseURL = env.BASE_URL;
+        this.dbString = env.DB_STRING;
 
         // Create and configure Express app
         this.express = this.createExpressApp();
@@ -48,6 +53,8 @@ class OSP {
         app.use(express.json());
         app.use(express.urlencoded({ extended: false }));
         app.use(cookieParser());
+        app.set('view engine', 'ejs');
+        app.use('/public', express.static('./public'));
 
         return app;
     }
@@ -81,6 +88,17 @@ class OSP {
     }
 
     /**
+     * Connects to a MongoDB database instance.
+     * @param dbString the connection string to use
+     */
+    async connectToDB(dbString: string) {
+        await connect(dbString, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        } as ConnectOptions);
+    }
+
+    /**
      * Starts the Express application server on the configured port.
      */
     async startApp() {
@@ -92,14 +110,17 @@ class OSP {
 const app = new OSP();
 
 if (require.main === module) {
-
-    app.startApp().then(() => {
-        // Print to console the URL of the application server
-        let url = `http://127.0.0.1:${app.port}`;
-        if (env.PROD) {
-            url = app.deploymentURL;
-        }
-        logger.info(`Server listening at: ${url}${app.baseURL}`);
+    // Connect to the database
+    app.connectToDB(app.dbString).then(() => {
+        // Once connected to the database, start the application server
+        app.startApp().then(() => {
+            // Print to console the URL of the application server
+            let url = `http://127.0.0.1:${app.port}`;
+            if (env.PROD) {
+                url = app.deploymentURL;
+            }
+            logger.info(`Server listening at: ${url}${app.baseURL}`);
+        });
     });
 }
 

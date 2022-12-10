@@ -27,7 +27,7 @@ export default class TriggersDataRoute extends Route {
             return;
         }
 
-        //TODO: Verify that the API key is bound to the service owning the trigger
+        // TODO: Verify that the API key is bound to the service owning the trigger
 
         //Check that the user with the specified ID owns the service
         const referencedRule = await Rule.find({ userId: userId, triggerId: triggerId });
@@ -64,7 +64,7 @@ export default class TriggersDataRoute extends Route {
             return;
         }
 
-        //TODO: Do we need to show some kind of rule execution error??
+        // TODO: Do we need to show some kind of rule execution error??
         const actionResponse = await axios.post(actionEndpoint, dataToForwardToActionAPI, {
             headers: {
                 Authorization: "Bearer " + oauthToken
