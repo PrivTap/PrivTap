@@ -13,7 +13,7 @@ const authStore = useAuthStore();
 const userStore = storeToRefs(authStore);
 // Used to access the router
 const router = useRouter();
-// Always watch if the user is logged in
+// Always watch if the user is logged in 
 // if not, redirect to login
 watch(userStore.isAutheticated, (val) => {
   console.log("isAutheticated", val);

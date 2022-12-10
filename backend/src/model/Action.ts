@@ -2,7 +2,8 @@ import { Schema, Types } from "mongoose";
 import Service from "./Service";
 import Model from "../Model";
 import { OperationDataType } from "../helper/rule_execution";
-
+import Permission, { IPermission } from "./Permission";
+import mongoose from "mongoose";
 export interface IAction {
     _id: string;
     name: string;
@@ -34,7 +35,7 @@ const actionSchema = new Schema({
         type: [String]
         // required?
     },
-    permissions: [Schema.Types.ObjectId]
+    permissions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'permission' }]
 });
 
 class Action extends Model<IAction> {
@@ -47,8 +48,34 @@ class Action extends Model<IAction> {
      * Finds all the actions provided by a service.
      * @param serviceId the id of the service
      */
-    async findAllForService(serviceId: string): Promise<Partial<IAction>[] | null> {
-        return await this.findAll({ serviceId }, "-serviceId ");
+    async findAllForService(serviceId: string): Promise<Partial<ActionOsp>[] | null> {
+        const allPermissions = await Permission.findByServiceId(serviceId, "name");
+        if (allPermissions == null)
+            return null;
+        let actions: IAction[] | null;
+        try {
+            actions = await this.findAll({ serviceId }, "-serviceId");
+        } catch (e) {
+            return null;
+        }
+        if (actions == null)
+            return null;
+        const actionsResult = new Array<ActionOsp>();
+        actions.forEach((action) => {
+            const associatedPerm = Object.assign(new Array<Partial<IPermission>>, action.permissions);
+            let temp: Partial<IPermission>[] = allPermissions.map((permission) => {
+                return { _id: permission._id, name: permission.name, associated: associatedPerm.includes(permission._id) };
+            });
+            const actionResult: ActionOsp = {
+                name: action.name,
+                _id: action._id,
+                endpoint: action.endpoint,
+                description: action.description,
+                permissions: temp
+            }
+            actionsResult.push(actionResult);
+        })
+        return actionsResult;
     }
 
     /**
@@ -65,3 +92,10 @@ class Action extends Model<IAction> {
 }
 
 export default new Action();
+export interface ActionOsp {
+    _id: string,
+    name: string,
+    description: string,
+    endpoint: string,
+    permissions: Partial<IPermission>[]
+}
