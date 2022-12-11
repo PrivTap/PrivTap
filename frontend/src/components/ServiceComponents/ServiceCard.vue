@@ -11,8 +11,16 @@
       </p>
 
       <p class="text-xl font-medium">
-        Authorization Server:
-        <label class="text-lg font-normal">{{ service.authServer }} </label>
+        Base Url:
+        <label class="text-lg font-normal">{{ service.baseUrl }} </label>
+      </p>
+      <p class="text-xl font-medium my-2">
+        Auth Path:
+        <label class="text-lg font-normal">{{ service.authPath }} </label>
+      </p>
+      <p class="text-xl font-medium my-2">
+        Token Path:
+        <label class="text-lg font-normal">{{ service.tokenPath }} </label>
       </p>
       <p class="text-xl font-medium my-2">
         Client ID:

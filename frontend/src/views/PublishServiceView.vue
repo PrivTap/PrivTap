@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen">
+  <div class="h-full">
     <h1 class="text-5xl text-center text-blue-100 font-medium py-10">
       {{ route.params.id ? "Edit" : "Publish" }} Service
     </h1>
@@ -10,16 +10,20 @@
             required></v-text-field>
           <v-textarea variant="outlined" no-resize v-model="form.description" :rules="form.descriptionRule"
             label="Description" required></v-textarea>
-          <v-text-field variant="outlined" v-model="form.endpoint" :rules="form.endpointRule" label="Authorization Server"
-            hint="www.example.com" required></v-text-field>
+          <v-text-field variant="outlined" v-model="form.baseUrl" label="Base Url"
+            hint="www.example.com" ></v-text-field>
+          <v-text-field variant="outlined" v-model="form.authPath" label="Auth Path"
+                        hint="/auth" ></v-text-field>
+          <v-text-field variant="outlined" v-model="form.tokenPath" label="Token Path"
+                        hint="/login/oauth/access_token" ></v-text-field>
           <v-text-field variant="outlined" v-model="form.clientId" :rules="form.idRule" label="Client ID"
-            required></v-text-field>
+            ></v-text-field>
           <v-text-field variant="outlined" v-model="form.secret" :rules="form.secretRule" label="Client Secret"
-            required></v-text-field>
+            ></v-text-field>
         </v-form>
 
       </div>
-      <PrimaryButton @click="validate" class="mt-5"
+      <PrimaryButton @click="validate" class="mt-5 mb-5"
         :text="route.params.id ? 'Edit API endpoint' : 'Create API endpoint'" />
     </div>
 
@@ -28,8 +32,7 @@
 >
 
 <script setup lang="ts">
-// import { useOspServiceStore } from "@/stores/osp_service_store";
-import { onMounted, reactive, ref, watch } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
 import { useRoute } from "vue-router";
 import router from "@/router/router";
@@ -48,7 +51,9 @@ async function checkEdit() {
     if (serviceToEdit) {
       form.name = serviceToEdit.name;
       form.description = serviceToEdit.description;
-      form.endpoint = serviceToEdit.authServer ?? '';
+      form.baseUrl = serviceToEdit.baseUrl ?? '';
+      form.authPath = serviceToEdit.authPath ?? '';
+      form.tokenPath = serviceToEdit.tokenPath ?? '';
       form.clientId = serviceToEdit.clientId ?? '';
       form.secret = serviceToEdit.clientSecret ?? '';
     }
@@ -63,13 +68,15 @@ const form = reactive({
   nameRule: [(v: string) => !!v || 'Name is required'],
   description: '',
   descriptionRule: [(v: string) => !!v || 'Description is required'],
-  endpoint: '',
-  endpointRule: [
+  baseUrl: "",
+  baseUrlRule: [
     (v: string) => !!v || 'Endpoint is required',
-    (v: string) => isValidUrlRegex(v) || 'Endpoint is not valid'
+    (v: string) => isValidUrlRegex(v) || 'Url is not valid'
   ],
+  authPath: "",
+  tokenPath: "",
   clientId: '',
-  idRule: [(v: string) => !!v || 'Client Id is required'],
+  idRule: [ (v: string) => !!v || 'Client Id is required'],
   secret: '',
   secretRule: [(v: string) => !!v || 'Client secret is required'],
 });
@@ -88,7 +95,9 @@ async function validate() {
         serviceId,
         form.name,
         form.description,
-        form.endpoint,
+        form.baseUrl,
+        form.authPath,
+        form.tokenPath,
         form.clientId,
         form.secret,
       )
@@ -96,7 +105,9 @@ async function validate() {
       await manage_service.createService(
         form.name,
         form.description,
-        form.endpoint,
+          form.baseUrl,
+          form.authPath,
+          form.tokenPath,
         form.clientId,
         form.secret,
       );

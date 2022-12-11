@@ -5,7 +5,9 @@ export default class ServiceModel {
   name: string;
   description: string;
   creator: string;
-  authServer?: string;
+  baseUrl?: string;
+  authPath?: string;
+  tokenPath?: string;
   clientId?: string;
   clientSecret?: string;
 
@@ -14,7 +16,9 @@ export default class ServiceModel {
     name: string,
     description: string,
     creator: string,
-    authServer?: string,
+    baseUrl?: string,
+    authPath?: string,
+    tokenPath?: string,
     clientId?: string,
     clientSecret?: string,
   ) {
@@ -22,7 +26,9 @@ export default class ServiceModel {
     this.name = name;
     this.description = description;
     this.creator = creator;
-    this.authServer = authServer;
+    this.baseUrl = baseUrl;
+    this.authPath=authPath;
+    this.tokenPath=tokenPath;
     this.clientId = clientId;
     this.clientSecret = clientSecret;
   }

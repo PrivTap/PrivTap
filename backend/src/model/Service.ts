@@ -6,6 +6,9 @@ export interface IService {
     name: string;
     description: string;
     creator: string;
+    baseUrl: string;
+    authPath: string;
+    tokenPath: string;
     authServer: string;
     clientId: string;
     clientSecret: string;
@@ -29,7 +32,13 @@ const serviceSchema = new Schema({
         type: Schema.Types.ObjectId,
         required: true,
     },
-    authServer: {
+    baseUrl: {
+        type: String,
+    },
+    authPath: {
+        type: String,
+    },
+    tokenPath:{
         type: String,
     },
     clientId: {
