@@ -45,7 +45,7 @@ class Action extends Model<IAction> {
     }
 
     /**
-     * Finds all the actions provided by a service.
+     * Finds all the actions provided by a service by adding all the permissions and adding a tag
      * @param serviceId the id of the service
      */
     async findAllForService(serviceId: string): Promise<Partial<ActionOsp>[] | null> {
@@ -62,7 +62,7 @@ class Action extends Model<IAction> {
             return null;
         const actionsResult = new Array<ActionOsp>();
         actions.forEach((action) => {
-            const associatedPerm = Object.assign(new Array<Partial<IPermission>>, action.permissions);
+            const associatedPerm = Object.assign(<Partial<IPermission>>[], action.permissions);
             let temp: Partial<IPermission>[] = allPermissions.map((permission) => {
                 return { _id: permission._id, name: permission.name, associated: associatedPerm.includes(permission._id) };
             });

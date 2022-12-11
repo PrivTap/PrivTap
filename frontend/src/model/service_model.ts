@@ -5,18 +5,18 @@ export default class ServiceModel {
   name: string;
   description: string;
   creator: string;
-  authServer: string;
-  clientId: string;
-  clientSecret: string;
+  authServer?: string;
+  clientId?: string;
+  clientSecret?: string;
 
   constructor(
     serviceId: string,
     name: string,
     description: string,
     creator: string,
-    authServer: string,
-    clientId: string,
-    clientSecret: string,
+    authServer?: string,
+    clientId?: string,
+    clientSecret?: string,
   ) {
     this._id = serviceId;
     this.name = name;

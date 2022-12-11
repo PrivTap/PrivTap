@@ -15,14 +15,14 @@ export interface IManageService {
     triggerUrl: string
   ): Promise<void>;
   getServiceById(serviceId: string): Promise<ServiceModel | null>;
-  updateService(servciceId: string,
+  updateService(serviceId: string,
     name: string,
     description: string,
     authServer: string,
     clientId: string,
     clientSecret: string,
     triggerUrl: string
-  ): Promise<ServiceModel | null>;
+  ): Promise<void>;
   deleteService(serviceId: string): Promise<void>;
   getAllServices(): Promise<void>;
 }
@@ -35,7 +35,7 @@ class ManageService extends GenericController<ServiceModel[]> implements IManage
 
   async getAllServices(): Promise<void> {
     const res = await super.get<ServiceModel[]>(path);
-    services.value = res;
+    services.value = !!res ? res : [];
   }
 
   async getServiceById(serviceId: string): Promise<ServiceModel | null> {
@@ -57,7 +57,8 @@ class ManageService extends GenericController<ServiceModel[]> implements IManage
       "clientSecret": clientSecret,
     };
     const res = await super.post<ServiceModel>(path, { body: body, message: "Service created" });
-    services.value.push(res);
+    if (res != null)
+      services.value.push(res);
   }
 
   async updateService(
@@ -67,7 +68,7 @@ class ManageService extends GenericController<ServiceModel[]> implements IManage
     authServer: string,
     clientId: string,
     clientSecret: string,
-  ): Promise<ServiceModel | null> {
+  ): Promise<void> {
     const body = {
       "serviceId": serviceId,
       "name": name,
@@ -76,14 +77,22 @@ class ManageService extends GenericController<ServiceModel[]> implements IManage
       "clientId": clientId,
       "clientSecret": clientSecret,
     }
-    return await super.put<ServiceModel | null>(path, { body: body, message: "Service updated" });
+    const res= await super.put<ServiceModel>(path, { body: body, message: "Service updated" });
+    if (res != null) {
+      services.value = services.value.map((service) => {
+        if (service._id === res._id) {
+          return res;
+        }
+        return service;
+      });
+    }
   }
 
   async deleteService(serviceId: string): Promise<void> {
     const body = { "serviceId": serviceId }
-    const res = await super.delete(path, { body: body, message: "Service deleted" });
+    await super.delete(path, { body: body, message: "Service deleted" });
     services.value = services.value.filter((service) => service._id !== serviceId);
   }
 }
 
-export const manage_service = new ManageService();
+export default new ManageService();

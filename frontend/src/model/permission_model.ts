@@ -1,18 +1,18 @@
-import type RarObjectModel from "./rar_model";
+
 
 export default class PermissionModel {
     _id: string;
     serviceId: string;
     name: string;
     description: string;
-    authorization_details: string;
+    authorization_details: object;
 
     constructor(
         permissionId: string,
         serviceId: string,
         name: string,
         description: string,
-        authorization_details: string,
+        authorization_details: object,
     ) {
         this._id = permissionId;
         this.serviceId = serviceId;

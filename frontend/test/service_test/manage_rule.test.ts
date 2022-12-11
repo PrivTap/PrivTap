@@ -1,61 +1,70 @@
-import { beforeAll, beforeEach, describe, expect, Mock, test } from "vitest";
-import { ManageRule } from "../../src/services/manage_rule";
-import RuleModel from "../../src/model/rule_model";
-import MockAdapter from "axios-mock-adapter";
+import {afterEach, beforeEach, describe, test} from "vitest";
+import {SinonStub} from "sinon";
+import * as sinon from "sinon";
+import {use, expect} from "chai";
+import sinonChai = require("sinon-chai");
+import manageRule from "../../src/controllers/manage_Rule";
+import RuleModel from "../../src/model/Rule_model";
+import axiosInstance from "../../src/helpers/axios_service";
 
-describe("Manage Rule Tests", () => {
-  let mock: MockAdapter;
-  const _manageRule = ManageRule.getInstance
-  let testRuleModel: RuleModel = new RuleModel(
-    "Test Rule id",
-    "Test Ruele name",
-    "Test User id",
-    "Test Trigger id",
-    "Test Action id",
-    true,
+
+use(sinonChai);
+
+const sandbox = sinon.createSandbox();
+
+describe("Manage Rule Test", () => {
+  let getStub: SinonStub;
+  let postStub: SinonStub;
+  let putStub: SinonStub;
+  let deleteStub: SinonStub;
+
+  const testRuleModel: RuleModel = new RuleModel(
+      "Test Rule id",
+      "Test Rule name",
+      "Rule description",
+      "creator",
   );
-
-  beforeAll(() => {
-    mock = new MockAdapter(_manageRule.http);
-  });
-
   beforeEach(() => {
-    mock.reset();
+    getStub = sandbox.stub(axiosInstance, "get");
+    postStub = sandbox.stub(axiosInstance, "post");
+    putStub = sandbox.stub(axiosInstance, "put");
+    deleteStub = sandbox.stub(axiosInstance, "delete");
+  });
+  afterEach(async () => {
+    sandbox.restore();
+    manageRule.getRef().value=[]
   })
 
-  //TEST CreateRule
-  test("Should return the created rule", async () => {
-    mock.onPost(_manageRule.path).reply(200, { data: testRuleModel });
-    const res = await _manageRule.createRule(
-      testRuleModel.triggerId,
-      testRuleModel.actionId,
-    );
-    expect(res.name).toEqual(testRuleModel.name);
+  //TEST GetRules
+  test("Should put in the ref all the Rules", async () => {
+    getStub.resolves({data: {data: [testRuleModel]}})
+    await manageRule.getAllRules();
+    expect(manageRule.getRef().value).to.be.eql([testRuleModel]);
   });
-
-  //TEST GetAllRules
-  test("Should return a list of defined rules", async () => {
-    mock.onGet(_manageRule.path).reply(200, { data: [testRuleModel] });
-    const res = await _manageRule.getAllRules();
-    expect(res).toEqual([testRuleModel]);
+  test("Should put nothing in the ref value if the gets failed", async()=>{
+    getStub.resolves(null);
+    await manageRule.getAllRules();
+    expect(manageRule.getRef().value).to.be.eql([]);
+  })
+  //TEST CreateRules
+  test("Should put the created Rule in the ref array", async () => {
+    postStub.resolves({data: {data: testRuleModel}})
+    await manageRule.createRule(testRuleModel.name, testRuleModel.triggerId,
+        testRuleModel.actionId)
+    expect(manageRule.getRef().value).to.be.eql([testRuleModel]);
   });
+  test("Should put nothing in the ref value if the gets failed", async()=>{
+    postStub.resolves(null);
+    await manageRule.createRule(testRuleModel.name, testRuleModel.triggerId,
+        testRuleModel.actionId)
+    expect(manageRule.getRef().value).to.be.eql([]);
+  })
 
   //TEST DeleteRule
-  test("Should return a list of rules after deletetion", async () => {
-    mock.onDelete(_manageRule.path).reply(200, { data: [] });
-    const res = await _manageRule.deleteRule("Test Rule id");
-    expect(res).to.empty;
+  test("Should delete the Rule in the ref value", async () => {
+    manageRule.getRef().value= [testRuleModel];
+    await manageRule.deleteRule(testRuleModel._id);
+    expect(manageRule.getRef().value).to.be.eql([]);
   });
-
-
-//TEST GetRuleById
-test("Should return the rule with the passed id", async () => {
-  mock.onGet(_manageRule.path, { params: { "ruleId": testRuleModel._id } }).reply(200, {
-    data: testRuleModel
-  }
-  );
-  const res = await _manageRule.getRuleById(testRuleModel._id);
-  expect(res.name).toBe(testRuleModel.name);
-});
 
 });

@@ -4,7 +4,7 @@ export default class ActionModel {
     description: string;
     serviceId?: string;
     permissions: string[];
-    inputs: string[];
+    inputs?: string[];
     endpoint?: string;
 
     constructor(
@@ -12,12 +12,10 @@ export default class ActionModel {
         name: string,
         description: string,
         permissions: string[],
-        inputs: string[],
     ) {
         this._id = actionId;
         this.name = name;
         this.description = description;
         this.permissions = permissions;
-        this.inputs = inputs;
     }
 }

@@ -15,7 +15,7 @@ export abstract class GenericController<T> {
      * - message: the message you want to show when the request has 200 as status <br>
      * @return The data contained in the response as an object of type T. If there is an error it will return an empty object
      */
-    protected async get<T>(path: string, config?: { query?: object, headers?: object, message?: string }): Promise<T> {
+     protected async get<T>(path: string, config?: { query?: object, headers?: object, message?: string }): Promise<T|null> {
         try {
             const res = await axiosInstance.get(path, { params: config?.query, headers: config?.headers });
             if (config?.message != undefined)
@@ -23,7 +23,7 @@ export abstract class GenericController<T> {
             return res.data.data as T;
         } catch (error) {
             axiosCatch(error);
-            return {} as T;
+            return null;
         }
     }
 
@@ -38,7 +38,7 @@ export abstract class GenericController<T> {
 
     }
 
-    protected async post<T>(path: string, config?: { body?: object, message?: string }): Promise<T> {
+    protected async post<T>(path: string, config?: { body?: object, message?: string }): Promise<T|null> {
         try {
             const res = await axiosInstance.post(path, config?.body);
             if (config?.message != undefined)
@@ -46,10 +46,10 @@ export abstract class GenericController<T> {
             return res.data.data as T;
         } catch (error) {
             axiosCatch(error);
-            return {} as T;
+            return null;
         }
     }
-    protected async put<T>(path: string, config?: { body?: object, message?: string }): Promise<T> {
+    protected async put<T>(path: string, config?: { body?: object, message?: string }): Promise<T|null> {
         try {
             const res = await axiosInstance.put(path, config?.body);
             if (config?.message != undefined)
@@ -57,7 +57,7 @@ export abstract class GenericController<T> {
             return res.data.data as T;
         } catch (error) {
             axiosCatch(error);
-            return {} as T;
+            return null;
         }
     }
 
