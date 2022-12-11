@@ -1,4 +1,4 @@
-import { Schema, Types } from "mongoose";
+import {Schema, Types} from "mongoose";
 import Model from "../Model";
 
 export interface IPermission {
@@ -42,27 +42,40 @@ export class Permission extends Model<IPermission> {
     async isCreator(userId: string, permissionId: string): Promise<boolean> {
         const filteredPermissions = await this.model.aggregate()
             // Keep only the _id and serviceId
-            .project({ serviceId: 1 })
+            .project({serviceId: 1})
             // Filter by _id (permissionId)
-            .match({ _id: new Types.ObjectId(permissionId) })
+            .match({_id: new Types.ObjectId(permissionId)})
             // Left outer join with services
-            .lookup({ from: "services", localField: "serviceId", foreignField: "_id", as: "matchedServices" })
+            .lookup({from: "services", localField: "serviceId", foreignField: "_id", as: "matchedServices"})
             // Deconstruct array created by the join
             .unwind("matchedServices")
             // Set the userId field taking data from the matchedService data
-            .addFields({ "userId": "$matchedServices.creator" })
+            .addFields({"userId": "$matchedServices.creator"})
             // Keep only the _id (permissionId) and the userId
-            .project({ userId: 1 });
+            .project({userId: 1});
         // The query is supposed to return an array with just one component if the user is the actual owner of the permission
         return filteredPermissions.length == 1;
     }
 
     async findByServiceId(serviceId: string, select?: string): Promise<IPermission[] | null> {
-        return await this.findAll({ serviceId }, select);
+        return await this.findAll({serviceId}, select);
     }
 
     async belongsToService(permissionId: string, serviceId: string): Promise<boolean> {
-        return await this.find({ _id: permissionId, serviceId }) != null;
+        return await this.find({_id: permissionId, serviceId}) != null;
+    }
+
+    async getAllPermissionAndAddBooleanTag(serviceId: string, permissions?: Array<string>): Promise<Partial<IPermission>[] | null> {
+        const allPermissions = await this.findByServiceId(serviceId, "name");
+        if (allPermissions == null)
+            return null;
+        return allPermissions.map((permission) => {
+            return {
+                _id: permission._id,
+                name: permission.name,
+                associated: permissions == undefined ? false :permissions.includes(permission._id)
+            };
+        });
     }
 
     /*async findAllPermission(serviceId: string, userId: string) {
