@@ -6,7 +6,8 @@
         <p class="text-lg font-medium text-white/60"> {{ action.endpoint }} </p>
         <v-label class="pt-4 pb-2">Selected Permissions </v-label>
         <div>
-            <v-chip v-for="permission in permissions" :key="permission._id" class="mr-2" color="success"
+            <div v-if="!action.permissions.some(p => p.associated)"> No permission required </div>
+            <v-chip v-for="permission in action.permissions.filter(p => p.associated)" :key="permission._id" class="mr-2" color="success"
                 variant="outlined" appendIcon="mdi-check-circle-outline">
                 {{ permission.name }}
             </v-chip>
@@ -35,47 +36,27 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, onMounted, ref } from 'vue';
+import { defineProps, ref } from 'vue';
 import ModalComponent from '@/components/ModalComponent.vue';
 import type ActionModel from '@/model/action_model';
-import { ManageAction } from '@/services/manage_action';
-import ManagePermission from '@/services/manage_permission';
-import type PermissionModel from '@/model/permission_model';
 import ActionForm from './ActionForm.vue';
+import manage_action from '@/controllers/manage_action';
 const props = defineProps<{
     action: ActionModel;
     serviceId: string;
 }>();
 
-const permissions = ref<PermissionModel[]>([]);
-
-onMounted(async () => {
-    _fetchPermissions();
-});
-
 function onFormClose() {
-    permissions.value = [];
-    _fetchPermissions();
     formDialog.value = false;
-}
-
-async function _fetchPermissions() {
-    const perms = await ManagePermission.getInstance.getPermissions(props.serviceId);
-    perms.map((perm) => {
-        if (props.action.permissions.includes(perm._id)) {
-            permissions.value.push(perm);
-        }
-    });
 }
 
 const showDialog = ref(false);
 const formDialog = ref(false);
 
-const manageAction = ManageAction.getInstance;
 function onModalClose(res: boolean) {
     showDialog.value = false;
     if (!res) return;
-    manageAction.deleteAction(props.action._id);
+    manage_action.deleteAction(props.action._id);
 }
 
 </script>

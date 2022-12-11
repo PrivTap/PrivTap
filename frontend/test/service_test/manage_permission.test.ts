@@ -1,122 +1,104 @@
-import MockAdapter from "axios-mock-adapter";
-import { afterEach, beforeAll, beforeEach, describe, expect, test } from "vitest";
-import ManagePermission from "../../src/services/manage_permission";
-import PermissionModel from "../../src/model/permission_model";
-import RarObjectModel from "../../src/model/rar_model";
+import {afterEach, beforeEach, describe, test} from "vitest";
+import {SinonStub} from "sinon";
+import * as sinon from "sinon";
+import {use, expect} from "chai";
+import sinonChai = require("sinon-chai");
+import axiosInstance from "../../src/helpers/axios_service";
+import managePermission from "../../src/controllers/manage_Permission";
+import PermissionModel from "../../src/model/Permission_model";
 
-describe("Manage Permission Tests", () => {
-    let mock: MockAdapter;
-    const _managePermission = ManagePermission.getInstance;
-    let rar = new RarObjectModel(
-        "type",
-        ['action1, action2'],
-        [],
+
+use(sinonChai);
+
+const sandbox = sinon.createSandbox();
+
+describe("Manage Permission Test", () => {
+    let getStub: SinonStub;
+    let postStub: SinonStub;
+    let putStub: SinonStub;
+    let deleteStub: SinonStub;
+    const serviceId = "test Service id";
+    const testPermissionModel: PermissionModel = new PermissionModel(
+        "Test Permission id",
+        serviceId,
+        "Test Permission name",
+        "Permission description",
+        {detail:"details"},
     );
-    let testPermissionModel: PermissionModel = new PermissionModel(
-        "permissionId",
-        "serviceId",
-        "permissionName",
-        "permissionDescription",
-        rar,
-    );
-    beforeAll(() => {
-        mock = new MockAdapter(_managePermission.http);
-    });
 
     beforeEach(() => {
-        console.log("beforeEach");
-        mock.reset();
-        mock.resetHandlers();
-        _managePermission.permissions.value = [];
+        getStub = sandbox.stub(axiosInstance, "get");
+        postStub = sandbox.stub(axiosInstance, "post");
+        putStub = sandbox.stub(axiosInstance, "put");
+        deleteStub = sandbox.stub(axiosInstance, "delete");
     });
+    afterEach(async () => {
+        sandbox.restore();
+        managePermission.getRef().value = [];
+    })
 
-    /// Test successful createPermission
-    test("should return a the created permission", async () => {
-        mock.onPost(_managePermission.path).reply(200, { data: testPermissionModel });
-        const res = await _managePermission.createPermission(
-            testPermissionModel.serviceId,
-            testPermissionModel.name,
-            testPermissionModel.description,
-            rar,
+    //TEST GetPermissions
+    test("Should put in the ref all the Permissions", async () => {
+        getStub.resolves({data: {data: [testPermissionModel]}})
+        await managePermission.getAllPermissions(testPermissionModel.serviceId);
+        expect(managePermission.getRef().value).to.be.eql([testPermissionModel]);
+    });
+    test("Should put nothing in the ref value if the gets failed", async () => {
+        getStub.resolves(null);
+        await managePermission.getAllPermissions(testPermissionModel.serviceId);
+        expect(managePermission.getRef().value).to.be.eql([]);
+    })
+    //TEST CreatePermissions
+    test("Should put the created Permission in the ref array", async () => {
+        postStub.resolves({data: {data: testPermissionModel}})
+        await managePermission.createPermission(testPermissionModel.serviceId, testPermissionModel.name,
+            testPermissionModel.description, testPermissionModel.authorization_details)
+        expect(managePermission.getRef().value).to.be.eql([testPermissionModel]);
+    });
+    test("Should put nothing in the ref value if the gets failed", async () => {
+        postStub.resolves(null);
+        await managePermission.createPermission(testPermissionModel.serviceId, testPermissionModel.name,
+            testPermissionModel.description, testPermissionModel.authorization_details)
+
+        expect(managePermission.getRef().value).to.be.eql([]);
+    })
+
+    //TEST UpdatePermission
+    test("Should change the updated Permission in the ref array", async () => {
+        managePermission.getRef().value = [testPermissionModel];
+        const updatedPermission: PermissionModel = new PermissionModel(
+            "Test Permission id",
+            serviceId,
+            "Test Permission name changed",
+            "Permission description changed",
+            {detail:"details"},
         );
-        expect(res.name).toEqual(testPermissionModel.name);
-        expect(_managePermission.permissions.value.length).toEqual(1);
-        expect(_managePermission.permissions.value[0]._id).toEqual(testPermissionModel._id);
-    });
-
-    /// Test unsuccessful createPermission
-    test("should return an error if the permission already exists", async () => {
-        mock.onPost(_managePermission.path).reply(409, { error: "Permission already exists" });
-        const res = await _managePermission.createPermission(
-            testPermissionModel.serviceId,
-            testPermissionModel.name,
-            testPermissionModel.description,
-            rar,
+        putStub.resolves({data: {data: updatedPermission}});
+        await managePermission.updatePermission(updatedPermission._id, updatedPermission.serviceId,
+            updatedPermission.name, updatedPermission.description, updatedPermission.authorization_details)
+        expect(managePermission.getRef().value).to.be.eql([updatedPermission]);
+    })
+    test("Should not change the updated Permission in the ref array if it fails", async () => {
+        managePermission.getRef().value = [testPermissionModel];
+        const updatedPermission: PermissionModel = new PermissionModel(
+            "Test Permission id",
+            serviceId,
+            "Test Permission name changed",
+            "Permission description changed",
+            {detail:"details"},
         );
-        expect(res).toBeNull();
-        expect(_managePermission.permissions.value.length).toEqual(0);
+        putStub.resolves(null);
+        await managePermission.updatePermission(updatedPermission.serviceId, updatedPermission._id,
+            updatedPermission.name, updatedPermission.description, updatedPermission.authorization_details)
+        expect(managePermission.getRef().value).to.be.eql([testPermissionModel]);
+
+    })
+
+    //TEST DeletePermission
+    test("Should delete the Permission in the ref value", async () => {
+        managePermission.getRef().value = [testPermissionModel];
+        await managePermission.deletePermission(testPermissionModel.serviceId,testPermissionModel._id);
+        expect(managePermission.getRef().value).to.be.eql([]);
     });
-
-
-    /// Test getAllPermissions
-    test("should return a list of defined permissions", async () => {
-        mock.onGet(_managePermission.path).reply(200, { data: [testPermissionModel] });
-        const res = await _managePermission.getPermissions(testPermissionModel.serviceId);
-        expect(res).toEqual([testPermissionModel]);
-        expect(_managePermission.permissions.value.length).toEqual(1);
-        expect(_managePermission.permissions.value[0]._id).toEqual(testPermissionModel._id);
-    });
-
-    /// Test unsuccessful getAllPermissions
-    test("should return an error if the serviceId is invalid", async () => {
-        mock.onGet(_managePermission.path).reply(400, { error: "Invalid serviceId" });
-        const res = await _managePermission.getPermissions("invalid_service_id");
-        expect(res).toEqual([]);
-        expect(_managePermission.permissions.value.length).toEqual(0);
-    });
-
-    /// Test delete permission
-    test("should return a list of permissions after delete", async () => {
-        _managePermission.permissions.value.push(testPermissionModel);
-        expect(_managePermission.permissions.value.length).toEqual(1);
-        mock.onDelete(_managePermission.path).reply(200, { data: [] });
-        const res = await _managePermission.deletePermission(testPermissionModel.serviceId, testPermissionModel._id);
-        expect(res).toEqual([]);
-        expect(_managePermission.permissions.value.length).toEqual(0);
-    });
-
-    /// Test unsuccessful delete permission
-    test("should return an error if the serviceId is invalid", async () => {
-        _managePermission.permissions.value.push(testPermissionModel);
-        expect(_managePermission.permissions.value.length).toEqual(1);
-        mock.onDelete(_managePermission.path).reply(400, { error: "Invalid serviceId" });
-        const res = await _managePermission.deletePermission("invalid_service_id", testPermissionModel._id);
-        expect(res).toEqual([testPermissionModel]);
-        expect(_managePermission.permissions.value.length).toEqual(1);
-    });
-
-    /// Test update permission
-    test("should return updated permission after update", async () => {
-        testPermissionModel.name = "newName";
-        _managePermission.permissions.value.push(testPermissionModel);
-        expect(_managePermission.permissions.value.length).toEqual(1);
-        mock.onPut(_managePermission.path).reply(200, { data: testPermissionModel });
-        const res = await _managePermission.updatePermission(testPermissionModel.serviceId, testPermissionModel._id, "newName", testPermissionModel.description, rar);
-        expect(res).toEqual(testPermissionModel);
-        expect(_managePermission.permissions.value.length).toEqual(1);
-        expect(_managePermission.permissions.value[0].name).toEqual("newName");
-    });
-
-    /// Test unsuccessful update permission
-    /// I don't know why but still return 200 even if i set it to 400, so the test always fail..
-    // test("should return an error if the serviceId is invalid", async () => {
-    //     _managePermission.permissions.value.push(testPermissionModel);
-    //     expect(_managePermission.permissions.value.length).toEqual(1);
-    //     mock.onPut(_managePermission.path).reply(400, { error: "Invalid serviceId" });
-    //     const res = await _managePermission.updatePermission("invalid_service_id", testPermissionModel._id, "newName", testPermissionModel.description, rar);
-    //     expect(res).toBeNull();
-    //     expect(_managePermission.permissions.value.length).toEqual(1);
-    //     expect(_managePermission.permissions.value[0].name).toEqual("permissionName");
-    // });
 
 });

@@ -1,96 +1,100 @@
-import { beforeAll, beforeEach, describe, expect, test } from "vitest";
-import {ManageTrigger} from "../../src/services/manage_trigger";
+import {afterEach, beforeEach, describe, test} from "vitest";
+import manageTrigger from "../../src/controllers/manage_trigger";
 import TriggerModel from "../../src/model/trigger_model";
-import MockAdapter from "axios-mock-adapter";
-import PermissionModel from "../../src/model/permission_model";
-import RarObjectModel from "../../src/model/rar_model";
+import {SinonStub} from "sinon";
+import * as sinon from "sinon";
+import {use, expect} from "chai";
+import sinonChai = require("sinon-chai");
+import axiosInstance from "../../src/helpers/axios_service";
 
-// let RarObjectModel1: RarObjectModel = new RarObjectModel(
-// "Type",
-// ["String"],
-// ["String"],
-// );
 
-// let PermissionModel1: PermissionModel = new PermissionModel(
-//   "Permission id",
-//   "Service id",
-//   "Name",
-//   "Description",
-//   "Authorization details",
-// );
+use(sinonChai);
 
- 
+const sandbox = sinon.createSandbox();
 
 describe("Manage Trigger Test", () => {
-  let mock: MockAdapter;
-  const _manageTrigger = ManageTrigger.getInstance;
-  let testTriggerModel: TriggerModel = new TriggerModel(
-    "Test Trigger id",
-    "Test Trigger name",
-    "Trigger description",
-    ["String1", "String2"],
-  );
-
-  beforeAll(() => {
-    mock = new MockAdapter(_manageTrigger.http);
-  });
-
-
-  beforeEach(() => {
-    mock.reset();
-  })
-
-
-  //TEST CreateTrigger
-  // test("Should return the created trigger", async () => {
-  //   mock.onPost(_manageTrigger.path).reply(200, { data: testTriggerModel });
-  //   const res = await _manageTrigger.createTrigger(
-  //   testTriggerModel._id,
-  //   testTriggerModel.name,
-  //   testTriggerModel.serviceId,
-  //   testTriggerModel.description,
-  //   testTriggerModel.premission,
-  //   );
-  //   expect(res.name).toEqual(testTriggerModel.name);
-  // });
-
-  //TEST GetAllTriggers
-  // test("Should return a list of defined triggers", async () => {
-  //   mock.onGet(_manageTrigger.path).reply(200, { data: [testTriggerModel] });
-  //   const res = await _manageTrigger.getAllTriggers();
-  //   expect(res).toEqual([testTriggerModel]);
-  // });
-
-  //TEST GetTriggerById
-  // test("Should return the trigger with the passed id", async () => {
-  //   mock.onGet(_manageTrigger.path, { params: { "triggerId": testTriggerModel._id } }).reply(200, {
-  //     data: testTriggerModel
-  //   }
-  //   );
-  //   const res = await _manageTrigger.getTriggerById(testTriggerModel._id);
-  //   expect(res.name).toBe(testTriggerModel.name);
-  // });
-
-  //TEST DeleteTrigger
-  // test("Should return a list of triggers after delete", async () => {
-  //   mock.onDelete(_manageTrigger.path).reply(200, { data: [] });
-  //   const res = await _manageTrigger.deleteTrigger("Test Trigger id");
-  //   expect(res).to.empty;
-  // });
-
-  //TEST UpdateTrigger
-  test("Should return the updated trigger", async () => {
-    testTriggerModel.name = "Updated Trigger Name";
-    mock.onPut(_manageTrigger.path).reply(200, { data: testTriggerModel });
-    const res: TriggerModel = await _manageTrigger.updateTrigger(
-      testTriggerModel._id,
-      "Updated Trigger name",
-      testTriggerModel.description,
-      testTriggerModel.permissions,
-      testTriggerModel.resourceServer,  
+    let getStub: SinonStub;
+    let postStub: SinonStub;
+    let putStub: SinonStub;
+    let deleteStub: SinonStub;
+    const testTriggerModel: TriggerModel = new TriggerModel(
+        "Test Trigger id",
+        "Test Trigger name",
+        "Trigger description",
+        ["String1", "String2"],
     );
-    expect(res).not.toBe(null);
-    expect(res.name).toEqual("Updated Trigger Name");
-  });
+    const serviceId = "test Service id";
+    beforeEach(() => {
+        getStub = sandbox.stub(axiosInstance, "get");
+        postStub = sandbox.stub(axiosInstance, "post");
+        putStub = sandbox.stub(axiosInstance, "put");
+        deleteStub = sandbox.stub(axiosInstance, "delete");
+    });
+    afterEach(async () => {
+        sandbox.restore();
+        manageTrigger.getRef().value=[];
+    })
 
- });
+    //TEST GetTriggers
+    test("Should put in the ref all the triggers", async () => {
+        getStub.resolves({data: {data: [testTriggerModel]}})
+        await manageTrigger.getAllTriggers(testTriggerModel.serviceId);
+        expect(manageTrigger.getRef().value).to.be.eql([testTriggerModel]);
+    });
+    test("Should put nothing in the ref value if the gets failed", async()=>{
+        getStub.resolves(null);
+        await manageTrigger.getAllTriggers(testTriggerModel.serviceId);
+        expect(manageTrigger.getRef().value).to.be.eql([]);
+    })
+
+    //TEST CreateTriggers
+    test("Should put the created trigger in the ref array", async () => {
+        postStub.resolves({data: {data: testTriggerModel}})
+        await manageTrigger.createTrigger(testTriggerModel.name, testTriggerModel.description,
+            serviceId, testTriggerModel.permissions)
+        expect(manageTrigger.getRef().value).to.be.eql([testTriggerModel]);
+    });
+    test("Should put nothing in the ref value if the gets failed", async()=>{
+        postStub.resolves(null);
+        await manageTrigger.createTrigger(testTriggerModel.name, testTriggerModel.description,
+            serviceId, testTriggerModel.permissions)
+        expect(manageTrigger.getRef().value).to.be.eql([]);
+    })
+
+    //TEST UpdateTrigger
+    test("Should change the updated trigger in the ref array", async()=>{
+        manageTrigger.getRef().value= [testTriggerModel];
+        const updatedTrigger= new TriggerModel(
+            "Test Trigger id",
+            "Test Trigger name changed",
+            "Trigger description changed",
+            ["String1", "String2", "added String"],
+        )
+        putStub.resolves({data: {data:updatedTrigger}});
+        await manageTrigger.updateTrigger(updatedTrigger._id, updatedTrigger.name, updatedTrigger.description,
+            updatedTrigger.permissions, updatedTrigger.resourceServer)
+        expect(manageTrigger.getRef().value).to.be.eql([updatedTrigger]);
+    })
+    test("Should not change the updated trigger in the ref array if it fails", async()=>{
+        manageTrigger.getRef().value= [testTriggerModel];
+        const updatedTrigger= new TriggerModel(
+            "Test Trigger id",
+            "Test Trigger name changed",
+            "Trigger description changed",
+            ["String1", "String2", "added String"],
+        )
+        putStub.resolves(null);
+        await manageTrigger.updateTrigger(updatedTrigger._id, updatedTrigger.name, updatedTrigger.description,
+            updatedTrigger.permissions, updatedTrigger.resourceServer)
+        expect(manageTrigger.getRef().value).to.be.eql([testTriggerModel]);
+
+    })
+
+    //TEST DeleteTrigger
+    test("Should delete the trigger in the ref value", async () => {
+        manageTrigger.getRef().value= [testTriggerModel];
+        await manageTrigger.deleteTrigger(testTriggerModel._id);
+        expect(manageTrigger.getRef().value).to.be.eql([]);
+    });
+
+});

@@ -1,9 +1,9 @@
 import type Ref from "vue";
-import {ref} from "vue";
-import {GenericServices} from "@/services/generic-services";
+import { ref } from "vue";
+import { GenericController } from "@/controllers/generic_controller";
 import type SimplePermissionModel from "@/model/simple_permission_model";
 import axiosInstance from "@/helpers/axios_service";
-import {useToast} from "vue-toastification";
+import { useToast } from "vue-toastification";
 import axiosCatch from "@/helpers/axios_catch";
 
 const path = "/permission-authorized";
@@ -14,10 +14,10 @@ export interface IShowPermissions {
 
 }
 
-export class ShowPermissions extends GenericServices<SimplePermissionModel> implements IShowPermissions {
+export class ShowPermissions extends GenericController<SimplePermissionModel[]> implements IShowPermissions {
 
     async getAllPermissions(serviceId: string) {
-        const result = await super.get<SimplePermissionModel[]>(path, {query: {serviceId: serviceId}})
+        const result = await super.get<SimplePermissionModel[]>(path, { query: { serviceId: serviceId } })
         permissions.value = !!result ? result : [];
         return permissions;
     }
@@ -40,11 +40,11 @@ export class ShowPermissions extends GenericServices<SimplePermissionModel> impl
     async sendCodeOAuth(code: string, state: string) {
         const path = "oauth";
         try {
-            const res = await axiosInstance.get(path, {params: {code: code, state: state}});
+            const res = await axiosInstance.get(path, { params: { code: code, state: state } });
             if (res.status == 200)
                 useToast().success("Authorization Granted!");
         } catch
-            (error) {
+        (error) {
             axiosCatch(error);
             return null
         }
@@ -53,4 +53,4 @@ export class ShowPermissions extends GenericServices<SimplePermissionModel> impl
 
 export default new
 
-ShowPermissions();
+    ShowPermissions();

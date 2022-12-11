@@ -2,9 +2,9 @@ import axiosCatch from "@/helpers/axios_catch";
 import { http } from "@/helpers/axios_service";
 import type { UserModel } from "@/model/user_model";
 import type { AxiosInstance } from "axios";
-import type { StandartRepsonse } from "../model/response_model";
+import type { StandartRepsonse } from "@/model/response_model";
 
-interface IAuthService {
+interface IAuthController {
   login(username: string, password: string): Promise<UserModel | null>;
   logout(): Promise<boolean>;
   activate(token: String): Promise<boolean>;
@@ -15,7 +15,7 @@ interface IAuthService {
   ): Promise<boolean>;
 }
 
-export default class AuthService implements IAuthService {
+export default class AuthController implements IAuthController {
   http: AxiosInstance;
 
   constructor() {
@@ -33,7 +33,7 @@ export default class AuthService implements IAuthService {
       password: password,
     };
     try {
-      const res = await this.http.post("/register", body);
+      await this.http.post("/register", body);
       return true
     } catch (error) {
       axiosCatch(error);
@@ -64,8 +64,8 @@ export default class AuthService implements IAuthService {
   async logout(): Promise<boolean> {
     try {
       const res = await this.http.get<StandartRepsonse<Object>>("/logout");
-      if (res.data.status) return true
-      return false;
+      return !!res.data.status;
+
     } catch (error) {
       axiosCatch(error);
       return false;
@@ -77,8 +77,8 @@ export default class AuthService implements IAuthService {
       const res = await this.http.post<StandartRepsonse<Object>>("/activate", {
         token: token,
       });
-      if (res.data.status) return true;
-      return false;
+      return !!res.data.status;
+
     } catch (error) {
       axiosCatch(error);
       return false;
