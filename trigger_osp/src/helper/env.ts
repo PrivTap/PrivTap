@@ -21,13 +21,15 @@ interface EnvVariables {
     // The minimum level of messages to log
     LOG_LEVEL: "log"|"trace"|"debug"|"info"|"warn"|"error"|"fatal",
     // The database connection string for a MongoDB database
-    DB_STRING: string
+    DB_STRING: string,
     // The api key provided by privTap
-    API_KEY: string
+    API_KEY: string,
     // Google OAuth client Id
-    CLIENT_ID: string
+    CLIENT_ID: string,
     // Google OAuth client secret
-    CLIENT_SECRET:string
+    CLIENT_SECRET:string,
+    // Rounds of salting that will be applied to password hashes before storing them in the database
+    SALT_ROUNDS: number
 }
 
 // Default values for some of the env variables
@@ -35,7 +37,8 @@ const defaults = {
     PORT: 8001,
     BASE_URL: "/",
     DEPLOYMENT_URL: "https://osp_dummy.it",
-    LOG_LEVEL: "info"
+    LOG_LEVEL: "info",
+    SALT_ROUNDS: 8
 };
 
 /**

@@ -10,19 +10,10 @@ const userSchema = new Schema({
     username: {
         type: String,
         required: true,
-        index: {
-            unique: true
-        },
-        minLength: 3,
-        maxLength: 20,
-        match: /[a-zA-Z0-9.\-_]*/
     },
     email: {
         type: String,
         required: true,
-        index: {
-            unique: true
-        },
     }
 });
 
