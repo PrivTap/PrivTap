@@ -74,7 +74,6 @@ let triggers = manage_trigger.getRef();
 
 async function onClose(){
     dialog.value = false
-    await manage_trigger.getAllTriggers(route.params.id as string);
 }
 
 // On Mounted page, check if the Service has already defined permissions

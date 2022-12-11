@@ -33,7 +33,7 @@
       <v-btn color="indigo" text @click="validate"> {{ props.onEdit ? 'Edit' : 'Create' }}</v-btn>
       <v-btn color="red" variant="outlined" text @click="resetValidation">Reset</v-btn>
       <v-spacer></v-spacer>
-      <v-btn color="error" variant="text" text @click="props.onCancel()">Cancel</v-btn>
+      <v-btn color="error" variant="text" text @click="onClose">Cancel</v-btn>
     </v-row>
     <v-card-actions></v-card-actions>
   </v-card>
@@ -75,7 +75,6 @@ const choosablePermissions = reactive<{ perm: Partial<PermissionModel>[] }>({
 })
 
 onMounted(async () => {
-
   if (props.onEdit && props.action) {
     const action = props.action;
     form.name = action.name;
@@ -103,6 +102,11 @@ const form = reactive({
   ],
 });
 
+async function onClose() {
+    await manage_action.getAllActions(props.serviceId);
+    props.onCancel();
+}
+
 async function validate() {
   const { valid } = await formRef.value.validate();
   console.log(valid);
@@ -113,8 +117,7 @@ async function validate() {
     } else {
       await manage_action.createAction(form.name, form.description, props.serviceId, perm, form.endpoint);
     }
-    await manage_action.getAllActions(props.serviceId);
-    props.onCancel();
+    onClose();
   }
 }
 

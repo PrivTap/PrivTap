@@ -46,7 +46,6 @@ const props = defineProps<{
 }>();
 
 function onFormClose() {
-    manage_trigger.getAllTriggers(props.serviceId);
     formDialog.value = false;
 }
 

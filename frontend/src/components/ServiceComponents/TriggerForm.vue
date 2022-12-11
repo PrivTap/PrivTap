@@ -25,7 +25,7 @@
             <v-btn color="info" text @click="validate"> {{ props.onEdit ? 'Edit' : 'Create' }}</v-btn>
             <v-btn color="red" variant="outlined" text @click="resetValidation">Reset</v-btn>
             <v-spacer></v-spacer>
-            <v-btn color="error" variant="text" text @click="props.onCancel()">Cancel</v-btn>
+            <v-btn color="error" variant="text" text @click="onClose()">Cancel</v-btn>
         </v-row>
     </v-card>
 </template>
@@ -34,7 +34,6 @@ import { onMounted, reactive, ref, watch } from 'vue'
 import TriggerModel from '@/model/trigger_model';
 import { isValidUrlRegex } from '@/helpers/validators';
 import manage_permission from '@/controllers/manage_permission';
-import SimplePermissionModel from '@/model/simple_permission_model';
 import manage_trigger from '@/controllers/manage_trigger';
 import type PermissionModel from '@/model/permission_model';
 
@@ -93,6 +92,11 @@ const form = reactive({
     ],
 });
 
+async function onClose() {
+    await manage_trigger.getAllTriggers(props.serviceId);
+    props.onCancel();
+}
+
 async function validate() {
     const { valid } = await formRef.value.validate();
     console.log(valid);
@@ -103,7 +107,7 @@ async function validate() {
         } else {
             await manage_trigger.createTrigger(form.name, form.description, props.serviceId, perm, form.resourceServer);
         }
-        props.onCancel(); 
+        onClose();
     }
 }
 
