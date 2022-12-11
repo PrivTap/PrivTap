@@ -1,9 +1,11 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
 import { checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
-import Action, { IAction } from "../../model/Action";
+import Action, {ActionOsp, IAction} from "../../model/Action";
 import Service from "../../model/Service";
 import { handleInsert, handleUpdate } from "../../helper/misc";
+import Permissions from "../../model/Permission";
+
 
 export default class ManageActionsRoute extends Route {
     constructor() {
@@ -49,8 +51,16 @@ export default class ManageActionsRoute extends Route {
             permissions
         }, true) as IAction;
         if (!action) return;
+        const associatedPermissions = await Permissions.getAllPermissionAndAddBooleanTag(serviceId, action.permissions);
+        const actionResult: ActionOsp = {
+            name: action.name,
+            _id: action._id,
+            endpoint: action.endpoint,
+            description: action.description,
+            permissions: !!associatedPermissions ? associatedPermissions : []
+        }
 
-        success(response, action);
+        success(response, actionResult);
     }
 
     protected async httpDelete(request: Request, response: Response): Promise<void> {
@@ -85,14 +95,22 @@ export default class ManageActionsRoute extends Route {
             return;
         }
 
-        const queriedAction = await handleUpdate(response, Action, { "_id": actionId }, {
+        const updatedAction = await handleUpdate(response, Action, { "_id": actionId }, {
             name,
             description,
             permissions,
             endpoint
         }, true) as IAction;
-        if (!queriedAction) return;
+        if (!updatedAction) return;
+        const associatedPermissions = await Permissions.getAllPermissionAndAddBooleanTag(updatedAction.serviceId, updatedAction.permissions);
+        const triggerResult: ActionOsp = {
+            name: updatedAction.name,
+            _id: updatedAction._id,
+            endpoint: updatedAction.endpoint,
+            description: updatedAction.description,
+            permissions: !!associatedPermissions ? associatedPermissions : []
+        }
 
-        success(response, queriedAction);
+        success(response, triggerResult);
     }
 }
