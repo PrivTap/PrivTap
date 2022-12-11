@@ -1,6 +1,7 @@
 
 
 <template>
+  <div class="h-full">
   <!-- <link rel="stylesheet" href="/dist/output.css" />
 
   <title>Persnal Page</title> -->
@@ -119,9 +120,7 @@ class="container mx-auto grid grid-cols-1 bg-gray-800 rounded-md px-5 py-5 borde
 
 
 
-    <button type="button" class="px-5 py-3 bg-blue-800 text-white hover:bg-blue-900 rounded-md font-semibold" @click="router.push(RoutingPath.SERVICES_PAGE)">
-      See authorized services
-    </button>
+
 
 
 
@@ -195,7 +194,7 @@ class="container mx-auto grid grid-cols-1 bg-gray-800 rounded-md px-5 py-5 borde
 
     </div>
   </div>
-
+</div>
 
 
 </template>

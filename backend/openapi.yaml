@@ -1,0 +1,1103 @@
+openapi: 3.0.3
+info:
+  title: PrivTAP
+  description: |-
+    ### Privacy preserving Trigger-Action Platform
+    This document describes the interface of the REST API that is exposed by PrivTAP backend.
+    
+    #### Conventions
+    All responses are in JSON format and will include an object like this in their body:
+    ```typescript
+    {
+      // Flag indicating if the request has been executed successfully
+      status: boolean,
+      // Optional message, this is usually used for error messages
+      message: string,
+      // Optional data, this is usually used in successful requests to return the results
+      data: object | array
+    }
+    ```
+    This external structure will not be represented in this document to avoid clutter:
+    - for successful responses (status codes 2xx), it is represented the value associated with the *data* field, if present
+    - for unsuccessful responses (status codes 4xx/5xx), it is specified a description of what caused the error
+    
+    Common errors will not be specified in endpoints description, keep in mind that:
+    - endpoints that needs authentication can respond with *401 unauthorized*, if the authentication cookie is not valid
+    - all endpoints can respond with *5xx internal server error*, if something unexpected happens on the server
+    - all endpoints can response with *400 bad request*, if the required parameters/body fields are not present
+    
+    Only errors specific to the single endpoints will be specified in this document.
+  termsOfService: https://privtap.it/terms/
+  contact:
+    email: contact@privtap.it
+  license:
+    name: GNU GPLv2
+    url: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+  version: 0.3.0
+servers:
+  - url: https://privtap.it/api
+tags:
+  - name: Authentication
+    description: Endpoints for authenticating users
+  - name: Services Management
+    description: Endpoints for creating and modifying services that provides triggers and/or actions
+  - name: Rules Management
+    description: Endpoints for creating and modifying trigger-action rules
+  - name: OSP Authorization
+    description: Endpoints for authorizing services on behalf of users
+  - name: Rules Execution
+    description: Endpoints for executing trigger-action rules defined by users
+security:
+  - auth: []
+paths:
+  /register:
+    post:
+      security: []
+      tags:
+        - Authentication
+      summary: New user register to the platform
+      description: The user has the possibility to create a new account in order to access the platform
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: John71
+                email:
+                  type: string
+                  example: Jhon71@gmail.com
+                password:
+                  type: string
+                  example: MyPrivatePassword
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /login:
+    post:
+      security: []
+      tags:
+        - Authentication
+      summary: Registered user log-in to the platform
+      description: The user has the possibility to log into the platform and access his private account
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: John71
+                password:
+                  type: string
+                  example: MyPrivatePassword
+      responses:
+        '200':
+          description: Successful operation
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: _jwt=a_jwt_token; Path=/; HttpOnly; Secure
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+  /logout:
+    get:
+      tags:
+        - Authentication
+      summary: OSP and user log-out from the platform
+      description: The user has the possibility to logout from his account
+      operationId: logout
+      responses:
+        '200':
+          description: Successful logout, delete the _jwt cookie from the user's browser
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+  /activate:
+    post:
+      security: []
+      tags:
+        - Authentication
+      summary: Activates the account of a user
+      description: Once a user registers a new account, he will receive an activation token. That token needs to be sent here to access the full functionalities of the platform.
+      operationId: activate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                  example: 823217d03a2d149c7d3c8c8f3235d62dcc7047730990f405b7f0feb104ce7c3ec7899ddbf0562558af9e0de7e71953456e840925556c494492e7c876c8f47413
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: The token is not valid
+
+  /rules:
+    get:
+      tags:
+        - Rules Management
+      summary: The user requests the set of rules already defined
+      description: Returns all the rules defined by the user
+      operationId: get-rules
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Rule'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+    post:
+      tags:
+        - Rules Management
+      summary: The user defines a new rule
+      description: The user has the possibility of defining a new rule specifying the chosen trigger and action
+      operationId: post-rules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: ruleNameExample
+                triggerId:
+                  type: string
+                  example: 63446c0e2677ffe654ea9672
+                actionId:
+                  type: string
+                  example: 632e6caa2677ffe654ea9672
+              required:
+                - triggerId
+                - actionId
+                - name
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+    delete:
+      tags:
+        - Rules Management
+      summary: The user deletes an already defined rule
+      description: The user has the possibility of deleting a rule he created
+      operationId: delete-rules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ruleId:
+                  type: string
+                  example: 6377550e2677ffe654ea9672
+              required:
+                - ruleId
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /services:
+    get:
+      tags:
+        - OSP Authorization
+      summary: The user requests a list of OSP
+      description: Returns a list of all the OSP registered to the platform. If specified in the authorized query parameters, only the authorized OSPs will be returned
+      operationId: services
+      parameters:
+        - name: authorized
+          description: Filters the returned list including only the OSPs authorized by the user
+          in: query
+          schema:
+            type: boolean
+          example: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    _id:
+                      type: string
+                      example: exampleId
+                    name:
+                      type: string
+                      example: Dropbox
+                    description:
+                      type: string
+                      example: This service allow you to interact with your dropbox account!
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /triggers:
+    get:
+      tags:
+        - Rules Management
+      summary:  Gets a list of available triggers
+      description: Returns a list of triggers offered by services that the user has authorized. The triggers will be grouped by the service that is providing them. The results can be filtered with a search query.
+      operationId: triggers
+      parameters:
+        - name: search
+          description: Search query that will restrict the result to only triggers whose name or description matches it (NOT YET IMPLEMENTED)
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request was successful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    serviceName:
+                      type: string
+                      example: SensorService
+                    serviceId:
+                      type: string
+                      example: 025ccd4951hld089ba219okl
+                    triggers:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Trigger'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /actions:
+    get:
+      tags:
+        - Rules Management
+      summary: Gets a list of available actions
+      description: Returns a list of actions offered by services that the user has authorized. The actions will be grouped by the service that is providing them. The results can be filtered with a search query.
+      operationId: actions
+      parameters:
+        - name: search
+          description: Search query that will restrict the result to only actions whose name or description matches it (NOT YET IMPLEMENTED)
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request was successful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    serviceName:
+                      type: string
+                      example: NotificationService
+                    serviceId:
+                      type: string
+                      example: 025ccd4951hld089ba219okl
+                    actions:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Action'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /service-authorization:
+    get:
+      tags:
+        - OSP Authorization
+      summary: The user request a set of authorization already granted
+      description: Returns all the authorization granted to the specified service
+      operationId: get-service-authorization
+      parameters:
+        - name: serviceId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Permission'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+    post:
+      tags:
+        - OSP Authorization
+      summary: The user grants a new authorization
+      description: The user can grant a new authorization specifying the different permissions. The OAuth flow begins and a redirect URI is returned.
+      operationId: post-service-authorization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                serviceId:
+                  type: string
+                  example: 025ccd4951hld089ba219okl
+                permissionId:
+                  type: array
+                  example: [ 637ccd4951cdf089ba2123be, a1ccd1951cdf080ba2123a3 ]
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  redirectUri:
+                    type: string
+                    example: https://github.com/login/oauth/authorize?response_type=code&client_id=client_id&redirect_uri=http%3A%2F%2F127.0.0.1%3A8000%2Fapi%2Fservice-authorization&scope=user&state=%242b%2408%244scfB3bTo%2FGEPvoh0bAtue&%5B%22%7Bsomething:%20random%7D%22%5D
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+    delete:
+      tags:
+        - OSP Authorization
+      summary: The user deletes one or more of the permissions precedently granted to a OSP
+      description: The user deletes one or more of the permissions precedently granted to a OSP
+      operationId: delete-service-authorization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                permissionId:
+                  type: array
+                  example: [ 637ccd4951cdf089ba2123be, a1ccd1951cdf080ba2123a3 ]
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /manage-services:
+    get:
+      tags:
+        - Services Management
+      summary: The OSP requests a list of already defined services
+      description: The OSP can request a list of defined services in order to view, modify or delete them. It can pass the id of a service in the query string to request only the detail of that specific one
+      operationId: get-manage-services
+      parameters:
+        - in: query
+          name : serviceId
+          schema:
+            type: string
+            example: 637e6c0e2677ffe654ea9672
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/Service'
+                  - $ref: '#/components/schemas/Service'
+
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+    post:
+      tags:
+        - Services Management
+      summary: The OSP defines a new service
+      description: The OSP can create a new service defining the service name, a description, the creator
+      operationId: post-manage-services
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                name:
+                  type: string
+                  example: Dropbox service
+                description:
+                  type: string
+                  example: This service allows the interaction with Dropbox's APIs
+                authServer:
+                  type: string
+                  example: http://www.dropboxauth.com
+                clientId:
+                  type: string
+                  example: very_secret_id
+                clientSecret:
+                  type: string
+                  example: very_secret_secret
+                triggerNotificationServer:
+                  type: string
+                  example : http://www.triggerserver.com
+              required:
+                - name
+                - description
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Error while creating a service
+        '500':
+          description: Internal server error
+
+    delete:
+      tags:
+        - Services Management
+      summary: The OSP deletes an already defined service
+      description: A OSP can delete a defined service, assuming that he's the creator of the latter
+      operationId: delete-manage-services
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                serviceId :
+                  type : string
+                  example : 637ccd4951cdf089ba2123be
+              required:
+                - serviceId
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Error while creating a service
+
+    put:
+      tags:
+        - Services Management
+      summary: The OSP modify an already defined service
+      description: A OSP can modify a defined service, assuming that he's the creator of the latter
+      operationId: modify-manage-services
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                serviceId :
+                  type : string
+                  example : 637ccd4951cdf089ba2123be
+                description:
+                  type: string
+                  example: Some very nice new service description
+                name:
+                  type: string
+                  example: someNewServiceName
+                authServer:
+                  type: string
+                  example: someNewAuthorizationServerUrl
+                clientId:
+                  type: string
+                  example: someNewSecretClientId
+                clientSecret:
+                  type: string
+                  example: someNewVerySecretSecret
+                triggerNotificationServer:
+                  type : string
+                  example: http://example.com/notification
+              required :
+                - serviceId
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Error while creating a service
+  /triggers-data:
+    post:
+      tags:
+        - Rules Execution
+      summary: The OSP sends data to activate a registered trigger
+      description: The OSP sends data to activate a registered trigger (TODO)
+      operationId: post-triggers-data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Trigger'
+      responses:
+        '200':
+          description: successful operation
+  /oauth:
+    get:
+      tags:
+        - OSP Authorization
+      summary: Manages the oAuth flow redirect
+      description: Manages the oAuth flow redirect
+      operationId: get-oauth
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+            example: 6648fa09a97a03d89cb4
+        - name: state
+          in: query
+          required: true
+          schema:
+            type: string
+            example: $2b$08$4scfB3bTo/GEPvoh0bAtue
+      responses:
+        '200':
+          description: successful operation
+
+  /manage-triggers:
+    get:
+      tags:
+        - Services Management
+      summary: The OSP requests the set of already specified triggers.
+      description: The OSP requests the set of already specified triggers. It must pass the serviceId in the queryString
+      operationId: get-manage-triggers
+      parameters:
+        - name: serviceId
+          in: query
+          required: true
+          schema:
+            type: string
+            example: 637e6c0e2677ffe654ea9672
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Trigger'
+    post:
+      tags:
+        - Services Management
+      summary: The OSP defines a new trigger service which has as implicit endpoint /trigger-data
+      description: The OSP defines a new trigger service which has as implicit endpoint /trigger-data (TODO)
+      operationId: post-manage-triggers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  type: string
+                  example: SomeTriggerName
+                description:
+                  type: string
+                  example: SomeTriggerDescription
+                serviceId:
+                  type: string
+                  example: 637e6c0e2677ffe654ea9672
+                permissions:
+                  type: array
+                  items:
+                    type: string
+                    example: permissionId
+                resourceServer:
+                  type: string
+                  example: someUrlToGetAResource
+              required:
+                - name
+                - description
+                - serviceId
+      responses:
+        '200':
+          description: successful operation
+    delete:
+      tags:
+        - Services Management
+      summary: The OSP deletes an already defined trigger
+      description: The OSP deletes an already defined trigger
+      operationId: delete-manage-triggers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                triggerId:
+                  type: string
+                  example: SomeTriggerId
+              required:
+                - triggerId
+      responses:
+        '200':
+          description: successful operation
+
+    put:
+      tags:
+        - Services Management
+      summary: The OSP modify an already defined trigger
+      description: The OSP modify an already defined trigger
+      operationId: put-manage-triggers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                triggerId:
+                  type: string
+                  example: 637e6c0e2677ffe654ea9672
+                name:
+                  type: string
+                  example: SomeTriggerName
+                description:
+                  type: string
+                  example: SomeTriggerDescription
+                permissions:
+                  type: array
+                  items:
+                    type: string
+                    example: permissionId
+                resourceServer:
+                  type: string
+                  example: someUrlToGetAResource
+              required:
+                - triggerId
+      responses:
+        '200':
+          description: successful operation
+
+  /manage-actions:
+    get:
+      tags:
+        - Services Management
+      summary: The OSP requests the set of already specified actions
+      description: The OSP requests the set of already specified actions
+      operationId: get-manage-actions
+      parameters:
+        - name: serviceId
+          in: query
+          required: true
+          schema:
+            type: string
+            example: 637e6c0e2677ffe654ea9672
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Action'
+    post:
+      tags:
+        - Services Management
+      summary: The OSP defines a new action service
+      description: The OSP defines a new action service
+      operationId: post-manage-actions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                name:
+                  type: string
+                  example: SomeActionName
+                description:
+                  type: string
+                  example: SomeActionDescription
+                serviceId:
+                  type: string
+                  example: 637e6c0e2677ffe654ea9672
+                permissions:
+                  type: array
+                  items:
+                    type: string
+                    example: permissionId
+                endpoint:
+                  type: string
+                  example: someUrlToPerformAction
+              required:
+                - name
+                - description
+                - serviceId
+                - endpoint
+
+      responses:
+        '200':
+          description: successful operation
+    delete:
+      tags:
+        - Services Management
+      summary: The OSP deletes an already defined action
+      description: The OSP deletes an already defined action
+      operationId: delete-manage-actions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                actionId:
+                  type: string
+                  example: 6489ccd4951cdf089ba21288c
+              required:
+                - actionId
+      responses:
+        '200':
+          description: successful operation
+
+    put:
+      tags:
+        - Services Management
+      summary: The OSP modify an already defined action
+      description: The OSP modify an already defined action
+      operationId: put-manage-actions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                actionId:
+                  type: string
+                  example: 637e6c0e2677ffe654ea9672
+                name:
+                  type: string
+                  example: SomeActionName
+                description:
+                  type: string
+                  example: SomeActionDescription
+                permissions:
+                  type: array
+                  items:
+                    type: string
+                    example: permissionId
+                endpoint:
+                  type: string
+                  example: someUrlToPerformAction
+              required:
+                - actionId
+      responses:
+        '200':
+          description: successful operation
+
+  /permissions:
+    get:
+      tags:
+        - Services Management
+      summary: The OSP requests the permissions defined for a service
+      description: Returns the permission defined by the OSP for a specific service
+      operationId: get-permissions
+      parameters:
+        - name: serviceId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Permission'
+        '400':
+          description: This service doesn't exits, One of the parameters is missing
+        '403':
+          description: You don't have enough privileges to modify this service
+        '500':
+          description: Internal server error
+    post:
+      tags:
+        - Services Management
+      summary: The OSP creates a new permission for a defined service
+      description: The OSP can create a new permission for a service he already defined
+      operationId: post-permissions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                serviceId:
+                  type: string
+                  example: 137e6c0e2611ffe654ea9672
+                name:
+                  type: string
+                  example: Account information
+                description:
+                  type: string
+                  example: This permission requires your account information data such as username, email and birth date
+                authorization_details:
+                  type: object
+                  example: { 'type': 'account_information','actions': [ 'list_accounts','read_balances','read_transactions' ],'locations': [ 'https://google.com/accounts' ] }
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: This service doesn't exits, One of the parameters is missing
+        '403':
+          description: You don't have enough privileges to modify this service
+        '500':
+          description: Internal server error
+
+    delete:
+      tags:
+        - Services Management
+      summary: The OSP deletes permission for a defined service
+      description: The OSP can delete a permission for a service he already defined
+      operationId: delete-permissions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                permissionId:
+                  type: string
+                  example: 637e6c102677ffe654ea9672
+                serviceId:
+                  type: string
+                  example: 617a6c102677ffe654ea9aa2
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: This service doesn't exits, One of the parameters is missing
+        '403':
+          description: You don't have enough privileges to modify this service, You don't have enough privileges to modify this permission
+        '500':
+          description: Internal server error
+
+    put:
+      tags:
+        - Services Management
+      summary: The OSP modifies a permission for a defined service
+      description: The OSP can modify a permission for a service he already defined
+      operationId: put-permissions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                serviceId:
+                  type: string
+                  example: 617aac0e2611ffe654ea9a71
+                permissionId:
+                  type: string
+                  example: 617aac0e2611ffe654ea9a71
+                name:
+                  type: string
+                  example: Account information
+                description:
+                  type: string
+                  example: This permission requires your account information data such as username, email and birth date
+                authorization_details:
+                  type: object
+                  example: { 'type': 'account_information','actions': [ 'list_accounts','read_balances','read_transactions' ],'locations': [ 'https://google.com/accounts' ] }
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: This service doesn't exits, One of the parameters is missing
+        '403':
+          description: You don't have enough privileges to modify this service, You don't have enough privileges to modify this permission
+        '500':
+          description: Internal server error'
+
+components:
+  securitySchemes:
+    auth:
+      type: apiKey
+      description: The cookie that is set after a succesful call to the /login endpoint
+      in: cookie
+      name: __session
+
+  schemas:
+    Trigger:
+      properties:
+        _id:
+          type: string
+          example: 637ccd4951cdf089ba2123be
+        name:
+          type: string
+          example: Sensor detects movement
+        serviceId:
+          type: string
+          example : 637e6c0e2677ffe654ea9672
+        description:
+          type: string
+          example: Fires when a SensorService sensor detects movement
+        permission:
+          type : array
+          example: "[{Permission1}, {Permission2}]"
+          items:
+            $ref : '#/components/schemas/Permission'
+        resourceServer:
+          type : array
+          example : http://service.com/resource
+      required:
+        - name
+        - description
+        - serviceId
+    Action:
+      type: object
+      properties:
+        name:
+          type: string
+          example: SomeActionName
+        description:
+          type: string
+          example: SomeActionDescription
+        serviceId:
+          type: string
+          example: 637e6c0e2677ffe654ea9672
+        permissions:
+          type: array
+          items:
+            type: string
+            example: permissionId
+        endpoint:
+          type: string
+          example: someUrlToPerformAction
+      required:
+        - name
+        - description
+        - serviceId
+        - endpoint
+
+    Rule:
+      properties:
+        _id:
+          type: string
+          example: 637e6c0e2677ffe654ea9672
+        name:
+          type: string
+          example : ruleNameExample
+        userId:
+          type: string
+          example: 637e11162677ffe654ea9672
+        triggerId:
+          type: string
+          example: 617e6c0e2677ffe659999672
+        actionId:
+          type: string
+          example: 632e6c0e2677ffe654ea9672
+        isAuthorized:
+          type: boolean
+          example: true
+
+    Service:
+      properties:
+        _id:
+          type: string
+          example: 637e6c0e2677ffe654ea9672
+        name:
+          type: string
+          example: Dropbox
+        description:
+          type: string
+          example: This service allow you to interact with your dropbox account!
+        creator:
+          type: string
+          example: 632e69a12677ffe654ea9672
+        authServer:
+          type: string
+          example: http://www.dropbox_auth_server.com
+        clientId:
+          type: string
+          example: very_secret_id
+        clientSecret:
+          type: string
+          example: very_secret_secret
+        triggerNotificationServer:
+          type: string
+          example: http://example.com/notification
+      required:
+        - name
+        - description
+        - _id
+
+    Permission:
+      properties:
+        _id:
+          type: string
+          example: 637e6c102677ffe654ea9672
+        serviceId:
+          type: string
+          example: 137e6c0e2611ffe654ea9672
+        name:
+          type: string
+          example: Account information
+        description:
+          type: string
+          example: This permission requires your account information data such as username, email and birth date
+        authorization_details:
+          type: object
+          example: {'type':'account_information','actions':['list_accounts','read_balances','read_transactions'],'locations':['https://google.com/accounts']}

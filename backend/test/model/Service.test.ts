@@ -1,156 +1,54 @@
-import { expect } from "chai";
-import * as sinon from "sinon";
+import { expect, use } from "chai";
+import Model from "../../src/Model";
 import "../../src/app";
-import mongoose, { Types } from "mongoose";
 import Service from "../../src/model/Service";
+import chaiHttp = require("chai-http");
 import { beforeEach } from "mocha";
 import { SinonStub } from "sinon";
+import * as sinon from "sinon";
+import sinonChai = require("sinon-chai");
+
+use(chaiHttp);
+use(sinonChai);
 
 const sandbox = sinon.createSandbox();
 
-describe("Testing the Service model class", () => {
+describe("Service model class", () => {
 
-    let existStub: SinonStub;
+    let findAllStub: SinonStub;
     let findStub: SinonStub;
-    let findOneStub: SinonStub;
-    let deleteOneStub: SinonStub;
-    let updateOneStub: SinonStub;
-    let saveStub: SinonStub;
+    const userIdExample = "6373d3b31b03840eb0138708";
+    const serviceIdExample = "6373d3b31b03840eb0138708";
 
     beforeEach(() => {
-        existStub = sandbox.stub(mongoose.Model, "exists");
-        findStub = sandbox.stub(mongoose.Model, "find");
-        findOneStub = sandbox.stub(mongoose.Model, "findOne");
-        deleteOneStub = sandbox.stub(mongoose.Model, "deleteOne");
-        updateOneStub = sandbox.stub(mongoose.Model, "updateOne");
-        saveStub = sandbox.stub(Service["serviceModel"].prototype, "save");
+        findStub = sandbox.stub(Model.prototype, "find");
+        findAllStub = sandbox.stub(Model.prototype, "findAll");
     });
 
     afterEach(async () => {
         sandbox.restore();
     });
 
-    it("should create a new service", async () => {
-        existStub.resolves(null);
-        saveStub.resolves();
+    it("findAllForUser should return the results of findAll", async () => {
+        findAllStub.resolves([{ serviceId: "service" }]);
+        const res = await Service.findAllCreatedByUser(userIdExample);
+        expect(findAllStub).to.be.calledOnceWith({ creator: userIdExample });
+        expect(res).to.be.eql([{ serviceId: "service" }]);
 
-        expect(await Service.insert("Test", "Test", "A Creator ID", undefined, undefined, undefined)).to.be.true;
     });
 
-    it("should not create a duplicate service", async () => {
-        existStub.resolves({ _id: "Something" });
-        saveStub.resolves();
-
-        expect(await Service.insert("Test", "Test", "A Creator ID", undefined, undefined, undefined)).to.be.false;
+    it("should correctly see if the user is creator", async () => {
+        //if it resolves null then it should return false
+        findStub.resolves(null);
+        const res = await Service.isCreator(userIdExample, serviceIdExample);
+        expect(findStub).to.have.been.calledOnceWith({ _id: serviceIdExample, creator: userIdExample });
+        expect(res).to.be.false;
+    });
+    it("isCreator should return true if find resolves something different from null", async () => {
+        findStub.resolves("ciao");
+        const res = await Service.isCreator(userIdExample, serviceIdExample);
+        expect(findStub).to.have.been.calledOnceWith({ _id: serviceIdExample, creator: userIdExample });
+        expect(res).to.be.true;
     });
 
-    it("should not create a service if the save method fails", async () => {
-        existStub.resolves(null);
-        saveStub.throws();
-
-        expect(await Service.insert("Test", "Test", "A Creator ID", undefined, undefined, undefined)).to.be.false;
-    });
-
-    it("should correctly find user services", async () => {
-        const queryResult = [{
-            _id: "612g281261gw",
-            name: "Test 1",
-            description: "Description 1",
-            creator: "612g281261gw",
-            authServer: "https://www.test.com/auth",
-            clientId: "Client ID",
-            clientSecret: "Client Secret"
-        }, {
-            _id: "612g281261ga",
-            name: "Test 2",
-            description: "Description 2",
-            creator: "612g281261gw",
-            authServer: "https://www.test.com/auth",
-            clientId: "Client ID",
-            clientSecret: "Client Secret"
-        }];
-        findStub.resolves(queryResult);
-
-        expect(await Service.findServicesCreatedByUser("612g281261gw")).to.be.equal(queryResult);
-    });
-
-    it("should return null if the find fails", async () => {
-        findStub.throws();
-
-        expect(await Service.findServicesCreatedByUser("612g281261gw")).to.be.null;
-    });
-
-    it("should correctly find one user service", async () => {
-        const queryResult = [{
-            _id: "612g281261ga",
-            name: "Test 1",
-            description: "Description 1",
-            creator: "612g281261gw",
-            authServer: "https://www.test.com/auth",
-            clientId: "Client ID",
-            clientSecret: "Client Secret"
-        }];
-        findOneStub.resolves(queryResult);
-
-        expect(await Service.findServiceCreatedByUser("612g281261gw", "612g281261ga")).to.be.equal(queryResult);
-    });
-
-    it("should return null if the findOne fails", async () => {
-        findOneStub.throws();
-
-        expect(await Service.findServiceCreatedByUser("612g281261gw", "612g281261ga")).to.be.null;
-    });
-
-    it("should correctly delete a service", async () => {
-        deleteOneStub.resolves();
-
-        expect(await Service.deleteService("612g281261gw", "612g281261ga")).to.be.true;
-    });
-
-    it("should return null if the delete fails", async () => {
-        deleteOneStub.throws();
-
-        expect(await Service.deleteService("612g281261gw", "612g281261ga")).to.be.false;
-    });
-
-    it("should correctly update a service", async () => {
-        updateOneStub.resolves({
-            modifiedCount: 1,
-            acknowledged: false,
-            matchedCount: 0,
-            upsertedCount: 0,
-            upsertedId: new Types.ObjectId("612g281261gw")
-        });
-
-        expect(await Service.updateService("612g281261gw", "ARandomID", null, null, null, null)).to.be.true;
-    });
-
-    it("should return null if the update fails", async () => {
-        updateOneStub.throws();
-
-        expect(await Service.updateService("612g281261gw", "ARandomID", null, null, null, null)).to.be.false;
-    });
-    it("should correctly return all the services", async () => {
-        const service1= {
-            _id: "612g281261gw",
-            name: "Test 1",
-            description: "Description 1",
-            creator: "612g281261gw",
-            authServer: "https://www.test.com/auth",
-            clientId: "Client ID",
-            clientSecret: "Client Secret"
-        };
-        const service2 ={
-            _id: "612g281261ga",
-            name: "Test 2",
-            description: "Description 2",
-            creator: "612g281261gw",
-            authServer: "https://www.test.com/auth",
-            clientId: "Client ID",
-            clientSecret: "Client Secret"
-        };
-        const queryResult = [service1, service2];
-        findStub.resolves(queryResult);
-        expect(await Service.findServices(1,1)).to.be.eql(service1);
-    });
 });

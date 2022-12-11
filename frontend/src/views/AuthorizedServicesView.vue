@@ -147,14 +147,7 @@
   </template>
   
   <script setup lang="ts">
-  import type ServiceModel from "@/model/service_model";
-  import { useOspServiceStore } from "../stores/osp_service_store";
-  import ManageService from "../services/manage_service";
-  import { onMounted } from "vue";
-  
-  const ospServiceStore = useOspServiceStore();
-  const services = ospServiceStore.services;
-  console.log(services);
+
   
   
   </script>

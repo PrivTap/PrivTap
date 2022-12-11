@@ -48,7 +48,7 @@ const router = createRouter({
       },
     },
     {
-      path: RoutingPath.PUBLISH_SERVICE_PAGE,
+      path: `${RoutingPath.PUBLISH_SERVICE_PAGE}/:id?`,
       name: "publishservice",
       component: () => import("../views/PublishServiceView.vue"),
       meta: {
@@ -73,13 +73,44 @@ const router = createRouter({
       },
     },
     {
-      path: RoutingPath.MODIFY_AUTH_PAGE,
+      path: `${RoutingPath.MODIFY_AUTH_PAGE}/:id?`,
       name: "modifyauth",
       component: () => import("../views/ModifyAuth.vue"),
       meta: {
         requireAuth: true,
       },
     },
+    {
+      path: `${RoutingPath.SERVICE_PERMISSION_PAGE}/:id?`,
+      name: "servicepermission",
+      component: () => import("../views/OspManagePermissionView.vue"),
+      meta: {
+        requireAuth: true,
+      },
+    },
+
+    {
+      path: `${RoutingPath.SERVICE_TRIGGER_PAGE}/:id?`,
+      name: "servicetrigger",
+      component: () => import("../views/OspManageTriggerView.vue"),
+      meta: {
+        requireAuth: true,
+      },
+    },
+
+    {
+      path: `${RoutingPath.SERVICE_ACTION_PAGE}/:id?`,
+      name: "serviceaction",
+      component: () => import("../views/OspManageActionView.vue"),
+      meta: {
+        requireAuth: true,
+      },
+    },
+    {
+      path: "/:pathMatch(.*)*",
+      name: "not-found",
+      redirect: "/home",
+    }
   ],
 });
 

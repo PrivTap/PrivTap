@@ -1,30 +1,32 @@
 import axiosCatch from "@/helpers/axios_catch";
+import { http } from "@/helpers/axios_service";
 import type { UserModel } from "@/model/user_model";
-import type { AxiosError } from "axios";
-import AxiosService from "../helpers/axios_service";
+import type { AxiosInstance } from "axios";
 import type { StandartRepsonse } from "../model/response_model";
 
 interface IAuthService {
-  login(username: string, password: string): Promise<StandartRepsonse<Object>>;
-  logout(): Promise<StandartRepsonse<Object>>;
-  activate(token: String): Promise<StandartRepsonse<Object>>;
+  login(username: string, password: string): Promise<UserModel | null>;
+  logout(): Promise<boolean>;
+  activate(token: String): Promise<boolean>;
   register(
     username: string,
     email: string,
     password: string
-  ): Promise<StandartRepsonse<Object>>;
+  ): Promise<boolean>;
 }
 
-export default class AuthService extends AxiosService implements IAuthService {
+export default class AuthService implements IAuthService {
+  http: AxiosInstance;
+
   constructor() {
-    super();
+    this.http = http();
   }
 
   async register(
     username: String,
     email: String,
     password: String
-  ): Promise<StandartRepsonse<Object>> {
+  ): Promise<boolean> {
     const body = {
       username: username,
       email: email,
@@ -32,16 +34,17 @@ export default class AuthService extends AxiosService implements IAuthService {
     };
     try {
       const res = await this.http.post("/register", body);
-      return res.data;
+      return true
     } catch (error) {
-      return axiosCatch(error);
+      axiosCatch(error);
+      return false;
     }
   }
 
   async login(
     username: String,
     password: String
-  ): Promise<StandartRepsonse<UserModel | Object>> {
+  ): Promise<UserModel | null> {
     const body = {
       username: username,
       password: password,
@@ -51,29 +54,34 @@ export default class AuthService extends AxiosService implements IAuthService {
         "/login",
         body
       );
-      return res.data;
+      return res.data.data as UserModel;
     } catch (error) {
-      return axiosCatch(error);
+      axiosCatch(error);
+      return null;
     }
   }
 
-  async logout(): Promise<StandartRepsonse<Object>> {
+  async logout(): Promise<boolean> {
     try {
       const res = await this.http.get<StandartRepsonse<Object>>("/logout");
-      return res.data;
+      if (res.data.status) return true
+      return false;
     } catch (error) {
-      return axiosCatch(error);
+      axiosCatch(error);
+      return false;
     }
   }
 
-  async activate(token: String): Promise<StandartRepsonse<Object>> {
+  async activate(token: String): Promise<boolean> {
     try {
       const res = await this.http.post<StandartRepsonse<Object>>("/activate", {
         token: token,
       });
-      return res.data;
+      if (res.data.status) return true;
+      return false;
     } catch (error) {
-      return axiosCatch(error);
+      axiosCatch(error);
+      return false;
     }
   }
 }

@@ -1,42 +1,67 @@
-import { model, Schema, Types } from "mongoose";
+import { Schema, Types } from "mongoose";
+import Service from "./Service";
+import Model from "../Model";
+import { OperationDataType } from "../helper/rule_execution";
 
 export interface IAction {
     _id: string;
     name: string;
     description: string;
-    serviceID: Types.ObjectId;
-    permissions: any[]; // TO DEFINE
+    serviceId: string;
     endpoint: string;
+    inputs: OperationDataType[];
+    permissions?: Types.Array<string>;
 }
 
-const actionSchema = new Schema<IAction>({
+const actionSchema = new Schema({
     name: {
         type: String,
         required: true,
-        index: {
-            unique: true
-        }
     },
     description: {
         type: String,
         required: true,
     },
-    serviceID: {
+    serviceId: {
         type: Schema.Types.ObjectId,
-        required: true
-    },
-    permissions: {
-        type: [Object],
         required: true
     },
     endpoint: {
         type: String,
         required: true
-    }
+    },
+    inputs: {
+        type: [String]
+        // required?
+    },
+    permissions: [Schema.Types.ObjectId]
 });
 
-export default class Action {
+class Action extends Model<IAction> {
 
-    private static actionModel = model<IAction>("Action", actionSchema);
+    constructor() {
+        super("action", actionSchema);
+    }
 
+    /**
+     * Finds all the actions provided by a service.
+     * @param serviceId the id of the service
+     */
+    async findAllForService(serviceId: string): Promise<Partial<IAction>[] | null> {
+        return await this.findAll({ serviceId }, "-serviceId -endpoint");
+    }
+
+    /**
+     * Checks if a user is the creator of an action.
+     * @param userId the id of the user
+     * @param actionId the id of the action
+     */
+    async isCreator(userId: string, actionId: string): Promise<boolean> {
+        const action = await this.findById(actionId);
+        if (action == null)
+            return false;
+        return await Service.isCreator(userId, action.serviceId);
+    }
 }
+
+export default new Action();

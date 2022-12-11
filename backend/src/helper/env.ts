@@ -36,6 +36,10 @@ interface EnvVariables {
     MAILJET_SECRET_KEY: string,
     // Address that will send emails through the Mailjet service
     MAILJET_SENDER: string
+    // OAuth client Id
+    CLIENT_ID: string
+    // OAuth client secret
+    CLIENT_SECRET: string
 }
 
 // Default values for some of the env variables
@@ -60,7 +64,6 @@ function loadEnvVariables(): EnvVariables {
     // Check if the defaults should be overwritten
     for (const [name, value] of Object.entries(defaults)) {
         const envVariable = process.env[name];
-
         if (envVariable) {
             let newEnvVariable: string|number = envVariable;
 
@@ -99,6 +102,8 @@ function loadEnvVariables(): EnvVariables {
 
     // Force the cast of res to EnvVariables before returning it
     // as we know that it will not contain any different properties
+    res.CLIENT_ID = process.env.CLIENT_ID || "";
+    res.CLIENT_SECRET = process.env.CLIENT_SECRET || "";
     return res as unknown as EnvVariables;
 }
 

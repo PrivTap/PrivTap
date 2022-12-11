@@ -1,18 +1,18 @@
 import type { StandartRepsonse } from "@/model/response_model";
 import { useAuthStore } from "@/stores/auth_store";
 import type { AxiosError } from "axios";
+import { useToast } from "vue-toastification";
 
-export default function axiosCatch(error: any): StandartRepsonse<Object>{
+export default function axiosCatch(error: any): void {
     const err = error as AxiosError;
+    var message = "An error occured";
     if (err.response?.data) {
         /// Means that the user is more not logged in
-        if(err.status === 401){
+        if (err.response.status === 401 && import.meta.env.PROD) {
+            console.log("401");
             useAuthStore().logout(true);
         }
-        return err.response?.data as StandartRepsonse<Object>;
+        message = (err.response?.data as StandartRepsonse<Object>).message;
     }
-    return {
-        status: false,
-        message: "Somenthing went wrong..",
-    } as StandartRepsonse<Object>;
+    useToast().error(message);
 }
