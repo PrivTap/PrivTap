@@ -24,6 +24,10 @@ interface EnvVariables {
     DB_STRING: string
     // The api key provided by privTap
     API_KEY: string
+    // Google OAuth client Id
+    CLIENT_ID: string
+    // Google OAuth client secret
+    CLIENT_SECRET:string
 }
 
 // Default values for some of the env variables
@@ -73,6 +77,10 @@ function loadEnvVariables(): EnvVariables {
     res.API_KEY = process.env.API_KEY || "";
     if (res.API_KEY == "")
         throw Error("API key string environment variable is not set");
+
+    res.CLIENT_ID = process.env.CLIENT_ID || "";
+
+    res.CLIENT_SECRET = process.env.CLIENT_SECRET || "";
 
     return res as unknown as EnvVariables;
 }

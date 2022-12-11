@@ -1,6 +1,5 @@
 import Route from "../Route";
 import {Request, Response} from "express";
-import ejs, {renderFile} from "ejs";
 
 export default class LoginRoute extends Route {
     constructor() {
@@ -8,7 +7,6 @@ export default class LoginRoute extends Route {
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
-        response.render("test");
+        response.render("login");
     }
-
 }
