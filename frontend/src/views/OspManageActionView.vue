@@ -25,14 +25,14 @@
                                     Create New Action
                                 </v-btn>
                             </template>
-                            <ActionForm v-if="service" :serviceId=service!._id :onCancel="() => (dialog = false)" />
+                            <ActionForm v-if="serviceId !== undefined" :serviceId="serviceId" :onCancel="onClose" />
                         </v-dialog>
                     </div>
                 </div>
                 <div v-if="actions.length" class="py-10">
                     <div class=" px-10 grid lg:grid-cols-2 xl:grid-cols-3 gap-10">
-                        <ActionCard v-if="service" v-for="action in actions" :tag="action._id" :action="action"
-                            :serviceId="service?._id" />
+                        <ActionCard v-if="serviceId !== undefined" v-for="action in actions" :tag="action._id" :action="action"
+                            :serviceId="serviceId" />
                         <v-dialog v-model="dialog" class="flex flex-col justify-center items-center center">
                             <template v-slot:activator="{ props }">
                                 <div v-bind="props"
@@ -45,7 +45,7 @@
                                     </div>
                                 </div>
                             </template>
-                            <ActionForm v-if="service" :serviceId=service!._id :onCancel="() => (dialog = false)" />
+                            <ActionForm v-if="serviceId !== undefined" :serviceId="serviceId" :onCancel="onClose" />
                         </v-dialog>
                     </div>
 
@@ -58,26 +58,25 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import type ServiceModel from '@/model/service_model';
 import ActionCard from '@/components/ServiceComponents/ActionCard.vue';
 import ActionForm from '@/components/ServiceComponents/ActionForm.vue';
 import radial from '@/assets/images/radial.svg';
 import logo from '@/assets/images/logo_dark.svg';
 import empty from '@/assets/images/empty.svg';
 import manage_action from '@/controllers/manage_action';
-import manage_service from '@/controllers/manage_service';
-
 const dialog = ref(false);
 const isLoading = ref(true);
 
 const route = useRoute();
-let service = ref<ServiceModel | null>(null);
+const serviceId = route.params.id as string;
 let actions = manage_action.getRef();
+
+async function onClose(){
+    dialog.value = false
+}
 
 onMounted(async () => {
     isLoading.value = true;
-    const serviceId = route.params.id as string;
-    service.value = await manage_service.getServiceById(serviceId);
     await manage_action.getAllActions(serviceId);
     isLoading.value = false;
 });

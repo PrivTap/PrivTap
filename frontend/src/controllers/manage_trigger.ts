@@ -1,7 +1,7 @@
 
 import type TriggerModel from "@/model/trigger_model";
-import {ref, type Ref} from "vue";
-import {GenericController} from "./generic_controller";
+import { ref, type Ref } from "vue";
+import { GenericController } from "./generic_controller";
 
 const path: string = "/manage-triggers";
 let triggers = ref<TriggerModel[]>([]);
@@ -14,10 +14,10 @@ export interface IManageTrigger {
     deleteTrigger(triggerId: string): Promise<void>;
 
     updateTrigger(triggerId: string,
-                  name: string,
-                  description: string,
-                  permissions: string[],
-                  resourceServer: string): Promise<void>;
+        name: string,
+        description: string,
+        permissions: string[],
+        resourceServer: string): Promise<void>;
 }
 
 
@@ -27,10 +27,9 @@ class ManageTrigger extends GenericController<TriggerModel[]> implements IManage
     }
 
     async getAllTriggers(serviceId: string): Promise<void> {
-        const res = await super.get<TriggerModel[]>(path, {query: {serviceId}});
+        const res = await super.get<TriggerModel[]>(path, { query: { serviceId } });
         triggers.value = triggers.value = res != null ? res : [];
     }
-
 
     async createTrigger(
         name: string,
@@ -46,7 +45,7 @@ class ManageTrigger extends GenericController<TriggerModel[]> implements IManage
             "permissions": permissions,
             "resourceServer": resourceServer,
         };
-        const res = await super.post<TriggerModel>(path, {body: body, message: "Trigger created"});
+        const res = await super.post<TriggerModel>(path, { body: body, message: "Trigger created" });
         if (res != null)
             triggers.value.push(res);
     }
@@ -66,7 +65,7 @@ class ManageTrigger extends GenericController<TriggerModel[]> implements IManage
             permissions: permissions,
             resourceServer: resourceServer,
         }
-        const updatedTrigger = await super.put<TriggerModel>(path, {body: body, message: "Trigger updated"});
+        const updatedTrigger = await super.put<TriggerModel>(path, { body: body, message: "Trigger updated" });
         if (!!updatedTrigger) {
             triggers.value = triggers.value.map((trigger) => {
                 if (trigger._id === updatedTrigger._id) {
@@ -78,8 +77,8 @@ class ManageTrigger extends GenericController<TriggerModel[]> implements IManage
     }
 
     async deleteTrigger(triggerId: string): Promise<void> {
-        const body = {"triggerId": triggerId}
-        await super.delete(path, {body: body, message: "Trigger deleted"});
+        const body = { "triggerId": triggerId }
+        await super.delete(path, { body: body, message: "Trigger deleted" });
         triggers.value = triggers.value.filter((trigger) => trigger._id !== triggerId);
     }
 

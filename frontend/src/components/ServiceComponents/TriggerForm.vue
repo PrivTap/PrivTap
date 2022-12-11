@@ -11,16 +11,13 @@
                     <v-text-field v-model="form.resourceServer" :rules="form.resourceServerRule" label="ResourceServer"
                     required></v-text-field>
                     <v-label class="mb-2 mt-4">Choose Permissions</v-label>
-
-                    <v-input v-model="choosablePermissions" :readonly="true">
                     <v-row align-content="start" no-gutters class="-translate-x-3 h-14"
                         >
-                        <v-col cols="2" align-self="start" v-for="choosablePerm in choosablePermissions" :key="choosablePerm._id">
-                            <v-checkbox v-model="choosablePerm.authorized" :label="choosablePerm.name" v-bind:value="choosablePerm.authorized"
+                        <v-col cols="2" align-self="start" v-for="choosablePerm in choosablePermissions.perm" :key="choosablePerm._id">
+                            <v-checkbox v-model="choosablePerm.associated" :label="choosablePerm.name"
                                 color="success"></v-checkbox>
                         </v-col>
                     </v-row>
-                </v-input>
                 <v-divider class="my-5"></v-divider>
             </v-form>
         </v-card-text>
@@ -38,6 +35,8 @@ import TriggerModel from '@/model/trigger_model';
 import { isValidUrlRegex } from '@/helpers/validators';
 import manage_permission from '@/controllers/manage_permission';
 import SimplePermissionModel from '@/model/simple_permission_model';
+import manage_trigger from '@/controllers/manage_trigger';
+import type PermissionModel from '@/model/permission_model';
 
 const props = defineProps(
     {
@@ -63,19 +62,21 @@ const props = defineProps(
 );
 
 onMounted(async () => {
-    await manage_permission.getAllPermissions(props.serviceId);
-    choosablePermissions = manage_permission.getRef().value.map(p => new SimplePermissionModel(p._id, p.name, p.description)); 
-    console.log(choosablePermissions);
     if (props.onEdit && props.trigger) {
         const trigger = props.trigger;
         form.name = trigger.name;
         form.description = trigger.description;
         form.resourceServer = trigger.resourceServer ?? '';
-        choosablePermissions = props.trigger.permissions;
+        choosablePermissions.perm = trigger.permissions
+    }else{
+        await manage_permission.getAllPermissions(props.serviceId);
+        choosablePermissions.perm = manage_permission.getRef().value;
     }
 });
 
-let choosablePermissions = reactive<SimplePermissionModel[]>([]);
+const choosablePermissions = reactive<{perm: Partial<PermissionModel>[]}>({
+    perm: []
+})
 
 /// Form part
 const formRef = ref();
@@ -93,21 +94,17 @@ const form = reactive({
 });
 
 async function validate() {
-    // const { valid } = await formRef.value.validate();
-    // console.log(valid);
-    // if (valid) {
-        console.log(choosablePermissions);
-        const perm = choosablePermissions.filter(p => p._id !== undefined && p.authorized === true).map(p => p._id) as string[];
-        // console.log(perm);
-        // if (props.onEdit) {
-        //     await manage_trigger.updateTrigger(props.trigger._id, form.name, form.description, perm, form.resourceServer);
-        //     console.log(perm);
-        //     console.log(form.name);
-        // } else {
-        //     await manage_trigger.createTrigger(form.name, form.description, props.serviceId, perm, form.resourceServer);
-        // }
-        // props.onCancel(); 
-    // }
+    const { valid } = await formRef.value.validate();
+    console.log(valid);
+    if (valid) {
+        const perm = choosablePermissions.perm.filter(p => p._id !== undefined && p.associated === true).map(p => p._id) as string[];
+        if (props.onEdit) {
+            await manage_trigger.updateTrigger(props.trigger._id, form.name, form.description, perm, form.resourceServer);
+        } else {
+            await manage_trigger.createTrigger(form.name, form.description, props.serviceId, perm, form.resourceServer);
+        }
+        props.onCancel(); 
+    }
 }
 
 function resetValidation() {

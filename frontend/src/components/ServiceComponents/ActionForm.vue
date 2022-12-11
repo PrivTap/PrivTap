@@ -6,10 +6,8 @@
     <v-card-text>
       <v-form ref="formRef" v-model="form.valid" lazy-validation>
         <v-text-field v-model="form.name" :rules="form.nameRule" label="Name" required></v-text-field>
-        <v-textarea :rules="form.descriptionRule" v-model="form.description" label="Description"
-                    required></v-textarea>
-        <v-text-field v-model="form.endpoint" :rules="form.endpointRule" label="Endpoint"
-                      required></v-text-field>
+        <v-textarea :rules="form.descriptionRule" v-model="form.description" label="Description" required></v-textarea>
+        <v-text-field v-model="form.endpoint" :rules="form.endpointRule" label="Endpoint" required></v-text-field>
         <v-label class="mb-2 mt-4">Choose Permissions</v-label>
 
         <!-- <v-chip-group v-model="selectedPermissions" column multiple selected-class="text-success">
@@ -22,15 +20,12 @@
                 {{ choosablePerm.name }}
             </v-chip>
         </v-chip-group> -->
-        <v-input :rules="permissionRule" v-model="selectedPermissions" :readonly="true">
-          <v-row align-content="start" no-gutters class="-translate-x-3 h-14"
-          >
-            <v-col cols="2" align-self="start" v-for="choosablePerm in choosablePermissions" :key="choosablePerm._id">
-              <v-checkbox v-model="selectedPermissions" :label="choosablePerm.name" :value="choosablePerm"
-                          color="success"></v-checkbox>
+          <v-row align-content="start" no-gutters class="-translate-x-3 h-14">
+            <v-col cols="2" align-self="start" v-for="choosablePerm in choosablePermissions.perm" :key="choosablePerm._id">
+              <v-checkbox v-model="choosablePerm.associated" :label="choosablePerm.name"
+                color="success"></v-checkbox>
             </v-col>
           </v-row>
-        </v-input>
         <v-divider class="my-5"></v-divider>
       </v-form>
     </v-card-text>
@@ -45,7 +40,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, reactive, ref} from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import ActionModel from '@/model/action_model';
 import { isValidUrlRegex } from '@/helpers/validators';
 import manage_action from '@/controllers/manage_action';
@@ -53,54 +48,45 @@ import manage_permission from '@/controllers/manage_permission';
 import type PermissionModel from '@/model/permission_model';
 
 const props = defineProps(
-    {
-      serviceId: {
-        type: String,
-        required: true
-      },
-      onCancel: {
-        type: Function,
-        required: true
-      },
-      onEdit: {
-        type: Boolean,
-        required: false,
-        default: false
-      },
-      action: {
-        type: ActionModel,
-        required: false,
-        default: null
-      }
+  {
+    serviceId: {
+      type: String,
+      required: true
+    },
+    onCancel: {
+      type: Function,
+      required: true
+    },
+    onEdit: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    action: {
+      type: ActionModel,
+      required: false,
+      default: null
     }
+  }
 );
 
-let choosablePermissions = manage_permission.getRef();
-let selectedPermissions = ref<PermissionModel[]>([]);
+const choosablePermissions = reactive<{ perm: Partial<PermissionModel>[] }>({
+  perm: []
+})
 
 onMounted(async () => {
-  await manage_permission.getAllPermissions(props.serviceId);
+
   if (props.onEdit && props.action) {
     const action = props.action;
     form.name = action.name;
     form.description = action.description;
     form.endpoint = action.endpoint ?? '';
-    _getSelectedPermissions(action);
+    choosablePermissions.perm = action.permissions;
+  } else {
+    await manage_permission.getAllPermissions(props.serviceId);
+    choosablePermissions.perm = manage_permission.getRef().value;
   }
 });
-
-function _getSelectedPermissions(action: ActionModel) {
-  for (const permId of action.permissions) {
-    const permIndex = choosablePermissions.value.findIndex(p => p._id === permId);
-    if (permIndex >= -1) {
-      selectedPermissions.value.push(choosablePermissions.value[permIndex]);
-    }
-  }
-}
-
-const permissionRule = ref([
-  (v: string[]) => (v.length !== 0) || 'Permission is required',
-]);
 
 /// Form part
 const formRef = ref();
@@ -118,15 +104,16 @@ const form = reactive({
 });
 
 async function validate() {
-  const {valid} = await formRef.value.validate();
+  const { valid } = await formRef.value.validate();
   console.log(valid);
   if (valid) {
-    const permissionIds = selectedPermissions.value.map(p => p._id);
+    const perm = choosablePermissions.perm.filter(p => p._id !== undefined && p.associated === true).map(p => p._id) as string[];
     if (props.onEdit) {
-      await manage_action.updateAction(props.action._id, form.name, form.description, permissionIds, form.endpoint);
+      await manage_action.updateAction(props.action._id, form.name, form.description, perm, form.endpoint);
     } else {
-      await manage_action.createAction(form.name, form.description, props.serviceId, permissionIds, form.endpoint);
+      await manage_action.createAction(form.name, form.description, props.serviceId, perm, form.endpoint);
     }
+    await manage_action.getAllActions(props.serviceId);
     props.onCancel();
   }
 }

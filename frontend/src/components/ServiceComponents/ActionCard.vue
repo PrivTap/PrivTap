@@ -6,7 +6,8 @@
         <p class="text-lg font-medium text-white/60"> {{ action.endpoint }} </p>
         <v-label class="pt-4 pb-2">Selected Permissions </v-label>
         <div>
-            <v-chip v-for="permission in action.permissions" :key="permission._id" class="mr-2" color="success"
+            <div v-if="!action.permissions.some(p => p.associated)"> No permission required </div>
+            <v-chip v-for="permission in action.permissions.filter(p => p.associated)" :key="permission._id" class="mr-2" color="success"
                 variant="outlined" appendIcon="mdi-check-circle-outline">
                 {{ permission.name }}
             </v-chip>

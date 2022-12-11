@@ -25,6 +25,6 @@ export default class PermissionModel {
     }
 
     toSimplePermissionModel(): SimplePermissionModel {
-        return new SimplePermissionModel(this._id, this.name, this.associated, this.description);
+        return new SimplePermissionModel(this._id, this.name, this.description);
     }
 }
