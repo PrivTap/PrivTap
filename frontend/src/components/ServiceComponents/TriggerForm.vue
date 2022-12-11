@@ -66,7 +66,7 @@ onMounted(async () => {
         form.name = trigger.name;
         form.description = trigger.description;
         form.resourceServer = trigger.resourceServer ?? '';
-        choosablePermissions.perm = trigger.permissions
+        choosablePermissions.perm = JSON.parse(JSON.stringify(trigger.permissions));
     }else{
         await manage_permission.getAllPermissions(props.serviceId);
         choosablePermissions.perm = manage_permission.getRef().value;
@@ -93,7 +93,6 @@ const form = reactive({
 });
 
 async function onClose() {
-    await manage_trigger.getAllTriggers(props.serviceId);
     props.onCancel();
 }
 

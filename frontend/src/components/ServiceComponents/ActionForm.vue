@@ -80,7 +80,7 @@ onMounted(async () => {
     form.name = action.name;
     form.description = action.description;
     form.endpoint = action.endpoint ?? '';
-    choosablePermissions.perm = action.permissions;
+    choosablePermissions.perm = JSON.parse(JSON.stringify(action.permissions));
   } else {
     await manage_permission.getAllPermissions(props.serviceId);
     choosablePermissions.perm = manage_permission.getRef().value;
@@ -103,7 +103,6 @@ const form = reactive({
 });
 
 async function onClose() {
-    await manage_action.getAllActions(props.serviceId);
     props.onCancel();
 }
 

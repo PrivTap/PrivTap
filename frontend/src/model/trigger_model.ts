@@ -23,9 +23,3 @@ export default class TriggerModel {
     }
 
 }
-
-export function clone(triggerModel: TriggerModel): TriggerModel {
-    let permClone = [] as Partial<PermissionModel>[];
-    triggerModel.permissions.forEach((perm) => permClone.push(perm));
-    return new TriggerModel(triggerModel._id, triggerModel.name, triggerModel.description, permClone, triggerModel.resourceServer);
-}

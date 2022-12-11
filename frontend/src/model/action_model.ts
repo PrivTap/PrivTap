@@ -22,9 +22,3 @@ export default class ActionModel {
         this.endpoint = endpoint;
     }
 }
-
-export function clone(acitonModel: ActionModel): ActionModel {
-    let permClone = [] as Partial<PermissionModel>[];
-    acitonModel.permissions.forEach((perm) => permClone.push(perm));
-    return new ActionModel(acitonModel._id, acitonModel.name, acitonModel.description, permClone, acitonModel.endpoint);
-}

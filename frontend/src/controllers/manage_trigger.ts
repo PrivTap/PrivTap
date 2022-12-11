@@ -66,7 +66,7 @@ class ManageTrigger extends GenericController<TriggerModel[]> implements IManage
             resourceServer: resourceServer,
         }
         const updatedTrigger = await super.put<TriggerModel>(path, { body: body, message: "Trigger updated" });
-        console.log(updatedTrigger, "AO CHICCO")
+        console.log(updatedTrigger, "AO HIC");
         if (!!updatedTrigger) {
             triggers.value = triggers.value.map((trigger) => {
                 if (trigger._id === updatedTrigger._id) {

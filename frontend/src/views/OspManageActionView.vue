@@ -31,7 +31,7 @@
                 </div>
                 <div v-if="actions.length" class="py-10">
                     <div class=" px-10 grid lg:grid-cols-2 xl:grid-cols-3 gap-10">
-                        <ActionCard v-if="serviceId !== undefined" v-for="action in actions" :tag="action._id" :action="clone(action)"
+                        <ActionCard v-if="serviceId !== undefined" v-for="action in actions" :tag="action._id" :action="action"
                             :serviceId="serviceId" />
                         <v-dialog v-model="dialog" class="flex flex-col justify-center items-center center">
                             <template v-slot:activator="{ props }">
@@ -64,7 +64,6 @@ import radial from '@/assets/images/radial.svg';
 import logo from '@/assets/images/logo_dark.svg';
 import empty from '@/assets/images/empty.svg';
 import manage_action from '@/controllers/manage_action';
-import { clone } from '@/model/action_model';
 const dialog = ref(false);
 const isLoading = ref(true);
 

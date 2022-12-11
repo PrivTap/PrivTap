@@ -10,7 +10,7 @@
             required></v-text-field>
           <v-textarea variant="outlined" no-resize v-model="form.description" :rules="form.descriptionRule"
             label="Description" required></v-textarea>
-          <v-text-field variant="outlined" v-model="form.baseUrl" label="Base Url"
+          <v-text-field variant="outlined" :rules="form.baseUrlRule" v-model="form.baseUrl" label="Base Url"
             hint="www.example.com" ></v-text-field>
           <v-text-field variant="outlined" v-model="form.authPath" label="Auth Path"
                         hint="/auth" ></v-text-field>
@@ -70,7 +70,7 @@ const form = reactive({
   descriptionRule: [(v: string) => !!v || 'Description is required'],
   baseUrl: "",
   baseUrlRule: [
-    (v: string) => !!v || 'Endpoint is required',
+    (v: string) => !!v || 'Base url is required',
     (v: string) => isValidUrlRegex(v) || 'Url is not valid'
   ],
   authPath: "",

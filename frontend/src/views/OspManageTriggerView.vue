@@ -32,7 +32,7 @@
                 <div v-if="triggers.length" class="py-10">
                     <div class=" px-10 grid lg:grid-cols-2 xl:grid-cols-3 gap-10">
                         <TriggerCard v-for="trigger in triggers" :tag="trigger._id"
-                            :trigger="clone(trigger)" :serviceId="(route.params.id as string)" />
+                            :trigger="trigger" :serviceId="(route.params.id as string)" />
                         <v-dialog v-model="dialog" class="flex flex-col justify-center items-center center">
                             <template v-slot:activator="{ props }">
                                 <div v-bind="props"
@@ -64,7 +64,6 @@ import radial from '@/assets/images/radial.svg';
 import logo from '@/assets/images/logo_dark.svg';
 import empty from '@/assets/images/empty.svg';
 import manage_trigger from '@/controllers/manage_trigger';
-import { clone } from '@/model/trigger_model';
 
 const dialog = ref(false);
 const isLoading = ref(true);
