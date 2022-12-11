@@ -79,7 +79,7 @@ let choosablePermissions = manage_permission.getRef();
 let selectedPermissions = ref<PermissionModel[]>([]);
 
 onMounted(async () => {
-  await manage_permission.getPermissions(props.serviceId);
+  await manage_permission.getAllPermissions(props.serviceId);
   if (props.onEdit && props.action) {
     const action = props.action;
     form.name = action.name;

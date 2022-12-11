@@ -65,7 +65,7 @@ import radial from '@/assets/images/radial.svg';
 import logo from '@/assets/images/logo_dark.svg';
 import empty from '@/assets/images/empty.svg';
 import manage_action from '@/controllers/manage_action';
-import { manage_service } from '@/controllers/manage_service';
+import manage_service from '@/controllers/manage_service';
 
 const dialog = ref(false);
 const isLoading = ref(true);

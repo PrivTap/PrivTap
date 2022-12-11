@@ -12,11 +12,11 @@
                     required></v-text-field>
                     <v-label class="mb-2 mt-4">Choose Permissions</v-label>
 
-                    <v-input :rules="permissionRule" v-model="selectedPermissions" :readonly="true">
+                    <v-input v-model="choosablePermissions" :readonly="true">
                     <v-row align-content="start" no-gutters class="-translate-x-3 h-14"
                         >
                         <v-col cols="2" align-self="start" v-for="choosablePerm in choosablePermissions" :key="choosablePerm._id">
-                            <v-checkbox v-model="selectedPermissions" :label="choosablePerm.name" :value="choosablePerm"
+                            <v-checkbox v-model="choosablePerm.authorized" :label="choosablePerm.name" v-bind:value="choosablePerm.authorized"
                                 color="success"></v-checkbox>
                         </v-col>
                     </v-row>
@@ -32,20 +32,12 @@
         </v-row>
     </v-card>
 </template>
-  
-
-
-
 <script lang="ts" setup>
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, watch } from 'vue'
 import TriggerModel from '@/model/trigger_model';
 import { isValidUrlRegex } from '@/helpers/validators';
-import type PermissionModel from '@/model/permission_model';
-import ManagePermission from '@/controllers/manage_permission';
 import manage_permission from '@/controllers/manage_permission';
-import manage_trigger from '@/controllers/manage_trigger';
-// import { trigger } from '@vue/reactivity';
-
+import SimplePermissionModel from '@/model/simple_permission_model';
 
 const props = defineProps(
     {
@@ -71,32 +63,19 @@ const props = defineProps(
 );
 
 onMounted(async () => {
-    await manage_permission.getPermissions(props.serviceId);
-    choosablePermissions.value = manage_permission.getRef().value; 
+    await manage_permission.getAllPermissions(props.serviceId);
+    choosablePermissions = manage_permission.getRef().value.map(p => new SimplePermissionModel(p._id, p.name, p.description)); 
+    console.log(choosablePermissions);
     if (props.onEdit && props.trigger) {
         const trigger = props.trigger;
         form.name = trigger.name;
         form.description = trigger.description;
         form.resourceServer = trigger.resourceServer ?? '';
-        _getSelectedPermissions(trigger);
+        choosablePermissions = props.trigger.permissions;
     }
 });
 
-let choosablePermissions = ref<PermissionModel[]>([]);
-const selectedPermissions = ref<PermissionModel[]>([]);
-
-function _getSelectedPermissions(trigger: TriggerModel) {
-    for (const permId of trigger.permissions) {
-        const permIndex = choosablePermissions.value.findIndex(p => p._id === permId);
-        if (permIndex >= -1) {
-            selectedPermissions.value.push(choosablePermissions.value[permIndex]);
-        }
-    }
-}
-
-const permissionRule = ref([
-    (v: string[]) => (v.length !== 0) || 'Permission is required',
-]);
+let choosablePermissions = reactive<SimplePermissionModel[]>([]);
 
 /// Form part
 const formRef = ref();
@@ -114,19 +93,21 @@ const form = reactive({
 });
 
 async function validate() {
-    const { valid } = await formRef.value.validate();
-    console.log(valid);
-    if (valid) {
-        const permissionIds = selectedPermissions.value.map(p => p._id);
-        if (props.onEdit) {
-            await manage_trigger.updateTrigger(props.trigger._id, form.name, form.description, permissionIds, form.resourceServer);
-            console.log(permissionIds);
-            console.log(form.name);
-        } else {
-            await manage_trigger.createTrigger(form.name, form.description, props.serviceId, permissionIds, form.resourceServer);
-        }
-        props.onCancel(); 
-    }
+    // const { valid } = await formRef.value.validate();
+    // console.log(valid);
+    // if (valid) {
+        console.log(choosablePermissions);
+        const perm = choosablePermissions.filter(p => p._id !== undefined && p.authorized === true).map(p => p._id) as string[];
+        // console.log(perm);
+        // if (props.onEdit) {
+        //     await manage_trigger.updateTrigger(props.trigger._id, form.name, form.description, perm, form.resourceServer);
+        //     console.log(perm);
+        //     console.log(form.name);
+        // } else {
+        //     await manage_trigger.createTrigger(form.name, form.description, props.serviceId, perm, form.resourceServer);
+        // }
+        // props.onCancel(); 
+    // }
 }
 
 function resetValidation() {

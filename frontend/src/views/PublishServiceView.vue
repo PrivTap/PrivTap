@@ -32,10 +32,10 @@
 import { onMounted, reactive, ref, watch } from "vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
 import { useRoute } from "vue-router";
-import { manage_service } from "@/controllers/manage_service";
 import router from "@/router/router";
 import RoutingPath from "@/router/routing_path";
 import { isValidUrlRegex } from "@/helpers/validators";
+import manage_service from "@/controllers/manage_service";
 
 const route = useRoute();
 const isValidUrl = ref<boolean>(true);
@@ -48,9 +48,9 @@ async function checkEdit() {
     if (serviceToEdit) {
       form.name = serviceToEdit.name;
       form.description = serviceToEdit.description;
-      form.endpoint = serviceToEdit.authServer;
-      form.clientId = serviceToEdit.clientId;
-      form.secret = serviceToEdit.clientSecret;
+      form.endpoint = serviceToEdit.authServer ?? '';
+      form.clientId = serviceToEdit.clientId ?? '';
+      form.secret = serviceToEdit.clientSecret ?? '';
     }
   }
 }

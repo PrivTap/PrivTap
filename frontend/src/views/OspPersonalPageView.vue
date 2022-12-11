@@ -42,7 +42,7 @@ import PrimaryButton from "@/components/PrimaryButton.vue";
 import empty from '@/assets/images/empty.svg';
 import radial from '@/assets/images/radial.svg';
 import logo from '@/assets/images/logo_dark.svg';
-import { manage_service } from "@/controllers/manage_service";
+import manage_service from "@/controllers/manage_service";
 
 const router = useRouter();
 const isLoading = ref(true);

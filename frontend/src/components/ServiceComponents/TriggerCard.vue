@@ -5,7 +5,7 @@
         <p class="text-lg font-medium text-white/60"> {{ trigger.description }} </p>
         <v-label class="pt-4 pb-2">Selected Permissions </v-label>
         <div>
-            <v-chip v-for="permission in selectedPermission" :key="permission._id" class="mr-2" color="success"
+            <v-chip v-for="permission in trigger.permissions" :key="permission._id" class="mr-2" color="success"
                 variant="outlined" appendIcon="mdi-check-circle-outline">
                 {{ permission.name }}
             </v-chip>
@@ -37,29 +37,15 @@
 import { defineProps, onMounted, ref } from 'vue';
 import ModalComponent from '@/components/ModalComponent.vue';
 import type TriggerModel from '@/model/trigger_model';
-import type PermissionModel from '@/model/permission_model';
 import TriggerForm from './TriggerForm.vue';
-import manage_permission from '@/controllers/manage_permission';
 import manage_trigger from '@/controllers/manage_trigger';
 const props = defineProps<{
     trigger: TriggerModel;
     serviceId: string;
 }>();
 
-const selectedPermission = ref<PermissionModel[]>([]);
-
-onMounted(async () => {
-    _fetchPermissions();
-});
-
 function onFormClose() {
-    selectedPermission.value = [];
-    _fetchPermissions();
     formDialog.value = false;
-}
-
-async function _fetchPermissions() {
-    selectedPermission.value = await manage_permission.getSelectedPermission(props.serviceId, props.trigger.permissions);
 }
 
 const showDialog = ref(false);

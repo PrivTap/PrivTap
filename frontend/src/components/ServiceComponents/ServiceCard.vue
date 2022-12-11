@@ -78,7 +78,7 @@ import { EyeSlashIcon, EyeIcon } from "@heroicons/vue/24/solid";
 import ModalComponent from "@/components/ModalComponent.vue";
 import router from "@/router/router";
 import RoutingPath from "@/router/routing_path";
-import { manage_service } from "@/controllers/manage_service";
+import manage_service from "@/controllers/manage_service";
 const props = defineProps<{
   service: ServiceModel;
 }>();

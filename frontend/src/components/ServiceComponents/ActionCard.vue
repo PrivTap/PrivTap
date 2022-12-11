@@ -6,7 +6,7 @@
         <p class="text-lg font-medium text-white/60"> {{ action.endpoint }} </p>
         <v-label class="pt-4 pb-2">Selected Permissions </v-label>
         <div>
-            <v-chip v-for="permission in permissions" :key="permission._id" class="mr-2" color="success"
+            <v-chip v-for="permission in action.permissions" :key="permission._id" class="mr-2" color="success"
                 variant="outlined" appendIcon="mdi-check-circle-outline">
                 {{ permission.name }}
             </v-chip>
@@ -35,32 +35,18 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, onMounted, ref } from 'vue';
+import { defineProps, ref } from 'vue';
 import ModalComponent from '@/components/ModalComponent.vue';
 import type ActionModel from '@/model/action_model';
-import managePermission from '@/controllers/manage_permission';
 import ActionForm from './ActionForm.vue';
 import manage_action from '@/controllers/manage_action';
-import type PermissionModel from '@/model/permission_model';
 const props = defineProps<{
     action: ActionModel;
     serviceId: string;
 }>();
 
-let permissions = ref<PermissionModel[]>([]);
-
-onMounted(async () => {
-    await _fetchPermissions();
-});
-
 function onFormClose() {
-    permissions.value = [];
-    _fetchPermissions();
     formDialog.value = false;
-}
-
-async function _fetchPermissions() {
-    permissions.value = await managePermission.getSelectedPermission(props.serviceId, props.action.permissions)
 }
 
 const showDialog = ref(false);

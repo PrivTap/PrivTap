@@ -66,7 +66,7 @@ import radial from '@/assets/images/radial.svg';
 import logo from '@/assets/images/logo_dark.svg';
 import empty from '@/assets/images/empty.svg';
 import manage_permission from '@/controllers/manage_permission';
-import { manage_service } from '@/controllers/manage_service';
+import manage_service from '@/controllers/manage_service';
 
 const dialog = ref(false);
 
@@ -80,7 +80,7 @@ onMounted(async () => {
     isLoading.value = true;
     const serviceId = route.params.id as string;
     service.value = await manage_service.getServiceById(serviceId);
-    await manage_permission.getPermissions(serviceId);
+    await manage_permission.getAllPermissions(serviceId);
     isLoading.value = false;
 });
 
