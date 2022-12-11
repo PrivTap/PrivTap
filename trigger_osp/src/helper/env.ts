@@ -30,6 +30,10 @@ interface EnvVariables {
     CLIENT_SECRET:string,
     // Rounds of salting that will be applied to password hashes before storing them in the database
     SALT_ROUNDS: number
+    // Secret key used to sign the JWT tokens
+    JWT_SECRET: string,
+    // Expiration time (in seconds) of the JWT tokens
+    JWT_EXPIRE: number,
 }
 
 // Default values for some of the env variables
@@ -38,7 +42,9 @@ const defaults = {
     BASE_URL: "/",
     DEPLOYMENT_URL: "https://osp_dummy.it",
     LOG_LEVEL: "info",
-    SALT_ROUNDS: 8
+    SALT_ROUNDS: 8,
+    JWT_SECRET: "this_is_an_insecure_secret",
+    JWT_EXPIRE: 86400,
 };
 
 /**

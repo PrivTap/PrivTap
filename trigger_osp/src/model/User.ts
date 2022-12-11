@@ -1,4 +1,5 @@
-import {model as mongooseModel, Schema} from "mongoose";
+import {Error, model as mongooseModel, Schema} from "mongoose";
+import logger from "../helper/logger";
 
 export interface IUser {
     _id: string;
@@ -17,8 +18,35 @@ const userSchema = new Schema({
     }
 });
 
+userSchema.index({ username: 1, email: 1 }, { unique: true });
+
 class User {
     model = mongooseModel<IUser>("user", userSchema);
+
+    async insert(document: IUser, returnObject = false): Promise<boolean | IUser>{
+        const model = new this.model(document);
+        const user = await this.model.findOne(document);
+        if (user != null){
+            // User already existing
+            console.log("existing...");
+            if (returnObject){
+                document._id = model._id;
+                return document;
+            }
+            return true;
+        }
+        try {
+            await model.save();
+            if (returnObject){
+                document._id = model._id;
+                return document;
+            }
+            return true;
+        } catch (e) {
+            logger.error("Error inserting user", e);
+        }
+        return false;
+    }
 }
 
 export default new User();

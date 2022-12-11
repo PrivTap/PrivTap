@@ -1,4 +1,5 @@
 import { Request, Response, Router } from "express";
+import Authentication from "./helper/authentication";
 
 /**
  * Superclass for all routes that takes care of all the boilerplate for HTTP methods registration and
@@ -7,12 +8,21 @@ import { Request, Response, Router } from "express";
 export default class Route {
     // Name of the endpoint for this API route, this will be used for registering the route to the Express application
     readonly endpointName: string;
+    // Flag that indicates if this API route requires user authentication
+    readonly requiresAuth: boolean;
     // Router responsible for this API route
     readonly router: Router;
 
-    constructor(endpointName="") {
+
+    constructor(endpointName="", requiresAuth = true) {
         this.endpointName = endpointName;
+        this.requiresAuth = requiresAuth;
         this.router = Router();
+
+        if (requiresAuth){
+            console.log(endpointName);
+            this.router.use(Authentication.checkAuthentication);
+        }
 
         // If the subclass implements http methods handlers, register them to the Router
         if (this.httpGet)

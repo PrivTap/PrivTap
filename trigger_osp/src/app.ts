@@ -5,7 +5,15 @@ import {getFilesInDir} from "./helper/misc";
 import { join } from "path";
 import logger from "./helper/logger";
 import env from "./helper/env";
-import mongoose, { connect, ConnectOptions } from "mongoose";
+import { connect, ConnectOptions } from "mongoose";
+
+declare global {
+    namespace Express {
+        interface Request {
+            userId: string;
+        }
+    }
+}
 
 
 /**

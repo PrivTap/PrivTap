@@ -34,6 +34,13 @@ class State {
     async findByStateValue(stateValue: string): Promise<IState | null> {
         return this.model.findOne({stateValue});
     }
+
+    async deleteByStateValue(stateValue: string): Promise<boolean> {
+        const deleteStatus = await this.model.deleteOne({ stateValue }) as {deletedCount: number, acknowledged: boolean};
+        return deleteStatus.deletedCount == 1;
+
+    }
+
 }
 
 export default new State();
