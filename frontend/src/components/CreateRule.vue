@@ -20,15 +20,33 @@
       </v-col>
   </v-row>
  
+  <v-row>
+          <v-col>
+              <v-select
+              v-model="form.select"
+              :items="form.triggers"
+              :rules="[v => !!v  , 'Trigger is required']"
+              label="Trigger"
+              required
+             ></v-select>
+          </v-col>
+    </v-row>
 
-    <!--to-->
 
+    <v-row>
+        <v-col>
+          <v-select
+           v-model="form.select"
+           :items="form.actions"
+           :rules="[v => !!v , 'Action is required']"
+            label="Action"
+           required
+          ></v-select>
+        </v-col>
+    </v-row>
+<v-btn  @click="validate"> Submit </v-btn>
 
-
-
-          
-
-    <!--e-->
+  <v-btn color="red" variant="outlined"    @click="resetValidation"> Reset </v-btn>
     
   </v-container>
 
