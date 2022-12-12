@@ -2,6 +2,7 @@ import Route from "../../Route";
 import { Request, Response } from "express";
 import { internalServerError, success } from "../../helper/http";
 import Authorization, { ServiceActions } from "../../model/Authorization";
+import RuleExecution from "../../helper/rule_execution";
 
 export default class ActionsRoute extends Route {
     constructor() {
@@ -14,12 +15,23 @@ export default class ActionsRoute extends Route {
 
         let data: ServiceActions[]  = [];
 
-        // TODO: query only compatible actions
-        // const triggerId = request.query.triggerId;
-        const authorizedServices = await Authorization.findAllServicesAuthorizedByUserWithActions(request.userId);
+        //query only compatible actions
+        const triggerId = request.query.triggerId as string;
+        let authorizedServices = await Authorization.findAllServicesAuthorizedByUserWithActions(request.userId);
         if (!authorizedServices) {
             internalServerError(response);
             return;
+        }
+
+        //TODO: Can we check compatibility on the DB?
+        if (triggerId) {
+            authorizedServices = authorizedServices.map((service) => {
+                return {
+                    serviceId: service.serviceId,
+                    serviceName: service.serviceName,
+                    actions: service.actions.filter((action) => RuleExecution.areActionTriggerCompatible(action._id ?? "", triggerId))
+                };
+            }).filter((service) => service.actions.length > 0);
         }
 
         data = authorizedServices;
