@@ -20,7 +20,6 @@ export default class Route {
         this.router = Router();
 
         if (requiresAuth){
-            console.log(endpointName);
             this.router.use(Authentication.checkAuthentication);
         }
 

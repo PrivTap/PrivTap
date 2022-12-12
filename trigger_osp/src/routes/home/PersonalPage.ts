@@ -13,9 +13,13 @@ export default class PersonalPageRoute extends Route {
         let user = await User.findById(userId);
         // Dummy because the name is too long
         const dummy_user = {username: "Lorenzo"};
-        const posts = await Post.findAllByUserId(userId)
+        let posts = await Post.findAllByUserId(userId)
+        posts.forEach(post => {
+            post.content = post.content.replace(/(?:\r\n|\r|\n)/g, '<br>');
+        });
         response.render("personal_page", {user: dummy_user, posts: posts});
     }
+
     protected async httpPost(request: Request, response: Response): Promise<void> {
         const content = request.body.content;
         const userId = request.userId;
@@ -26,6 +30,22 @@ export default class PersonalPageRoute extends Route {
             response.status(500).send();
             return;
         }
+        response.status(200).send();
+    }
+
+    protected async httpDelete(request: Request, response: Response): Promise<void> {
+        const postId = request.body.postId;
+        const userId = request.userId;
+
+        if (!await Post.isCreator(userId, postId)){
+            response.status(401).send();
+            return;
+        }
+        if (!await Post.delete(postId)){
+            response.status(500).send();
+            return;
+        }
+
         response.status(200).send();
     }
 }

@@ -11,8 +11,9 @@
         <p>You can start sharing</p>
         <p>your adventures here.</p>
         <p>Try it now!</p>
+
     </div>
-    <div class="text_position">
+    <div class="textarea_position">
         <label>
             <form action="http://127.0.0.1:8001/personal-page" method="post" id="textForm">
                 <textarea id="text_area" placeholder="Start sharing your thoughts!" cols="50" rows="20"></textarea>
@@ -24,24 +25,28 @@
 
 <div class="split right">
     <div class="right_position">
-        <% if (posts == null) { %>
+        <% if (posts.length === 0) { %>
             <p>It looks that you didn't</p>
             <p>add anything yet...</p>
         <% } else { %>
                 <ul>
                     <% for(var i=0; i<posts.length; i++) {%>
-                        <li><%= posts[i].content %></li>
+                    <div class="rectangle" style="margin: 10px">
+                        <img id="<%= posts[i]._id %>" onclick="deletePost(this)" class="icon" style="max-width: 30px" src="public/bin.png">
+                        <p style="line-height: 1; text-align: left"><%- posts[i].content%></p>
+                    </div>
+                        <br>
                     <% } %>
                 </ul>
         <% } %>
 
     </div>
 </div>
+</body>
 
 <script>
     function submitText() {
         const content = document.getElementById("text_area").value;
-        console.log(content)
         let xhr = new XMLHttpRequest();
         xhr.open("POST", "http://127.0.0.1:8001/personal-page");
         xhr.setRequestHeader("Accept", "application/json");
@@ -49,8 +54,9 @@
 
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4) {
-                console.log(xhr.status);
-                console.log(xhr.responseText);
+                if (xhr.status === 200){
+                    document.location.reload();
+                }
             }};
 
         console.log(JSON.stringify(content));
@@ -58,13 +64,45 @@
         let data = `{ "content":` + JSON.stringify(content) + `}`;
 
         xhr.send(data);
-        document.location.reload()
+
+    }
+    function deletePost(caller){
+        const postId = caller.id;
+        let xhr = new XMLHttpRequest();
+        xhr.open("DELETE", "http://127.0.0.1:8001/personal-page");
+        xhr.setRequestHeader("Accept", "application/json");
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200){
+                    document.location.reload();
+                }
+            }};
+        let data = `{ "postId":` + JSON.stringify(postId) + `}`;
+        xhr.send(data);
     }
 </script>
 
-</body>
 <style>
-    /* Split the screen in half */
+    .rectangle {
+        padding: 10px;
+        color: #000000;
+        background-color: rgb(255, 255, 255);
+        border-radius:7px;
+        text-align:center;
+        vertical-align:middle;
+        justify-content:center;
+        align-items: center;
+        box-shadow: 0 10px 20px 10px rgba(0, 0, 0, 0.2);
+    }
+    .icon {
+        position: relative;
+        left: 40%;
+        max-width: 100%;
+        height: auto;
+        width: auto\9;
+    }
     .split {
         height: 100%;
         width: 50%;
@@ -99,13 +137,14 @@
         text-align: center;
     }
 
-    .text_position {
+    .textarea_position {
         position: relative;
         top: 35%;
         left: 7%;
     }
 
     html {
+        overflow: hidden;
         background: url("public/personal_page_side.jpg") no-repeat center center fixed;
         -webkit-background-size: cover;
         -moz-background-size: cover;
@@ -167,6 +206,9 @@
     div{
         display:inline-block;
         position:relative;
+    }
+    div:not(:first-child):not(:last-child) {
+        margin:10px;
     }
 </style>
 </html>

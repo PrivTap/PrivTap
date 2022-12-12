@@ -34,6 +34,16 @@ class Post {
     async findAllByUserId(userId: string): Promise<IPost[]>{
         return this.model.find({ userId });
     }
+
+    async isCreator(userId: string, postId: string): Promise<boolean>{
+        const posts = await this.model.find({ userId });
+        return posts.some(post => post._id == postId);
+    }
+
+    async delete(postId: string): Promise<boolean>{
+        const deleteStatus = await this.model.deleteOne({ "_id" : postId }) as {deletedCount: number, acknowledged: boolean};
+        return deleteStatus.deletedCount == 1;
+    }
 }
 
 export default new Post();
