@@ -1,4 +1,4 @@
-import {Error, model as mongooseModel, Schema} from "mongoose";
+import {model as mongooseModel, Schema} from "mongoose";
 import logger from "../helper/logger";
 
 export interface IUser {
@@ -46,6 +46,10 @@ class User {
             logger.error("Error inserting user", e);
         }
         return false;
+    }
+
+    async findById(userId: string): Promise<IUser | null>{
+        return this.model.findById(userId);
     }
 }
 

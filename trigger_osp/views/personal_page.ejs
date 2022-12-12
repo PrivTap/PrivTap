@@ -7,7 +7,7 @@
 <body>
 <div class="split left">
     <div class="left_position", style="color: white">
-        <p>Hey <%=user.name%>!<p>
+        <p>Hey <%=user.username%>!<p>
         <p>You can start sharing</p>
         <p>your adventures here.</p>
         <p>Try it now!</p>
@@ -24,8 +24,17 @@
 
 <div class="split right">
     <div class="right_position">
-        <p>It looks that you didn't</p>
-        <p>add anything yet...</p>
+        <% if (posts == null) { %>
+            <p>It looks that you didn't</p>
+            <p>add anything yet...</p>
+        <% } else { %>
+                <ul>
+                    <% for(var i=0; i<posts.length; i++) {%>
+                        <li><%= posts[i].content %></li>
+                    <% } %>
+                </ul>
+        <% } %>
+
     </div>
 </div>
 
@@ -49,6 +58,7 @@
         let data = `{ "content":` + JSON.stringify(content) + `}`;
 
         xhr.send(data);
+        document.location.reload()
     }
 </script>
 
