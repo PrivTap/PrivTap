@@ -1,9 +1,9 @@
-import Service, {IService} from "../../model/Service";
-import {Request, Response} from "express";
+import Service, { IService } from "../../model/Service";
+import { Request, Response } from "express";
 import Route from "../../Route";
-import {badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success} from "../../helper/http";
-import {checkURL, handleInsert, handleUpdate} from "../../helper/misc";
-import {randomBytes} from "crypto";
+import { badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
+import { checkURL, handleInsert, handleUpdate } from "../../helper/misc";
+import { randomBytes } from "crypto";
 
 
 export default class ManageServices extends Route {
@@ -114,7 +114,7 @@ export default class ManageServices extends Route {
             return;
         }
 
-        if (!await handleUpdate(response, Service, {_id: serviceId},
+        if (!await handleUpdate(response, Service, { _id: serviceId },
             {
                 name,
                 description,

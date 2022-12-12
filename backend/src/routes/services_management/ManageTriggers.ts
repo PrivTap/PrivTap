@@ -1,10 +1,10 @@
 import Route from "../../Route";
-import {Request, Response} from "express";
-import {badRequest, checkUndefinedParams, forbiddenUserError, success} from "../../helper/http";
-import Trigger, {ITrigger, TriggerOsp} from "../../model/Trigger";
+import { Request, Response } from "express";
+import { badRequest, checkUndefinedParams, forbiddenUserError, success } from "../../helper/http";
+import Trigger, { ITrigger, TriggerOsp } from "../../model/Trigger";
 import Permissions from "../../model/Permission";
 import Service from "../../model/Service";
-import {handleInsert, handleUpdate} from "../../helper/misc";
+import { handleInsert, handleUpdate } from "../../helper/misc";
 
 
 export default class ManageTriggersRoute extends Route {
@@ -57,8 +57,8 @@ export default class ManageTriggersRoute extends Route {
             _id: insertedTrigger._id,
             resourceServer: insertedTrigger.resourceServer,
             description: insertedTrigger.description,
-            permissions: !!associatedPermissions ? associatedPermissions : []
-        }
+            permissions: associatedPermissions ? associatedPermissions : []
+        };
 
         success(response, triggerResult);
     }
@@ -95,7 +95,7 @@ export default class ManageTriggersRoute extends Route {
             return;
         }
 
-        const modifiedTrigger = await handleUpdate(response, Trigger, {"_id": triggerId}, {
+        const modifiedTrigger = await handleUpdate(response, Trigger, { "_id": triggerId }, {
             name,
             description,
             permissions,
@@ -108,8 +108,8 @@ export default class ManageTriggersRoute extends Route {
             _id: modifiedTrigger._id,
             resourceServer: modifiedTrigger.resourceServer,
             description: modifiedTrigger.description,
-            permissions: !!associatedPermissions ? associatedPermissions : []
-        }
+            permissions: associatedPermissions ? associatedPermissions : []
+        };
 
         success(response, triggerResult);
     }

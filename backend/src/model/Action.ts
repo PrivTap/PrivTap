@@ -1,8 +1,8 @@
-import {Schema, Types} from "mongoose";
+import { Schema, Types } from "mongoose";
 import Service from "./Service";
 import Model from "../Model";
-import {OperationDataType} from "../helper/rule_execution";
-import Permission, {IPermission} from "./Permission";
+import { OperationDataType } from "../helper/rule_execution";
+import Permission, { IPermission } from "./Permission";
 import mongoose from "mongoose";
 
 export interface IAction {
@@ -36,7 +36,7 @@ const actionSchema = new Schema({
         type: [String]
         // required?
     },
-    permissions: [{type: mongoose.Schema.Types.ObjectId, ref: 'permission'}]
+    permissions: [{ type: mongoose.Schema.Types.ObjectId, ref: "permission" }]
 });
 
 class Action extends Model<IAction> {
@@ -55,7 +55,7 @@ class Action extends Model<IAction> {
             return null;
         let actions: IAction[] | null;
         try {
-            actions = await this.findAll({serviceId}, "-serviceId");
+            actions = await this.findAll({ serviceId }, "-serviceId");
         } catch (e) {
             return null;
         }
@@ -64,14 +64,14 @@ class Action extends Model<IAction> {
         const actionsResult = new Array<ActionOsp>();
         for (const action of actions) {
             if (action.permissions != undefined) {
-                let temp = await Permission.getAllPermissionAndAddBooleanTag(serviceId, action.permissions)
+                const temp = await Permission.getAllPermissionAndAddBooleanTag(serviceId, action.permissions);
                 const actionResult: ActionOsp = {
                     name: action.name,
                     _id: action._id,
                     endpoint: action.endpoint,
                     description: action.description,
-                    permissions: !!temp ? temp : []
-                }
+                    permissions: temp ? temp : []
+                };
                 actionsResult.push(actionResult);
             }
         }

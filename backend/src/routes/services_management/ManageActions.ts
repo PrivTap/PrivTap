@@ -1,7 +1,7 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
 import { checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
-import Action, {ActionOsp, IAction} from "../../model/Action";
+import Action, { ActionOsp, IAction } from "../../model/Action";
 import Service from "../../model/Service";
 import { handleInsert, handleUpdate } from "../../helper/misc";
 import Permissions from "../../model/Permission";
@@ -57,8 +57,8 @@ export default class ManageActionsRoute extends Route {
             _id: action._id,
             endpoint: action.endpoint,
             description: action.description,
-            permissions: !!associatedPermissions ? associatedPermissions : []
-        }
+            permissions: associatedPermissions ? associatedPermissions : []
+        };
 
         success(response, actionResult);
     }
@@ -108,8 +108,8 @@ export default class ManageActionsRoute extends Route {
             _id: updatedAction._id,
             endpoint: updatedAction.endpoint,
             description: updatedAction.description,
-            permissions: !!associatedPermissions ? associatedPermissions : []
-        }
+            permissions: associatedPermissions ? associatedPermissions : []
+        };
 
         success(response, triggerResult);
     }
