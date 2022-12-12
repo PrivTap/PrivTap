@@ -6,6 +6,7 @@ import Trigger from "../../model/Trigger";
 import axios from "axios";
 import Action from "../../model/Action";
 import logger from "../../helper/logger";
+import Authorization from "../../model/Authorization";
 
 export default class TriggersDataRoute extends Route {
     // TODO: figure out how to restrict this to only authorized services
@@ -43,7 +44,7 @@ export default class TriggersDataRoute extends Route {
         }
 
         //TODO: Get the OAuth token for the trigger
-        const oauthToken = "ASampleToken";
+        const oauthToken = await Authorization.findToken(userId, triggerData.serviceId);
 
         //Get the data from the resourceServer (if needed)
         let dataToForwardToActionAPI: object | null = null;
