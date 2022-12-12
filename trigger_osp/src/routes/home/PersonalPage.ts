@@ -1,5 +1,6 @@
 import Route from "../../Route";
 import {Request, Response} from "express";
+import ejs from "ejs";
 
 export default class PersonalPageRoute extends Route {
     constructor() {
@@ -7,7 +8,10 @@ export default class PersonalPageRoute extends Route {
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
-        response.status(200).send("Orcoddio");
+        const user = {name: "Lorenzo"}
+        response.render("personal_page", {user: user});
     }
-
+    protected async httpPost(request: Request, response: Response): Promise<void> {
+        console.log(request.body);
+    }
 }
