@@ -481,9 +481,15 @@ paths:
                 description:
                   type: string
                   example: This service allows the interaction with Dropbox's APIs
-                authServer:
+                baseUrl:
                   type: string
                   example: http://www.dropboxauth.com
+                authPath:
+                  type: string
+                  example: /login/auth
+                tokenPath:
+                  type: string
+                  example: /login/access_token
                 clientId:
                   type: string
                   example: very_secret_id
@@ -496,9 +502,14 @@ paths:
               required:
                 - name
                 - description
+                - baseUrl
       responses:
         '200':
           description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
         '400':
           description: Error while creating a service
         '500':
@@ -543,16 +554,22 @@ paths:
               properties:
                 serviceId :
                   type : string
-                  example : 637ccd4951cdf089ba2123be
+                  example : 637e6c0e2677ffe654ea9672
                 description:
                   type: string
-                  example: Some very nice new service description
+                  example: This service allow you to interact with your dropbox account!
                 name:
                   type: string
-                  example: someNewServiceName
-                authServer:
+                  example: Dropbox
+                baseUrl:
                   type: string
-                  example: someNewAuthorizationServerUrl
+                  example: http://www.dropbox_auth_server.com"
+                authPath:
+                  type: string
+                  example: /login/auth
+                tokenPath:
+                  type: string
+                  example: /login/access_token
                 clientId:
                   type: string
                   example: someNewSecretClientId
@@ -567,6 +584,10 @@ paths:
       responses:
         '200':
           description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
         '400':
           description: Error while creating a service
   /triggers-data:
@@ -629,9 +650,35 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Trigger'
+                properties:
+                  _id:
+                    type: string
+                    example: 637e6c0e2677ffe654ea9672
+                  name:
+                    type: string
+                    example: SomeTriggerName
+                  description:
+                    type: string
+                    example: SomeTriggerDescription
+                  serviceId:
+                    type: string
+                    example: 637e6c0e2677ffe654ea9672
+                  permissions:
+                    type: array
+                    items:
+                      properties:
+                        name:
+                          type: string
+                          example: SomePermissionName
+                        _id:
+                          type: string
+                          example: SomePermissionId
+                        associated:
+                          type: boolean
+                          example: true
+                  resourceServer:
+                    type: string
+                    example: someUrlToToGetAResource
     post:
       tags:
         - Services Management
@@ -668,6 +715,38 @@ paths:
       responses:
         '200':
           description: successful operation
+          content:
+            application/json:
+              schema:
+                properties:
+                  _id:
+                    type: string
+                    example: 637e6c0e2677ffe654ea9672
+                  name:
+                    type: string
+                    example: SomeTriggerName
+                  description:
+                    type: string
+                    example: SomeTriggerDescription
+                  serviceId:
+                    type: string
+                    example: 637e6c0e2677ffe654ea9672
+                  permissions:
+                    type: array
+                    items:
+                      properties:
+                        name:
+                          type: string
+                          example: SomePermissionName
+                        _id:
+                          type: string
+                          example: SomePermissionId
+                        associated:
+                          type: boolean
+                          example: true
+                  resourceServer:
+                    type: string
+                    example: someUrlToToGetAResource
     delete:
       tags:
         - Services Management
@@ -723,6 +802,38 @@ paths:
       responses:
         '200':
           description: successful operation
+          content:
+            application/json:
+              schema:
+                properties:
+                  _id:
+                    type: string
+                    example: 637e6c0e2677ffe654ea9672
+                  name:
+                    type: string
+                    example: SomeTriggerName
+                  description:
+                    type: string
+                    example: SomeTriggerDescription
+                  serviceId:
+                    type: string
+                    example: 637e6c0e2677ffe654ea9672
+                  permissions:
+                    type: array
+                    items:
+                      properties:
+                        name:
+                          type: string
+                          example: SomePermissionName
+                        _id:
+                          type: string
+                          example: SomePermissionId
+                        associated:
+                          type: boolean
+                          example: true
+                  resourceServer:
+                    type: string
+                    example: someUrlToToGetAResource
 
   /manage-actions:
     get:
@@ -746,7 +857,35 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Action'
+                  properties:
+                    _id:
+                      type: string
+                      example: 637e6c0e2677ffe654ea9672
+                    name:
+                      type: string
+                      example: SomeActionName
+                    description:
+                      type: string
+                      example: SomeActionDescription
+                    serviceId:
+                      type: string
+                      example: 637e6c0e2677ffe654ea9672
+                    permissions:
+                      type: array
+                      items:
+                        properties:
+                          name:
+                            type: string
+                            example: SomePermissionName
+                          _id:
+                            type: string
+                            example: SomePermissionId
+                          associated:
+                            type: boolean
+                            example: true
+                    endpoint:
+                      type: string
+                      example: someUrlToPerformAction
     post:
       tags:
         - Services Management
@@ -785,6 +924,38 @@ paths:
       responses:
         '200':
           description: successful operation
+          content:
+            application/json:
+              schema:
+                properties:
+                  _id:
+                    type: string
+                    example: 637e6c0e2677ffe654ea9672
+                  name:
+                    type: string
+                    example: SomeActionName
+                  description:
+                    type: string
+                    example: SomeActionDescription
+                  serviceId:
+                    type: string
+                    example: 637e6c0e2677ffe654ea9672
+                  permissions:
+                    type: array
+                    items:
+                      properties:
+                        name:
+                          type: string
+                          example: SomePermissionName
+                        _id:
+                          type: string
+                          example: SomePermissionId
+                        associated:
+                          type: boolean
+                          example: true
+                  endpoint:
+                    type: string
+                    example: someUrlToPerformAction
     delete:
       tags:
         - Services Management
@@ -805,6 +976,7 @@ paths:
       responses:
         '200':
           description: successful operation
+
 
     put:
       tags:
@@ -840,7 +1012,38 @@ paths:
       responses:
         '200':
           description: successful operation
-
+          content:
+            application/json:
+              schema:
+                properties:
+                  _id:
+                    type: string
+                    example: 637e6c0e2677ffe654ea9672
+                  name:
+                    type: string
+                    example: SomeActionName
+                  description:
+                    type: string
+                    example: SomeActionDescription
+                  serviceId:
+                    type: string
+                    example: 637e6c0e2677ffe654ea9672
+                  permissions:
+                    type: array
+                    items:
+                      properties:
+                        name:
+                          type: string
+                          example: SomePermissionName
+                        _id:
+                          type: string
+                          example: SomePermissionId
+                        associated:
+                          type: boolean
+                          example: true
+                  endpoint:
+                    type: string
+                    example: someUrlToPerformAction
   /permissions:
     get:
       tags:
@@ -1067,9 +1270,15 @@ components:
         creator:
           type: string
           example: 632e69a12677ffe654ea9672
-        authServer:
+        baseUrl:
           type: string
           example: http://www.dropbox_auth_server.com
+        authPath:
+          type: string
+          example: /login/auth
+        tokenPath:
+          type: string
+          example: /login/access_token
         clientId:
           type: string
           example: very_secret_id
