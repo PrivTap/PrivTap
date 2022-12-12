@@ -1,6 +1,6 @@
 import Route from "../../Route";
 import {Request, Response} from "express";
-import OAuth from "../../helper/OAuth";
+import OAuthClient from "../../helper/OAuthClient";
 import env from "../../helper/env";
 import crypto from "bcrypt";
 
@@ -10,9 +10,9 @@ export default class LoginRoute extends Route {
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
-        const client = await OAuth.buildClient();
+        const client = await OAuthClient.buildClient();
         const stateValue  = await crypto.genSalt(env.SALT_ROUNDS);
-        const redirectUrl = await OAuth.gerRedirectUrl(client, stateValue);
+        const redirectUrl = await OAuthClient.gerRedirectUrl(client, stateValue);
         console.log(redirectUrl);
         response.redirect(redirectUrl);
     }

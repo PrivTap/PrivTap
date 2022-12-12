@@ -4,6 +4,7 @@ export interface IPost {
     _id: string;
     userId: string;
     content: string;
+    creationDate: Date;
 }
 
 const postSchema = new Schema({
@@ -14,6 +15,10 @@ const postSchema = new Schema({
     content: {
         type: String,
         required: true,
+    },
+    creationDate: {
+        type: Date,
+        default: () => new Date()
     }
 });
 

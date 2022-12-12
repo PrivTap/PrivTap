@@ -1,6 +1,6 @@
 import Route from "../../Route";
 import {Request, Response} from "express";
-import OAuth from "../../helper/OAuth";
+import OAuthClient from "../../helper/OAuthClient";
 import State from "../../model/State";
 import User, {IUser} from "../../model/User";
 import Authentication from "../../helper/authentication";
@@ -11,7 +11,7 @@ export default class LoginRoute extends Route {
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
-        const client = await OAuth.buildClient();
+        const client = await OAuthClient.buildClient();
         const params = client.callbackParams(request);
         const stateValue = params.state;
         if (!stateValue){

@@ -16,7 +16,7 @@
     <div class="textarea_position">
         <label>
             <form action="http://127.0.0.1:8001/personal-page" method="post" id="textForm">
-                <textarea id="text_area" placeholder="Start sharing your thoughts!" cols="50" rows="20"></textarea>
+                <textarea id="text_area" placeholder="Start sharing your thoughts!" cols="50" rows="15"></textarea>
             </form>
         </label>
         <a class="my-button" onclick="submitText()" role="button" ><span></span>Post!</a>
@@ -26,14 +26,18 @@
 <div class="split right">
     <div class="right_position">
         <% if (posts.length === 0) { %>
-            <p>It looks that you didn't</p>
-            <p>add anything yet...</p>
+            <p>It looks like you didn't</p>
+            <p>post anything yet...</p>
         <% } else { %>
                 <ul>
                     <% for(var i=0; i<posts.length; i++) {%>
-                    <div class="rectangle" style="margin: 10px">
-                        <img id="<%= posts[i]._id %>" onclick="deletePost(this)" class="icon" style="max-width: 30px" src="public/bin.png">
-                        <p style="line-height: 1; text-align: left"><%- posts[i].content%></p>
+                    <div class="rectangle" style="margin: 10px; min-width: 30vw">
+                        <div style="align-content: center">
+                            <p style="display: inline-block; font-size: 1.2vw; padding-right: 1vw;"> <%- posts[i].creationDate%> </p>
+                            <img id="<%= posts[i]._id %>" onclick="deletePost(this)" class="icon" style="max-width: 1.2vw; display: inline-block" src="public/bin.png">
+
+                        </div>
+                        <p style="line-height: 1; text-align: left; padding-left: 1vw"><%- posts[i].content%></p>
                     </div>
                         <br>
                     <% } %>
@@ -95,10 +99,9 @@
         justify-content:center;
         align-items: center;
         box-shadow: 0 10px 20px 10px rgba(0, 0, 0, 0.2);
+        overflow: auto;
     }
     .icon {
-        position: relative;
-        left: 40%;
         max-width: 100%;
         height: auto;
         width: auto\9;
@@ -122,7 +125,7 @@
     }
 
     .left_position {
-        position: absolute;
+        position: relative;
         top: 50%;
         left: 50%;
         transform: translate(-100%, -150%);
@@ -137,19 +140,25 @@
         text-align: center;
     }
 
+    textarea {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+
     .textarea_position {
-        position: relative;
-        top: 35%;
+        position: absolute;
+        top: 50%;
         left: 7%;
     }
 
     html {
-        overflow: hidden;
         background: url("public/personal_page_side.jpg") no-repeat center center fixed;
         -webkit-background-size: cover;
         -moz-background-size: cover;
         -o-background-size: cover;
         background-size: cover;
+        overflow: hidden;
     }
     body {
         font-family: Georgia, serif;
@@ -208,7 +217,8 @@
         position:relative;
     }
     div:not(:first-child):not(:last-child) {
-        margin:10px;
+        margin-top:10px;
     }
+
 </style>
 </html>

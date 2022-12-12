@@ -24,9 +24,9 @@ interface EnvVariables {
     DB_STRING: string,
     // The api key provided by privTap
     API_KEY: string,
-    // Google OAuth client Id
+    // Google OAuthClient client Id
     CLIENT_ID: string,
-    // Google OAuth client secret
+    // Google OAuthClient client secret
     CLIENT_SECRET:string,
     // Rounds of salting that will be applied to password hashes before storing them in the database
     SALT_ROUNDS: number

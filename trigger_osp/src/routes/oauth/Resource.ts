@@ -1,10 +1,9 @@
-import Route from "../Route";
+import Route from "../../Route";
 import {Request, Response} from "express";
-import { join } from "path";
 
-export default class AuthorizeRoute extends Route {
+export default class ResourceRoute extends Route {
     constructor() {
-        super("authorize");
+        super("resource");
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {

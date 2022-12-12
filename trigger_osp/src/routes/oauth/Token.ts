@@ -1,9 +1,9 @@
 import Route from "../../Route";
 import {Request, Response} from "express";
 
-export default class NewPostRoute extends Route {
+export default class TokenRoute extends Route {
     constructor() {
-        super("newPost", true);
+        super("token");
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {

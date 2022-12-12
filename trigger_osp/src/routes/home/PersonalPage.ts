@@ -13,11 +13,17 @@ export default class PersonalPageRoute extends Route {
         let user = await User.findById(userId);
         // Dummy because the name is too long
         const dummy_user = {username: "Lorenzo"};
-        let posts = await Post.findAllByUserId(userId)
-        posts.forEach(post => {
-            post.content = post.content.replace(/(?:\r\n|\r|\n)/g, '<br>');
+        const postList = await Post.findAllByUserId(userId)
+        let formattedList: [{[id: string]: string }?] = [];
+        postList.forEach(post => {
+            let formattedPost: {[id: string] : string} = {};
+            formattedPost._id = post._id;
+            formattedPost.content = post.content.replace(/(?:\r\n|\r|\n)/g, '<br>');
+            formattedPost.creationDate = "Posted at: " + post.creationDate.toLocaleString();
+            formattedList.push(formattedPost);
         });
-        response.render("personal_page", {user: dummy_user, posts: posts});
+
+        response.render("personal_page", {user: dummy_user, posts: formattedList});
     }
 
     protected async httpPost(request: Request, response: Response): Promise<void> {

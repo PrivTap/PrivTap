@@ -3,7 +3,7 @@ import env from "./env";
 import State from "../model/State";
 import logger from "./logger";
 
-export default class OAuth {
+export default class OAuthClient {
     static async buildClient(): Promise<BaseClient> {
         const googleIssuer = await Issuer.discover('https://accounts.google.com');
         return new googleIssuer.Client({

@@ -123,4 +123,12 @@ export default abstract class Authentication {
         return true;
     }
 
+    // TODO
+    static validAuthDetails(authorization_details: [{[id:string]:string}]): boolean{
+        for (let i = 0; i < authorization_details.length; i++) {
+            const permission = authorization_details[i] as object;
+        }
+        return true;
+    }
+
 }
