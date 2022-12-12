@@ -3,6 +3,7 @@
         <v-card-title>
             <h2 class="text-h5"> {{ props.onEdit ? 'Edit' : 'Create' }} Trigger </h2>
         </v-card-title>
+        
         <v-card-text>
             <v-form ref="formRef" v-model="form.valid" lazy-validation>
                 <v-text-field v-model="form.name" :rules="form.nameRule" label="Name" required></v-text-field>
