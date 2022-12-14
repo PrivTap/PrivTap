@@ -37,7 +37,7 @@ class ManageTrigger extends GenericController<TriggerModel[]> implements IManage
         description: string,
         serviceId: string,
         permissions: string[],
-        resourceServer?: string,
+        resourceServer: string,
     ): Promise<void> {
         const body = {
             "name": name,
