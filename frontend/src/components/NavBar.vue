@@ -28,7 +28,7 @@
                 <span class="text-h6 text-white">{{ authStore.user?.username.slice(0, 2).toUpperCase() }}</span>
               </v-avatar>
               <h3 class="mt-3">{{ authStore.user?.username }}</h3>
-              <p class="text-caption">
+              <p class="text-caption opacity-70">
                 {{ authStore.user?.email }}
               </p>
               <v-divider class="mt-3" ></v-divider>
@@ -44,7 +44,7 @@
                 OSP Page
               </v-btn>
               <v-divider></v-divider>
-              <v-btn class="my-3" rounded variant="text" color="red" @click="authStore.logout(false)">
+              <v-btn class="mt-3" rounded variant="text" color="red" @click="authStore.logout(false)">
                 Disconnect
               </v-btn>
             </div>
