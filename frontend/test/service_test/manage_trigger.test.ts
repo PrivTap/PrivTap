@@ -63,7 +63,6 @@ describe("Manage Trigger Test", () => {
         expect(manageTrigger.getRef().value).to.be.eql([]);
     })
 
-    //TODO: (EMA <3) Why here the update require the resourceServer and on the creation is optional?
     test("Should change the updated trigger in the ref array", async () => {
         manageTrigger.getRef().value = [testTriggerModel];
         const updatedTrigger = new TriggerModel(
@@ -79,7 +78,6 @@ describe("Manage Trigger Test", () => {
         expect(manageTrigger.getRef().value).to.be.eql([updatedTrigger]);
     })
 
-    //TODO: (EMA <3) Why here the update require the resourceServer and on the creation is optional?
     test("Should not change the updated trigger in the ref array if it fails", async () => {
         manageTrigger.getRef().value = [testTriggerModel];
         const updatedTrigger = new TriggerModel(

@@ -71,6 +71,7 @@ describe("Manage Action Test", () => {
       "Test Action name changed",
       "Action description changed",
       [perm1, perm2],
+      "endpoint"
     )
     putStub.resolves({ data: { data: updatedAction } });
     await manageAction.updateAction(updatedAction._id, updatedAction.name, updatedAction.description,
@@ -84,6 +85,7 @@ describe("Manage Action Test", () => {
       "Test Action name changed",
       "Action description changed",
       [perm1, perm2],
+      "endpoint"
     )
     putStub.resolves(null);
     await manageAction.updateAction(updatedAction._id, updatedAction.name, updatedAction.description,

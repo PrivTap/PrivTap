@@ -31,7 +31,6 @@ class ManageTrigger extends GenericController<TriggerModel[]> implements IManage
         triggers.value = triggers.value = res != null ? res : [];
     }
 
-    /// TODO: (EMA <3) Why here the creation dont't require resourceServer and on the update is required?
     async createTrigger(
         name: string,
         description: string,
@@ -51,7 +50,6 @@ class ManageTrigger extends GenericController<TriggerModel[]> implements IManage
             triggers.value.push(res);
     }
 
-    /// TODO: (EMA <3) Why here the update require the resourceServer and on the creation is optional?
     async updateTrigger(
         triggerId: string,
         name: string,
