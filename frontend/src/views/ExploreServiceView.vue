@@ -1,10 +1,10 @@
 <template>
     <div class="h-full">
-        <div class="text-center pt-10 mt-5 bg-slate-900 shadow-md">
-            <v-avatar color="#172540" style="height: 120px; width: 120px;">
-                <v-icon size="60px" color="info" icon="mdi-lan"></v-icon>
+        <div class="text-center pt-10 mt-5 bg-slate-900/60 shadow-md">
+            <v-avatar color="#172540" style="height: 80px; width: 80px;">
+                <v-icon size="40px" color="info" icon="mdi-lan"></v-icon>
             </v-avatar>
-            <p class="text-h2 font-weight-medium text-white mt-10 mb-4"> {{ service.name }} </p>
+            <p class="text-h3 font-weight-medium text-white mt-10 mb-4"> {{ service.name }} </p>
             <p class="text-h6 font-weight-regular text-white/60"> {{ service.description }} </p>
             <v-btn variant="tonal" color="info" rounded size="x-large" class="my-10"> CONNECT </v-btn>
             <v-tabs fixed-tabs v-model="tabs">
@@ -41,6 +41,11 @@
                                 </v-card-subtitle>
                                 <v-card-text>
                                     <p class="text-h6 font-weight-regular"> Pemrission required: </p>
+                                    <v-chip v-for="permission in trigger.permissions"
+                                         class="mr-2 mt-2" color="success" variant="outlined"
+                                        appendIcon="mdi-check-circle-outline">
+                                        {{ permission.name }}
+                                    </v-chip>
                                 </v-card-text>
                             </v-card>
                         </div>
@@ -69,6 +74,11 @@
                                 </v-card-subtitle>
                                 <v-card-text>
                                     <p class="text-h6 font-weight-regular"> Pemrission required: </p>
+                                    <v-chip v-for="permission in action.permissions"
+                                         class="mr-2 mt-2" color="success" variant="outlined"
+                                        appendIcon="mdi-check-circle-outline">
+                                        {{ permission.name }}
+                                    </v-chip>
                                 </v-card-text>
                             </v-card>
                         </div>
@@ -82,11 +92,11 @@
 </template>
 
 <script setup lang="ts">
-import ServiceModel from '@/model/service_model';
 import { ref } from 'vue';
 import empty from '@/assets/images/empty.svg';
 import { useRoute } from 'vue-router';
 import type SimpleServiceModel from '@/model/simple_service_model';
+import type PermissionModel from '@/model/permission_model';
 
 const route = useRoute();
 const temp = route.params.service;
@@ -102,19 +112,43 @@ const listOfTrigger = [
         _id: '1',
         name: 'Trigger 1',
         description: 'Trigger when a new issue is created',
-        permission: [{}, {},]
+        permissions: [{
+            _id: '1',
+            name: 'Read',
+            description: 'Read the issue'
+        } as PermissionModel, {
+            _id: '2',
+            name: 'Write',
+            description: 'Write the issue'
+        } as PermissionModel,]
     },
     {
         _id: '2',
         name: 'Trigger 2',
         description: 'Trigger when a new pull-request is created',
-        permission: [{}, {},]
+        permissions: [{
+            _id: '1',
+            name: 'Read',
+            description: 'Read the issue'
+        } as PermissionModel, {
+            _id: '2',
+            name: 'Write',
+            description: 'Write the issue'
+        } as PermissionModel,]
     },
     {
         _id: '2',
         name: 'Trigger 2',
         description: 'Trigger when a new pull-request is created',
-        permission: [{}, {},]
+        permissions: [{
+            _id: '1',
+            name: 'Read',
+            description: 'Read the issue'
+        } as PermissionModel, {
+            _id: '2',
+            name: 'Write',
+            description: 'Write the issue'
+        } as PermissionModel,]
     },
 ];
 const listOfAction = [
@@ -122,19 +156,43 @@ const listOfAction = [
         _id: '1',
         name: 'Action1 ',
         description: 'Action create a comments',
-        permission: [{}, {},]
+        permissions: [{
+            _id: '1',
+            name: 'Read',
+            description: 'Read the issue'
+        } as PermissionModel, {
+            _id: '2',
+            name: 'Write',
+            description: 'Write the issue'
+        } as PermissionModel,]
     },
     {
         _id: '2',
         name: 'Action2',
         description: 'Action create a merge request',
-        permission: [{}, {},]
+        permissions: [{
+            _id: '1',
+            name: 'Read',
+            description: 'Read the issue'
+        } as PermissionModel, {
+            _id: '2',
+            name: 'Write',
+            description: 'Write the issue'
+        } as PermissionModel,]
     },
     {
         _id: '2',
         name: 'Action2',
         description: 'Action create a merge request',
-        permission: [{}, {},]
+        permissions: [{
+            _id: '1',
+            name: 'Read',
+            description: 'Read the issue'
+        } as PermissionModel, {
+            _id: '2',
+            name: 'Write',
+            description: 'Write the issue'
+        } as PermissionModel,]
     },
 ];
 
