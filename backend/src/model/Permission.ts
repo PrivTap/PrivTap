@@ -65,6 +65,12 @@ export class Permission extends Model<IPermission> {
         return await this.find({ _id: permissionId, serviceId }) != null;
     }
 
+    /**
+     * Return all the permissions , adding to all of them a boolean field: associated. It checks if the id of the permission is into the array of permissionsId (parameters).
+     * If it is then the field associated is true, otherwise it is false.
+     * @param serviceId The service id
+     * @param permissions   The array of permissions id
+     */
     async getAllPermissionAndAddBooleanTag(serviceId: string, permissions?: Array<string>): Promise<Partial<IPermission>[] | null> {
         const allPermissions = await this.findByServiceId(serviceId, "name");
         if (allPermissions == null)
@@ -73,6 +79,7 @@ export class Permission extends Model<IPermission> {
             return {
                 _id: permission._id,
                 name: permission.name,
+                description: permission.description,
                 associated: permissions == undefined ? false :permissions.includes(permission._id)
             };
         });
@@ -120,7 +127,7 @@ export class Permission extends Model<IPermission> {
 
 export default new Permission();
 
-export class permissionAuthorized {
+export class PermissionAuthorized {
     _id: string;
     name: string;
     description: string;

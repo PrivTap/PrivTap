@@ -18,7 +18,7 @@ export default class ManageTriggersRoute extends Route {
         if (checkUndefinedParams(response, serviceId)) return;
 
         // Insert the trigger
-        const services = await Trigger.findAllForService(serviceId);
+        const services = await Trigger.findAllForService(serviceId, true);
 
         if (services) {
             success(response, services);
@@ -51,7 +51,7 @@ export default class ManageTriggersRoute extends Route {
             resourceServer
         }, true) as ITrigger;
         if (!insertedTrigger) return;
-        const associatedPermissions = await Permissions.getAllPermissionAndAddBooleanTag(serviceId, insertedTrigger.permissions);
+        const associatedPermissions = await Permissions.getAllPermissionAndAddBooleanTag(serviceId, insertedTrigger.permissions as string[]);
         const triggerResult: TriggerOsp = {
             name: insertedTrigger.name,
             _id: insertedTrigger._id,
@@ -102,7 +102,7 @@ export default class ManageTriggersRoute extends Route {
             resourceServer
         }, true) as ITrigger;
         if (!modifiedTrigger) return;
-        const associatedPermissions = await Permissions.getAllPermissionAndAddBooleanTag(modifiedTrigger.serviceId, modifiedTrigger.permissions);
+        const associatedPermissions = await Permissions.getAllPermissionAndAddBooleanTag(modifiedTrigger.serviceId, modifiedTrigger.permissions as string[]);
         const triggerResult: TriggerOsp = {
             name: modifiedTrigger.name,
             _id: modifiedTrigger._id,

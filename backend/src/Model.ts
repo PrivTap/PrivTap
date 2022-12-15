@@ -160,7 +160,7 @@ export default class Model<T> {
      */
     async findAndUpdate(filterQuery: FilterQuery<T>, updateQuery: UpdateQuery<T>): Promise<T | null> {
         try {
-            return await this.model.findOneAndUpdate(filterQuery, updateQuery);
+            return await this.model.findOneAndUpdate(filterQuery, updateQuery, { new: true });
         } catch (e) {
             logger.error(`Unexpected error while finding and updating ${this.name}\n`, e);
         }

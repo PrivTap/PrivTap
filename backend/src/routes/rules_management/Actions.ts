@@ -1,8 +1,7 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
-import { internalServerError, success } from "../../helper/http";
-import Authorization, { ServiceActions } from "../../model/Authorization";
-import RuleExecution from "../../helper/rule_execution";
+import { checkUndefinedParams, internalServerError, success } from "../../helper/http";
+import Action, { ActionOsp } from "../../model/Action";
 
 export default class ActionsRoute extends Route {
     constructor() {
@@ -13,18 +12,26 @@ export default class ActionsRoute extends Route {
         // TODO: If we have time implement search https://www.mongodb.com/docs/atlas/atlas-search/query-syntax/#mongodb-pipeline-pipe.-search
         // const searchQuery = request.query.search;
 
-        let data: ServiceActions[]  = [];
-
-        //query only compatible actions
-        const triggerId = request.query.triggerId as string;
-        let authorizedServices = await Authorization.findAllServicesAuthorizedByUserWithActions(request.userId);
-        if (!authorizedServices) {
+        const serviceId = request.query.serviceId as string;
+        const userId = request.userId;
+        const authorized = request.query.authorized as string;
+        let data: ActionOsp[] | null = null;
+        if(checkUndefinedParams(response, serviceId))
+            return;
+        if (authorized==="true") {
+            data = await Action.findAllActionAuthorizedByUser(userId, serviceId);
+        }else{
+            data = await Action.findAllForService(serviceId);
+        }
+        if (data == null) {
             internalServerError(response);
             return;
         }
 
+        success(response, data);
+
         //TODO: Can we check compatibility on the DB?
-        if (triggerId) {
+        /*if (triggerId) {
             authorizedServices = authorizedServices.map((service) => {
                 return {
                     serviceId: service.serviceId,
@@ -34,7 +41,7 @@ export default class ActionsRoute extends Route {
             }).filter((service) => service.actions.length > 0);
         }
 
-        data = authorizedServices;
+        data = authorizedServices;*/
         success(response, data);
     }
 }

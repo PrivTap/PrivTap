@@ -17,7 +17,7 @@ export default class ManageActionsRoute extends Route {
 
         if (checkUndefinedParams(response, serviceId)) return;
 
-        const actions = await Action.findAllForService(serviceId);
+        const actions = await Action.findAllForService(serviceId, true);
         console.log(actions);
         if (!actions) {
             internalServerError(response);
