@@ -13,7 +13,7 @@ export default class TriggersDataRoute extends Route {
     // TODO: figure out how to restrict this to only authorized services
 
     constructor() {
-        super("triggers-data");
+        super("triggers-data", false, false);
     }
 
     protected async httpPost(request: Request, response: Response): Promise<void> {
@@ -55,7 +55,12 @@ export default class TriggersDataRoute extends Route {
         //Get the data from the resourceServer (if needed)
         let dataToForwardToActionAPI: object | null = null;
         if (triggerData?.resourceServer) {
-            const response = await axios.get(triggerData?.resourceServer ?? "", {
+            if (!oauthToken) {
+                forbiddenUserError(response, "Trigger not authorized");
+                return;
+            }
+
+            const axiosResponse = await axios.get(triggerData?.resourceServer ?? "", {
                 headers: {
                     Authorization: "Bearer " + oauthToken
                 },
@@ -64,16 +69,12 @@ export default class TriggersDataRoute extends Route {
                 }
             });
             //Now we replace all URLs
-            dataToForwardToActionAPI = response.data;
+            dataToForwardToActionAPI = axiosResponse.data;
         }
 
         //Forward the data to the Action API endpoint
         //TODO: Do we need to show some kind of rule execution error??
-        const actionResponse = await axios.post(actionData.endpoint, dataToForwardToActionAPI, {
-            headers: {
-                Authorization: "Bearer " + oauthToken
-            }
-        });
+        const actionResponse = await axios.post(actionData.endpoint, dataToForwardToActionAPI);
         if (actionResponse.status.toString() != "200") {
             logger.error("Could not execute rule with id " + referencedRule?._id + " with error " + actionResponse.status.toString());
         }
