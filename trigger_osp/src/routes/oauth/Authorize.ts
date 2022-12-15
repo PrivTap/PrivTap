@@ -20,11 +20,11 @@ export default class AuthorizeRoute extends Route {
             return;
         }
 
-        let authorization_details_json: IPermission[];
+        let permissions: IPermission[];
 
         try {
             // Don't ask me why...
-            authorization_details_json = JSON.parse(JSON.parse(authorization_details)) as IPermission[];
+            permissions = JSON.parse(JSON.parse(authorization_details)) as IPermission[];
         } catch (e){
             console.log("parse error")
             console.log(e);
@@ -34,29 +34,21 @@ export default class AuthorizeRoute extends Route {
 
         try {
             Authentication.checkJWT(request);
-            for (let i = 0; i < authorization_details_json.length; i++) {
-                let permission = authorization_details_json[i];
+            for (let i = 0; i < permissions.length; i++) {
+                let permission = permissions[i];
                 permission.userId = request.userId;
-                console.log("request userId =", request.userId);
-                console.log(authorization_details_json[i]);
-                try{
-                    if(!await Permission.insert(permission)){
-                        response.status(500).send();
-                        return;
-                    }
-                } catch (e) {
-                    // The json doesn't confor to the IPermission schema
-                    console.log("Wrong json format");
-                    response.status(400);
+                if (!Permission.checkSchema(permission)){
+                    // The JSON was did not conform to the Permission schema
+                    console.log("Invalid JSON format");
+                    response.status(400).send();
                     return;
                 }
-
             }
-            // TODO:
-            const formData = Permission.getAggregateData(request.userId);
-            //response.render("oauth_form")
+
+            const formData = Permission.getAggregateData(permissions);
+            response.render("oauth_form", {});
         } catch (e){
-            console.log("Not authenticated?")
+            console.log("Not authenticated")
             console.log(e);
             // The user needs to authenticate and then will get redirected to the same endpoint
             // with the same query parameters

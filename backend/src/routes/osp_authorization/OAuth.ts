@@ -42,7 +42,6 @@ export default class OAuthRoute extends Route {
         }
 
         // This should be an atomic transaction
-
         if (!await handleUpdate(response, Authorization, { userId:userId, serviceId:serviceId },{ userId,serviceId, oAuthToken, grantedPermissions: permissions }, false, true)){
             return;
         }
