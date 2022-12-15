@@ -36,7 +36,7 @@ class ManageTrigger extends GenericController<TriggerModel[]> implements IManage
         description: string,
         serviceId: string,
         permissions: string[],
-        resourceServer?: string,
+        resourceServer: string,
     ): Promise<void> {
         const body = {
             "name": name,
@@ -49,7 +49,6 @@ class ManageTrigger extends GenericController<TriggerModel[]> implements IManage
         if (res != null)
             triggers.value.push(res);
     }
-
 
     async updateTrigger(
         triggerId: string,
@@ -66,7 +65,6 @@ class ManageTrigger extends GenericController<TriggerModel[]> implements IManage
             resourceServer: resourceServer,
         }
         const updatedTrigger = await super.put<TriggerModel>(path, { body: body, message: "Trigger updated" });
-        console.log(updatedTrigger, "AO HIC");
         if (!!updatedTrigger) {
             triggers.value = triggers.value.map((trigger) => {
                 if (trigger._id === updatedTrigger._id) {
