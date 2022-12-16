@@ -1,6 +1,6 @@
 export enum authorizationType {
-    r_user = "Read-only access to your profile information",
-    r_post = "Read-only access to your posts",
+    r_user = "Read access to your profile information",
+    r_post = "Read access to your posts",
     w_post = "Write access to your posts"
 }
 

@@ -2,20 +2,118 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>AAA</title>
+    <title>Authorization</title>
 </head>
 <body>
-    <p>something</p>
+<div class="rectangle" style="margin: 10px; min-width: 40vw">
+    <div style="align-content: center">
+        <p style="font-weight: bold; font-size: 1.5vw">You're authorizing the following:</p>
+        <ul>
+            <% for (var i=0; i<fieldData.authorizationTypes.length; i++) { %>
+            <li style="text-align: left; font-size: 1.2vw"><%- fieldData.authorizationTypes[i] %></li>
+            <% } %>
+        </ul>
+        <hr class="solid">
+        <p style="font-weight: bold; font-size: 1.5vw">Access to your account data:</p>
+        <ul>
+            <% for (var i=0; i<fieldData.userGranularities.length; i++) { %>
+                <li style="text-align: left; font-size: 1.2vw"><%- fieldData.userGranularities[i] %></li>
+            <% } %>
+        </ul>
+        <hr class="solid">
+        <p style="font-weight: bold; font-size: 1.5vw">Access to your posts:</p>
+        <ul>
+            <% for (var i=0; i<fieldData.postGranularities.length; i++) { %>
+                <li style="text-align: left; font-size: 1.2vw"><%- fieldData.postGranularities[i] %></li>
+            <% } %>
+        </ul>
+        <hr class="solid">
+        <a id="accept" onclick="submitChoice('accept')" class="accept" style="-webkit-transform: translate(-100%, 0%); background-color: #00b916; background-image: url(/public/accept.png); background-repeat: no-repeat;
+        background-size: contain" href="#"><span></span>Accept</a>
+        <a id="refuse" onclick="submitChoice('refuse')" class="refuse" style="-webkit-transform: translate(100%, 0%); background-color: #da0000; background-image: url(/public/refuse.png); background-repeat: no-repeat;
+        background-size: contain" href="#"><span></span>Refuse</a>
+    </div>
+</div>
 </body>
+
+<script>
+    function submitChoice(status) {
+        const state = '<%= state %>'
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://127.0.0.1:8001/authorize");
+        xhr.setRequestHeader("Accept", "application/json");
+        xhr.setRequestHeader("Content-Type", "application/json");
+        let data = `{ "status": "${status}" , "state":` + JSON.stringify(state) + `}`;
+
+        xhr.send(data);
+
+    }
+</script>
 
 <style>
     html {
-        background: url("public/a.png") no-repeat center center fixed;
+        background: url("/public/personal_page_side.jpg") no-repeat center center fixed;
         -webkit-background-size: cover;
         -moz-background-size: cover;
         -o-background-size: cover;
         background-size: cover;
         overflow: hidden;
     }
+    .rectangle {
+        padding: 10px;
+        color: #000000;
+        background-color: rgb(255, 255, 255);
+        border-radius:7px;
+        text-align:center;
+        vertical-align:middle;
+        justify-content:center;
+        align-items: center;
+        box-shadow: 0 10px 20px 10px rgba(0, 0, 0, 0.2);
+        overflow: auto;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        -webkit-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+    }
+    hr.solid {
+        border-top: 3px solid #bbb;
+    }
+
+    a{
+        background-color: #00b916;
+        color: #fff;
+        font-family: Georgia;
+        font-size: 18px;
+        font-weight: 800;
+        font-style: normal;
+        text-decoration: none;
+        padding: 14px 15px;
+        border: 0px solid #000;
+        border-radius: 10px;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0px 0px 10px 2px rgba(77.2906494140625,77.2906494140625,77.2906494140625,0.5);
+    }
+
+    a span{
+        margin-right: 15px;
+        display: block;
+        width: 29px;
+        height: 29px;
+        background-repeat: no-repeat;
+        background-size: contain;
+        transform: rotate(0deg);
+    }
+
+    a:hover{
+        background-color: #51c153;
+    }
+
+    a:active{
+        transform: scale(0.95);
+    }
+
 </style>
 </html>

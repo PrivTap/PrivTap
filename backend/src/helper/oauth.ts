@@ -36,7 +36,7 @@ export default class OAuth {
         if (env.PROD) {
             redirectUri = "https://privtap.it/modifyauth/" + serviceId;
         } else {
-            redirectUri = "http://127.0.0.1:5173/modifyauth/" + serviceId;
+            redirectUri = "http://localhost:5173/modifyauth/" + serviceId;
         }
 
         let authorizationUri = client.authorizeURL({

@@ -1,5 +1,6 @@
 import {model as mongooseModel, Schema, Types} from "mongoose";
 import {authorizationType, location, operation, postGranularity, userGranularity} from "../Granularity";
+import logger from "../helper/logger";
 
 export interface IPermission {
     _id: string;
@@ -9,6 +10,7 @@ export interface IPermission {
     location: string;
     userGranularity: string;
     postGranularity: string;
+    authorized: boolean;
 }
 
 const permissionSchema = new Schema({
@@ -40,6 +42,11 @@ const permissionSchema = new Schema({
         type: String,
         enum: Object.keys(postGranularity),
         required: true
+    },
+    authorized:{
+        type: Boolean,
+        required: true,
+        default: false
     }
 });
 
@@ -68,17 +75,41 @@ class Permission {
         return true;
     }
 
-    async insert(document: Partial<IPermission>): Promise<boolean>{
+    async insert(document: Partial<IPermission>, returnId=false): Promise<boolean | string>{
         const model = new this.model(document);
         try {
             await model.save();
+            if (returnId){
+                return model._id;
+            }
             return true;
         } catch (e) {
+            // Duplicate insertion
+            if ((e as Error).name == "MongoServerError"){
+                logger.debug("The permission already exists");
+                if (returnId){
+                    return model._id;
+                }
+                return true;
+            }
             console.log("Error inserting permission", e);
         }
         return false;
     }
 
+    async insertAll(documents: Partial<IPermission>[]): Promise<string[] | null> {
+        let permissionIds: string[] = [];
+        for (let i = 0; i < documents.length; i++) {
+            const documentId = await this.insert(documents[i], true) as string;
+            if (!documentId) {
+                return null;
+            }
+            permissionIds.push(documentId)
+        }
+        return permissionIds;
+    }
+
+    // Is there a better way to generalize this?
     getAggregateData(permissions: IPermission[]): {operations: string[], authorizationTypes: string[], userGranularities: string[], postGranularities: string[]}{
         let operations: string[] = [];
         let authorizationTypes: string[] = [];
@@ -89,16 +120,6 @@ class Permission {
         let authorizationTypeKeys = Object.keys(authorizationType);
         let userGranularityKeys = Object.keys(userGranularity);
         let postGranularityKeys = Object.keys(postGranularity);
-
-        /*
-        console.log(operationKeys);
-        console.log(authorizationTypeKeys);
-        console.log(userGranularityKeys);
-        console.log(postGranularityKeys);
-         */
-
-        // All good
-
 
         type OperationKey = keyof typeof operation
         type AuthorizationTypeKey = keyof typeof authorizationType
@@ -137,6 +158,26 @@ class Permission {
             userGranularities,
             postGranularities
         };
+    }
+
+    async deleteUnauthorizedPermissions(userId: string): Promise<boolean>{
+        try{
+            this.model.deleteMany({ userId, authorized: false });
+            return true;
+        } catch (e) {
+            logger.debug("Error deleting unauthorized permissions", e);
+            return false;
+        }
+    }
+
+    async authorizePermissions(userId: string): Promise<string[] | null>{
+        try{
+            this.model.updateMany({ userId, authorized: false }, { authorized: true });
+            const permissions = await this.model.find({ userId, authorized: true });
+            return permissions.map(permission => permission._id);
+        } catch (e) {
+            return null;
+        }
     }
 }
 
