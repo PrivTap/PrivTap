@@ -13,7 +13,7 @@ export interface IUserTrigger {
 }
 
 
-class UserTrigger extends GenericController<TriggerModel[]> implements IUserTrigger {
+class User_trigger extends GenericController<TriggerModel[]> implements IUserTrigger {
     /**
      * Return the object reference of this controller. The controller is a singleton, so the reference is the same for all the class
      */
@@ -37,10 +37,9 @@ class UserTrigger extends GenericController<TriggerModel[]> implements IUserTrig
     /**
      * If value to return it's true, return the result of the request. When value to return it's false, the result of the request is stored inside the reference object.
      * The result of the request is the list of all the triggers of the service that are authorized (All their permissions have been granted)
-     * @param serviceId
-     * @param valueToReturn
+     * @param serviceId the Id of the service to get the triggers
+     * @param valueToReturn if true return the result of the request. Default false
      */
-
     async getAuthorizedTriggers(serviceId: string, valueToReturn: boolean = false): Promise<TriggerModel[]> {
         const res = await super.get<TriggerModel[]>(path, {query: {serviceId, authorized: true}});
         if (!valueToReturn)
@@ -57,4 +56,4 @@ class UserTrigger extends GenericController<TriggerModel[]> implements IUserTrig
     }
 }
 
-export default new UserTrigger();
+export default new User_trigger();

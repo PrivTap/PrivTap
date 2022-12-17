@@ -12,7 +12,7 @@ export interface IUserAction {
 }
 
 
-class UserAction extends GenericController<ActionModel[]> implements IUserAction {
+class User_action extends GenericController<ActionModel[]> implements IUserAction {
     getRef(): Ref<ActionModel[]> {
         return actions;
     }
@@ -44,4 +44,4 @@ class UserAction extends GenericController<ActionModel[]> implements IUserAction
 
 }
 
-export default new UserAction();
+export default new User_action();

@@ -96,8 +96,8 @@ import {onMounted, ref} from 'vue';
 import empty from '@/assets/images/empty.svg';
 import { useRoute } from 'vue-router';
 import type SimpleServiceModel from '@/model/simple_service_model';
-import UserTrigger from "@/controllers/user-trigger";
-import UserAction from "@/controllers/user-action";
+import UserTrigger from "@/controllers/user_trigger";
+import UserAction from "@/controllers/user_action";
 
 const route = useRoute();
 const temp = route.params.service;
