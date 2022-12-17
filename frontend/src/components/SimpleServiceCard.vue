@@ -1,14 +1,13 @@
 <template>
+  <div class=" hover:shadow-2xl hover:-translate-y-6 transition ease-in-out duration-700">
   <v-card
       elevation="3" @click="flipped=!flipped"
-      outlined
+      outlined class="h-full"
   >
-    <div class="bg-blue-700 rounded-lg py-8 px-8 fill-height">
+    <div class="rounded-lg py-8 px-8 bg-blue-700 fill-height ">
       <div class="h-1/2">
         <v-card-title v-if="!flipped" class="text-2xl text-center font-medium">{{ service.name }}</v-card-title>
-        <v-card-subtitle v-if="flipped" class="text-lg font-medium text-white/60">{{
-            service.description
-          }}
+        <v-card-subtitle v-if="flipped" class="text-lg font-medium text-white/60">{{service.description }}
         </v-card-subtitle>
         <br>
       </div>
@@ -26,6 +25,7 @@
       </div>
     </div>
   </v-card>
+  </div>
 </template>
 
 <script setup lang="ts">

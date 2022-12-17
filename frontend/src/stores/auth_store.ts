@@ -2,7 +2,7 @@ import { computed, onMounted, ref, type ComputedRef, type Ref } from "vue";
 import { defineStore } from "pinia";
 import type { UserModel } from "@/model/user_model";
 import { getCurrentInstance } from "vue";
-import AuthService from "@/services/auth_service";
+import AuthService from "../controllers/auth_controller";
 import { useToast } from "vue-toastification";
 import { useRouter } from "vue-router";
 import RoutingPath from "@/router/routing_path";

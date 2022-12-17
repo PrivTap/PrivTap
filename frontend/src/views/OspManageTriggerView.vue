@@ -25,14 +25,14 @@
                                     Create New Trigger
                                 </v-btn>
                             </template>
-                            <TriggerForm v-if="service" :serviceId=service!._id :onCancel="() => (dialog = false)" />
+                            <TriggerForm :serviceId="(route.params.id as string)" :onCancel="onClose" />
                         </v-dialog>
                     </div>
                 </div>
                 <div v-if="triggers.length" class="py-10">
                     <div class=" px-10 grid lg:grid-cols-2 xl:grid-cols-3 gap-10">
-                        <TriggerCard v-if="service" v-for="trigger in triggers" :tag="trigger._id" :trigger="trigger"
-                            :serviceId="service?._id" />
+                        <TriggerCard v-for="trigger in triggers" :tag="trigger._id"
+                            :trigger="trigger" :serviceId="(route.params.id as string)" />
                         <v-dialog v-model="dialog" class="flex flex-col justify-center items-center center">
                             <template v-slot:activator="{ props }">
                                 <div v-bind="props"
@@ -45,7 +45,7 @@
                                     </div>
                                 </div>
                             </template>
-                            <TriggerForm v-if="service" :serviceId=service!._id :onCancel="() => (dialog = false)" />
+                            <TriggerForm :serviceId="(route.params.id as string)" :onCancel="onClose" />
                         </v-dialog>
                     </div>
 
@@ -58,31 +58,29 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { ManageService } from '@/services/manage_service';
-import type ServiceModel from '@/model/service_model';
-import { ManageTrigger } from '@/services/manage_trigger';
 import TriggerCard from '@/components/ServiceComponents/TriggerCard.vue';
 import TriggerForm from '@/components/ServiceComponents/TriggerForm.vue';
 import radial from '@/assets/images/radial.svg';
 import logo from '@/assets/images/logo_dark.svg';
 import empty from '@/assets/images/empty.svg';
-
+import manage_trigger from '@/controllers/manage_trigger';
 
 const dialog = ref(false);
 const isLoading = ref(true);
 
 const route = useRoute();
-const manageTrigger = ManageTrigger.getInstance;
-const manageService = ManageService.getInstance;
-let service = ref<ServiceModel | null>(null);
-let triggers = manageTrigger.triggers;
+
+let triggers = manage_trigger.getRef();
+
+async function onClose(){
+    dialog.value = false
+}
 
 // On Mounted page, check if the Service has already defined permissions
 onMounted(async () => {
     isLoading.value = true;
     const serviceId = route.params.id as string;
-    service.value = await manageService.getServiceById(serviceId);
-    await manageTrigger.getAllTriggers(serviceId);
+    await manage_trigger.getAllTriggers(serviceId);
     isLoading.value = false;
 });
 

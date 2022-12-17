@@ -1,74 +1,99 @@
-import { beforeAll, beforeEach, describe, expect, test } from "vitest";
-import { ManageAction } from "../../src/services/manage_action";
-import ActionModel from "../../src/model/action_model";
-import MockAdapter from "axios-mock-adapter";
+import {afterEach, beforeEach, describe, test} from "vitest";
+import {SinonStub} from "sinon";
+import * as sinon from "sinon";
+import {use, expect} from "chai";
+import sinonChai = require("sinon-chai");
+import axiosInstance from "../../src/helpers/axios_service";
+import manageAction from "../../src/controllers/manage_action";
+import ActionModel from "../../src/model/Action_model";
+
+
+use(sinonChai);
+
+const sandbox = sinon.createSandbox();
 
 describe("Manage Action Test", () => {
-  let mock: MockAdapter;
-  const _manageAction = ManageAction.getInstance;
-  let testActionModel: ActionModel = new ActionModel(
-    "Test Action id",
-    "Test Action name",
-    "Test Description",
-    "Test Service name",
-    "Test Service id",
+  let getStub: SinonStub;
+  let postStub: SinonStub;
+  let putStub: SinonStub;
+  let deleteStub: SinonStub;
+  const testActionModel: ActionModel = new ActionModel(
+      "Test Action id",
+      "Test Action name",
+      "Action description",
+      ["String1", "String2"],
   );
-
-
-  beforeAll(() => {
-    mock = new MockAdapter(_manageAction.http);
-  });
-
+  const serviceId = "test Service id";
   beforeEach(() => {
-    mock.reset();
+    getStub = sandbox.stub(axiosInstance, "get");
+    postStub = sandbox.stub(axiosInstance, "post");
+    putStub = sandbox.stub(axiosInstance, "put");
+    deleteStub = sandbox.stub(axiosInstance, "delete");
+  });
+  afterEach(async () => {
+    sandbox.restore();
+    manageAction.getRef().value=[];
+  })
+
+  //TEST GetActions
+  test("Should put in the ref all the actions", async () => {
+    getStub.resolves({data: {data: [testActionModel]}})
+    await manageAction.getAllActions(testActionModel.serviceId);
+    expect(manageAction.getRef().value).to.be.eql([testActionModel]);
+  });
+  test("Should put nothing in the ref value if the gets failed", async()=>{
+    getStub.resolves(null);
+    await manageAction.getAllActions(testActionModel.serviceId);
+    expect(manageAction.getRef().value).to.be.eql([]);
+  })
+  //TEST CreateActions
+  test("Should put the created Action in the ref array", async () => {
+    postStub.resolves({data: {data: testActionModel}})
+    await manageAction.createAction(testActionModel.name, testActionModel.description,
+        serviceId, testActionModel.permissions, undefined)
+    expect(manageAction.getRef().value).to.be.eql([testActionModel]);
+  });
+  test("Should put nothing in the ref value if the gets failed", async()=>{
+    postStub.resolves(null);
+    await manageAction.createAction(testActionModel.name, testActionModel.description,
+        serviceId, testActionModel.permissions, undefined)
+    expect(manageAction.getRef().value).to.be.eql([]);
+  })
+
+  //TEST UpdateAction
+  test("Should change the updated Action in the ref array", async()=>{
+    manageAction.getRef().value= [testActionModel];
+    const updatedAction= new ActionModel(
+        "Test Action id",
+        "Test Action name changed",
+        "Action description changed",
+        ["String1", "String2", "added String"],
+    )
+    putStub.resolves({data: {data:updatedAction}});
+    await manageAction.updateAction(updatedAction._id, updatedAction.name, updatedAction.description,
+        updatedAction.permissions, updatedAction.endpoint)
+    expect(manageAction.getRef().value).to.be.eql([updatedAction]);
+  })
+  test("Should not change the updated Action in the ref array if it fails", async()=>{
+    manageAction.getRef().value= [testActionModel];
+    const updatedAction= new ActionModel(
+        "Test Action id",
+        "Test Action name changed",
+        "Action description changed",
+        ["String1", "String2", "added String"],
+    )
+    putStub.resolves(null);
+    await manageAction.updateAction(updatedAction._id, updatedAction.name, updatedAction.description,
+        updatedAction.permissions, updatedAction.endpoint)
+    expect(manageAction.getRef().value).to.be.eql([testActionModel]);
+
+  })
+
+  //TEST DeleteAction
+  test("Should delete the Action in the ref value", async () => {
+    manageAction.getRef().value= [testActionModel];
+    await manageAction.deleteAction(testActionModel._id);
+    expect(manageAction.getRef().value).to.be.eql([]);
   });
 
-
-  test("should return a the created action", async () => {
-    mock.onPost(_manageAction.path).reply(200, { data: testActionModel });
-    const res = await _manageAction.createAction(
-      testActionModel._id,
-      testActionModel.name,
-      testActionModel.description,
-      testActionModel.serviceName,
-      testActionModel.serviceId,
-    );
-    expect(res.name).toEqual(testActionModel.name);
-  });
-
-  test("should return a list of actions", async () => {
-    mock.onGet(_manageAction.path).reply(200, { data: [testActionModel] });
-    const res = await _manageAction.getAllActions();
-    expect(res).toEqual([testActionModel]);
-  });
-
-  test("should return an action with the passed id", async () => {
-    mock.onGet(_manageAction.path, { params: { "actionId": testActionModel._id } }).reply(200, {
-      data: testActionModel
-    }
-    );
-    const res = await _manageAction.getActionById(testActionModel._id);
-    expect(res.name).toBe(testActionModel.name);
-  });
-
- 
-  test("should return a list of actions after deletion", async () => {
-    mock.onDelete(_manageAction.path).reply(200, { data: [] });
-    const res = await _manageAction.deleteAction("Test Action id");
-    expect(res).to.empty;
-  });
- 
-  test("should return the updated action", async () => {
-    testActionModel.name = "Updated Action Name";
-    mock.onPut(_manageAction.path).reply(200, { data: testActionModel });
-    const res: ActionModel = await _manageAction.updateAction(
-      testActionModel._id,
-      "Updated ActionName",
-      testActionModel.description,
-      testActionModel.serviceId,
-      testActionModel.serviceId,
-    );
-    expect(res).not.toBe(null);
-    expect(res.name).toEqual("Updated Action Name");
-  });
 });

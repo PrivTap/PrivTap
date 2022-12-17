@@ -7,7 +7,7 @@ import {
 } from "vitest";
 import { StandartRepsonse } from "../../src/model/response_model";
 import { UserModel } from "../../src/model/user_model";
-import AuthService from "../../src/services/auth_service";
+import AuthService from "../../src/controllers/auth_controller";
 import MockAdapter from "axios-mock-adapter";
 
 describe("Auth Service Tests", () => {

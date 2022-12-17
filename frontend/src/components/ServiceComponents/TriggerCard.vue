@@ -3,10 +3,11 @@
     <div class="bg-green-900/40 rounded-lg py-8 px-8 shadow-lg">
         <p class="text-2xl font-medium"> {{ trigger.name }} </p>
         <p class="text-lg font-medium text-white/60"> {{ trigger.description }} </p>
-        <v-label class="pt-4 pb-2">Selected Permissions </v-label>
+        <v-label  class="pt-4 pb-2">Selected Permissions </v-label>
         <div>
-            <v-chip v-for="permission in permissions" :key="permission._id" class="mr-2" color="success"
-                variant="outlined" appendIcon="mdi-check-circle-outline">
+            <div v-if="!trigger.permissions.some(p => p.associated)"> No permission required </div>
+            <v-chip v-for="permission in trigger.permissions.filter(p => p.associated)" :key="permission._id"
+                class="mr-2" color="success" variant="outlined" appendIcon="mdi-check-circle-outline">
                 {{ permission.name }}
             </v-chip>
         </div>
@@ -18,8 +19,8 @@
                         Edit
                     </v-btn>
                 </template>
-                <TriggerForm v-if="serviceId" :serviceId="serviceId" :onCancel="onFormClose" onEdit
-                    :trigger="trigger"/>
+                <TriggerForm :serviceId="(props.serviceId)" :onCancel="onFormClose" onEdit
+                    :trigger="trigger" />
             </v-dialog>
 
             <v-btn color="error" @click="(showDialog = true)">
@@ -34,47 +35,27 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, onMounted, ref } from 'vue';
+import { defineProps, ref } from 'vue';
 import ModalComponent from '@/components/ModalComponent.vue';
 import type TriggerModel from '@/model/trigger_model';
-import { ManageTrigger } from '@/services/manage_trigger';
-import ManagePermission from '@/services/manage_permission';
-import type PermissionModel from '@/model/permission_model';
 import TriggerForm from './TriggerForm.vue';
+import manage_trigger from '@/controllers/manage_trigger';
 const props = defineProps<{
     trigger: TriggerModel;
     serviceId: string;
 }>();
 
-const permissions = ref<PermissionModel[]>([]);
-
-onMounted(async () => {
-    _fetchPermissions();
-});
-
 function onFormClose() {
-    permissions.value = [];
-    _fetchPermissions();
     formDialog.value = false;
-}
-
-async function _fetchPermissions() {
-    const perms = await ManagePermission.getInstance.getPermissions(props.serviceId);
-    perms.map((perm) => {
-        if (props.trigger.permissions.includes(perm._id)) {
-            permissions.value.push(perm);
-        }
-    });
 }
 
 const showDialog = ref(false);
 const formDialog = ref(false);
 
-const manageTrigger = ManageTrigger.getInstance;
 function onModalClose(res: boolean) {
     showDialog.value = false;
     if (!res) return;
-    manageTrigger.deleteTrigger(props.trigger._id);
+    manage_trigger.deleteTrigger(props.trigger._id);
 }
 
 </script>

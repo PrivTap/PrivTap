@@ -1,8 +1,9 @@
-import mongoose, { Schema, Types } from "mongoose";
+import mongoose, {Schema, Types} from "mongoose";
 import Service from "./Service";
 import Model from "../Model";
-import { OperationDataType } from "../helper/rule_execution";
+import {OperationDataType} from "../helper/rule_execution";
 import logger from "../helper/logger";
+import Permission, {IPermission} from "./Permission";
 
 export interface ITrigger {
     _id: string;
@@ -46,11 +47,33 @@ class Trigger extends Model<ITrigger> {
     }
 
     /**
-     * Finds all the triggers provided by a service.
+     * Finds all the triggers provided by a service by adding all the permissions and adding a tag
      * @param serviceId the id of the service
      */
-    async findAllForService(serviceId: string): Promise<Partial<ITrigger>[] | null> {
-        return await this.findAll({ serviceId }, "-serviceId");
+    async findAllForService(serviceId: string): Promise<Partial<TriggerOsp>[] | null> {
+        let triggers: ITrigger[] | null;
+        try {
+            triggers = await this.findAll({serviceId}, "-serviceId");
+        } catch (e) {
+            return null;
+        }
+        if (triggers == null)
+            return null;
+        const triggersResult = new Array<TriggerOsp>();
+        for (const trigger of triggers) {
+            if (trigger.permissions != undefined) {
+                let temp = await Permission.getAllPermissionAndAddBooleanTag(serviceId, trigger.permissions)
+                const triggerResult: TriggerOsp = {
+                    name: trigger.name,
+                    _id: trigger._id,
+                    resourceServer: trigger.resourceServer,
+                    description: trigger.description,
+                    permissions: !!temp ? temp : []
+                }
+                triggersResult.push(triggerResult);
+            }
+        }
+        return triggersResult;
     }
 
     /**
@@ -72,13 +95,13 @@ class Trigger extends Model<ITrigger> {
     async getTriggerServiceNotificationServer(triggerId: string): Promise<Partial<triggerServiceNotificationServer> | null> {
         try {
             const result = await this.model.aggregate()
-                .match({ _id: new mongoose.Types.ObjectId(triggerId) })
+                .match({_id: new mongoose.Types.ObjectId(triggerId)})
                 //keep only the serviceId
-                .project({ _id: 0, "serviceId": 1 })
+                .project({_id: 0, "serviceId": 1})
                 //left outer join with collection service
-                .lookup({ from: "services", localField: "serviceId", foreignField: "_id", as: "service" })
-                .unwind({ path: "$service" })
-                .addFields({ triggerNotificationServer: "$service.triggerNotificationServer" })
+                .lookup({from: "services", localField: "serviceId", foreignField: "_id", as: "service"})
+                .unwind({path: "$service"})
+                .addFields({triggerNotificationServer: "$service.triggerNotificationServer"})
                 //remove all the field except the trigger Notification center
                 .project({
                     _id: 0,
@@ -92,7 +115,7 @@ class Trigger extends Model<ITrigger> {
             }
             return result[0];
         } catch
-        (e) {
+            (e) {
             logger.debug("Unexpected error while finding the trigger notification url after creating a rule" + e);
             return null;
         }
@@ -105,4 +128,12 @@ export interface triggerServiceNotificationServer {
     serviceId: string,
     triggerNotificationServer: string,
     triggerId: string
+}
+
+export interface TriggerOsp {
+    _id: string,
+    name: string,
+    description: string,
+    resourceServer?: string,
+    permissions?: Partial<IPermission>[]
 }

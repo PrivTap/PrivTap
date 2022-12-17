@@ -1,14 +1,17 @@
-import {afterEach, beforeAll, beforeEach, describe, expect, test} from "vitest";
-import MockAdapter from "axios-mock-adapter";
+import {afterEach, beforeAll, beforeEach, describe, test} from "vitest";
+
 import SimpleServiceModel from "../../src/model/simple_service_model";
 import axiosInstance from "../../src/helpers/axios_service";
-import showServices from "../../src/services/show-services";
-import { SinonStub } from "sinon";
+import showServices from "../../src/controllers/show-services";
+import {SinonStub} from "sinon";
 import * as sinon from "sinon";
+import {use, expect} from "chai";
+import sinonChai = require("sinon-chai");
 
-
+use(sinonChai);
 
 const sandbox = sinon.createSandbox();
+
 describe("Manage Service Tests", () => {
     let getStub: SinonStub;
     let testServiceModel: SimpleServiceModel = new SimpleServiceModel(
@@ -18,25 +21,38 @@ describe("Manage Service Tests", () => {
         0,
     );
     beforeAll(() => {
-
-        //mock = new MockAdapter(showServices.getInstance())
     });
 
     beforeEach(() => {
-        getStub= sandbox.stub(axiosInstance,"get");
+        getStub = sandbox.stub(axiosInstance, "get");
+
     });
-    afterEach(async ()=>{
+    afterEach(async () => {
         sandbox.restore();
+        showServices.getRef().value = [];
     })
 
 
     /// Test createService
-    test("should return a the created service", async () => {
-        //mock.onPost(ShowServices.path).reply(200, );
-        getStub.resolves({ data: {data: [testServiceModel]}})
-        const res = await showServices.getAllServices();
-        console.log(res);
-        expect(res.value).toStrictEqual([testServiceModel]);
+    test("should return all the services", async () => {
+        getStub.resolves({data: {data: [testServiceModel]}})
+        await showServices.getAllServices();
+        expect(showServices.getRef().value).to.be.eql([testServiceModel]);
     });
+    test("Should put nothing in the ref value if the gets failed", async () => {
+        getStub.resolves(null);
+        await showServices.getAllServices();
+        expect(showServices.getRef().value).to.be.eql([]);
+    })
+    test("should return all the authorized services", async () => {
+        getStub.resolves({data: {data: [testServiceModel]}})
+        await showServices.getAllServices();
+        expect(showServices.getRef().value).to.be.eql([testServiceModel]);
+    });
+    test("Should put nothing in the ref value if the gets failed", async () => {
+        getStub.resolves(null);
+        await showServices.getAllServices();
+        expect(showServices.getRef().value).to.be.eql([]);
+    })
 
 });

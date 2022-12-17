@@ -1,80 +1,98 @@
-import { beforeAll, beforeEach, describe, expect, test } from "vitest";
-import { ManageService } from "../../src/services/manage_service";
-import ServiceModel from "../../src/model/service_model";
-import MockAdapter from "axios-mock-adapter";
+import {afterEach, beforeEach, describe, test} from "vitest";
+import {SinonStub} from "sinon";
+import * as sinon from "sinon";
+import {use, expect} from "chai";
+import sinonChai = require("sinon-chai");
+import axiosInstance from "../../src/helpers/axios_service";
+import manageService from "../../src/controllers/manage_Service";
+import ServiceModel from "../../src/model/Service_model";
 
-describe("Manage Service Tests", () => {
-  let mock: MockAdapter;
-  const _manageService = ManageService.getInstance;
-  let testServiceModel: ServiceModel = new ServiceModel(
-    "Test Service id",
-    "Test Service Name",
-    "Test Description",
-    "Test Creator",
-    "Test Auth Server",
-    "Test Client Id",
-    "Test ClientSecret",
-    0,
+
+use(sinonChai);
+
+const sandbox = sinon.createSandbox();
+
+describe("Manage Service Test", () => {
+  let getStub: SinonStub;
+  let postStub: SinonStub;
+  let putStub: SinonStub;
+  let deleteStub: SinonStub;
+  const testServiceModel: ServiceModel = new ServiceModel(
+      "Test Service id",
+      "Test Service name",
+      "Service description",
+      "creator",
   );
-  beforeAll(() => {
-    mock = new MockAdapter(_manageService.http);
-  });
-
   beforeEach(() => {
-    mock.reset();
+    getStub = sandbox.stub(axiosInstance, "get");
+    postStub = sandbox.stub(axiosInstance, "post");
+    putStub = sandbox.stub(axiosInstance, "put");
+    deleteStub = sandbox.stub(axiosInstance, "delete");
+  });
+  afterEach(async () => {
+    sandbox.restore();
+    manageService.getRef().value=[];
+  })
+
+  //TEST GetServices
+  test("Should put in the ref all the Services", async () => {
+    getStub.resolves({data: {data: [testServiceModel]}})
+    await manageService.getAllServices();
+    expect(manageService.getRef().value).to.be.eql([testServiceModel]);
+  });
+  test("Should put nothing in the ref value if the gets failed", async()=>{
+    getStub.resolves(null);
+    await manageService.getAllServices();
+    expect(manageService.getRef().value).to.be.eql([]);
+  })
+  //TEST CreateServices
+  test("Should put the created Service in the ref array", async () => {
+    postStub.resolves({data: {data: testServiceModel}})
+    await manageService.createService(testServiceModel.name, testServiceModel.description,
+        testServiceModel.authServer, testServiceModel.clientId, testServiceModel.clientSecret)
+    expect(manageService.getRef().value).to.be.eql([testServiceModel]);
+  });
+  test("Should put nothing in the ref value if the gets failed", async()=>{
+    postStub.resolves(null);
+    await manageService.createService(testServiceModel.name, testServiceModel.description,
+        testServiceModel.authServer, testServiceModel.clientId, testServiceModel.clientSecret)
+    expect(manageService.getRef().value).to.be.eql([]);
+  })
+
+  //TEST UpdateService
+  test("Should change the updated Service in the ref array", async()=>{
+    manageService.getRef().value= [testServiceModel];
+    const updatedService= new ServiceModel(
+        "Test Service id",
+        "Test Service name changed",
+        "Service description changed",
+        "changedCreator",
+    )
+    putStub.resolves({data: {data:updatedService}});
+    await manageService.updateService(updatedService._id, updatedService.name, updatedService.description,updatedService.authServer,
+        updatedService.clientId, updatedService.clientSecret)
+    expect(manageService.getRef().value).to.be.eql([updatedService]);
+  })
+  test("Should not change the updated Service in the ref array if it fails", async()=>{
+    manageService.getRef().value= [testServiceModel];
+    const updatedService= new ServiceModel(
+        "Test Service id",
+        "Test Service name changed",
+        "Service description changed",
+        "changedCreator",
+    )
+    putStub.resolves(null);
+    await manageService.updateService(updatedService._id, updatedService.name, updatedService.description,updatedService.authServer,
+        updatedService.clientId, updatedService.clientSecret)
+    expect(manageService.getRef().value).to.be.eql([testServiceModel]);
+
+  })
+
+  //TEST DeleteService
+  test("Should delete the Service in the ref value", async () => {
+    manageService.getRef().value= [testServiceModel];
+    await manageService.deleteService(testServiceModel._id);
+    expect(manageService.getRef().value).to.be.eql([]);
   });
 
-
-  /// Test createService
-  test("should return a the created service", async () => {
-    mock.onPost(_manageService.path).reply(200, { data: testServiceModel });
-    const res = await _manageService.createService(
-      testServiceModel.name,
-      testServiceModel.description,
-      testServiceModel.authServer,
-      testServiceModel.clientId,
-      testServiceModel.clientSecret,
-    );
-    expect(res.name).toEqual(testServiceModel.name);
-  });
-
-  /// Test getAllServices
-  test("should return a list of defined service", async () => {
-    mock.onGet(_manageService.path).reply(200, { data: [testServiceModel] });
-    const res = await _manageService.getAllServices();
-    expect(res).toEqual([testServiceModel]);
-  });
-
-  /// Test getService by Id
-  test("should return the service with the passed id", async () => {
-    mock.onGet(_manageService.path, { params: { "serviceId": testServiceModel._id } }).reply(200, {
-      data: testServiceModel
-    }
-    );
-    const res = await _manageService.getServiceById(testServiceModel._id);
-    expect(res.name).toBe(testServiceModel.name);
-  });
-
-  /// Test deleteService
-  test("should return a list of service after delete", async () => {
-    mock.onDelete(_manageService.path).reply(200, { data: [] });
-    const res = await _manageService.deleteService("Test Service id");
-    expect(res).to.empty;
-  });
-
-  /// Test updateService
-  test("should return the updated service", async () => {
-    testServiceModel.name = "Updated Service Name";
-    mock.onPut(_manageService.path).reply(200, { data: testServiceModel });
-    const res: ServiceModel = await _manageService.updateService(
-      testServiceModel._id,
-      "Updated Service Name",
-      testServiceModel.description,
-      testServiceModel.authServer,
-      testServiceModel.clientId,
-      testServiceModel.clientSecret,
-    );
-    expect(res).not.toBe(null);
-    expect(res.name).toEqual("Updated Service Name");
-  });
 });

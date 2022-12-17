@@ -1,10 +1,9 @@
-import Service, { IService } from "../../model/Service";
-import { Request, Response } from "express";
+import Service, {IService} from "../../model/Service";
+import {Request, Response} from "express";
 import Route from "../../Route";
-import { badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
-import { checkURL, handleInsert, handleUpdate } from "../../helper/misc";
-import { randomBytes } from "crypto";
-
+import {badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success} from "../../helper/http";
+import {checkURL, handleInsert, handleUpdate} from "../../helper/misc";
+import {randomBytes} from "crypto";
 
 
 export default class ManageServices extends Route {
@@ -45,16 +44,18 @@ export default class ManageServices extends Route {
     protected async httpPost(request: Request, response: Response): Promise<void> {
         const name = request.body.name;
         const description = request.body.description;
-        const authServer = request.body.authServer;
+        const baseUrl = request.body.baseUrl;
+        const authPath = request.body.authPath;
+        const tokenPath = request.body.tokenPath;
         const clientId = request.body.clientId;
         const clientSecret = request.body.clientSecret;
         const triggerNotificationServer = request.body.triggerNotificationServer;
 
         if (checkUndefinedParams(response, name, description)) return;
 
-        if (authServer != undefined) {
+        if (baseUrl != undefined) {
             // TODO: why is this checked here? We agreed on putting all checks into the model
-            if (!checkURL(authServer)) {
+            if (!checkURL(baseUrl)) {
                 badRequest(response);
                 return;
             }
@@ -66,7 +67,7 @@ export default class ManageServices extends Route {
         // Insert the service
         if (!await handleInsert(response, Service,
             {
-                name, description, creator: request.userId, authServer, clientId, clientSecret,
+                name, description, creator: request.userId, baseUrl, authPath, tokenPath, clientId, clientSecret,
                 triggerNotificationServer, apiKey: serviceAPIKey
             })) return;
 
@@ -98,7 +99,9 @@ export default class ManageServices extends Route {
         const serviceId = request.body.serviceId;
         const name = request.body.name;
         const description = request.body.description;
-        const authServer = request.body.authServer;
+        const baseUrl = request.body.baseUrl;
+        const authPath = request.body.authPath;
+        const tokenPath = request.body.tokenPath;
         const clientId = request.body.clientId;
         const clientSecret = request.body.clientSecret;
         const triggerNotificationServer = request.body.triggerNotificationServer;
@@ -111,8 +114,17 @@ export default class ManageServices extends Route {
             return;
         }
 
-        if (!await handleUpdate(response, Service, { _id: serviceId },
-            { name, description, authServer, clientId, clientSecret, triggerNotificationServer })) return;
+        if (!await handleUpdate(response, Service, {_id: serviceId},
+            {
+                name,
+                description,
+                baseUrl,
+                authPath,
+                tokenPath,
+                clientId,
+                clientSecret,
+                triggerNotificationServer
+            })) return;
 
         success(response);
     }
