@@ -349,7 +349,7 @@ paths:
             type: boolean
           example: true
         - name: compatible
-          description: Filters the returned list including only the actions authorized by the user [NOT YET IMPLEMENTED]
+          description: Filters the returned list including only the actions authorized by the user
           in: query
           schema:
             type: boolean

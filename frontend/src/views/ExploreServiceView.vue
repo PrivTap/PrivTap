@@ -92,11 +92,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import {onMounted, ref} from 'vue';
 import empty from '@/assets/images/empty.svg';
 import { useRoute } from 'vue-router';
 import type SimpleServiceModel from '@/model/simple_service_model';
-import type PermissionModel from '@/model/permission_model';
+import UserTrigger from "@/controllers/user-trigger";
+import UserAction from "@/controllers/user-action";
 
 const route = useRoute();
 const temp = route.params.service;
@@ -105,95 +106,12 @@ let service = JSON.parse(temp as string) as SimpleServiceModel
 const tabs = ref(0);
 // const service = new ServiceModel("id", "GitHub Integration", "Description of what that service offers..", "creator", "http://github.com", "authPath", "tokenPath", "clientId", "clientSecret");
 
-/// TODO: When the page load, fetch the Trigger and Action from the API
 
-const listOfTrigger = [
-    {
-        _id: '1',
-        name: 'Trigger 1',
-        description: 'Trigger when a new issue is created',
-        permissions: [{
-            _id: '1',
-            name: 'Read',
-            description: 'Read the issue'
-        } as PermissionModel, {
-            _id: '2',
-            name: 'Write',
-            description: 'Write the issue'
-        } as PermissionModel,]
-    },
-    {
-        _id: '2',
-        name: 'Trigger 2',
-        description: 'Trigger when a new pull-request is created',
-        permissions: [{
-            _id: '1',
-            name: 'Read',
-            description: 'Read the issue'
-        } as PermissionModel, {
-            _id: '2',
-            name: 'Write',
-            description: 'Write the issue'
-        } as PermissionModel,]
-    },
-    {
-        _id: '2',
-        name: 'Trigger 2',
-        description: 'Trigger when a new pull-request is created',
-        permissions: [{
-            _id: '1',
-            name: 'Read',
-            description: 'Read the issue'
-        } as PermissionModel, {
-            _id: '2',
-            name: 'Write',
-            description: 'Write the issue'
-        } as PermissionModel,]
-    },
-];
-const listOfAction = [
-    {
-        _id: '1',
-        name: 'Action1 ',
-        description: 'Action create a comments',
-        permissions: [{
-            _id: '1',
-            name: 'Read',
-            description: 'Read the issue'
-        } as PermissionModel, {
-            _id: '2',
-            name: 'Write',
-            description: 'Write the issue'
-        } as PermissionModel,]
-    },
-    {
-        _id: '2',
-        name: 'Action2',
-        description: 'Action create a merge request',
-        permissions: [{
-            _id: '1',
-            name: 'Read',
-            description: 'Read the issue'
-        } as PermissionModel, {
-            _id: '2',
-            name: 'Write',
-            description: 'Write the issue'
-        } as PermissionModel,]
-    },
-    {
-        _id: '2',
-        name: 'Action2',
-        description: 'Action create a merge request',
-        permissions: [{
-            _id: '1',
-            name: 'Read',
-            description: 'Read the issue'
-        } as PermissionModel, {
-            _id: '2',
-            name: 'Write',
-            description: 'Write the issue'
-        } as PermissionModel,]
-    },
-];
+let listOfTrigger = UserTrigger.getNewRef();
+let listOfAction = UserAction.getNewRef();
+onMounted(async () => {
 
+  listOfTrigger.value = await UserTrigger.getAllTriggers(service._id, true);
+  listOfAction.value = await UserAction.getAllActions(service._id, true);
+});
 </script>

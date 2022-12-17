@@ -1,7 +1,8 @@
 import Route from "../../Route";
-import { Request, Response } from "express";
-import { checkUndefinedParams, internalServerError, success } from "../../helper/http";
-import Action, { ActionOsp } from "../../model/Action";
+import {Request, Response} from "express";
+import {checkUndefinedParams, internalServerError, success} from "../../helper/http";
+import Action, {ActionOsp} from "../../model/Action";
+import RuleExecution from "../../helper/rule_execution";
 
 export default class ActionsRoute extends Route {
     constructor() {
@@ -15,12 +16,13 @@ export default class ActionsRoute extends Route {
         const serviceId = request.query.serviceId as string;
         const userId = request.userId;
         const authorized = request.query.authorized as string;
+        const triggerId = request.query.triggerId as string;
         let data: ActionOsp[] | null = null;
-        if(checkUndefinedParams(response, serviceId))
+        if (checkUndefinedParams(response, serviceId))
             return;
-        if (authorized==="true") {
+        if (authorized === "true") {
             data = await Action.findAllActionAuthorizedByUser(userId, serviceId);
-        }else{
+        } else {
             data = await Action.findAllForService(serviceId);
         }
         if (data == null) {
@@ -28,20 +30,10 @@ export default class ActionsRoute extends Route {
             return;
         }
 
-        success(response, data);
-
         //TODO: Can we check compatibility on the DB?
-        /*if (triggerId) {
-            authorizedServices = authorizedServices.map((service) => {
-                return {
-                    serviceId: service.serviceId,
-                    serviceName: service.serviceName,
-                    actions: service.actions.filter((action) => RuleExecution.areActionTriggerCompatible(action._id ?? "", triggerId))
-                };
-            }).filter((service) => service.actions.length > 0);
+        if (triggerId) {
+            data.filter((action) => RuleExecution.areActionTriggerCompatible(action._id ?? "", triggerId))
         }
-
-        data = authorizedServices;*/
         success(response, data);
     }
 }
