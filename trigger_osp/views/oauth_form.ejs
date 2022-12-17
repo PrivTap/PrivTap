@@ -39,14 +39,24 @@
 <script>
     function submitChoice(status) {
         const state = '<%= state %>'
+        const redirectUri = '<%= redirectUri %>';
         let xhr = new XMLHttpRequest();
         xhr.open("POST", "http://127.0.0.1:8001/authorize");
         xhr.setRequestHeader("Accept", "application/json");
         xhr.setRequestHeader("Content-Type", "application/json");
-        let data = `{ "status": "${status}" , "state":` + JSON.stringify(state) + `}`;
 
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                const data = JSON.parse(xhr.responseText);
+                const redirectUri = data.redirectUri;
+                let redirect = new XMLHttpRequest();
+                redirect.open("GET", redirectUri);
+                redirect.send();
+                window.location = redirectUri;
+            }};
+
+        let data = `{ "status": "${status}" , "state":` + JSON.stringify(state) + `, "redirectUri": "${redirectUri}" }`;
         xhr.send(data);
-
     }
 </script>
 

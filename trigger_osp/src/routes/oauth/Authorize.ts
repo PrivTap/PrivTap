@@ -47,16 +47,16 @@ export default class AuthorizeRoute extends Route {
         // Get aggregate data
         const aggregateData = Permission.getAggregateData(permissions);
         // Create authorization
-        // Should work, check if a new authorization with only userId and permissions exists
-        console.log("permissionIds:", permissionIds);
         if (! await Authorization.insert({ userId, permissionIds }))
-        response.render("oauth_form", { fieldData: aggregateData, state});
+        response.render("oauth_form", { fieldData: aggregateData, state, redirectUri});
     }
 
+    // Button callback
     protected async httpPost(request: Request, response: Response): Promise<void> {
-        console.log("POST");
         const userId = request.userId;
         const status = request.body.status;
+        const state = request.body.state;
+        let redirectUri = request.body.redirectUri;
         if (status != "accept"){
             if (!await rollBackAuthorization(userId)){
                 console.log("rollback error");
@@ -68,7 +68,7 @@ export default class AuthorizeRoute extends Route {
             response.status(200).send("Not accepted");
             return;
         }
-        const permissionIds = await Permission.authorizePermissions(userId)
+        const permissionIds = await Permission.authorizePermissions(userId);
         if (!permissionIds){
             console.log("no permissionIds");
             response.status(500).send();
@@ -76,10 +76,13 @@ export default class AuthorizeRoute extends Route {
         }
         // create code
         const code = await OAuthServer.generateCode(userId);
-        console.log("code=", code);
-        console.log("state=", status);
-        // retrieve redirectUri and send back {"code": code, "state": status}
-        //response.status(200).send({"code": code, "state": status});
+        if (!code){
+            response.status(500).send();
+            return;
+        }
+        redirectUri = redirectUri + "/?&code=" + encodeURIComponent(code) + "&state=" + encodeURIComponent(state);
+        console.log(redirectUri);
+        response.status(302).send({ redirectUri });
     }
 
 }
