@@ -18,7 +18,7 @@
             {{authorization? 'Permission': 'Authorize'}}
           </v-btn>
 
-          <v-btn size="small" variant="tonal" >
+          <v-btn size="small" variant="tonal"  @click="router.push(`${RoutingPath.EXPLORE_SERVICE_PAGE}/${JSON.stringify(service)}`)" >
             Explore
           </v-btn>
         </v-card-actions>

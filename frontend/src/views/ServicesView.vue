@@ -81,7 +81,7 @@ import {onMounted, ref} from "vue";
 import empty from '@/assets/images/empty1.svg';
 import radial from '@/assets/images/radial.svg';
 import logo from '@/assets/images/logo_dark.svg';
-import showServices from "@/controllers/show-services";
+import showServices from "@/controllers/show_services";
 import type SimpleServiceModel from "@/model/simple_service_model";
 
 const router = useRouter();

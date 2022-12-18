@@ -6,14 +6,14 @@ export default class TriggerModel {
     description: string;
     serviceId?: string;
     permissions: Partial<PermissionModel>[];
-    resourceServer?: string;
+    resourceServer: string;
 
     constructor(
         _id: string,
         name: string,
         description: string,
         permissions: Partial<PermissionModel>[],
-        resourceServer?: string
+        resourceServer: string
     ) {
         this._id = _id;
         this.name = name;

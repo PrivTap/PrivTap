@@ -1,11 +1,13 @@
-import { use, request, expect } from "chai";
+import {use, expect, request} from "chai";
 import chaiHttp = require("chai-http");
-import { createSandbox, SinonStub } from "sinon";
+import {createSandbox, SinonStub} from "sinon";
 import sinonChai = require("sinon-chai");
+import {beforeEach} from "mocha";
 import app from "../../src/app";
-import Authentication, { AuthError } from "../../src/helper/authentication";
-import Authorization from "../../src/model/Authorization";
-import { beforeEach } from "mocha";
+import Action from "../../src/model/Action";
+import Authentication from "../../src/helper/authentication";
+
+
 
 use(chaiHttp);
 use(sinonChai);
@@ -18,26 +20,25 @@ describe("/actions endpoint", () => {
 
     let requester: ChaiHttp.Agent;
     let checkJWTStub: SinonStub;
-    let findAllServicesAuthorizedByUserWithActionsStub: SinonStub;
+    let findAllActionAuthorizedByUserStub: SinonStub;
+    let findAllForServiceStub: SinonStub;
+    const exampleServiceId = "serviceId";
+    const examplePerm1 = {_id: "8380b79b38dda0d2f6be3746", name: "Service 1", desc: " Perm 1 desc"};
+    const examplePerm2 = {_id: "9380b79b38dda0d2f6be3746", name: "Service 2", desc: "Perm 2 desc"};
 
-    const exampleService1 = { _id: "8380b79b38dda0d2f6be3746", name: "Service 1" };
-    const exampleService2 = { _id: "9380b79b38dda0d2f6be3746", name: "Service 2" };
-
-    const exampleAction1 = { _id: "0380b79b38dda0d2f6be3746", name: "Action 1", description: "Action 1 desc" };
-    const exampleAction2 = { _id: "1380b79b38dda0d2f6be3746", name: "Action 2", description: "Action 2 desc" };
-
-    const serviceWithActions = [
-        {
-            serviceName: exampleService1.name,
-            serviceId: exampleService1._id,
-            actions: [exampleAction1]
-        },
-        {
-            serviceName: exampleService2.name,
-            serviceId: exampleService2._id,
-            actions: [exampleAction2]
-        }
-    ];
+    const exampleAction1 = {
+        _id: "0380b79b38dda0d2f6be3746",
+        name: "Action 1",
+        description: "Action 1 desc",
+        permissions: [examplePerm2, examplePerm1],
+        resourceServer: "http://resource.com"
+    };
+    const exampleAction2 = {
+        _id: "1380b79b38dda0d2f6be3746",
+        name: "Action 2",
+        description: "Action 2 desc",
+        permissions: [examplePerm2, examplePerm1]
+    };
 
     before(() => {
         requester = request(app.express).keepOpen();
@@ -48,10 +49,10 @@ describe("/actions endpoint", () => {
     });
 
     beforeEach(() => {
+        findAllForServiceStub = sandbox.stub(Action, "findAllForService");
+        findAllActionAuthorizedByUserStub = sandbox.stub(Action, "findAllActionAuthorizedByUser");
         checkJWTStub = sandbox.stub(Authentication, "checkJWT")
-            .returns({ userId: "test_user_id", active: true }); // User authenticated and account is active
-        findAllServicesAuthorizedByUserWithActionsStub = sandbox.stub(Authorization, "findAllServicesAuthorizedByUserWithActions")
-            .resolves(serviceWithActions);
+            .returns({userId: "test_user_id", active: true}); // User authenticated and account is active
     });
 
     afterEach(() => {
@@ -59,40 +60,43 @@ describe("/actions endpoint", () => {
     });
 
     describe("GET /", () => {
-
-        it("should fail if the user is not authenticated", async () => {
-            checkJWTStub.throws(new AuthError());
-
+        it("should return 400 if the service Id is not specified", async () => {
             const res = await requester.get(endpoint);
-            expect(res).to.have.status(401);
+            expect(res).to.have.status(400);
         });
-
+        it("should return all the Action with the permission populated", async () => {
+            findAllForServiceStub.returns([exampleAction1, exampleAction2]);
+            const res = await requester.get(endpoint).query({serviceId: exampleServiceId});
+            expect(findAllForServiceStub).to.have.been.calledOnceWith(exampleServiceId);
+            expect(res).to.have.status(200);
+            expect(res.body.data).to.be.eql([exampleAction1, exampleAction2]);
+        });
+        it("should return all the Action authorized with the permission populated", async () => {
+            checkJWTStub.returns({userId: "test_user_id", active: true});
+            findAllActionAuthorizedByUserStub.returns([exampleAction1, exampleAction2]);
+            const res = await requester.get(endpoint).query({serviceId: exampleServiceId, authorized: "true"});
+            expect(findAllActionAuthorizedByUserStub).to.have.been.calledOnceWith("test_user_id", exampleServiceId);
+            expect(res).to.have.status(200);
+            expect(res.body.data).to.be.eql([exampleAction1, exampleAction2]);
+        });
         it("should fail if the user account is not active", async () => {
-            checkJWTStub.returns({ userId: "test_user_id", active: false });
+            checkJWTStub.returns({userId: "test_user_id", active: false});
 
             const res = await requester.get(endpoint);
             expect(res).to.have.status(403);
         });
-
-        it("should return a list of actions for services that the user has authorized", async () => {
-            const res = await requester.get(endpoint);
-            expect(res).to.have.status(200);
-
-            expect(findAllServicesAuthorizedByUserWithActionsStub).to.have.been.calledOnceWith("test_user_id");
-
-            expect(res.body.data).to.be.eql(serviceWithActions);
+        it("should give internal server error if the database fails", async () => {
+            findAllForServiceStub.resolves(null);
+            let res = await requester.get(endpoint).query({serviceId: exampleServiceId});
+            expect(res).to.have.status(500);
+            sandbox.restore();
+            findAllActionAuthorizedByUserStub.resolves(null);
+            checkJWTStub = sandbox.stub(Authentication, "checkJWT")
+                .returns({userId: "test_user_id", active: true});
+            res = await requester.get(endpoint).query({serviceId: exampleServiceId, authorized  : "true"});
+            expect(res).to.have.status(500);
         });
 
-        it("should return an empty list if the user has not authorized any service", async () => {
-            findAllServicesAuthorizedByUserWithActionsStub.resolves([]);
-
-            const res = await requester.get(endpoint);
-            expect(res).to.have.status(200);
-
-            expect(res.body.data).to.be.eql([]);
-        });
 
     });
 });
-
-

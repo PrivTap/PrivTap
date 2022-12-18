@@ -1,9 +1,11 @@
-import {Schema, Types} from "mongoose";
+import { Schema, Types } from "mongoose";
 import Service from "./Service";
 import Model from "../Model";
-import {OperationDataType} from "../helper/rule_execution";
-import Permission, {IPermission} from "./Permission";
+import { OperationDataType } from "../helper/rule_execution";
+import Permission, { IPermission } from "./Permission";
 import mongoose from "mongoose";
+import Authorization from "./Authorization";
+import { TriggerOsp } from "./Trigger";
 
 export interface IAction {
     _id: string;
@@ -36,7 +38,7 @@ const actionSchema = new Schema({
         type: [String]
         // required?
     },
-    permissions: [{type: mongoose.Schema.Types.ObjectId, ref: 'permission'}]
+    permissions: [{ type: mongoose.Schema.Types.ObjectId, ref: "permission" }]
 });
 
 class Action extends Model<IAction> {
@@ -46,32 +48,34 @@ class Action extends Model<IAction> {
     }
 
     /**
-     * Finds all the actions provided by a service by adding all the permissions and adding a tag
+     * Finds all the Actions provided by a service
      * @param serviceId the id of the service
+     * @param associated Default false. If true, it returns the actions containing all the permissions of the service with a boolean field associated. "associated" is true if the permission is already associated to the action.
      */
-    async findAllForService(serviceId: string): Promise<Partial<ActionOsp>[] | null> {
-        const allPermissions = await Permission.findByServiceId(serviceId, "name");
-        if (allPermissions == null)
-            return null;
+    async findAllForService(serviceId: string, associated = false): Promise<ActionOsp[] | null> {
         let actions: IAction[] | null;
-        try {
-            actions = await this.findAll({serviceId}, "-serviceId");
-        } catch (e) {
-            return null;
-        }
+        if(associated)
+            //we don't populate the permissions, permissions is now an array of idPermission (string)
+            actions = await this.findAll({ serviceId }, "-serviceId");
+        else
+            //we populate the permissions, permissions is now an Array of IPermission
+            actions = await this.findAll({ serviceId }, "-serviceId", "permissions", "name description");
         if (actions == null)
             return null;
         const actionsResult = new Array<ActionOsp>();
         for (const action of actions) {
             if (action.permissions != undefined) {
-                let temp = await Permission.getAllPermissionAndAddBooleanTag(serviceId, action.permissions)
+                let allPermAndAssociated;
+                if (associated)
+                    allPermAndAssociated = await Permission.getAllPermissionAndAddBooleanTag(serviceId, action.permissions as Types.Array<string>);
+
                 const actionResult: ActionOsp = {
                     name: action.name,
                     _id: action._id,
                     endpoint: action.endpoint,
                     description: action.description,
-                    permissions: !!temp ? temp : []
-                }
+                    permissions: associated? (allPermAndAssociated ? allPermAndAssociated : []): action.permissions as Types.Array<Partial<IPermission>>
+                };
                 actionsResult.push(actionResult);
             }
         }
@@ -88,6 +92,25 @@ class Action extends Model<IAction> {
         if (action == null)
             return false;
         return await Service.isCreator(userId, action.serviceId);
+    }
+    async findAllActionAuthorizedByUser(userId: string, serviceId: string): Promise<ActionOsp[] | null> {
+        const grantedPermissionId = await Authorization.getGrantedPermissionsId(userId, serviceId);
+        console.log(grantedPermissionId);
+        let result;
+        try {
+            result = await this.model.aggregate()
+                .match({ serviceId: new mongoose.Types.ObjectId(serviceId) })
+                .match({
+                    $expr: {
+                        $setIsSubset: ["$permissions", grantedPermissionId]
+                    }
+                })
+                .project({ "outputs": 0, "data": 0, "serviceId":0 }) as ActionOsp[];
+        } catch (e) {
+            console.log(e);
+            return null;
+        }
+        return result;
     }
 }
 

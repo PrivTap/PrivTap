@@ -1,10 +1,10 @@
 import Route from "../../Route";
-import {Request, Response} from "express";
-import {badRequest, checkUndefinedParams, forbiddenUserError, success} from "../../helper/http";
-import Trigger, {ITrigger, TriggerOsp} from "../../model/Trigger";
+import { Request, Response } from "express";
+import { badRequest, checkUndefinedParams, forbiddenUserError, success } from "../../helper/http";
+import Trigger, { ITrigger, TriggerOsp } from "../../model/Trigger";
 import Permissions from "../../model/Permission";
 import Service from "../../model/Service";
-import {handleInsert, handleUpdate} from "../../helper/misc";
+import { handleInsert, handleUpdate } from "../../helper/misc";
 
 
 export default class ManageTriggersRoute extends Route {
@@ -18,7 +18,7 @@ export default class ManageTriggersRoute extends Route {
         if (checkUndefinedParams(response, serviceId)) return;
 
         // Insert the trigger
-        const services = await Trigger.findAllForService(serviceId);
+        const services = await Trigger.findAllForService(serviceId, true);
 
         if (services) {
             success(response, services);
@@ -51,14 +51,14 @@ export default class ManageTriggersRoute extends Route {
             resourceServer
         }, true) as ITrigger;
         if (!insertedTrigger) return;
-        const associatedPermissions = await Permissions.getAllPermissionAndAddBooleanTag(serviceId, insertedTrigger.permissions);
+        const associatedPermissions = await Permissions.getAllPermissionAndAddBooleanTag(serviceId, insertedTrigger.permissions as string[]);
         const triggerResult: TriggerOsp = {
             name: insertedTrigger.name,
             _id: insertedTrigger._id,
             resourceServer: insertedTrigger.resourceServer,
             description: insertedTrigger.description,
-            permissions: !!associatedPermissions ? associatedPermissions : []
-        }
+            permissions: associatedPermissions ? associatedPermissions : []
+        };
 
         success(response, triggerResult);
     }
@@ -95,21 +95,21 @@ export default class ManageTriggersRoute extends Route {
             return;
         }
 
-        const modifiedTrigger = await handleUpdate(response, Trigger, {"_id": triggerId}, {
+        const modifiedTrigger = await handleUpdate(response, Trigger, { "_id": triggerId }, {
             name,
             description,
             permissions,
             resourceServer
         }, true) as ITrigger;
         if (!modifiedTrigger) return;
-        const associatedPermissions = await Permissions.getAllPermissionAndAddBooleanTag(modifiedTrigger.serviceId, modifiedTrigger.permissions);
+        const associatedPermissions = await Permissions.getAllPermissionAndAddBooleanTag(modifiedTrigger.serviceId, modifiedTrigger.permissions as string[]);
         const triggerResult: TriggerOsp = {
             name: modifiedTrigger.name,
             _id: modifiedTrigger._id,
             resourceServer: modifiedTrigger.resourceServer,
             description: modifiedTrigger.description,
-            permissions: !!associatedPermissions ? associatedPermissions : []
-        }
+            permissions: associatedPermissions ? associatedPermissions : []
+        };
 
         success(response, triggerResult);
     }

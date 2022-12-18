@@ -6,14 +6,14 @@ export default class ActionModel {
     description: string;
     serviceId?: string;
     permissions: Partial<PermissionModel>[];
-    endpoint?: string;
+    endpoint: string;
 
     constructor(
         actionId: string,
         name: string,
         description: string,
         permissions: Partial<PermissionModel>[],
-        endpoint?: string,
+        endpoint: string,
     ) {
         this._id = actionId;
         this.name = name;

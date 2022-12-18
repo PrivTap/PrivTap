@@ -1,9 +1,12 @@
-import mongoose, {Schema, Types} from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 import Service from "./Service";
 import Model from "../Model";
-import {OperationDataType} from "../helper/rule_execution";
+import { OperationDataType } from "../helper/rule_execution";
 import logger from "../helper/logger";
-import Permission, {IPermission} from "./Permission";
+import Permission, { IPermission } from "./Permission";
+import permission from "./Permission";
+import { pipeline } from "stream";
+import Authorization from "./Authorization";
 
 export interface ITrigger {
     _id: string;
@@ -11,7 +14,7 @@ export interface ITrigger {
     description: string;
     serviceId: string;
     outputs: OperationDataType[];
-    permissions?: Types.Array<string>;
+    permissions?: Types.Array<string> | Types.Array<Partial<IPermission>>;
     resourceServer?: string;
     data?: Types.Array<string>; // TO DEFINE
 }
@@ -33,7 +36,7 @@ const triggerSchema = new Schema({
         type: [String]
         // required?
     },
-    permissions: [Schema.Types.ObjectId],
+    permissions: [{ type: mongoose.Schema.Types.ObjectId, ref: "permission" }],
     resourceServer: {
         type: String
     },
@@ -47,33 +50,59 @@ class Trigger extends Model<ITrigger> {
     }
 
     /**
-     * Finds all the triggers provided by a service by adding all the permissions and adding a tag
+     * Finds all the triggers provided by a service
      * @param serviceId the id of the service
+     * @param associated Default false. If true, it returns the triggers containing all the permissions of the service with a boolean field associated. "associated" is true if the permission is already associated to the trigger.
      */
-    async findAllForService(serviceId: string): Promise<Partial<TriggerOsp>[] | null> {
+    async findAllForService(serviceId: string, associated = false): Promise<TriggerOsp[] | null> {
         let triggers: ITrigger[] | null;
-        try {
-            triggers = await this.findAll({serviceId}, "-serviceId");
-        } catch (e) {
-            return null;
-        }
+        if (associated)
+            //we don't populate the permissions, permissions is now an array of idPermission (string)
+            triggers = await this.findAll({ serviceId }, "-serviceId");
+        else
+            //we populate the permissions, permissions is now an Array of IPermission
+            triggers = await this.findAll({ serviceId }, "-serviceId", "permissions", "name description");
         if (triggers == null)
             return null;
         const triggersResult = new Array<TriggerOsp>();
         for (const trigger of triggers) {
             if (trigger.permissions != undefined) {
-                let temp = await Permission.getAllPermissionAndAddBooleanTag(serviceId, trigger.permissions)
+                let allPermAndAssociated;
+                if (associated)
+                    allPermAndAssociated = await Permission.getAllPermissionAndAddBooleanTag(serviceId, trigger.permissions as Types.Array<string>);
+
                 const triggerResult: TriggerOsp = {
                     name: trigger.name,
                     _id: trigger._id,
                     resourceServer: trigger.resourceServer,
                     description: trigger.description,
-                    permissions: !!temp ? temp : []
-                }
+                    permissions: associated ? (allPermAndAssociated ? allPermAndAssociated : []) : trigger.permissions as Types.Array<Partial<IPermission>>
+                };
                 triggersResult.push(triggerResult);
             }
         }
         return triggersResult;
+    }
+
+
+    async findAllTriggerAuthorizedByUser(userId: string, serviceId: string): Promise<TriggerOsp[] | null> {
+        const grantedPermissionId = await Authorization.getGrantedPermissionsId(userId, serviceId);
+        console.log(grantedPermissionId);
+        let result;
+        try {
+            result = await this.model.aggregate()
+                .match({ serviceId: new mongoose.Types.ObjectId(serviceId) })
+                .match({
+                    $expr: {
+                        $setIsSubset: ["$permissions", grantedPermissionId]
+                    }
+                })
+                .project({ "outputs": 0, "data": 0, "serviceId":0 }) as TriggerOsp[];
+        } catch (e) {
+            console.log(e);
+            return null;
+        }
+        return result;
     }
 
     /**
@@ -95,13 +124,13 @@ class Trigger extends Model<ITrigger> {
     async getTriggerServiceNotificationServer(triggerId: string): Promise<Partial<triggerServiceNotificationServer> | null> {
         try {
             const result = await this.model.aggregate()
-                .match({_id: new mongoose.Types.ObjectId(triggerId)})
+                .match({ _id: new mongoose.Types.ObjectId(triggerId) })
                 //keep only the serviceId
-                .project({_id: 0, "serviceId": 1})
+                .project({ _id: 0, "serviceId": 1 })
                 //left outer join with collection service
-                .lookup({from: "services", localField: "serviceId", foreignField: "_id", as: "service"})
-                .unwind({path: "$service"})
-                .addFields({triggerNotificationServer: "$service.triggerNotificationServer"})
+                .lookup({ from: "services", localField: "serviceId", foreignField: "_id", as: "service" })
+                .unwind({ path: "$service" })
+                .addFields({ triggerNotificationServer: "$service.triggerNotificationServer" })
                 //remove all the field except the trigger Notification center
                 .project({
                     _id: 0,
@@ -114,8 +143,7 @@ class Trigger extends Model<ITrigger> {
                 logger.debug("Should only have one element here");
             }
             return result[0];
-        } catch
-            (e) {
+        } catch (e) {
             logger.debug("Unexpected error while finding the trigger notification url after creating a rule" + e);
             return null;
         }

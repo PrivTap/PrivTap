@@ -1,11 +1,11 @@
-import {afterEach, beforeEach, describe, test} from "vitest";
-import {SinonStub} from "sinon";
+import { afterEach, beforeEach, describe, test } from "vitest";
+import { SinonStub } from "sinon";
 import * as sinon from "sinon";
-import {use, expect} from "chai";
-import sinonChai = require("sinon-chai");
+import { use, expect } from "chai";
 import axiosInstance from "../../src/helpers/axios_service";
 import managePermission from "../../src/controllers/manage_Permission";
 import PermissionModel from "../../src/model/Permission_model";
+import sinonChai from "sinon-chai";
 
 
 use(sinonChai);
@@ -23,7 +23,7 @@ describe("Manage Permission Test", () => {
         serviceId,
         "Test Permission name",
         "Permission description",
-        {detail:"details"},
+        { detail: "details" },
     );
 
     beforeEach(() => {
@@ -39,7 +39,7 @@ describe("Manage Permission Test", () => {
 
     //TEST GetPermissions
     test("Should put in the ref all the Permissions", async () => {
-        getStub.resolves({data: {data: [testPermissionModel]}})
+        getStub.resolves({ data: { data: [testPermissionModel] } })
         await managePermission.getAllPermissions(testPermissionModel.serviceId);
         expect(managePermission.getRef().value).to.be.eql([testPermissionModel]);
     });
@@ -50,7 +50,7 @@ describe("Manage Permission Test", () => {
     })
     //TEST CreatePermissions
     test("Should put the created Permission in the ref array", async () => {
-        postStub.resolves({data: {data: testPermissionModel}})
+        postStub.resolves({ data: { data: testPermissionModel } })
         await managePermission.createPermission(testPermissionModel.serviceId, testPermissionModel.name,
             testPermissionModel.description, testPermissionModel.authorization_details)
         expect(managePermission.getRef().value).to.be.eql([testPermissionModel]);
@@ -71,9 +71,9 @@ describe("Manage Permission Test", () => {
             serviceId,
             "Test Permission name changed",
             "Permission description changed",
-            {detail:"details"},
+            { detail: "details" },
         );
-        putStub.resolves({data: {data: updatedPermission}});
+        putStub.resolves({ data: { data: updatedPermission } });
         await managePermission.updatePermission(updatedPermission._id, updatedPermission.serviceId,
             updatedPermission.name, updatedPermission.description, updatedPermission.authorization_details)
         expect(managePermission.getRef().value).to.be.eql([updatedPermission]);
@@ -85,7 +85,7 @@ describe("Manage Permission Test", () => {
             serviceId,
             "Test Permission name changed",
             "Permission description changed",
-            {detail:"details"},
+            { detail: "details" },
         );
         putStub.resolves(null);
         await managePermission.updatePermission(updatedPermission.serviceId, updatedPermission._id,
@@ -97,8 +97,9 @@ describe("Manage Permission Test", () => {
     //TEST DeletePermission
     test("Should delete the Permission in the ref value", async () => {
         managePermission.getRef().value = [testPermissionModel];
-        await managePermission.deletePermission(testPermissionModel.serviceId,testPermissionModel._id);
+        await managePermission.deletePermission(testPermissionModel.serviceId, testPermissionModel._id);
         expect(managePermission.getRef().value).to.be.eql([]);
     });
 
 });
+

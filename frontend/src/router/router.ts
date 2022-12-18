@@ -1,3 +1,4 @@
+import SimpleServiceModel from "@/model/simple_service_model";
 import { useAuthStore } from "@/stores/auth_store";
 import { createRouter, createWebHistory } from "vue-router";
 import RoutingPath from "./routing_path";
@@ -97,11 +98,19 @@ const router = createRouter({
         requireAuth: true,
       },
     },
-
     {
       path: `${RoutingPath.SERVICE_ACTION_PAGE}/:id?`,
       name: "serviceaction",
       component: () => import("../views/OspManageActionView.vue"),
+      meta: {
+        requireAuth: true,
+      },
+    },
+    {
+      path: `${RoutingPath.EXPLORE_SERVICE_PAGE}/:service`,
+      name: "exploreservice",
+      component: () => import("../views/ExploreServiceView.vue"),
+      props: true,
       meta: {
         requireAuth: true,
       },

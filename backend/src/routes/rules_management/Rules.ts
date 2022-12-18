@@ -1,11 +1,13 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
-import { checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
+import { badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
 import Rule from "../../model/Rule";
 import { deleteHttp, getHttp, handleInsert } from "../../helper/misc";
 import Authorization from "../../model/Authorization";
 import logger from "../../helper/logger";
 import Trigger from "../../model/Trigger";
+import RuleExecution from "../../helper/rule_execution";
+import Action from "../../model/Action";
 
 export default class RulesRoute extends Route {
     constructor() {
@@ -27,9 +29,33 @@ export default class RulesRoute extends Route {
         const name = request.body.name;
         const triggerId = request.body.triggerId;
         const actionId = request.body.actionId;
-        //TODO: Check if the triggerId and actionId actually exist
-        //TODO CHECK IF TRIGGER AND ACTION ARE EFFECTIVELY COMPATIBLE AND AUTHORIZED
+
         if (checkUndefinedParams(response, name, triggerId, actionId)) return;
+
+        //CHECK IF TRIGGER AND ACTION ARE EFFECTIVELY COMPATIBLE
+        if (!(await RuleExecution.areActionTriggerCompatible(actionId, triggerId))) return;
+
+        //To check if trigger and action are authorized we check if the parent services are authorized
+        const triggerServiceId = await Trigger.findById(triggerId, "serviceId");
+        const actionServiceId = await Action.findById(actionId, "serviceId");
+
+        //This verifies that Trigger and Action actually exist
+        if (!triggerServiceId || !actionServiceId) {
+            badRequest(response, "Trigger or Action not found");
+            return;
+        }
+
+        const isTriggerAuthorized = (await Authorization.findToken(userId, triggerServiceId.serviceId)) != null;
+        let isActionAuthorized = isTriggerAuthorized;
+        if (actionServiceId.serviceId != triggerServiceId.serviceId) {
+            isActionAuthorized = (await Authorization.findToken(userId, actionServiceId.serviceId) != null);
+        }
+
+        if (!isTriggerAuthorized || !isActionAuthorized) {
+            badRequest(response, "Trigger or Action not authorized");
+            return;
+        }
+
         //TODO the response should go down after the control of the token
         const ruleId = await handleInsert(response, Rule, { userId, name, triggerId, actionId });
         if (!ruleId) return;

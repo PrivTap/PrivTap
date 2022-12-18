@@ -4,7 +4,7 @@ import logger from "../helper/logger";
 import { IAction } from "./Action";
 import { ITrigger } from "./Trigger";
 import { IService } from "./Service";
-import { permissionAuthorized } from "./Permission";
+import { PermissionAuthorized } from "./Permission";
 
 export interface IAuthorization {
     _id: string;
@@ -144,9 +144,22 @@ class Authorization extends Model<IAuthorization> {
                     $project: { _id: 1, "name": 1, "description": 1, "authorized": 1 }
                 }
             ]
-        }) as Partial<permissionAuthorized>[];
+        }) as Partial<PermissionAuthorized>[];
     }
 
+    async getGrantedPermissionsId(userId: string, serviceId: string) {
+        let result;
+        try{
+            const temp=await this.model.aggregate()
+                .match({ userId: new Types.ObjectId(userId), serviceId: new Types.ObjectId(serviceId) })
+                .project({ _id: 0, "grantedPermissions": 1 }) as Partial<IAuthorization>[];
+            result=temp[0].grantedPermissions;
+            return result;
+        }catch(e){
+            return null;
+        }
+
+    }
     /**
      * Finds all the services that have been authorized by a user and all the actions associated.
      * @param userId the id of the user
