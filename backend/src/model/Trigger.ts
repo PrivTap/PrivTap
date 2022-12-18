@@ -1,11 +1,10 @@
 import mongoose, { Schema, Types } from "mongoose";
 import Service from "./Service";
 import Model from "../Model";
-import { OperationDataType } from "../helper/rule_execution";
 import logger from "../helper/logger";
 import Permission, { IPermission } from "./Permission";
+import { DataDefinition } from "../helper/dataDefinition";
 import permission from "./Permission";
-import { pipeline } from "stream";
 import Authorization from "./Authorization";
 
 export interface ITrigger {
@@ -13,7 +12,7 @@ export interface ITrigger {
     name: string;
     description: string;
     serviceId: string;
-    outputs: OperationDataType[];
+    outputs: DataDefinition;
     permissions?: Types.Array<string> | Types.Array<Partial<IPermission>>;
     resourceServer?: string;
     data?: Types.Array<string>; // TO DEFINE
@@ -33,7 +32,7 @@ const triggerSchema = new Schema({
         required: true
     },
     outputs: {
-        type: [String]
+        type: String
         // required?
     },
     permissions: [{ type: mongoose.Schema.Types.ObjectId, ref: "permission" }],

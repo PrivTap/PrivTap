@@ -8,6 +8,7 @@ import Action from "../../model/Action";
 import logger from "../../helper/logger";
 import Authorization from "../../model/Authorization";
 import Service from "../../model/Service";
+import { dataDefinitionIDs } from "../../helper/dataDefinition";
 
 export default class TriggersDataRoute extends Route {
     // TODO: figure out how to restrict this to only authorized services
@@ -64,7 +65,7 @@ export default class TriggersDataRoute extends Route {
                     Authorization: "Bearer " + oauthToken
                 },
                 params: {
-                    filter: actionData.inputs
+                    filter: dataDefinitionIDs(actionData.inputs)
                 }
             });
             //Now we replace all URLs

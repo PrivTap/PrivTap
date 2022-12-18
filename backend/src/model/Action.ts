@@ -1,11 +1,10 @@
 import { Schema, Types } from "mongoose";
 import Service from "./Service";
 import Model from "../Model";
-import { OperationDataType } from "../helper/rule_execution";
 import Permission, { IPermission } from "./Permission";
 import mongoose from "mongoose";
 import Authorization from "./Authorization";
-import { TriggerOsp } from "./Trigger";
+import { DataDefinition } from "../helper/dataDefinition";
 
 export interface IAction {
     _id: string;
@@ -13,7 +12,7 @@ export interface IAction {
     description: string;
     serviceId: string;
     endpoint: string;
-    inputs: OperationDataType[];
+    inputs: DataDefinition;
     permissions?: Types.Array<string>;
 }
 
@@ -35,7 +34,7 @@ const actionSchema = new Schema({
         required: true
     },
     inputs: {
-        type: [String]
+        type: String
         // required?
     },
     permissions: [{ type: mongoose.Schema.Types.ObjectId, ref: "permission" }]

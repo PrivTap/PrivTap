@@ -4,13 +4,13 @@ import app from "../../src/app";
 import { beforeEach } from "mocha";
 import Rule, { IRule } from "../../src/model/Rule";
 import Trigger, { ITrigger } from "../../src/model/Trigger";
-import { OperationDataType } from "../../src/helper/rule_execution";
 import Action, { IAction } from "../../src/model/Action";
-import chaiHttp = require("chai-http");
-import sinonChai = require("sinon-chai");
 import Service from "../../src/model/Service";
 import OAuth from "../../src/helper/oauth";
 import axios from "axios";
+import { DataType } from "../../src/helper/dataType";
+import chaiHttp = require("chai-http");
+import sinonChai = require("sinon-chai");
 
 use(chaiHttp);
 use(sinonChai);
@@ -36,7 +36,14 @@ describe("/triggers-data endpoint", () => {
         _id: "0380b79b38dda0d2f6be3746",
         name: "Sample Trigger",
         description: "Trigger 1 desc",
-        outputs: [OperationDataType.Text],
+        outputs: {
+            trigger_data: [
+                {
+                    type: DataType.Text,
+                    identifier: "title"
+                }
+            ]
+        },
         serviceId: "8380b79b38dda0d2f6be3746",
         resourceServer: "https://www.sample.trigger/endpoint/triggerDataEndpoint"
     };
@@ -46,7 +53,14 @@ describe("/triggers-data endpoint", () => {
         name: "Sample Action",
         description: "Trigger 2 desc",
         endpoint: "https://www.sample.action/endpoint/actionEndpoint",
-        inputs: [OperationDataType.Text],
+        inputs: {
+            trigger_data: [
+                {
+                    type: DataType.Text,
+                    identifier: "title"
+                }
+            ]
+        },
         serviceId: "9380b79b38dda0d2f6be3746",
     };
 
@@ -55,7 +69,14 @@ describe("/triggers-data endpoint", () => {
         name: "Sample Action",
         description: "Trigger 2 desc",
         endpoint: "https://www.sample.action/endpoint/actionEndpoint",
-        inputs: [OperationDataType.Image],
+        inputs: {
+            trigger_data: [
+                {
+                    type: DataType.Image,
+                    identifier: "image"
+                }
+            ]
+        },
         serviceId: "9380b79b38dda0d2f6be3746",
     };
 
@@ -74,16 +95,12 @@ describe("/triggers-data endpoint", () => {
             trigger_data: [
                 {
                     type: "text",
+                    identifier: "title",
                     data: "Post Title"
-                },
-                {
-                    type: "text",
-                    data: "Lorem ipsum here is my post content"
                 }
             ]
         }
     };
-
 
     before(() => {
         requester = request(app.express).keepOpen();
