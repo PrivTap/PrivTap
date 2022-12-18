@@ -1,0 +1,132 @@
+
+.rectangle {
+    padding: 10px;
+    color: #000000;
+    background-color: rgb(255, 255, 255);
+    border-radius:7px;
+    text-align:center;
+    vertical-align:middle;
+    justify-content:center;
+    align-items: center;
+    box-shadow: 0 10px 20px 10px rgba(0, 0, 0, 0.2);
+    overflow: auto;
+}
+.icon {
+    max-width: 100%;
+    height: auto;
+    width: auto\9;
+}
+.split {
+    height: 100%;
+    width: 50%;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    overflow-x: hidden;
+    padding-top: 20px;
+}
+
+.left {
+    left: 0;
+}
+
+.right {
+    right: 0;
+}
+
+.left_position {
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-100%, -150%);
+    text-align: left;
+}
+
+.right_position {
+    position: absolute;
+    top: 50%;
+    right: 50%;
+    transform: translate(50%, -50%);
+    text-align: center;
+}
+
+textarea {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.textarea_position {
+    position: absolute;
+    top: 50%;
+    left: 7%;
+}
+
+html {
+    background: url("../personal_page_side.jpg") no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    overflow: hidden;
+}
+body {
+    font-family: Georgia, serif;
+}
+p {
+    font-size: 15px;
+    font-size: 2.2vw;
+    line-height: 0.6;
+}
+textarea {
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 10px;
+    outline: none;
+    resize: none;
+    box-shadow: 0 10px 20px 10px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+}
+a.my-button{
+    position:absolute;
+    bottom:10px;
+    right:165px;
+    background-color: #ffffff;
+    color: #000000;
+    font-family: Georgia, serif;
+    font-size: 19px;
+    font-weight: 800;
+    font-style: normal;
+    text-decoration: none;
+    padding: 14px 15px;
+    border: 0px solid #000;
+    border-radius: 10px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0px 0px 7px 0px #2D2D2D;
+}
+a.my-button span{
+    margin-right: 15px;
+    display: block;
+    width: 29px;
+    height: 29px;
+    background-image: url("../mail.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    transform: rotate(0deg);
+}
+a.my-button:hover{
+    background-color: #f2f2f2;
+}
+a.my-button:active{
+    transform: scale(0.95);
+}
+div{
+    display:inline-block;
+    position:relative;
+}
+div:not(:first-child):not(:last-child) {
+    margin-top:10px;
+}
+

@@ -36,7 +36,7 @@ export default class OAuth {
         if (env.PROD) {
             redirectUri = "https://privtap.it/modifyauth/" + serviceId;
         } else {
-            redirectUri = "http://127.0.0.1:5173/modifyauth/" + serviceId;
+            redirectUri = "http://localhost:5173/modifyauth/" + serviceId;
         }
 
         let authorizationUri = client.authorizeURL({
@@ -52,7 +52,7 @@ export default class OAuth {
     private static appendAuthDetails(authorizationUri: string, authorization_details: object): string {
         const authorizationUriStringify = JSON.stringify(authorization_details);
         console.log(authorizationUriStringify);
-        return authorizationUri + "&" + encodeURI(authorizationUriStringify);
+        return authorizationUri + "&authorization_details=" + encodeURI(authorizationUriStringify);
     }
 
     // TODO: Specify the token path in the Service model

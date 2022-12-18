@@ -43,11 +43,6 @@ export default class TriggersDataRoute extends Route {
             return;
         }
 
-        const actionData = await Action.findById(referencedRule?.actionId);
-        if (!(actionData?.endpoint)) {
-            internalServerError(response);
-            return;
-        }
 
         //Get the OAuth token for the trigger
         const oauthToken = await Authorization.findToken(userId, triggerData.serviceId);
@@ -73,8 +68,20 @@ export default class TriggersDataRoute extends Route {
         }
 
         //Forward the data to the Action API endpoint
-        //TODO: Do we need to show some kind of rule execution error??
-        const actionResponse = await axios.post(actionData.endpoint, dataToForwardToActionAPI);
+
+        const actionEndpoint = (await Action.findById(referencedRule!.actionId, "endpoint"))?.endpoint;
+        if (!actionEndpoint) {
+            internalServerError(response);
+            return;
+        }
+
+        // TODO: Do we need to show some kind of rule execution error??
+        const actionResponse = await axios.post(actionEndpoint, dataToForwardToActionAPI, {
+            headers: {
+                Authorization: "Bearer " + oauthToken
+            }
+        });
+
         if (actionResponse.status.toString() != "200") {
             logger.error("Could not execute rule with id " + referencedRule?._id + " with error " + actionResponse.status.toString());
         }

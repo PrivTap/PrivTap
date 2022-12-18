@@ -1,47 +1,31 @@
-import "./mongoose.config";
 import express, { Express } from "express";
-import { getFilesInDir } from "./helper/misc";
-import { join } from "path";
-import requestLogger from "morgan";
 import cookieParser from "cookie-parser";
-import cors from "cors";
-import mongoose, { connect, ConnectOptions } from "mongoose";
 import Route from "./Route";
-import env from "./helper/env";
+import {getFilesInDir} from "./helper/misc";
+import { join } from "path";
 import logger from "./helper/logger";
-import YAML from "yamljs";
-import swaggerUI from "swagger-ui-express";
-import { GridFSBucket } from "mongodb";
+import env from "./helper/env";
+import { connect, ConnectOptions } from "mongoose";
 
-// Expand the Express request definition to include the userId
 declare global {
-    // eslint-disable-next-line @typescript-eslint/no-namespace
     namespace Express {
         interface Request {
-            /**
-             * The id of the user that sent this request.
-             * Optionally set by PrivTAP authentication middleware if JWT cookie is provided and valid. Can be used by other middleware.
-             */
             userId: string;
-            /**
-             * The activation status of the user that sent this request.
-             * Optionally set by PrivTAP authentication middleware if JWT cookie is provided and valid. Can be used by other middleware.
-             */
-            userActive: boolean;
         }
     }
 }
+
 
 /**
  * Represents the PrivTAP backend application. Contains useful configuration data and exposes methods to connect
  * to the database and start the application server.
  */
-class BackendApp {
+class OSP {
     // Domain where this app will be deployed in production
     readonly deploymentURL: string;
     // Port where to start the application server on
     readonly port: number;
-    // Base url where REST endpoints will be registered, relative to the address, default is '/api/'
+    // Base url where REST endpoints will be registered, relative to the address, default is '/'
     readonly baseURL: string;
     // Connection string for a MongoDB database instance
     readonly dbString: string;
@@ -74,40 +58,11 @@ class BackendApp {
     protected createExpressApp() {
         const app = express();
 
-        // We need to configure our app for CORS requests.
-        // The environment variable FRONTEND_URL should be the URL of the frontend that is making the requests
-
-        // Configure CORS for preflight requests
-        app.options(
-            "*",
-            cors({
-                origin: env.FRONTEND_URL,
-                credentials: true,
-                allowedHeaders: ["Cookie", "Content-Type"],
-            })
-        );
-
-        // Configure CORS for all endpoints
-        app.use(
-            cors({
-                origin: env.FRONTEND_URL,
-                credentials: true,
-            })
-        );
-
         app.use(express.json());
         app.use(express.urlencoded({ extended: false }));
         app.use(cookieParser());
-
-        // Host API docs through Swagger UI
-        const swaggerDocument = YAML.load("./openapi.yaml");
-        app.use(this.baseURL + "docs", swaggerUI.serve, swaggerUI.setup(swaggerDocument));
-
-        // If we are in a development environment
-        if (env.DEV) {
-            // Log all requests to console
-            app.use(requestLogger("dev"));
-        }
+        app.set('view engine', 'ejs');
+        app.use('/public', express.static('./public'));
 
         return app;
     }
@@ -149,13 +104,6 @@ class BackendApp {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         } as ConnectOptions);
-        this.#bucket = new GridFSBucket(mongoose.connection.db, { bucketName: "dataRule" });
-    }
-
-    #bucket: GridFSBucket| undefined;
-
-    async getBucket() {
-        return this.#bucket;
     }
 
     /**
@@ -167,10 +115,8 @@ class BackendApp {
 }
 
 // Create a new instance of our backend application
-const app = new BackendApp();
+const app = new OSP();
 
-// If this is being run as a script, connect to the db and start the application server.
-// Otherwise, this is being imported for testing and the testing library will take care of the setup
 if (require.main === module) {
     // Connect to the database
     app.connectToDB(app.dbString).then(() => {
@@ -181,7 +127,6 @@ if (require.main === module) {
             if (env.PROD) {
                 url = app.deploymentURL;
             }
-
             logger.info(`Server listening at: ${url}${app.baseURL}`);
         });
     });
