@@ -1,12 +1,12 @@
+export enum operation {
+    r = "Read",
+    w = "Write",
+}
+
 export enum authorizationType {
     r_user = "Read access to your profile information",
     r_post = "Read access to your posts",
     w_post = "Write access to your posts"
-}
-
-export enum operation {
-    r = "Read",
-    w = "Write",
 }
 
 export enum location {

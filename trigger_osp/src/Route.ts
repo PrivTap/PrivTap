@@ -1,5 +1,6 @@
 import { Request, Response, Router } from "express";
 import Authentication from "./helper/authentication";
+import NotificationService from "./helper/notificationService";
 
 /**
  * Superclass for all routes that takes care of all the boilerplate for HTTP methods registration and
@@ -22,6 +23,8 @@ export default class Route {
         if (requiresAuth){
             this.router.use(Authentication.checkAuthentication);
         }
+
+        this.router.use(NotificationService.checkNotification);
 
         // If the subclass implements http methods handlers, register them to the Router
         if (this.httpGet)

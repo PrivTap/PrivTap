@@ -47,7 +47,10 @@ export default class AuthorizeRoute extends Route {
         // Get aggregate data
         const aggregateData = Permission.getAggregateData(permissions);
         // Create authorization
-        if (! await Authorization.insert({ userId, permissionIds }))
+        if (! await Authorization.insert({ userId, permissionIds })){
+            response.status(500).send();
+            return;
+        }
         response.render("oauth_form", { fieldData: aggregateData, state, redirectUri});
     }
 
@@ -80,7 +83,7 @@ export default class AuthorizeRoute extends Route {
             response.status(500).send();
             return;
         }
-        redirectUri = redirectUri + "/?&code=" + encodeURIComponent(code) + "&state=" + encodeURIComponent(state);
+        redirectUri = redirectUri + "?&code=" + encodeURIComponent(code) + "&state=" + encodeURIComponent(state);
         console.log(redirectUri);
         response.status(302).send({ redirectUri });
     }

@@ -9,6 +9,7 @@
     "coverage": "nyc --reporter=html npm test"
   },
   "dependencies": {
+    "axios": "^1.2.0",
     "cookie-parser": "^1.4.3",
     "dotenv": "^16.0.3",
     "ejs": "^3.1.8",

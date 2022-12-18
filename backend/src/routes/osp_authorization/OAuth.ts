@@ -6,6 +6,7 @@ import OAuth from "../../helper/oauth";
 import { AuthorizationTokenConfig } from "simple-oauth2";
 import { handleUpdate } from "../../helper/misc";
 import Authorization from "../../model/Authorization";
+import env from "../../helper/env";
 
 export default class OAuthRoute extends Route {
     constructor() {
@@ -16,24 +17,25 @@ export default class OAuthRoute extends Route {
         const userId = request.userId;
         const { code } = request.query;
         const stateValue = request.query.state as string;
-        const options = {
-            code,
-        };
-
         const state = await State.findByValue(stateValue);
         if (!state){
             badRequest(response);
             return;
         }
-
         if (state.userId != userId){
             badRequest(response);
             return;
         }
-
         const serviceId = state.serviceId;
         const permissions = state.permissionId;
-        console.log(request.query);
+
+        const options = {
+            code,
+            redirect_uri: env.PROD ? "https://privtap.it/modifyauth/" + serviceId : "http://localhost:5173/modifyauth/" + serviceId
+        };
+
+        console.log(options);
+
         const oAuthToken = await OAuth.retrieveToken(serviceId, options as AuthorizationTokenConfig);
         console.log(oAuthToken);
         if (!oAuthToken){

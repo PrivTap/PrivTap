@@ -2,7 +2,7 @@ import Route from "../../Route";
 import { Request, Response } from "express";
 import { badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
 import Rule from "../../model/Rule";
-import { deleteHttp, getHttp, handleInsert } from "../../helper/misc";
+import { deleteReqHttp, handleInsert, postReqHttp } from "../../helper/misc";
 import Authorization from "../../model/Authorization";
 import logger from "../../helper/logger";
 import Trigger from "../../model/Trigger";
@@ -36,19 +36,19 @@ export default class RulesRoute extends Route {
         if (!(await RuleExecution.areActionTriggerCompatible(actionId, triggerId))) return;
 
         //To check if trigger and action are authorized we check if the parent services are authorized
-        const triggerServiceId = await Trigger.findById(triggerId, "serviceId");
-        const actionServiceId = await Action.findById(actionId, "serviceId");
+        const trigger = await Trigger.findById(triggerId, "serviceId name");
+        const service = await Action.findById(actionId, "serviceId");
 
         //This verifies that Trigger and Action actually exist
-        if (!triggerServiceId || !actionServiceId) {
+        if (!trigger || !service) {
             badRequest(response, "Trigger or Action not found");
             return;
         }
 
-        const isTriggerAuthorized = (await Authorization.findToken(userId, triggerServiceId.serviceId)) != null;
+        const isTriggerAuthorized = (await Authorization.findToken(userId, trigger.serviceId)) != null;
         let isActionAuthorized = isTriggerAuthorized;
-        if (actionServiceId.serviceId != triggerServiceId.serviceId) {
-            isActionAuthorized = (await Authorization.findToken(userId, actionServiceId.serviceId) != null);
+        if (service.serviceId != trigger.serviceId) {
+            isActionAuthorized = (await Authorization.findToken(userId, service.serviceId) != null);
         }
 
         if (!isTriggerAuthorized || !isActionAuthorized) {
@@ -69,7 +69,7 @@ export default class RulesRoute extends Route {
             if (token != null)
                 if (triggerService.triggerNotificationServer != undefined)
                     //TODO should respond to the user that he can't create this rule because he didn't authorize the service (do this also for action)
-                    await getHttp(triggerService.triggerNotificationServer, token, { userId, triggerId });
+                    await postReqHttp(triggerService.triggerNotificationServer, token, { userId, triggerId, "triggerName": trigger.name });
         } else
             logger.error("Error while");
         return;
@@ -100,7 +100,7 @@ export default class RulesRoute extends Route {
             if (token != null) {
                 const triggerId = triggerService.triggerId;
                 if (triggerService.triggerNotificationServer != undefined)
-                    await deleteHttp(triggerService.triggerNotificationServer, token, { userId, triggerId });
+                    await deleteReqHttp(triggerService.triggerNotificationServer, token, { userId, triggerId });
             } else {
                 //TODO do a generic error when a user doesn't have the token for a service?
             }

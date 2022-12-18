@@ -127,7 +127,7 @@ export async function handleUpdate<T>(response: Response, model: Model<T>, filte
  * @param token use this if you want to put an auth token
  * @param queryString the object containing the field and the value of the query string
  */
-export async function getHttp(url: string, token?: string, queryString?: object): Promise<AxiosResponse> {
+export async function getReqHttp(url: string, token?: string, queryString?: object): Promise<AxiosResponse> {
     const config = {};
     if (token != undefined)
         Object.assign(config, { headers: { "Authorization": `Bearer ${token}` } });
@@ -137,12 +137,27 @@ export async function getHttp(url: string, token?: string, queryString?: object)
 }
 
 /**
+ * Make a post http request to a specific url
+ * @param url the url of the request
+ * @param token use this if you want to put an auth token
+ * @param body the object containing the field and the value of the query string
+ */
+export async function postReqHttp(url: string, token?: string, body?: object): Promise<AxiosResponse> {
+    const config = {};
+    if (token != undefined)
+        Object.assign(config, { headers: { "Authorization": `Bearer ${token}` } });
+    if (body != undefined)
+        Object.assign(config, { data: body });
+    return await axios.post(url, config);
+}
+
+/**
  * Make a delete http request to a specific url
  * @param url the url of the request
  * @param token use this if you want to put an auth token
  * @param body the object containing the field and the value of the query string
  */
-export async function deleteHttp(url: string, token?: string, body?: object): Promise<AxiosResponse> {
+export async function deleteReqHttp(url: string, token?: string, body?: object): Promise<AxiosResponse> {
     const config = {};
     if (token != undefined)
         Object.assign(config, { headers: { "Authorization": `Bearer ${token}` } });

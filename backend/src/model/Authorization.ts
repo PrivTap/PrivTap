@@ -100,7 +100,6 @@ class Authorization extends Model<IAuthorization> {
      * Returns all the permission of a service and also the one granted by a user with an extra field
      */
     async findAllPermissionsAddingAuthorizationTag(serviceId: string, userId: string) {
-        console.log("user", userId, "\nservice", serviceId, "\n");
         const collection = this.model.aggregate()
             .match(({
                 userId: new Types.ObjectId(userId),
@@ -121,12 +120,10 @@ class Authorization extends Model<IAuthorization> {
                 description: "$authPermissions.description",
                 authorized: true
             }).project({ _id: 1, "name": 1, "description": 1, "authorized": 1 });
-        console.log(await collection);
         const IDCollection: string[] = [];
         (await collection).forEach((p) => {
             IDCollection.push(p._id);
         });
-        console.log(IDCollection);
         return await collection.unionWith({
             coll: "permissions", pipeline: [
                 {

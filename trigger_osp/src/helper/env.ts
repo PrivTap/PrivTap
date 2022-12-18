@@ -34,6 +34,14 @@ interface EnvVariables {
     JWT_SECRET: string,
     // Expiration time (in seconds) of the JWT tokens
     JWT_EXPIRE: number,
+    // PrivTap's client Id
+    PRIVTAP_CLIENT_ID: string,
+    // PrivTap's client secret
+    PRIVTAP_CLIENT_SECRET: string,
+    // Map of triggers
+    TRIGGERS: {[id:string]: string}
+    // Privtap's notification url
+    PRIVTAP_NOTIFICATION_URL: string
 }
 
 // Default values for some of the env variables
@@ -52,7 +60,7 @@ const defaults = {
  * @throws Error if variables are invalid or if a variable without a default is not set
  */
 function loadEnvVariables(): EnvVariables {
-    const res: {[name: string]: string|number|boolean} = {};
+    const res: {[name: string]: string|number|boolean|object} = {};
 
     // Check if the defaults should be overwritten
     for (const [name, value] of Object.entries(defaults)) {
@@ -90,6 +98,16 @@ function loadEnvVariables(): EnvVariables {
     res.CLIENT_ID = process.env.CLIENT_ID || "";
 
     res.CLIENT_SECRET = process.env.CLIENT_SECRET || "";
+
+    res.PRIVTAP_CLIENT_ID = process.env.PRIVTAP_CLIENT_ID || "";
+
+    res.PRIVTAP_CLIENT_SECRET = process.env.PRIVTAP_CLIENT_SECRET || "";
+
+    res.TRIGGERS = {
+        "/personal-page": "Something has been posted" // "Something has been posted" is supposed to be the trigger name, this is a draft
+    }
+
+    res.PRIVTAP_NOTIFICATION_URL = res.PROD ? "http://privtap.com/triggers-data" : "http://127.0.0.1:8000/api/triggers-data"
 
     return res as unknown as EnvVariables;
 }

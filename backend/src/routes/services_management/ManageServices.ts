@@ -2,7 +2,7 @@ import Service, { IService } from "../../model/Service";
 import { Request, Response } from "express";
 import Route from "../../Route";
 import { badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
-import { checkURL, handleInsert, handleUpdate } from "../../helper/misc";
+import { handleInsert, handleUpdate } from "../../helper/misc";
 import { randomBytes } from "crypto";
 
 
@@ -53,6 +53,10 @@ export default class ManageServices extends Route {
 
         if (checkUndefinedParams(response, name, description)) return;
 
+        /*
+
+        Commented because with 127.0.0.1 the check fails
+
         if (baseUrl != undefined) {
             // TODO: why is this checked here? We agreed on putting all checks into the model
             if (!checkURL(baseUrl)) {
@@ -61,17 +65,20 @@ export default class ManageServices extends Route {
             }
         }
 
+         */
+
         // Generate the service API key
         const serviceAPIKey = randomBytes(256).toString("hex");
 
         // Insert the service
-        if (!await handleInsert(response, Service,
+        const service = await handleInsert(response, Service,
             {
                 name, description, creator: request.userId, baseUrl, authPath, tokenPath, clientId, clientSecret,
                 triggerNotificationServer, apiKey: serviceAPIKey
-            })) return;
+            }, true);
+        if (!service) return;
 
-        success(response);
+        success(response, { service });
     }
 
     protected async httpDelete(request: Request, response: Response): Promise<void> {
