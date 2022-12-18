@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html>
+
+<div class="split left">
+    <div class="left_position" style="color: white">
+        <p>Hey <%=user.username%>!<p>
+        <p>You can start sharing</p>
+        <p>your adventures here.</p>
+        <p>Try it now!</p>
+
+    </div>
+    <div class="textarea_position">
+        <label>
+            <form method="post" id="textForm">
+                <textarea id="text_area" placeholder="Start sharing your thoughts!" cols="50" rows="15"></textarea>
+            </form>
+        </label>
+        <a class="my-button" onclick="submitText()" role="button" ><span></span>Post!</a>
+    </div>
+</div>
+
+<div class="split right">
+    <div class="right_position">
+        <<%- include('partials/user.ejs') %>
+
+    </div>
+</div>
+<link rel="stylesheet" href="../public/css/main.css">
+
+<script>
+    function submitText() {
+        const content = document.getElementById("text_area").value;
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://127.0.0.1:8002/personal-page");
+        xhr.setRequestHeader("Accept", "application/json");
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200){
+                    document.location.reload();
+                }
+            }};
+
+        console.log(JSON.stringify(content));
+
+        let data = `{ "content":` + JSON.stringify(content) + `}`;
+
+        xhr.send(data);
+
+    }
+    function deletePost(caller){
+        const postId = caller.id;
+        let xhr = new XMLHttpRequest();
+        xhr.open("DELETE", "http://127.0.0.1:8002/personal-page");
+        xhr.setRequestHeader("Accept", "application/json");
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200){
+                    document.location.reload();
+                }
+            }};
+        let data = `{ "postId":` + JSON.stringify(postId) + `}`;
+        xhr.send(data);
+    }
+</script>
+
+</html>
