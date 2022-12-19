@@ -26,8 +26,10 @@ class ManageAction extends GenericController<ActionModel[]> implements IManageAc
 
     async getAllActions(serviceId: string) {
         const res = await super.get<ActionModel[]>(path, {query: {serviceId: serviceId}});
-        actions.value = !!res ? res : [];
+        actions.value = !!res ? res : [] ;
     }
+ 
+
 
     async createAction(
         name: string,

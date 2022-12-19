@@ -115,6 +115,32 @@ const router = createRouter({
         requireAuth: true,
       },
     },
+  
+    {
+      path: `${RoutingPath.CREATE_RULE_PAGE}/:id?`,
+      name: "createrule",
+      component: () => import("../views/CreateRuleView.vue"),
+      props: true,
+      meta: {
+        requireAuth: true,
+      },
+    },
+
+    {
+      path: `${RoutingPath.CHOOSE_TRIGGER_FOR_RULE}/:id`,
+      name: "choosetriggerforrule",
+      component: () => import("../views/ChooseTriggerForRuleView.vue"),
+      props: true,
+      meta: {
+        requireAuth: true,
+      },
+    },
+
+    
+
+
+
+
     {
       path: "/:pathMatch(.*)*",
       name: "not-found",
