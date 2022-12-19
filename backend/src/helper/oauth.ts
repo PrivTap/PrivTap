@@ -32,7 +32,7 @@ export default class OAuth {
             return null;
         }
 
-        const redirectUri = env.PROD ? "https://privtap.it/modifyauth/" + serviceId : "http://localhost:5173/modifyauth/" + serviceId;
+        const redirectUri = env.PROD ? "https://privtap.it/modifyauth/" + serviceId : "http://127.0.0.1:5173/modifyauth/" + serviceId;
 
         let authorizationUri = client.authorizeURL({
             redirect_uri: redirectUri,
@@ -75,7 +75,7 @@ export default class OAuth {
             return null;
         }
         try {
-            const accessToken = await client.getToken(authConfig);
+            const accessToken = await client.getToken(authConfig, {json: true});
             return accessToken.token.access_token;
         } catch (e) {
             console.error("Access Token Error");

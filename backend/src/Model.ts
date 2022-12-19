@@ -81,6 +81,7 @@ export default class Model<T> {
      */
     async updateWithFilter(filter: FilterQuery<T>, documentUpdate: Partial<T>, upsert = false): Promise<boolean> {
         try {
+            console.log(documentUpdate);
             const updateResult = await this.model.updateOne(filter, documentUpdate, { upsert: upsert });
             return updateResult.upsertedId != null || updateResult.modifiedCount == 1;
         } catch (e) {
@@ -211,7 +212,6 @@ export default class Model<T> {
                 // Check if the error is actually a duplicate key error
                 if (castedE.code == MONGODB_DUPLICATE_KEY_ERROR_CODE) {
                     logger.debug(`Duplicate key in model ${this.name}: `, castedE);
-
                     throw new ModelSaveError(`This ${this.name} already exists`);
                 }
             }

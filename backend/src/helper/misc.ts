@@ -101,7 +101,6 @@ export async function handleUpdate<T>(response: Response, model: Model<T>, filte
             // The whole object
             updateResult = await model.updateWithFilterAndReturn(filter, update,upsert);
         else
-            // true if no error occurred. false otherwise
             updateResult = await model.updateWithFilter(filter, update, upsert);
         if (!updateResult) {
             badRequest(response, "An object with this id does not exist");
@@ -111,6 +110,7 @@ export async function handleUpdate<T>(response: Response, model: Model<T>, filte
             return updateResult as T;
         return updateResult;
     } catch (e) {
+        console.log(e)
         if (e instanceof ModelSaveError) {
             badRequest(response, e.message);
         } else {

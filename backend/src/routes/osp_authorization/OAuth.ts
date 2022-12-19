@@ -31,7 +31,7 @@ export default class OAuthRoute extends Route {
 
         const options = {
             code,
-            redirect_uri: env.PROD ? "https://privtap.it/modifyauth/" + serviceId : "http://localhost:5173/modifyauth/" + serviceId
+            redirect_uri: env.PROD ? "https://privtap.it/modifyauth/" + serviceId : "http://127.0.0.1:5173/modifyauth/" + serviceId
         };
 
         console.log(options);
@@ -42,9 +42,8 @@ export default class OAuthRoute extends Route {
             badRequest(response);
             return;
         }
-
         // This should be an atomic transaction
-        if (!await handleUpdate(response, Authorization, { userId:userId, serviceId:serviceId },{ userId,serviceId, oAuthToken, grantedPermissions: permissions }, false, true)){
+        if (!await handleUpdate(response, Authorization, { userId:userId, serviceId:serviceId },{ userId, serviceId, oAuthToken, grantedPermissions: permissions }, false, true)){
             return;
         }
 

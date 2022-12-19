@@ -32,7 +32,7 @@ const authorizationSchema = new Schema({
 });
 
 // Build an unique index on tuple <userId, service> to prevent duplicates
-authorizationSchema.index({ userId: 1, service: 1 }, { unique: true });
+authorizationSchema.index({ userId: 1, serviceId: 1 }, { unique: true });
 
 export type ServiceActions = { serviceName: string, serviceId: string, actions: Partial<IAction>[] }
 export type ServiceTriggers = { serviceName: string, serviceId: string, triggers: Partial<ITrigger>[] }

@@ -28,9 +28,9 @@
             <% } %>
         </ul>
         <hr class="solid">
-        <a id="accept" onclick="submitChoice('accept')" class="accept" style="-webkit-transform: translate(-100%, 0%); background-color: #00b916; background-image: url(/public/accept.png); background-repeat: no-repeat;
+        <a id="accept" onclick="submitChoice('accept')" class="accept" style="transform: translate(-100%, 0%); background-color: #00b916; background-image: url(/public/accept.png); background-repeat: no-repeat;
         background-size: contain" href="#"><span></span>Accept</a>
-        <a id="refuse" onclick="submitChoice('refuse')" class="refuse" style="-webkit-transform: translate(100%, 0%); background-color: #da0000; background-image: url(/public/refuse.png); background-repeat: no-repeat;
+        <a id="refuse" onclick="submitChoice('refuse')" class="refuse" style="transform: translate(100%, 0%); background-color: #da0000; background-image: url(/public/refuse.png); background-repeat: no-repeat;
         background-size: contain" href="#"><span></span>Refuse</a>
     </div>
 </div>
@@ -39,14 +39,24 @@
 <script>
     function submitChoice(status) {
         const state = '<%= state %>'
+        const redirectUri = '<%= redirectUri %>';
         let xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://127.0.0.1:8001/authorize");
+        xhr.open("POST", "http://127.0.0.1:8002/authorize");
         xhr.setRequestHeader("Accept", "application/json");
         xhr.setRequestHeader("Content-Type", "application/json");
-        let data = `{ "status": "${status}" , "state":` + JSON.stringify(state) + `}`;
 
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                const data = JSON.parse(xhr.responseText);
+                const redirectUri = data.redirectUri;
+                let redirect = new XMLHttpRequest();
+                redirect.open("GET", redirectUri);
+                redirect.send();
+                window.location = redirectUri;
+            }};
+
+        let data = `{ "status": "${status}" , "state":` + JSON.stringify(state) + `, "redirectUri": "${redirectUri}" }`;
         xhr.send(data);
-
     }
 </script>
 

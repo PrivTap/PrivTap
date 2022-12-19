@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express";
 import Authentication from "./helper/authentication";
 
+
 /**
  * Superclass for all routes that takes care of all the boilerplate for HTTP methods registration and
  * authentication handling.
@@ -55,6 +56,14 @@ export default class Route {
      * @protected
      */
     protected async httpPost?(request: Request, response: Response): Promise<void>;
+    /**
+     * HTTP POST method handler. This will be registered to route '/<endpointName>'.
+     * If this method is implemented it will be registered to the router by the constructor of the Route superclass.
+     * @param request the HTTP request
+     * @param response the HTTP response
+     * @protected
+     */
+    protected async httpPostUpload?(request: Request, response: Response): Promise<void>;
 
     /**
      * HTTP PUT method handler. This will be registered to route '/<endpointName>'.

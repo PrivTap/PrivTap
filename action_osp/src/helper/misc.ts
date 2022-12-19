@@ -26,7 +26,7 @@ export function getFilesInDir(dirPath: string, arrayOfFiles: string[] = []) {
 export function parsePermissions(data: string): IPermission[] | null{
     try {
         // Don't ask me why...
-        return JSON.parse(JSON.parse(data)) as IPermission[];
+        return JSON.parse(data) as IPermission[];
     } catch (e){
         logger.error("parse error", e)
         return null;

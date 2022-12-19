@@ -53,6 +53,7 @@ const defaults = {
     SALT_ROUNDS: 8,
     JWT_SECRET: "this_is_an_insecure_secret",
     JWT_EXPIRE: 86400,
+
 };
 
 /**
