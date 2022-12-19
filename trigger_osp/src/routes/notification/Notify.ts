@@ -5,16 +5,21 @@ import Notification from "../../model/Notification";
 
 export default class NotifyRoute extends Route {
     constructor() {
-        super("notify", false);
+        super("notify", false, false);
     }
 
+    // We're registering a new notification
     protected async httpPost(request: Request, response: Response): Promise<void> {
-        const oauthToken = request.headers.authorization as string;
+        const bearer = request.headers.authorization as string;
         const foreignUserId = request.body.userId;
         const foreignTriggerId = request.body.triggerId;
         const triggerName = request.body.triggerName;
+        const oauthToken = bearer.split(" ")[1];
 
-        console.log(oauthToken); // Im not sure, maybe it contains bearer and has to be splitted
+        console.log("headers =", request.headers);
+        console.log("body =", request.body);
+
+        console.log(oauthToken); // I'm not sure, maybe it contains bearer and has to be split
 
         const authorization = await Authorization.findByToken(oauthToken);
 

@@ -5,7 +5,7 @@ import User from "../../model/User";
 
 export default class PersonalPageRoute extends Route {
     constructor() {
-        super("personal-page", true);
+        super("personal-page", true, true);
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {

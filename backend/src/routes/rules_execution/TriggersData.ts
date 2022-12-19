@@ -8,6 +8,7 @@ import Action from "../../model/Action";
 import logger from "../../helper/logger";
 import Authorization from "../../model/Authorization";
 import Service from "../../model/Service";
+import Permission from "../../model/Permission";
 
 export default class TriggersDataRoute extends Route {
     // TODO: figure out how to restrict this to only authorized services
@@ -23,21 +24,23 @@ export default class TriggersDataRoute extends Route {
         const userId = request.body.userId;
         const api = request.body.apiKey;
 
+        console.log("body=", request.body);
+
         if (checkUndefinedParams(response, triggerId, userId, api)) {
             return;
         }
 
         //Check that the user with the specified ID owns the service
         const referencedRule = await Rule.find({ userId: userId, triggerId: triggerId });
-        const triggerData = await Trigger.findById(triggerId);
+        const trigger = await Trigger.findById(triggerId);
 
-        if (!triggerData || !referencedRule) {
+        if (!trigger || !referencedRule) {
             forbiddenUserError(response, "You are not the owner of this rule");
             return;
         }
 
         //Verify that the API key is bound to the service owning the trigger
-        const isValidAPIKey = await Service.isValidAPIKey(triggerData.serviceId, api);
+        const isValidAPIKey = await Service.isValidAPIKey(trigger.serviceId, api);
         if (!isValidAPIKey) {
             forbiddenUserError(response, "Invalid key");
             return;
@@ -49,22 +52,29 @@ export default class TriggersDataRoute extends Route {
             return;
         }
         //Get the OAuth token for the trigger
-        const oauthToken = await Authorization.findToken(userId, triggerData.serviceId);
+        const oauthToken = await Authorization.findToken(userId, trigger.serviceId);
 
         //Get the data from the resourceServer (if needed)
         let dataToForwardToActionAPI: object | null = null;
-        if (triggerData?.resourceServer) {
+
+        if (trigger?.resourceServer) {
             if (!oauthToken) {
                 forbiddenUserError(response, "Trigger not authorized");
                 return;
             }
 
-            const axiosResponse = await axios.get(triggerData?.resourceServer ?? "", {
+            // We were not specifying the granularity! That is contained in the trigger's permission field.
+
+            const permissionIds = trigger.permissions ? trigger.permissions as string[] : [];
+            const aggregateAuthorizationDetails = await Permission.getAggregateAuthorizationDetails(permissionIds);
+
+            const axiosResponse = await axios.get(trigger?.resourceServer ?? "", {
                 headers: {
                     Authorization: "Bearer " + oauthToken
                 },
                 params: {
-                    filter: actionData.inputs
+                    filter: actionData.inputs,
+                    "authorization_details": JSON.stringify(aggregateAuthorizationDetails)
                 }
             });
             //Now we replace all URLs

@@ -85,6 +85,18 @@ export class Permission extends Model<IPermission> {
         });
     }
 
+    async getAggregateAuthorizationDetails(permissionIds: string[]): Promise<object[]> {
+        let aggregate: object[] = [];
+        for (let i=0; i<permissionIds.length; i++){
+            const permission = await this.model.findById(permissionIds[i]) as IPermission;
+            if (permission){
+                aggregate.push(permission.authorization_details);
+            }
+        }
+        return aggregate;
+    }
+
+
     /*async findAllPermission(serviceId: string, userId: string) {
         const result = await this.model.aggregate()
             .match({serviceId: new Types.ObjectId(serviceId)})

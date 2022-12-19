@@ -19,8 +19,9 @@ export default class RuleExecution {
      * @param triggerId the id of the trigger
      */
     static async areActionTriggerCompatible(actionId: string, triggerId: string): Promise<boolean> {
-        const action = await Action.findById(triggerId, "inputs -_id");
-        const trigger = await Trigger.findById(triggerId, "outputs -_id");
+        const action = await Action.findById(actionId, "inputs");
+        const trigger = await Trigger.findById(triggerId, "outputs");
+
         if (!trigger || !action)
             return false;
         // TODO: do we need to check for strict equality or is this enough?

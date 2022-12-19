@@ -5,7 +5,6 @@ import { OperationDataType } from "../helper/rule_execution";
 import logger from "../helper/logger";
 import Permission, { IPermission } from "./Permission";
 import permission from "./Permission";
-import { pipeline } from "stream";
 import Authorization from "./Authorization";
 
 export interface ITrigger {
@@ -121,6 +120,9 @@ class Trigger extends Model<ITrigger> {
      * Find the url for notification of the trigger service of a rule and the id of the service
      * @param: triggerId is the id of the trigger in the rule
      */
+    // This doesn't work: return only the serviceId
+    // example output:
+    // { serviceId: new ObjectId("639dcb606b1eb8eff9ed80e1") }
     async getTriggerServiceNotificationServer(triggerId: string): Promise<Partial<triggerServiceNotificationServer> | null> {
         try {
             const result = await this.model.aggregate()

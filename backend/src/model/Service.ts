@@ -79,7 +79,7 @@ class Service extends Model<IService> {
      * @param apiKey the api key to check
      */
     async isValidAPIKey(serviceId: string, apiKey: string): Promise<boolean> {
-        const service = await this.findById(serviceId, "-_id apiKey");
+        const service = await this.findById(serviceId, "apiKey");
         // TODO: do we need a timing safe compare here?
         return service?.apiKey == apiKey;
     }

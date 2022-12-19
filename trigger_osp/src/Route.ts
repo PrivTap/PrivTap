@@ -11,20 +11,25 @@ export default class Route {
     readonly endpointName: string;
     // Flag that indicates if this API route requires user authentication
     readonly requiresAuth: boolean;
+    readonly notify: boolean;
     // Router responsible for this API route
     readonly router: Router;
 
 
-    constructor(endpointName="", requiresAuth = true) {
+    constructor(endpointName="", requiresAuth = true, notify = false) {
         this.endpointName = endpointName;
         this.requiresAuth = requiresAuth;
+        this.notify = notify;
         this.router = Router();
 
-        if (requiresAuth){
+        if (requiresAuth)
             this.router.use(Authentication.checkAuthentication);
-        }
 
-        this.router.use(NotificationService.checkNotification);
+        if (notify){
+            console.log("registering notify middleware to", endpointName);
+            this.router.use(NotificationService.checkNotification);
+
+        }
 
         // If the subclass implements http methods handlers, register them to the Router
         if (this.httpGet)

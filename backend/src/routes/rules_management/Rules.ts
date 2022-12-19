@@ -33,11 +33,16 @@ export default class RulesRoute extends Route {
         if (checkUndefinedParams(response, name, triggerId, actionId)) return;
 
         //CHECK IF TRIGGER AND ACTION ARE EFFECTIVELY COMPATIBLE
-        if (!(await RuleExecution.areActionTriggerCompatible(actionId, triggerId))) return;
+        if (!(await RuleExecution.areActionTriggerCompatible(actionId, triggerId))) {
+            response.status(400).send();
+            return;
+        }
 
         //To check if trigger and action are authorized we check if the parent services are authorized
-        const trigger = await Trigger.findById(triggerId, "serviceId name");
-        const service = await Action.findById(actionId, "serviceId");
+        const trigger = await Trigger.findById(triggerId);
+        const service = await Action.findById(actionId);
+
+        console.log("found trigger:", trigger);
 
         //This verifies that Trigger and Action actually exist
         if (!trigger || !service) {
@@ -50,6 +55,7 @@ export default class RulesRoute extends Route {
         if (service.serviceId != trigger.serviceId) {
             isActionAuthorized = (await Authorization.findToken(userId, service.serviceId) != null);
         }
+
 
         if (!isTriggerAuthorized || !isActionAuthorized) {
             badRequest(response, "Trigger or Action not authorized");
@@ -64,14 +70,18 @@ export default class RulesRoute extends Route {
         //every time a rule is created then we should notify the service of the trigger by sending to him
         //triggerId and user Id
         const triggerService = await Trigger.getTriggerServiceNotificationServer(triggerId);
+        console.log(triggerService);
         if (triggerService != null) {
             const token = triggerService.serviceId != undefined ? await Authorization.findToken(userId, triggerService.serviceId) : null;
-            if (token != null)
-                if (triggerService.triggerNotificationServer != undefined)
+            if (token != null){
+                if (triggerService.triggerNotificationServer != undefined){
                     //TODO should respond to the user that he can't create this rule because he didn't authorize the service (do this also for action)
+                    console.log("seding req");
                     await postReqHttp(triggerService.triggerNotificationServer, token, { userId, triggerId, "triggerName": trigger.name });
+                }
+            }
         } else
-            logger.error("Error while");
+            logger.error("/rules: triggerService == null");
         return;
     }
 

@@ -47,7 +47,7 @@ class Authorization {
 
     async update(update: Partial<IAuthorization>, filter: Partial<IAuthorization>): Promise<boolean>{
         try{
-            this.model.findOneAndUpdate(filter, update);
+            await this.model.updateOne(filter, update);
             return true;
         } catch (e) {
             console.log("Error updating authorization", e);
