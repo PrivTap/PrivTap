@@ -6,7 +6,7 @@ import {use, expect} from "chai";
 import axiosInstance from "../../src/helpers/axios_service";
 import sinonChai = require("sinon-chai");
 import PermissionModel from "../../src/model/permission_model";
-import UserAction from "../../src/controllers/user-Action";
+import UserAction from "../../src/controllers/user_action";
 
 use(sinonChai);
 

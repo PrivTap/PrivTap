@@ -1,9 +1,9 @@
-import mongoose, { Schema, Types } from "mongoose";
+import mongoose, {Schema, Types} from "mongoose";
 import Service from "./Service";
 import Model from "../Model";
 import logger from "../helper/logger";
-import Permission, { IPermission } from "./Permission";
-import { DataDefinition } from "../helper/dataDefinition";
+import Permission, {IPermission} from "./Permission";
+import {DataDefinition} from "../helper/dataDefinition";
 import permission from "./Permission";
 import Authorization from "./Authorization";
 
@@ -35,7 +35,7 @@ const triggerSchema = new Schema({
         type: String
         // required?
     },
-    permissions: [{ type: mongoose.Schema.Types.ObjectId, ref: "permission" }],
+    permissions: [{type: mongoose.Schema.Types.ObjectId, ref: "permission"}],
     resourceServer: {
         type: String
     },
@@ -57,10 +57,10 @@ class Trigger extends Model<ITrigger> {
         let triggers: ITrigger[] | null;
         if (associated)
             //we don't populate the permissions, permissions is now an array of idPermission (string)
-            triggers = await this.findAll({ serviceId }, "-serviceId");
+            triggers = await this.findAll({serviceId}, "-serviceId");
         else
             //we populate the permissions, permissions is now an Array of IPermission
-            triggers = await this.findAll({ serviceId }, "-serviceId", "permissions", "name description");
+            triggers = await this.findAll({serviceId}, "-serviceId", "permissions", "name description");
         if (triggers == null)
             return null;
         const triggersResult = new Array<TriggerOsp>();
@@ -85,18 +85,19 @@ class Trigger extends Model<ITrigger> {
 
 
     async findAllTriggerAuthorizedByUser(userId: string, serviceId: string): Promise<TriggerOsp[] | null> {
-        const grantedPermissionId = await Authorization.getGrantedPermissionsId(userId, serviceId);
-        console.log(grantedPermissionId);
+        let grantedPermissionId = await Authorization.getGrantedPermissionsId(userId, serviceId);
+        if (grantedPermissionId == null)
+            grantedPermissionId = [];
         let result;
         try {
             result = await this.model.aggregate()
-                .match({ serviceId: new mongoose.Types.ObjectId(serviceId) })
+                .match({serviceId: new mongoose.Types.ObjectId(serviceId)})
                 .match({
                     $expr: {
                         $setIsSubset: ["$permissions", grantedPermissionId]
                     }
                 })
-                .project({ "outputs": 0, "data": 0, "serviceId":0 }) as TriggerOsp[];
+                .project({"outputs": 0, "data": 0, "serviceId": 0}) as TriggerOsp[];
         } catch (e) {
             console.log(e);
             return null;
@@ -123,13 +124,13 @@ class Trigger extends Model<ITrigger> {
     async getTriggerServiceNotificationServer(triggerId: string): Promise<Partial<triggerServiceNotificationServer> | null> {
         try {
             const result = await this.model.aggregate()
-                .match({ _id: new mongoose.Types.ObjectId(triggerId) })
+                .match({_id: new mongoose.Types.ObjectId(triggerId)})
                 //keep only the serviceId
-                .project({ _id: 0, "serviceId": 1 })
+                .project({_id: 0, "serviceId": 1})
                 //left outer join with collection service
-                .lookup({ from: "services", localField: "serviceId", foreignField: "_id", as: "service" })
-                .unwind({ path: "$service" })
-                .addFields({ triggerNotificationServer: "$service.triggerNotificationServer" })
+                .lookup({from: "services", localField: "serviceId", foreignField: "_id", as: "service"})
+                .unwind({path: "$service"})
+                .addFields({triggerNotificationServer: "$service.triggerNotificationServer"})
                 //remove all the field except the trigger Notification center
                 .project({
                     _id: 0,

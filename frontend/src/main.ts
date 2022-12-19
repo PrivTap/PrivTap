@@ -34,6 +34,7 @@ const app = createApp(App);
 app.use(vuetify)
 app.use(pinia);
 app.use(router);
+app.config.unwrapInjectedRef = true
 const options: PluginOptions = {
   // You can set your default options here
   position: POSITION.TOP_CENTER,

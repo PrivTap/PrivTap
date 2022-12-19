@@ -6,7 +6,6 @@ import { deleteHttp, getHttp, handleInsert } from "../../helper/misc";
 import Authorization from "../../model/Authorization";
 import logger from "../../helper/logger";
 import Trigger from "../../model/Trigger";
-import RuleExecution from "../../helper/rule_execution";
 import Action from "../../model/Action";
 
 export default class RulesRoute extends Route {
@@ -33,7 +32,11 @@ export default class RulesRoute extends Route {
         if (checkUndefinedParams(response, name, triggerId, actionId)) return;
 
         //CHECK IF TRIGGER AND ACTION ARE EFFECTIVELY COMPATIBLE
-        if (!(await RuleExecution.areActionTriggerCompatible(actionId, triggerId))) return;
+        /*if (!(await RuleExecution.areActionTriggerCompatible(actionId, triggerId))) {
+            badRequest(response, "Action and trigger are not compatible");
+            return;
+        }*/
+
 
         //To check if trigger and action are authorized we check if the parent services are authorized
         const triggerServiceId = await Trigger.findById(triggerId, "serviceId");

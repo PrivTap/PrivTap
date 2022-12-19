@@ -18,7 +18,7 @@
         </div>
         <v-window v-model="tabs">
             <v-window-item v-for="i in 2" :key="i" :value="i">
-                <div v-if="i == 1" class="py-10 content-center flex items-center justify-center">
+                <div v-if="i === 1" class="py-10 content-center flex items-center justify-center">
                     <div v-if="!listOfTrigger.length"
                         class="text-center flex flex-col justify-center items-center content-center ">
                         <h1 class="text-3xl text-blue-100 pt-8 font-medium">
@@ -27,7 +27,7 @@
                         <h1 class="text-lg text-stone-400 pt-4 pb-10 font-medium">
                             Wait until the service provider add some trigger
                         </h1>
-                        <img :src=empty class="h-40 ">
+                        <img :src=empty class="h-40 " :alt="empty">
                     </div>
                     <div v-else class="mx-10 grid lg:grid-cols-2 xl:grid-cols-3 gap-10 content-center">
                         <div v-for="trigger in listOfTrigger"
@@ -51,7 +51,7 @@
                         </div>
                     </div>
                 </div>
-                <div v-if="i == 2" class="py-10 content-center flex items-center justify-center">
+                <div v-if="i === 2" class="py-10 content-center flex items-center justify-center">
                     <div v-if="!listOfAction.length"
                         class="text-center flex flex-col justify-center items-center content-center ">
                         <h1 class="text-3xl text-blue-100 pt-8 font-medium">
@@ -60,7 +60,7 @@
                         <h1 class="text-lg text-stone-400 pt-4 pb-10 font-medium">
                             Wait until the service provider add some action
                         </h1>
-                        <img :src=empty class="h-40 ">
+                        <img :src=empty class="h-40 " alt="empty">
                     </div>
                     <div class="mx-10 grid lg:grid-cols-2 xl:grid-cols-3 gap-10 content-center">
                         <div v-for="action in listOfAction"

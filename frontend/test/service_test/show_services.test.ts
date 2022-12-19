@@ -1,13 +1,12 @@
-import { afterEach, beforeAll, beforeEach, describe, test } from "vitest";
+import {afterEach, beforeAll, beforeEach, describe, test} from "vitest";
 
 import SimpleServiceModel from "../../src/model/simple_service_model";
 import axiosInstance from "../../src/helpers/axios_service";
-import showServices from "../../src/controllers/show-services";
-import { SinonStub } from "sinon";
+import showServices from "../../src/controllers/show_services";
+import {SinonStub} from "sinon";
 import * as sinon from "sinon";
-import { use, expect } from "chai";
-import sinonChai from "sinon-chai";
-
+import {use, expect} from "chai";
+import sinonChai = require("sinon-chai");
 
 use(sinonChai);
 
@@ -36,7 +35,7 @@ describe("Manage Service Tests", () => {
 
     /// Test createService
     test("should return all the services", async () => {
-        getStub.resolves({ data: { data: [testServiceModel] } })
+        getStub.resolves({data: {data: [testServiceModel]}})
         await showServices.getAllServices();
         expect(showServices.getRef().value).to.be.eql([testServiceModel]);
     });
@@ -46,7 +45,7 @@ describe("Manage Service Tests", () => {
         expect(showServices.getRef().value).to.be.eql([]);
     })
     test("should return all the authorized services", async () => {
-        getStub.resolves({ data: { data: [testServiceModel] } })
+        getStub.resolves({data: {data: [testServiceModel]}})
         await showServices.getAllServices();
         expect(showServices.getRef().value).to.be.eql([testServiceModel]);
     });

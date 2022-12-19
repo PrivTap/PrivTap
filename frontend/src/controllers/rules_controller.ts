@@ -2,7 +2,7 @@ import type RuleModel from "@/model/rule_model";
 import {ref, type Ref} from "vue";
 import {GenericController} from "./generic_controller";
 
-const path = "/manage-rules";
+const path = "rules";
 let rules = ref<RuleModel[]>([]);
 
 export interface IManageRule {
@@ -23,8 +23,7 @@ class ManageRule extends GenericController<RuleModel[]> implements IManageRule {
     }
 
     async getAllRules(userId: string): Promise<void> {
-        
-        const res = await super.get<RuleModel[]>(path, { query: { userId }} );
+        const res = await super.get<RuleModel[]>(path, {query: {userId}});
         rules.value = !!res ? res : [];
     }
 
@@ -47,6 +46,13 @@ class ManageRule extends GenericController<RuleModel[]> implements IManageRule {
         await super.delete(path, {body: body, message: "Rule deleted"});
         rules.value = rules.value.filter((rule) => rule._id !== ruleId);
     }
+}
+
+export interface ruleCreation {
+    triggerName: string;
+    actionName: string;
+    triggerId: string;
+    actionId: string;
 }
 
 export default new ManageRule();

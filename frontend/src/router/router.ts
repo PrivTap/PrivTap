@@ -1,4 +1,3 @@
-import SimpleServiceModel from "@/model/simple_service_model";
 import { useAuthStore } from "@/stores/auth_store";
 import { createRouter, createWebHistory } from "vue-router";
 import RoutingPath from "./routing_path";
@@ -125,22 +124,6 @@ const router = createRouter({
         requireAuth: true,
       },
     },
-
-    {
-      path: `${RoutingPath.CHOOSE_TRIGGER_FOR_RULE}/:id`,
-      name: "choosetriggerforrule",
-      component: () => import("../views/ChooseTriggerForRuleView.vue"),
-      props: true,
-      meta: {
-        requireAuth: true,
-      },
-    },
-
-    
-
-
-
-
     {
       path: "/:pathMatch(.*)*",
       name: "not-found",

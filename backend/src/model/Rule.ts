@@ -32,7 +32,7 @@ const ruleSchema = new Schema({
     isAuthorized: {
         type: Boolean,
         required: true,
-        default: false
+        default: true
     }
 });
 // Build an unique index on tuple <userId, triggerId, actionId> to prevent duplicates
