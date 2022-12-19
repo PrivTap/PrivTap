@@ -10,7 +10,7 @@
       </button>
       <button class="rounded-lg bg-blue-600 py-2 px-9 text-lg font-medium text-white hover:bg-blue-700"
         @click="router.push(RoutingPath.PERSONAL_PAGE)">
-        Create
+        My rules
       </button>
 
       <v-menu min-width="200px" rounded>

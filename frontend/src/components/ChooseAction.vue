@@ -12,8 +12,8 @@
             </v-chip>
 
             <v-btn   class="ma-2" variant="outlined" color="text-blue-100" @click="router.push(`${RoutingPath.CREATE_RULE_PAGE}/${props.action._id}`)">
-                                  ajde dalje
-          </v-btn>
+                nj
+           </v-btn>
         </div>
  
         <div class="flex justify-start mt-5 space-x-5">

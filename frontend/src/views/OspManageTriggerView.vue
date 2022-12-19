@@ -1,6 +1,6 @@
 <template>
     <div class="h-full">
-        <h1 class="text-5xl text-blue-100 font-medium text-center py-5">Your Trigger</h1>
+        <h1 class="text-5xl text-blue-100 font-medium text-center py-5">Your Triggers</h1>
 
         <div class="flex flex-col items-center justify-center place-self-center relative">
             <img :src="radial" class="w-1/2">

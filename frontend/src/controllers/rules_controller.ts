@@ -14,7 +14,7 @@ export interface IManageRule {
 
     deleteRule(ruleId: string): Promise<void>;
 
-    getAllRules(userId: string): Promise<void>;
+    getAllRules( ): Promise<void>;
 }
 
 class ManageRule extends GenericController<RuleModel[]> implements IManageRule {
@@ -22,8 +22,8 @@ class ManageRule extends GenericController<RuleModel[]> implements IManageRule {
         return rules;
     }
 
-    async getAllRules(userId: string): Promise<void> {
-        const res = await super.get<RuleModel[]>(path, {query: {userId}});
+    async getAllRules( ): Promise<void> {
+        const res = await super.get<RuleModel[]>(path);
         rules.value = !!res ? res : [];
     }
 

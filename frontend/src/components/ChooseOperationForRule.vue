@@ -55,9 +55,9 @@ const lookingForTriggers = ref(computed(() => props.operation === "trigger"));
 
 onMounted(async () => {
   if (lookingForTriggers.value)
-    operations.value = await user_trigger.getAuthorizedTriggers(props.serviceId, true);
+    operations.value = await user_trigger.getAllTriggers(props.serviceId, true);
   else
-    operations.value = await user_action.getAuthorizedActions(props.serviceId, true);
+    operations.value = await user_action.getAllActions(props.serviceId, true);
   //TODO Put the compatible actions
 });
 const setTriggerId = inject("setTriggerId") as (triggerId: string) => void;

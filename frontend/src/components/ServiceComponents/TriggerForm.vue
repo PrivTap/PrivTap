@@ -28,6 +28,7 @@
             <v-spacer></v-spacer>
             <v-btn color="error" variant="text" text @click="onClose()">Cancel</v-btn>
         </v-row>
+        <v-card-actions></v-card-actions>
     </v-card>
 </template>
 <script lang="ts" setup>

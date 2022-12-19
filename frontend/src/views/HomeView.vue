@@ -41,7 +41,7 @@
                 </li>
               </ul>
               <div class="text-white font-semibold text-xl space-x-16 pt-20">
-                <PrimaryButton text="Create your Rule" :onClick="() => router.push(RoutingPath.PERSONAL_PAGE)" />
+                <PrimaryButton text="Create your Rule" :onClick="() => router.push(RoutingPath.CREATE_RULE_PAGE)" />
 
                 <OutilinedButton text="Publish your Service"
                   :onClick="() => router.push(RoutingPath.PUBLISH_SERVICE_PAGE)" />

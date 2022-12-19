@@ -65,7 +65,7 @@
         </v-btn>
         <v-btn class="ma-2" color="error" size="large" variant="flat" @click="showModal = true">
           <v-icon start icon="mdi-delete"></v-icon>
-          Cancel
+          Delete
         </v-btn>
       </v-card-actions>
     </div>

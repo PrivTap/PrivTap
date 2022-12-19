@@ -1,19 +1,13 @@
 <template>
+ 
 
 
-  <v-dialog v-model="dialog" class="flex flex-col justify-center items-center center">
-    <template v-slot:activator="{ props }">
-      <div v-bind:="props"
-           class="ring-2 rounded-lg flex items-center justify-center bg-green-900/10 ring-pink-900 hover:ring-pink-700">
-        <v-btn color="pink" elevation="0" variant="text" :onClick="() => router.push(RoutingPath.CREATE_RULE_PAGE)">
-          Create New Rule
-        </v-btn>
-      </div>
-
-    </template>
 
 
-  </v-dialog>
+
+
+
+
 </template>
 
 <script setup lang="ts">
@@ -22,9 +16,18 @@ import {inject, onMounted, ref} from 'vue';
 import {useRoute} from 'vue-router';
 import router from '@/router/router';
 import RoutingPath from "@/router/routing_path";
+import radial from '@/assets/images/radial.svg';
+import logo from '@/assets/images/logo_dark.svg';
+import rules_controller from '@/controllers/rules_controller';
+import empty from '@/assets/images/empty.svg';
+import RuleCard from '@/components/RuleCard.vue';
+import PrimaryButton from '@/components/PrimaryButton.vue';
 
 
 const dialog = ref(false);
+const isLoading = ref(true);
+
+let rules = rules_controller.getRef();
 
 const route = useRoute();
 
@@ -33,7 +36,13 @@ async function onClose() {
   dialog.value = false
 }
 
-onMounted(() => {
+onMounted(async() => {
+  await rules_controller.getAllRules();
+
+
+  isLoading.value = true;
+  isLoading.value = false;
+
   console.log(inject("setTriggerId"));
   console.log(inject("triggerId"));
 })
