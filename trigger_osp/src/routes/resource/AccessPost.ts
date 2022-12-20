@@ -9,6 +9,7 @@ export default class AccessPostRoute extends Route {
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
+        console.log("resource server called");
         const bearer = request.headers.authorization as string;
         const oauthToken = bearer.split(" ")[1];
         const queryStr = request.query.authDetails as string;
@@ -23,6 +24,7 @@ export default class AccessPostRoute extends Route {
         const actionDataFilter = request.query.filter; //TODO: Filter retrieved data with only what was requested by the action
 
         if (!authorization){
+            console.log("couldn't find authorization");
             response.status(400).send();
             return;
         }
