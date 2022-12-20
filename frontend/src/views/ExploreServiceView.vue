@@ -6,6 +6,7 @@
             </v-avatar>
             <p class="text-h3 font-weight-medium text-white mt-10 mb-4"> {{ service.name }} </p>
             <p class="text-h6 font-weight-regular text-white/60"> {{ service.description }} </p>
+            <!-- TODO Define where this button should redirect, otherwhise remove it -->
             <v-btn variant="tonal" color="info" rounded size="x-large" class="my-10"> CONNECT </v-btn>
             <v-tabs fixed-tabs v-model="tabs">
                 <v-tab :value="1">
