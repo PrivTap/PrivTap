@@ -2,6 +2,7 @@ import Route from "../../Route";
 import {Request, Response} from "express";
 import Authorization from "../../model/Authorization";
 import Permission from "../../model/Permission";
+import {TriggerData} from "../../helper/dataDefinition";
 
 export default class AccessPostRoute extends Route {
     constructor() {
@@ -38,7 +39,9 @@ export default class AccessPostRoute extends Route {
         }
          */
 
+        //Format the received post data into the standard format
+        const formattedData = new TriggerData([data], ["post-text"]);
 
-        response.status(200).send(data);
+        response.status(200).send(formattedData);
     }
 }

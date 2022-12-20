@@ -5,6 +5,8 @@ import {Configuration, OpenAIApi} from "openai";
 
 import env from "../../helper/env";
 import Authorization from "../../model/Authorization";
+import {IDataDefinition} from "../../helper/dataDefinition";
+import {DataType} from "../../helper/dataType";
 
 export default class CreatePostRoute extends Route {
     constructor() {
@@ -12,18 +14,27 @@ export default class CreatePostRoute extends Route {
     }
 
     protected async httpPost(request: Request, response: Response): Promise<void> {
-        const content = request.body.content;
         const bearer = request.headers.authorization as string;
         const oauthToken = bearer.split(" ")[1];
         const authorization = await Authorization.findByToken(oauthToken);
+        const dataFromTrigger = request.body as IDataDefinition;
+
         console.log("authorization=", authorization);
-        console.log("content=", content);
-        if (!authorization || !content){
+        console.log("content=", dataFromTrigger);
+
+        if (!authorization || !dataFromTrigger){
             console.log("Not auth or content");
             response.status(400).send();
             return;
         }
         const userId = authorization.userId;
+
+        const postText = dataFromTrigger.trigger_data.find((entry) => entry.type == DataType.Text && entry.identifier == "post-text")?.data as string;
+        if (!postText){
+            console.log("Wrongly formatted data from trigger");
+            response.status(400).send();
+            return;
+        }
 
         // TODO: Permission checking
 
@@ -34,7 +45,7 @@ export default class CreatePostRoute extends Route {
         let dataImg = undefined;
         try {
             dataImg = await openai.createImage({
-                prompt: content,
+                prompt: postText,
                 size: "256x256",
                 response_format: "url"
             }, {timeout: 10000});
@@ -42,7 +53,7 @@ export default class CreatePostRoute extends Route {
             console.log(e);
         }
         const post: Partial<IPost> = {
-            content: content,
+            content: postText,
             userId: userId,
             img: dataImg?.data.data[0].url
         }

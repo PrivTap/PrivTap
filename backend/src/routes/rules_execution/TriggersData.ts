@@ -99,7 +99,7 @@ export default class TriggersDataRoute extends Route {
         // TODO: Do we need to show some kind of rule execution error??
         let actionResponse;
         try {
-            actionResponse = await postReqHttp(actionEndpoint, oauthToken, { content: dataToForwardToActionAPI });
+            actionResponse = await postReqHttp(actionEndpoint, oauthToken, dataToForwardToActionAPI ?? {});
         } catch (e) {
             logger.debug("Could not execute rule with id " + referencedRule?._id + " with error " + actionResponse?.status);
         }
