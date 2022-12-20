@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { checkCompatibility, DataDefinition } from "../../src/helper/dataDefinition";
+import { checkCompatibility, DataDefinition, dataDefinitionIDs } from "../../src/helper/dataDefinition";
 import { DataType } from "../../src/helper/dataType";
 
 describe("Data Definition helper module", () => {
@@ -56,5 +56,9 @@ describe("Data Definition helper module", () => {
 
     it("should return that two actions are not compatible", () => {
         expect(checkCompatibility(mockDefinitionT, incompatibleActionDefinition)).to.be.false;
+    });
+
+    it("should correctly extract data definition IDs", function () {
+        expect(dataDefinitionIDs(incompatibleActionDefinition)).to.be.eql(["title", "image"]);
     });
 });

@@ -1,7 +1,6 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
 import {
-    badRequest,
     checkUndefinedParams,
     forbiddenUserError,
     internalServerError,
@@ -35,53 +34,53 @@ export default class TriggersDataRoute extends Route {
 
         //Check that the user with the specified ID owns the service
         const referencedRule = await Rule.find({ userId: userId, triggerId: triggerId });
-        const triggerData = await Trigger.findById(triggerId);
+        const trigger = await Trigger.findById(triggerId);
 
-        if (!triggerData || !referencedRule) {
+        if (!trigger || !referencedRule) {
             forbiddenUserError(response, "You are not the owner of this rule");
             return;
         }
 
         //Verify that the API key is bound to the service owning the trigger
-        const isValidAPIKey = await Service.isValidAPIKey(triggerData.serviceId, api);
+        const isValidAPIKey = await Service.isValidAPIKey(trigger.serviceId, api);
         if (!isValidAPIKey) {
             forbiddenUserError(response, "Invalid key");
             return;
         }
 
-        const actionData = await Action.findById(referencedRule!.actionId);
-        if (!actionData?.endpoint) {
+        const action = await Action.findById(referencedRule!.actionId);
+        if (!action?.endpoint) {
             internalServerError(response);
             return;
         }
         //Get the OAuth token for the trigger
-        let oauthToken = await Authorization.findToken(userId, triggerData.serviceId);
+        let oauthToken = await Authorization.findToken(userId, trigger.serviceId);
 
         //Get the data from the resourceServer (if needed)
         let dataToForwardToActionAPI: object | null = null;
-        if (triggerData?.resourceServer) {
+        if (trigger?.resourceServer) {
             if (!oauthToken) {
                 forbiddenUserError(response, "Trigger not authorized");
                 return;
             }
 
             //TODO: RAR data MUST NOT be sent manually since it is already included in the token
-            const permissionIds: string[] = (triggerData.permissions ?? []) as string[];
+            const permissionIds: string[] = (trigger.permissions ?? []) as string[];
             const aggregateAuthorizationDetails = await Permission.getAggregateAuthorizationDetails(permissionIds);
 
             let axiosResponse;
             try {
-                axiosResponse = await getReqHttp(triggerData?.resourceServer, oauthToken, {
-                    filter: dataDefinitionIDs(actionData.inputs),
+                const queryParams = {
+                    filter: dataDefinitionIDs(action.inputs),
                     authDetails: aggregateAuthorizationDetails
-                });
+                };
+                axiosResponse = await getReqHttp(trigger?.resourceServer, oauthToken, queryParams);
                 dataToForwardToActionAPI = axiosResponse?.data;
                 if (!dataToForwardToActionAPI){
                     logger.debug("Axios response data not found");
                     internalServerError(response);
                     return;
                 }
-                //console.log("data =", dataToForwardToActionAPI);
             } catch (e){
                 logger.debug("Axios response status =", axiosResponse?.status);
             }
@@ -89,8 +88,8 @@ export default class TriggersDataRoute extends Route {
 
         //Forward the data to the Action API endpoint
 
-        const actionEndpoint = actionData.endpoint;
-        oauthToken = await Authorization.findToken(userId, actionData.serviceId);
+        const actionEndpoint = action.endpoint;
+        oauthToken = await Authorization.findToken(userId, action.serviceId);
 
         if (!actionEndpoint) {
             internalServerError(response);

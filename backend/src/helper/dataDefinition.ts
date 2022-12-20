@@ -70,5 +70,5 @@ function checkEntryCompatibility(triggerEntry: EntryDefinition, actionEntry: Ent
  * @param definition The data definition objects to extract IDs from
  */
 export function dataDefinitionIDs(definition: DataDefinition): string[] {
-    return definition.trigger_data.map((entry) => (entry.identifier ?? ""));
+    return definition ? definition.trigger_data.map((entry) => (entry.identifier ?? "")) : [];
 }
