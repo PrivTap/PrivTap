@@ -2,41 +2,68 @@
 
   <div class="h-full">
     <h2 class="text-5xl text-blue-100 font-medium text-center py-5"> Create Your Own Rule</h2>
-    <!--    <v-form ref="formRef" v-model="form.valid">-->
-    <!--      <v-container>-->
-    <!--        <v-row>-->
-    <!--          <v-col cols="12" md="4">-->
-    <!--            <v-text-field v-model="form.name" :rules="form.nameRule" label="Name" required></v-text-field>-->
-    <!--          </v-col>-->
-    <!--        </v-row>-->
-    <!--      </v-container>-->
-    <!--    </v-form>-->
-    <h2 class="text-3xl text-blue-100 font-medium text-center py-5"> Choose from which service you want to take the
-      {{ lookingForTriggers ? 'trigger' : 'action' }}</h2>
-    <div class="flex justify-md-space-around text-center py-5" v-if="ruleCreation.triggerName.length!==0">
-      <span>SelectedTrigger:</span>
-      <span> {{ ruleCreation.triggerName }}</span>
-      <v-btn @click="ruleCreation.triggerName=''">
-        <v-icon>mdi-delete</v-icon>
-      </v-btn>
+
+    <div class="flex-col items-center flex py-16">
+      <div class="text-center items-center flex space-x-4 ring-4 py-4 px-16 rounded-xl ring-blue-800">
+        <div class="items-center text-5xl font-semibold"> If This
+        </div>
+        <div v-if="ruleCreation.triggerName !== ''">
+          <v-chip class="ma-2" color="success" size="x-large" label text-color="white" closable
+            @click:close="ruleCreation.triggerName = ''">
+            {{ ruleCreation.triggerName }}
+          </v-chip>
+        </div>
+        <div v-else>
+          <v-chip class="ma-2" color="success" size="x-large" label text-color="white" @click="onChipTap">
+            select a trigger
+          </v-chip>
+        </div>
+      </div>
+      <div class="w-1 h-10 bg-blue-800 rounded-full" v-bind:class="{
+        'opacity-30': ruleCreation.triggerName === '',
+      }"></div>
+      <div class=" text-center items-center flex space-x-4 py-4 px-8 rounded-xl ring-4 ring-blue-800" v-bind:class="{
+        'opacity-30': ruleCreation.triggerName === '',
+      }">
+        <div class="items-center text-5xl font-semibold"> Then That
+        </div>
+        <div v-if="ruleCreation.actionName !== ''">
+          <v-chip class="ma-2" color="info" size="x-large" label text-color="white" closable
+            @click:close="ruleCreation.actionName = ''">
+            {{ ruleCreation.actionName }}
+          </v-chip>
+        </div>
+        <div v-else>
+          <v-chip class="ma-2" color="info" size="x-large" label text-color="white" @click="onChipTap">
+            select an action
+          </v-chip>
+        </div>
+      </div>
     </div>
-    <div class="flex justify-md-space-around text-center py-5" v-if="ruleCreation.actionName.length!==0">
-      <div><span>SelectedAction:</span></div>
-      <div><span> {{ ruleCreation.actionName }}</span></div>
+    <div v-if="ruleCreation.triggerName !== '' && ruleCreation.actionName !== ''"
+      class="justify-items-center items-center content-center text-center pt-5 pb-20">
+      <v-form ref="formRef" v-model="ruleCreation.valid" lazy-validation>
+        <v-responsive class="mx-auto" max-width="344">
+          <v-text-field :rules="nameRule" v-model="ruleCreation.name" label="Rule Name" variant="underlined" />
+        </v-responsive>
+        <v-btn @click="createRule()" color="#3662E3" size="large">
+          <v-icon>mdi-plus</v-icon>
+          Crate Rule
+        </v-btn>
+      </v-form>
     </div>
-    <div v-if="ruleCreation.triggerName!=='' && ruleCreation.actionName!==''"
-         class="flex justify-md-space-around text-center py-5">
-      <v-text-field v-model="ruleCreation.name" required >
-      </v-text-field>
-      <v-btn @click="createRule()">
-        <v-icon>mdi-plus</v-icon>
-      </v-btn>
-    </div>
-    <div class="text-center flex flex-col justify-center items-center content-center ">
+
+    <h2 v-if="ruleCreation.actionName === '' || ruleCreation.triggerName === ''"
+      class="text-3xl text-blue-100 font-medium text-center py-5 justify-center">Choose from which service you want to
+      take the <strong v-bind:class="{
+        'text-green-700': lookingForTriggers,
+        'text-blue-500': !lookingForTriggers
+      }"> {{ lookingForTriggers ? 'Trigger' : 'Action' }} </strong> </h2>
+
+    <div ref="scrollTarget" class="text-center flex flex-col justify-center items-center content-center pb-10">
       <div class=" px-5 grid lg:grid-cols-2 xl:grid-cols-3 gap-10">
-        <ServiceCardRule v-for="item in services" :operation="lookingForTriggers? 'trigger': 'action'"
-                         :key="componentKey" :service="item"
-                         :authorization="authorized"/>
+        <ServiceCardRule v-for="item in services" :operation="lookingForTriggers ? 'trigger' : 'action'"
+          :key="componentKey" :service="item" :authorization="authorized" />
       </div>
     </div>
   </div>
@@ -48,8 +75,8 @@
 
 
 import ruleModel from "@/controllers/rules_controller"
-import {onMounted, ref, provide, watch, reactive} from "vue";
-import {useRoute} from 'vue-router';
+import { onMounted, ref, provide, watch, reactive } from "vue";
+import { useRoute } from 'vue-router';
 import ServiceCardRule from '@/components/ServiceCardRule.vue';
 import showServices from "@/controllers/show_services";
 import router from "@/router/router";
@@ -58,21 +85,33 @@ import RoutingPath from "@/router/routing_path";
 
 const route = useRoute();
 const serviceId = route.params.id as string;
+const scrollTarget = ref()
+const formRef = ref();
+const nameRule = [
+  (v: string) => !!v || 'Name is required',
+  (v: string) => (v && v.length <= 20) || 'Name must be less than 20 characters',
+];
 const ruleCreation = reactive({
   name: '',
   triggerName: '',
   triggerId: '',
   actionName: '',
   actionId: '',
-  ruleName: [
-    (v: string) => !!v || 'Name is required',
-    (v: string) => (v && v.length <= 20) || 'Name must be less than 20 characters',
-  ],
+  valid: true,
 })
 
-function createRule() {
+async function createRule() {
+  const { valid } = await formRef.value.validate();
+  if (!valid) return;
   ruleModel.createRule(ruleCreation.name, ruleCreation.triggerId, ruleCreation.actionId);
   router.push(RoutingPath.PERSONAL_PAGE);
+}
+
+function onChipTap() {
+  scrollTarget.value.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start'
+  })
 }
 
 provide("ruleCreation", ruleCreation.triggerId);
@@ -98,13 +137,13 @@ watch(ruleCreation, (value) => {
 });
 
 const props = defineProps(
-    {
-      rule: {
-        type: RuleModel,
-        required: false,
-        default: null
-      },
-    }
+  {
+    rule: {
+      type: RuleModel,
+      required: false,
+      default: null
+    },
+  }
 );
 
 

@@ -53,7 +53,7 @@ class Action extends Model<IAction> {
      */
     async findAllForService(serviceId: string, associated = false): Promise<ActionOsp[] | null> {
         let actions: IAction[] | null;
-        if(associated)
+        if (associated)
             //we don't populate the permissions, permissions is now an array of idPermission (string)
             actions = await this.findAll({ serviceId }, "-serviceId");
         else
@@ -73,7 +73,7 @@ class Action extends Model<IAction> {
                     _id: action._id,
                     endpoint: action.endpoint,
                     description: action.description,
-                    permissions: associated? (allPermAndAssociated ? allPermAndAssociated : []): action.permissions as Types.Array<Partial<IPermission>>
+                    permissions: associated ? (allPermAndAssociated ? allPermAndAssociated : []) : action.permissions as Types.Array<Partial<IPermission>>
                 };
                 actionsResult.push(actionResult);
             }
@@ -93,8 +93,10 @@ class Action extends Model<IAction> {
         return await Service.isCreator(userId, action.serviceId);
     }
     async findAllActionAuthorizedByUser(userId: string, serviceId: string): Promise<ActionOsp[] | null> {
-        const grantedPermissionId = await Authorization.getGrantedPermissionsId(userId, serviceId);
-        console.log(grantedPermissionId);
+        let grantedPermissionId = await Authorization.getGrantedPermissionsId(userId, serviceId);
+        /// TODO
+        if (grantedPermissionId == null)
+            grantedPermissionId = [];
         let result;
         try {
             result = await this.model.aggregate()
@@ -104,7 +106,7 @@ class Action extends Model<IAction> {
                         $setIsSubset: ["$permissions", grantedPermissionId]
                     }
                 })
-                .project({ "outputs": 0, "data": 0, "serviceId":0 }) as ActionOsp[];
+                .project({ "outputs": 0, "data": 0, "serviceId": 0 }) as ActionOsp[];
         } catch (e) {
             console.log(e);
             return null;

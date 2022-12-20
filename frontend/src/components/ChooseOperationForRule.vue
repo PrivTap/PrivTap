@@ -42,9 +42,11 @@ import {useRoute} from 'vue-router';
 import {computed, defineProps, inject, onMounted, ref} from 'vue';
 import user_trigger from "@/controllers/user_trigger";
 import user_action from "@/controllers/user_action";
+import type TriggerModel from '@/model/trigger_model';
+import type ActionModel from '@/model/action_model';
 
 
-const operations = ref<any>([]);
+const operations = ref<TriggerModel[] | ActionModel[]>([]);
 const props = defineProps<{
   serviceId: string;
   operation: "trigger" | "action";

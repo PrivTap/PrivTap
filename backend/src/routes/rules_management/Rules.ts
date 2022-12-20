@@ -48,6 +48,7 @@ export default class RulesRoute extends Route {
             return;
         }
 
+        /// TODO: Remember to uncomment this
         // const isTriggerAuthorized = (await Authorization.findToken(userId, triggerServiceId.serviceId)) != null;
         // let isActionAuthorized = isTriggerAuthorized;
         // if (actionServiceId.serviceId != triggerServiceId.serviceId) {
