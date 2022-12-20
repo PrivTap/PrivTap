@@ -21,8 +21,6 @@ export default class AuthorizeRoute extends Route {
             userId = Authentication.checkJWT(request).userId;
             request.userId = userId;
         } catch (e) {
-            console.log("here");
-
             response.render("oauth_login", {
                 url: "/google-auth?oAuthAuthorization=" + encodeURI(JSON.stringify({
                     clientId,

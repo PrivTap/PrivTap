@@ -4,17 +4,27 @@ import Post, {IPost} from "../../model/Post";
 import {Configuration, OpenAIApi} from "openai";
 
 import env from "../../helper/env";
+import Authorization from "../../model/Authorization";
 
 export default class CreatePostRoute extends Route {
     constructor() {
-        super("create-post", true);
+        super("create-post", false);
     }
 
     protected async httpPost(request: Request, response: Response): Promise<void> {
-        const userId = request.userId;
+        console.log("called POST");
         const content = request.body.content;
-        if (content == undefined)
+        const bearer = request.headers.authorization as string;
+        const oauthToken = bearer.split(" ")[1];
+        const authorization = await Authorization.findByToken(oauthToken);
+        if (!authorization || !content){
             response.status(400).send();
+            return;
+        }
+        const userId = authorization.userId;
+
+        // TODO: Permission checking
+
         const configuration = new Configuration({
             apiKey: env.AI_API_KEY
         });
@@ -26,19 +36,19 @@ export default class CreatePostRoute extends Route {
                 size: "256x256",
                 response_format: "url"
             }, {timeout: 10000});
-
-        } catch (error) {
-            console.log(error);
+        } catch (e) {
+            console.log(e);
         }
-        const obj: Partial<IPost> = {
+        const post: Partial<IPost> = {
             content: content,
             userId: userId,
             img: dataImg?.data.data[0].url
         }
-        if (await Post.insert(obj)) {
-            response.status(200).send();
-        } else
+        if (!await Post.insert(post)) {
             response.status(500).send();
-
+            return;
+        }
+        response.status(200).send();
     }
+
 }

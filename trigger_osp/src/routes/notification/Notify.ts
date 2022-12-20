@@ -2,6 +2,7 @@ import Route from "../../Route";
 import {Request, Response} from "express";
 import Authorization from "../../model/Authorization";
 import Notification from "../../model/Notification";
+import logger from "../../helper/logger";
 
 export default class NotifyRoute extends Route {
     constructor() {
@@ -19,11 +20,12 @@ export default class NotifyRoute extends Route {
         console.log("headers =", request.headers);
         console.log("body =", request.body);
 
-        console.log(oauthToken); // I'm not sure, maybe it contains bearer and has to be split
+        console.log(oauthToken);
 
         const authorization = await Authorization.findByToken(oauthToken);
 
         if (!authorization){
+            logger.debug("not authorized");
             response.status(401).send();
             return;
         }
@@ -36,6 +38,7 @@ export default class NotifyRoute extends Route {
             triggerName
         }
         if (!await Notification.insert(doc)){
+            logger.debug("error inserting notification");
             response.status(500).send();
             return;
         }

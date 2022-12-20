@@ -17,22 +17,32 @@ export default abstract class NotificationService {
         const associatedTrigger = env.TRIGGERS[endpoint];
         await NotificationService.manageRequestedNotification(request.userId, associatedTrigger);
         next();
+        /*
+request.on("finish", async (request: Request, response: Response, next: NextFunction) => {
+    const endpoint = request.baseUrl;
+    console.log("Caught a post request:", endpoint);
+    const associatedTrigger = env.TRIGGERS[endpoint];
+    await NotificationService.manageRequestedNotification(request.userId, associatedTrigger);
+    next();
+})
+
+ */
     }
 
     private static async manageRequestedNotification(userId: string, triggerName: string){
         const notifications = await Notifcation.find(userId, triggerName);
+        console.log("found", notifications?.length, "notifications associated to userId=", userId);
         const apiKey = env.API_KEY;
         if(!notifications)
             return;
         for (let i=0; i<notifications.length; i++){
             const notification = notifications[i];
             const data = { "triggerId": notification.foreignTriggerId, "userId": notification.foreignUserId, apiKey };
-            let res;
             try{
-                res = await axios.post(env.PRIVTAP_NOTIFICATION_URL, data);
+                console.log("posting to", env.PRIVTAP_NOTIFICATION_URL);
+                axios.post(env.PRIVTAP_NOTIFICATION_URL, data);
             } catch (e){
-                logger.debug("Axios response status = ", res != undefined ? res.status : "undefined")
-                logger.debug("Axios respose body = ", res);
+                logger.debug("Axios respose != 200");
             }
         }
     }

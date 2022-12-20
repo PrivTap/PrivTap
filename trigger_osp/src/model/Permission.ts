@@ -1,6 +1,7 @@
 import {model as mongooseModel, Schema, Types} from "mongoose";
 import {authorizationType, location, operation, postGranularity, userGranularity} from "../Granularity";
 import logger from "../helper/logger";
+import Post from "./Post";
 
 export interface IPermission {
     _id: string;
@@ -179,6 +180,31 @@ class Permission {
             return null;
         }
     }
+
+    // TODO: Implement
+    async authorized(userId: string, permissions: {[id:string]:string}[]): Promise<boolean>{
+        /*
+        const authorizedPermissions = await this.model.find({ userId, authorized: true});
+        const idk = permissions as Partial<IPermission>;
+         */
+        return true;
+    }
+
+    // TODO: Implement
+    async retrieveData(userId: string, permissions: {[id:string]:string}[]): Promise<string>{
+        const posts = await Post.findAllByUserId(userId);
+        posts.sort((a ,b) => {
+            if (a.creationDate < b.creationDate){
+                return 1;
+            }
+            if (a.creationDate > b.creationDate){
+                return -1;
+            }
+            return 0;
+        })
+        return posts[0].content;
+    }
+
 }
 
 export default new Permission();

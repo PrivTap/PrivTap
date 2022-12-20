@@ -110,7 +110,7 @@ export async function handleUpdate<T>(response: Response, model: Model<T>, filte
             return updateResult as T;
         return updateResult;
     } catch (e) {
-        console.log(e)
+        console.log(e);
         if (e instanceof ModelSaveError) {
             badRequest(response, e.message);
         } else {
@@ -119,6 +119,25 @@ export async function handleUpdate<T>(response: Response, model: Model<T>, filte
         }
     }
     return false;
+}
+
+/**
+ * Make a get http request to a specific url
+ * @param url the url of the request
+ * @param token use this if you want to put an auth token
+ * @param body the object containing the field and the value of the query string
+ */
+export async function getReqHttp(url: string, token: string, parameters: object): Promise<AxiosResponse | null> {
+    const config = { headers: { "Authorization": `Bearer ${token}` },
+        params: parameters };
+    let res;
+    try{
+        res = await axios.get(url, config);
+        return res;
+    } catch (e){
+        logger.error("Axios response status:", res != undefined ? res.status : "undefined");
+        return null;
+    }
 }
 
 /**
@@ -149,4 +168,8 @@ export async function deleteReqHttp(url: string, token: string, body: object): P
     const config = { headers: { "Authorization": `Bearer ${token}` } };
     // TODO: manage body
     return await axios.delete(url, config);
+}
+
+export function delay(ms: number) {
+    return new Promise( resolve => setTimeout(resolve, ms) );
 }

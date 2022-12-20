@@ -5,7 +5,6 @@ import { OperationDataType } from "../helper/rule_execution";
 import Permission, { IPermission } from "./Permission";
 import mongoose from "mongoose";
 import Authorization from "./Authorization";
-import { TriggerOsp } from "./Trigger";
 
 export interface IAction {
     _id: string;

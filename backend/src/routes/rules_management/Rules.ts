@@ -42,8 +42,6 @@ export default class RulesRoute extends Route {
         const trigger = await Trigger.findById(triggerId);
         const service = await Action.findById(actionId);
 
-        console.log("found trigger:", trigger);
-
         //This verifies that Trigger and Action actually exist
         if (!trigger || !service) {
             badRequest(response, "Trigger or Action not found");
@@ -70,7 +68,6 @@ export default class RulesRoute extends Route {
         //every time a rule is created then we should notify the service of the trigger by sending to him
         //triggerId and user Id
         const triggerService = await Trigger.getTriggerServiceNotificationServer(triggerId);
-        console.log(triggerService);
         if (triggerService != null) {
             const token = triggerService.serviceId != undefined ? await Authorization.findToken(userId, triggerService.serviceId) : null;
             if (token != null){

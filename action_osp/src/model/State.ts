@@ -1,4 +1,4 @@
-import {model as mongooseModel, Schema} from "mongoose";
+import { model as mongooseModel, Schema } from "mongoose";
 
 export class oAuthAuthorization {
     clientId: String
