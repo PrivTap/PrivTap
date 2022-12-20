@@ -8,10 +8,10 @@
           <p class="text-lg font-medium text-white/60"> {{ operation.description }} </p>
           <v-label class="pt-4 pb-2">Permissions</v-label>
           <div>
-            <div v-if="!operation.permissions.length || !operation.permissions.some(p => p.associated)"> No permission
+            <div v-if="!operation.permissions.length "> No permission
               required
             </div>
-            <v-chip v-for="permission in operation.permissions.filter(p => p.associated)" :key="permission._id"
+            <v-chip v-for="permission in operation.permissions" :key="permission._id"
                     class="mr-2" variant="outlined">
               {{ permission.name }}
             </v-chip>
