@@ -9,8 +9,8 @@
         Services
       </button>
       <button class="rounded-lg bg-blue-600 py-2 px-9 text-lg font-medium text-white hover:bg-blue-700"
-        @click="router.push(RoutingPath.PERSONAL_PAGE)">
-        My rules
+        @click="router.push(RoutingPath.CREATE_RULE_PAGE)">
+        Create
       </button>
 
       <v-menu min-width="200px" rounded>
@@ -32,13 +32,13 @@
                 {{ authStore.user?.email }}
               </p>
               <v-divider class="mt-3" ></v-divider>
-              <v-btn rounded variant="plain">
+              <v-btn rounded variant="plain" @click="router.push(RoutingPath.PERSONAL_PAGE)">
                 My Rules
               </v-btn>
-              <v-divider></v-divider>
+              <!-- <v-divider></v-divider>
               <v-btn rounded variant="plain">
                 Edit Account
-              </v-btn>
+              </v-btn> -->
               <v-divider></v-divider>
               <v-btn rounded variant="plain" @click="router.push(RoutingPath.OSP_PERSONAL_PAGE)">
                 OSP Page

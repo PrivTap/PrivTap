@@ -14,7 +14,7 @@
           </v-chip>
         </div>
         <div v-else>
-          <v-chip class="ma-2" color="success" size="x-large" label text-color="white" @click="onChipTap">
+          <v-chip class="ma-2 opacity-70" color="success" size="x-large" label text-color="white" @click="onChipTap">
             select a trigger
           </v-chip>
         </div>
@@ -28,13 +28,13 @@
         <div class="items-center text-5xl font-semibold"> Then That
         </div>
         <div v-if="ruleCreation.actionName !== ''">
-          <v-chip class="ma-2" color="info" size="x-large" label text-color="white" closable
+          <v-chip class="ma-2 " color="info" size="x-large" label text-color="white" closable
             @click:close="ruleCreation.actionName = ''">
             {{ ruleCreation.actionName }}
           </v-chip>
         </div>
         <div v-else>
-          <v-chip class="ma-2" color="info" size="x-large" label text-color="white" @click="onChipTap">
+          <v-chip class="ma-2 opacity-70" color="info" size="x-large" label text-color="white" @click="onChipTap">
             select an action
           </v-chip>
         </div>
