@@ -1,14 +1,14 @@
-import express, { Express } from "express";
+import express, {Express} from "express";
 import cookieParser from "cookie-parser";
-import expressEjsLayouts from "express-ejs-layouts";
 import Route from "./Route";
 import {getFilesInDir} from "./helper/misc";
-import { join } from "path";
+import {join} from "path";
 import logger from "./helper/logger";
 import env from "./helper/env";
-import { connect, ConnectOptions } from "mongoose";
+import {connect, ConnectOptions} from "mongoose";
 import bodyParser from "body-parser";
 import multer from "multer";
+
 declare global {
     namespace Express {
         interface Request {
@@ -59,10 +59,8 @@ class OSP {
      */
     protected createExpressApp() {
         const app = express();
-        app.use(expressEjsLayouts);
-        app.set('layout', './layouts/full-width')
         app.use(bodyParser.json());
-        app.use(express.urlencoded({ extended: false }));
+        app.use(express.urlencoded({extended: false}));
         app.use(cookieParser());
         app.set('view engine', 'ejs');
         app.use('/public', express.static('./public'));
@@ -76,7 +74,6 @@ class OSP {
             }
         });
 
-        const upload = multer({ storage: storage });
         return app;
     }
 

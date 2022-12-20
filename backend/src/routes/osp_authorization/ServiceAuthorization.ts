@@ -38,7 +38,7 @@ export default class ServiceAuthorizationRoute extends Route {
             return;
         }
 
-        console.log(authorizationUri);
+        console.log("authorization uri =", authorizationUri);
 
         success(response, { "redirectUri": authorizationUri });
     }

@@ -71,7 +71,8 @@ const form = reactive({
   baseUrl: "",
   baseUrlRule: [
     (v: string) => !!v || 'Base url is required',
-    (v: string) => isValidUrlRegex(v) || 'Url is not valid'
+    //(v: string) => isValidUrlRegex(v) || 'Url is not valid' Commented just because I couldn't test it with 127.0.0.1
+
   ],
   authPath: "",
   tokenPath: "",

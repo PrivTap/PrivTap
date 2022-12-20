@@ -1,4 +1,5 @@
 import {model as mongooseModel, Schema, Types} from "mongoose";
+import logger from "../helper/logger";
 
 export interface IAuthorization {
     _id: string;
@@ -29,35 +30,42 @@ const authorizationSchema = new Schema({
 class Authorization {
     model = mongooseModel<IAuthorization>("authorization", authorizationSchema);
 
-    async insert(document: Partial<IAuthorization>): Promise<boolean>{
+    async insert(document: Partial<IAuthorization>): Promise<boolean> {
         const model = new this.model(document);
         try {
             await model.save();
             return true;
         } catch (e) {
+            if ((e as Error).name == "MongoServerError") {
+                logger.debug("The Authorization already exists");
+                return true;
+            }
             console.log("Error inserting authorization", e);
             return false;
         }
     }
 
-    async update(update: Partial<IAuthorization>, userId: string): Promise<boolean>{
-        try{
-            this.model.findOneAndUpdate({userId}, update);
-            return true;
+    async update(update: Partial<IAuthorization>, filter: Partial<IAuthorization>, upsert: boolean = false): Promise<IAuthorization | null> {
+        try {
+            return await this.model.findOneAndUpdate(filter, update, {upsert: upsert, new: true});
         } catch (e) {
             console.log("Error updating authorization", e);
-            return false;
+            return null;
         }
     }
 
-    async delete(userId: string): Promise<boolean>{
-        try{
+    async delete(userId: string): Promise<boolean> {
+        try {
             this.model.deleteOne({userId});
             return true;
         } catch (e) {
             console.log("Error deleting authorization", e);
             return false;
         }
+    }
+
+    async findByToken(oauthToken: string): Promise<IAuthorization | null> {
+        return this.model.findOne({oauthToken});
     }
 }
 

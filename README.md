@@ -146,8 +146,8 @@ is mandatory:
 The variables can be set in a `.env` file located in the `backend/` folder.
 
 The simplest way to start a local development environment is by running the `run_dev.sh` script.
-This will start a local Express appserver that serves both the REST API (at `http://localhost:<PORT>/api/`) of the 
-backend and the Single Page Application of the frontend (at `http://localhost:<PORT>/`).
+This will start a local Express appserver that serves both the REST API (at `http://127.0.0.1:<PORT>/api/`) of the 
+backend and the Single Page Application of the frontend (at `http://127.0.0.1:<PORT>/`).
 Otherwise, you can build the frontend and the backend separately and deploy them as you like.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

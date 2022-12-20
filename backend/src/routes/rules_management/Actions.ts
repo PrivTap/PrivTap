@@ -1,7 +1,7 @@
 import Route from "../../Route";
-import {Request, Response} from "express";
-import {checkUndefinedParams, internalServerError, success} from "../../helper/http";
-import Action, {ActionOsp} from "../../model/Action";
+import { Request, Response } from "express";
+import { checkUndefinedParams, internalServerError, success } from "../../helper/http";
+import Action, { ActionOsp } from "../../model/Action";
 import RuleExecution from "../../helper/rule_execution";
 
 export default class ActionsRoute extends Route {
@@ -32,7 +32,7 @@ export default class ActionsRoute extends Route {
 
         //TODO: Can we check compatibility on the DB?
         if (triggerId) {
-            data.filter((action) => RuleExecution.areActionTriggerCompatible(action._id ?? "", triggerId))
+            data.filter((action) => RuleExecution.areActionTriggerCompatible(action._id ?? "", triggerId));
         }
         success(response, data);
     }

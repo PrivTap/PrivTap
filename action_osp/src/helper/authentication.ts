@@ -19,7 +19,7 @@ export default abstract class Authentication {
             decodedJWT = Authentication.checkJWT(request);
         } catch (e) {
             logger.debug("Auth check failed, JWT is not valid: ", e);
-            response.status(401).send();
+            response.redirect("");
             return;
         }
 
@@ -39,9 +39,9 @@ export default abstract class Authentication {
     static checkJWT(request: Request): { userId: string } {
         const secret = env.JWT_SECRET;
 
-        const cookieJWT: string | undefined = request.cookies?.__session;
+        const cookieJWT: string | undefined = request.cookies?.__sessionAction;
         if (!cookieJWT) {
-            logger.debug("__session cookie is undefined, headers are: ", request.headers);
+            logger.debug("__sessionAction cookie is undefined, headers are: ", request.headers);
             throw new Error("JWT Cookie is undefined");
         }
 
@@ -118,7 +118,7 @@ export default abstract class Authentication {
         };
 
         // Set the cookie header
-        response.cookie("__session", jwt, cookieOptions);
+        response.cookie("__sessionAction", jwt, cookieOptions);
         console.log("Headers set correctly");
         return true;
     }

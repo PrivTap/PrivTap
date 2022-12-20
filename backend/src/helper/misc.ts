@@ -3,6 +3,7 @@ import Model, { ModelSaveError } from "../Model";
 import { badRequest, internalServerError } from "./http";
 import { Response } from "express";
 import axios, { AxiosResponse } from "axios";
+import logger from "./logger";
 
 
 /**
@@ -100,7 +101,6 @@ export async function handleUpdate<T>(response: Response, model: Model<T>, filte
             // The whole object
             updateResult = await model.updateWithFilterAndReturn(filter, update,upsert);
         else
-            // true if no error occurred. false otherwise
             updateResult = await model.updateWithFilter(filter, update, upsert);
         if (!updateResult) {
             badRequest(response, "An object with this id does not exist");
@@ -110,6 +110,7 @@ export async function handleUpdate<T>(response: Response, model: Model<T>, filte
             return updateResult as T;
         return updateResult;
     } catch (e) {
+        console.log(e);
         if (e instanceof ModelSaveError) {
             badRequest(response, e.message);
         } else {
@@ -120,20 +121,41 @@ export async function handleUpdate<T>(response: Response, model: Model<T>, filte
     return false;
 }
 
-
 /**
  * Make a get http request to a specific url
  * @param url the url of the request
  * @param token use this if you want to put an auth token
- * @param queryString the object containing the field and the value of the query string
+ * @param body the object containing the field and the value of the query string
  */
-export async function getHttp(url: string, token?: string, queryString?: object): Promise<AxiosResponse> {
-    const config = {};
-    if (token != undefined)
-        Object.assign(config, { headers: { "Authorization": `Bearer ${token}` } });
-    if (queryString != undefined)
-        Object.assign(config, { params: queryString });
-    return await axios.get(url, config);
+export async function getReqHttp(url: string, token: string, parameters: object): Promise<AxiosResponse | null> {
+    const config = { headers: { "Authorization": `Bearer ${token}` },
+        params: parameters };
+    let res;
+    try{
+        res = await axios.get(url, config);
+        return res;
+    } catch (e){
+        logger.error("Axios response status:", res != undefined ? res.status : "undefined");
+        return null;
+    }
+}
+
+/**
+ * Make a post http request to a specific url
+ * @param url the url of the request
+ * @param token use this if you want to put an auth token
+ * @param body the object containing the field and the value of the query string
+ */
+export async function postReqHttp(url: string, token: string, body: object): Promise<AxiosResponse | null> {
+    const config = { headers: { "Authorization": `Bearer ${token}` } };
+    let res;
+    try{
+        res = await axios.post(url, body, config);
+        return res;
+    } catch (e){
+        logger.error("Axios response status:", res != undefined ? res.status : "undefined");
+        return null;
+    }
 }
 
 /**
@@ -142,11 +164,12 @@ export async function getHttp(url: string, token?: string, queryString?: object)
  * @param token use this if you want to put an auth token
  * @param body the object containing the field and the value of the query string
  */
-export async function deleteHttp(url: string, token?: string, body?: object): Promise<AxiosResponse> {
-    const config = {};
-    if (token != undefined)
-        Object.assign(config, { headers: { "Authorization": `Bearer ${token}` } });
-    if (body != undefined)
-        Object.assign(config, { data: body });
+export async function deleteReqHttp(url: string, token: string, body: object): Promise<AxiosResponse> {
+    const config = { headers: { "Authorization": `Bearer ${token}` } };
+    // TODO: manage body
     return await axios.delete(url, config);
+}
+
+export function delay(ms: number) {
+    return new Promise( resolve => setTimeout(resolve, ms) );
 }

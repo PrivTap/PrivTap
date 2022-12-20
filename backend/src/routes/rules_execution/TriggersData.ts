@@ -1,14 +1,20 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
-import { checkUndefinedParams, forbiddenUserError, internalServerError } from "../../helper/http";
+import {
+    badRequest,
+    checkUndefinedParams,
+    forbiddenUserError,
+    internalServerError,
+} from "../../helper/http";
 import Rule from "../../model/Rule";
 import Trigger from "../../model/Trigger";
-import axios from "axios";
 import Action from "../../model/Action";
 import logger from "../../helper/logger";
 import Authorization from "../../model/Authorization";
 import Service from "../../model/Service";
 import { dataDefinitionIDs } from "../../helper/dataDefinition";
+import Permission from "../../model/Permission";
+import { getReqHttp, postReqHttp } from "../../helper/misc";
 
 export default class TriggersDataRoute extends Route {
     // TODO: figure out how to restrict this to only authorized services
@@ -19,7 +25,6 @@ export default class TriggersDataRoute extends Route {
 
     protected async httpPost(request: Request, response: Response): Promise<void> {
         //We received an event notification from the OSP
-
         const triggerId = request.body.triggerId;
         const userId = request.body.userId;
         const api = request.body.apiKey;
@@ -50,7 +55,7 @@ export default class TriggersDataRoute extends Route {
             return;
         }
         //Get the OAuth token for the trigger
-        const oauthToken = await Authorization.findToken(userId, triggerData.serviceId);
+        let oauthToken = await Authorization.findToken(userId, triggerData.serviceId);
 
         //Get the data from the resourceServer (if needed)
         let dataToForwardToActionAPI: object | null = null;
@@ -60,31 +65,52 @@ export default class TriggersDataRoute extends Route {
                 return;
             }
 
-            const axiosResponse = await axios.get(triggerData?.resourceServer ?? "", {
-                headers: {
-                    Authorization: "Bearer " + oauthToken
-                },
-                params: {
+            //TODO: RAR data MUST NOT be sent manually since it is already included in the token
+            const permissionIds: string[] = triggerData.permissions ?? [];
+            const aggregateAuthorizationDetails = await Permission.getAggregateAuthorizationDetails(permissionIds);
+
+            /*
+            params: {
                     filter: dataDefinitionIDs(actionData.inputs)
                 }
-            });
-            //Now we replace all URLs
-            dataToForwardToActionAPI = axiosResponse.data;
+             */
+            let axiosResponse;
+            try {
+                axiosResponse = await getReqHttp(triggerData?.resourceServer, oauthToken, aggregateAuthorizationDetails);
+                dataToForwardToActionAPI = axiosResponse.data;
+                if (!dataToForwardToActionAPI){
+                    logger.debug("Axios response data not found");
+                    internalServerError(response);
+                    return;
+                }
+                //console.log("data =", dataToForwardToActionAPI);
+            } catch (e){
+                logger.debug("Axios respose status =", axiosResponse?.status);
+            }
         }
 
         //Forward the data to the Action API endpoint
 
         const actionEndpoint = actionData.endpoint;
+        oauthToken = await Authorization.findToken(userId, actionData.serviceId);
+
+        if (!actionEndpoint) {
+            internalServerError(response);
+            return;
+        }
 
         // TODO: Do we need to show some kind of rule execution error??
-        const actionResponse = await axios.post(actionEndpoint, dataToForwardToActionAPI, {
-            headers: {
-                Authorization: "Bearer " + oauthToken
-            }
-        });
+        let actionResponse;
+        try {
+            actionResponse = await postReqHttp(actionEndpoint, oauthToken, { content: dataToForwardToActionAPI });
+        } catch (e) {
+            logger.debug("Could not execute rule with id " + referencedRule?._id + " with error " + axiosResponse?.status);
+        }
 
         if (actionResponse.status.toString() != "200") {
             logger.error("Could not execute rule with id " + referencedRule?._id + " with error " + actionResponse.status.toString());
         }
+
+        response.status(200).send();
     }
 }

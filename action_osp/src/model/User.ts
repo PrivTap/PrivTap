@@ -16,10 +16,7 @@ const userSchema = new Schema({
         type: String,
         required: true,
     },
-    img: {
-        data: Buffer,
-        contentType: String
-    }
+
 });
 
 userSchema.index({username: 1, email: 1}, {unique: true});

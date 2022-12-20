@@ -4,11 +4,12 @@ import { checkUndefinedParams, forbiddenUserError } from "../../helper/http";
 
 
 export default class ActionData extends Route {
-    // TODO: figure out how to restrict this to only authorized services
 
     constructor() {
         super("action-data",false,false);
     }
+
+    // THIS CLASS IS FUCKING USELESS
 
     /*
     protected async httpGet(request: Request, response: Response): Promise<void> {

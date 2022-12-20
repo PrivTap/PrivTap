@@ -38,7 +38,15 @@ class State extends Model<IState> {
     }
 
     async findByValue(value: string): Promise<IState | null> {
-        return await this.find({ value: value });
+
+        try{
+            const res=await this.find({ value: value });
+            console.log(res);
+            return res;
+        }catch (e) {
+            return null;
+        }
+
     }
 
 }

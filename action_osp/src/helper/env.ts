@@ -34,6 +34,12 @@ interface EnvVariables {
     JWT_SECRET: string,
     // Expiration time (in seconds) of the JWT tokens
     JWT_EXPIRE: number,
+    // PrivTap's client Id
+    PRIVTAP_CLIENT_ID: string,
+    // PrivTap's client secret
+    PRIVTAP_CLIENT_SECRET: string,
+    //API KEY with openai
+    AI_API_KEY: string,
 }
 
 // Default values for some of the env variables
@@ -45,6 +51,9 @@ const defaults = {
     SALT_ROUNDS: 8,
     JWT_SECRET: "this_is_an_insecure_secret",
     JWT_EXPIRE: 86400,
+    AI_API_KEY: "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",
+    PRIVTAP_CLIENT_ID: "clientId",
+    PRIVTAP_CLIENT_SECRET: "clientSecret"
 };
 
 /**

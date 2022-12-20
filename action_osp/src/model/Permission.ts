@@ -100,6 +100,7 @@ class Permission {
     async insertAll(documents: Partial<IPermission>[]): Promise<string[] | null> {
         let permissionIds: string[] = [];
         for (let i = 0; i < documents.length; i++) {
+
             const documentId = await this.insert(documents[i], true) as string;
             if (!documentId) {
                 return null;
