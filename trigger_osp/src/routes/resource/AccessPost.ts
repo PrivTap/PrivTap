@@ -11,9 +11,16 @@ export default class AccessPostRoute extends Route {
     protected async httpGet(request: Request, response: Response): Promise<void> {
         const bearer = request.headers.authorization as string;
         const oauthToken = bearer.split(" ")[1];
-        const query = request.query;
+        const queryStr = request.query.authDetails as string;
+        let query = {};
+        try {
+            query = JSON.parse(queryStr);
+        } catch (error) {
+            console.log(error);
+        }
         const permissions: {[id:string]:string}[] = []
         const authorization = await Authorization.findByToken(oauthToken);
+        const actionDataFilter = request.query.filter; //TODO: Filter retrieved data with only what was requested by the action
 
         if (!authorization){
             response.status(400).send();

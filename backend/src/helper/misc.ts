@@ -127,14 +127,14 @@ export async function handleUpdate<T>(response: Response, model: Model<T>, filte
  * @param token use this if you want to put an auth token
  * @param body the object containing the field and the value of the query string
  */
-export async function getReqHttp(url: string, token: string, parameters: object): Promise<AxiosResponse | null> {
-    const config = { headers: { "Authorization": `Bearer ${token}` },
-        params: parameters };
+export async function getReqHttp(url: string, token: string | null, parameters: object): Promise<AxiosResponse | null> {
+    const config = token ? { headers: { "Authorization": `Bearer ${token}` },
+        params: parameters } : { params: parameters };
     let res;
     try{
         res = await axios.get(url, config);
         return res;
-    } catch (e){
+    } catch (e) {
         logger.error("Axios response status:", res != undefined ? res.status : "undefined");
         return null;
     }
@@ -146,13 +146,13 @@ export async function getReqHttp(url: string, token: string, parameters: object)
  * @param token use this if you want to put an auth token
  * @param body the object containing the field and the value of the query string
  */
-export async function postReqHttp(url: string, token: string, body: object): Promise<AxiosResponse | null> {
-    const config = { headers: { "Authorization": `Bearer ${token}` } };
+export async function postReqHttp(url: string, token: string | null, body: object): Promise<AxiosResponse | null> {
+    const config = token ? { headers: { "Authorization": `Bearer ${token}` } } : undefined;
     let res;
     try{
         res = await axios.post(url, body, config);
         return res;
-    } catch (e){
+    } catch (e) {
         logger.error("Axios response status:", res != undefined ? res.status : "undefined");
         return null;
     }

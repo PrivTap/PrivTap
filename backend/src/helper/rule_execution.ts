@@ -18,6 +18,9 @@ export default class RuleExecution {
 
         if (!trigger || !action)
             return false;
+        if (!trigger.outputs || !action.inputs) {
+            return true;
+        }
         //Parse the two JSON strings and compare
         return checkCompatibility(trigger.outputs, action.inputs);
     }

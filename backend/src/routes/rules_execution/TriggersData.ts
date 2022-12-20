@@ -66,18 +66,16 @@ export default class TriggersDataRoute extends Route {
             }
 
             //TODO: RAR data MUST NOT be sent manually since it is already included in the token
-            const permissionIds: string[] = triggerData.permissions ?? [];
+            const permissionIds: string[] = (triggerData.permissions ?? []) as string[];
             const aggregateAuthorizationDetails = await Permission.getAggregateAuthorizationDetails(permissionIds);
 
-            /*
-            params: {
-                    filter: dataDefinitionIDs(actionData.inputs)
-                }
-             */
             let axiosResponse;
             try {
-                axiosResponse = await getReqHttp(triggerData?.resourceServer, oauthToken, aggregateAuthorizationDetails);
-                dataToForwardToActionAPI = axiosResponse.data;
+                axiosResponse = await getReqHttp(triggerData?.resourceServer, oauthToken, {
+                    filter: dataDefinitionIDs(actionData.inputs),
+                    authDetails: aggregateAuthorizationDetails
+                });
+                dataToForwardToActionAPI = axiosResponse?.data;
                 if (!dataToForwardToActionAPI){
                     logger.debug("Axios response data not found");
                     internalServerError(response);
@@ -85,7 +83,7 @@ export default class TriggersDataRoute extends Route {
                 }
                 //console.log("data =", dataToForwardToActionAPI);
             } catch (e){
-                logger.debug("Axios respose status =", axiosResponse?.status);
+                logger.debug("Axios response status =", axiosResponse?.status);
             }
         }
 
@@ -104,11 +102,11 @@ export default class TriggersDataRoute extends Route {
         try {
             actionResponse = await postReqHttp(actionEndpoint, oauthToken, { content: dataToForwardToActionAPI });
         } catch (e) {
-            logger.debug("Could not execute rule with id " + referencedRule?._id + " with error " + axiosResponse?.status);
+            logger.debug("Could not execute rule with id " + referencedRule?._id + " with error " + actionResponse?.status);
         }
 
-        if (actionResponse.status.toString() != "200") {
-            logger.error("Could not execute rule with id " + referencedRule?._id + " with error " + actionResponse.status.toString());
+        if (actionResponse?.status.toString() != "200") {
+            logger.error("Could not execute rule with id " + referencedRule?._id + " with error " + actionResponse?.status.toString());
         }
 
         response.status(200).send();
