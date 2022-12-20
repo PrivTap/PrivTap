@@ -28,7 +28,6 @@ export default class Route {
         if (notify){
             console.log("registering notify middleware to", endpointName);
             this.router.use(NotificationService.checkNotification);
-
         }
 
         // If the subclass implements http methods handlers, register them to the Router

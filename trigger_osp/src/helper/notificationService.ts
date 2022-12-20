@@ -25,7 +25,6 @@ request.on("finish", async (request: Request, response: Response, next: NextFunc
     await NotificationService.manageRequestedNotification(request.userId, associatedTrigger);
     next();
 })
-
  */
     }
 

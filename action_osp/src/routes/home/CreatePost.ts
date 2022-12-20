@@ -12,12 +12,14 @@ export default class CreatePostRoute extends Route {
     }
 
     protected async httpPost(request: Request, response: Response): Promise<void> {
-        console.log("called POST");
         const content = request.body.content;
         const bearer = request.headers.authorization as string;
         const oauthToken = bearer.split(" ")[1];
         const authorization = await Authorization.findByToken(oauthToken);
+        console.log("authorization=", authorization);
+        console.log("content=", content);
         if (!authorization || !content){
+            console.log("Not auth or content");
             response.status(400).send();
             return;
         }
@@ -45,6 +47,7 @@ export default class CreatePostRoute extends Route {
             img: dataImg?.data.data[0].url
         }
         if (!await Post.insert(post)) {
+            console.log("error inserting post");
             response.status(500).send();
             return;
         }
