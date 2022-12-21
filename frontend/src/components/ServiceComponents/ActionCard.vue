@@ -7,10 +7,9 @@
         <v-label class="pt-4 pb-2">Selected Permissions </v-label>
         <div>
             <div v-if="!action.permissions.some(p => p.associated)"> No permission required </div>
-            <v-chip v-for="permission in action.permissions.filter(p => p.associated)" :key="permission._id" class="mr-2" color="success"
-                variant="outlined" appendIcon="mdi-check-circle-outline">
-                {{ permission.name }}
-            </v-chip>
+            <PermissionChip v-for="permission in action.permissions.filter(p => p.associated)"
+                :permission-model="permission">
+            </PermissionChip>
         </div>
 
         <div class="flex justify-start mt-5 space-x-5">
@@ -20,8 +19,7 @@
                         Edit
                     </v-btn>
                 </template>
-                <ActionForm v-if="serviceId" :serviceId="serviceId" :onCancel="onFormClose" onEdit
-                    :action="action" />
+                <ActionForm v-if="serviceId" :serviceId="serviceId" :onCancel="onFormClose" onEdit :action="action" />
             </v-dialog>
 
             <v-btn color="error" @click="(showDialog = true)">
@@ -41,6 +39,7 @@ import ModalComponent from '@/components/ModalComponent.vue';
 import type ActionModel from '@/model/action_model';
 import ActionForm from './ActionForm.vue';
 import manage_action from '@/controllers/manage_action';
+import PermissionChip from '../PermissionChip.vue';
 const props = defineProps<{
     action: ActionModel;
     serviceId: string;

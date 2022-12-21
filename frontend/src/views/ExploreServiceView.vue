@@ -41,12 +41,10 @@
                                     <p class="text-h7 font-weight-regular"> {{ trigger.description }} </p>
                                 </v-card-subtitle>
                                 <v-card-text>
-                                    <p class="text-h6 font-weight-regular"> Pemrission required: </p>
-                                    <v-chip v-for="permission in trigger.permissions"
-                                         class="mr-2 mt-2" color="success" variant="outlined"
-                                        appendIcon="mdi-check-circle-outline">
-                                        {{ permission.name }}
-                                    </v-chip>
+                                    <p class="text-h6 font-weight-regular"> Permission required: </p>
+                                    <PermissionChip v-for="permission in trigger.permissions"
+                                        :permissionModel="permission">
+                                    </PermissionChip>
                                 </v-card-text>
                             </v-card>
                         </div>
@@ -74,12 +72,10 @@
                                     <p class="text-h7 font-weight-regular"> {{ action.description }} </p>
                                 </v-card-subtitle>
                                 <v-card-text>
-                                    <p class="text-h6 font-weight-regular"> Pemrission required: </p>
-                                    <v-chip v-for="permission in action.permissions"
-                                         class="mr-2 mt-2" color="success" variant="outlined"
-                                        appendIcon="mdi-check-circle-outline">
-                                        {{ permission.name }}
-                                    </v-chip>
+                                    <p class="text-h6 font-weight-regular"> Permission required: </p>
+                                    <PermissionChip v-for="permission in action.permissions"
+                                        :permissionModel="permission">
+                                    </PermissionChip>
                                 </v-card-text>
                             </v-card>
                         </div>
@@ -93,12 +89,13 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref} from 'vue';
+import { onMounted, ref } from 'vue';
 import empty from '@/assets/images/empty.svg';
 import { useRoute } from 'vue-router';
 import type SimpleServiceModel from '@/model/simple_service_model';
 import UserTrigger from "@/controllers/user_trigger";
 import UserAction from "@/controllers/user_action";
+import PermissionChip from '@/components/PermissionChip.vue';
 
 const route = useRoute();
 const temp = route.params.service;
@@ -112,7 +109,7 @@ let listOfTrigger = UserTrigger.getNewRef();
 let listOfAction = UserAction.getNewRef();
 onMounted(async () => {
 
-  listOfTrigger.value = await UserTrigger.getAllTriggers(service._id, true);
-  listOfAction.value = await UserAction.getAllActions(service._id, true);
+    listOfTrigger.value = await UserTrigger.getAllTriggers(service._id, true);
+    listOfAction.value = await UserAction.getAllActions(service._id, true);
 });
 </script>
