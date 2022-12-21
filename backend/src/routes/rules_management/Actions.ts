@@ -1,7 +1,7 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
 import { checkUndefinedParams, internalServerError, success } from "../../helper/http";
-import Action, { ActionOsp } from "../../model/Action";
+import Action from "../../model/Action";
 import RuleExecution from "../../helper/rule_execution";
 
 export default class ActionsRoute extends Route {
@@ -15,16 +15,10 @@ export default class ActionsRoute extends Route {
 
         const serviceId = request.query.serviceId as string;
         const userId = request.userId;
-        const authorized = request.query.authorized as string;
         const triggerId = request.query.triggerId as string;
-        let data: ActionOsp[] | null = null;
         if (checkUndefinedParams(response, serviceId))
             return;
-        if (authorized === "true") {
-            data = await Action.findAllActionAuthorizedByUser(userId, serviceId);
-        } else {
-            data = await Action.findAllForService(serviceId);
-        }
+        const data = await Action.findAllActionAddingAuthorizedTag(userId, serviceId);
         if (data == null) {
             internalServerError(response);
             return;

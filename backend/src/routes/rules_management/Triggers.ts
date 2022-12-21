@@ -1,7 +1,7 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
 import { checkUndefinedParams, internalServerError, success } from "../../helper/http";
-import Trigger, { TriggerOsp } from "../../model/Trigger";
+import Trigger from "../../model/Trigger";
 
 export default class TriggersRoute extends Route {
     constructor() {
@@ -13,15 +13,9 @@ export default class TriggersRoute extends Route {
         // const searchQuery = request.query.search;
         const serviceId = request.query.serviceId as string;
         const userId = request.userId;
-        const authorized = request.query.authorized as string;
-        let data: TriggerOsp[] | null = null;
-        if(checkUndefinedParams(response, serviceId))
+        if (checkUndefinedParams(response, serviceId))
             return;
-        if (authorized==="true") {
-            data = await Trigger.findAllTriggerAuthorizedByUser(userId, serviceId);
-        }else{
-            data = await Trigger.findAllForService(serviceId);
-        }
+        const data = await Trigger.findAllTriggerAddingAuthorizedTag(userId, serviceId);
         if (data == null) {
             internalServerError(response);
             return;

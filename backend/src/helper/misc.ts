@@ -4,6 +4,10 @@ import { badRequest, internalServerError } from "./http";
 import { Response } from "express";
 import axios, { AxiosResponse } from "axios";
 import logger from "./logger";
+import mongoose from "mongoose";
+import { IAction } from "../model/Action";
+import { ITrigger } from "../model/Trigger";
+import Authorization from "../model/Authorization";
 
 
 /**
@@ -99,7 +103,7 @@ export async function handleUpdate<T>(response: Response, model: Model<T>, filte
         let updateResult;
         if (returnObject)
             // The whole object
-            updateResult = await model.updateWithFilterAndReturn(filter, update,upsert);
+            updateResult = await model.updateWithFilterAndReturn(filter, update, upsert);
         else
             updateResult = await model.updateWithFilter(filter, update, upsert);
         if (!updateResult) {
@@ -125,13 +129,15 @@ export async function handleUpdate<T>(response: Response, model: Model<T>, filte
  * Make a get http request to a specific url
  * @param url the url of the request
  * @param token use this if you want to put an auth token
- * @param body the object containing the field and the value of the query string
+ * @param parameters
  */
 export async function getReqHttp(url: string, token: string | null, parameters: object): Promise<AxiosResponse | null> {
-    const config = token ? { headers: { "Authorization": `Bearer ${token}` },
-        params: parameters } : { params: parameters };
+    const config = token ? {
+        headers: { "Authorization": `Bearer ${token}` },
+        params: parameters
+    } : { params: parameters };
     let res;
-    try{
+    try {
         res = await axios.get(url, config);
         return res;
     } catch (e) {
@@ -149,7 +155,7 @@ export async function getReqHttp(url: string, token: string | null, parameters: 
 export async function postReqHttp(url: string, token: string | null, body: object): Promise<AxiosResponse | null> {
     const config = token ? { headers: { "Authorization": `Bearer ${token}` } } : undefined;
     let res;
-    try{
+    try {
         res = await axios.post(url, body, config);
         return res;
     } catch (e) {
@@ -171,5 +177,40 @@ export async function deleteReqHttp(url: string, token: string, body: object): P
 }
 
 export function delay(ms: number) {
-    return new Promise( resolve => setTimeout(resolve, ms) );
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export async function findAllOperationAddingAuthorizedTag(model: mongoose.Model<IAction> | mongoose.Model<ITrigger>, userId: string, serviceId: string): Promise<Partial<IAction | ITrigger>[]> {
+    let grantedPermissionId = await Authorization.getGrantedPermissionsId(userId, serviceId);
+    if (grantedPermissionId == null)
+        grantedPermissionId = [];
+    return await model.aggregate([
+        { $match: { serviceId: new mongoose.Types.ObjectId(serviceId) } },
+        {
+            $addFields: {
+                authorized: {
+                    $cond: {
+                        if: {
+                            $setIsSubset: ["$permissions", grantedPermissionId]
+                        },
+                        then: true,
+                        else: false
+                    }
+                }
+            }
+        },
+        { $project: { "data": 0, "outputs": 0 } },
+        { $lookup: { from: "permissions", localField: "permissions", foreignField: "_id", as: "permissions" } },
+        {
+            $project: {
+                "permissions._id": 1,
+                "permissions.name": 1,
+                "permissions.description": 1,
+                "authorized": 1,
+                _id: 1,
+                name: 1,
+                description: 1
+            }
+        }
+    ]) as Partial<IAction>[];
 }
