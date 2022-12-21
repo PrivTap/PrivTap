@@ -4,6 +4,7 @@
     grid-gap: 50px;
     justify-items: center;
     position: relative;
+    margin-bottom: 50px;
 }
 .containerForm{
     display: grid;
@@ -78,6 +79,7 @@ img{
 .right {
     right:0;
     width: 70%;
+    height: calc(100vh - 50px);
 }
 
 .left {
