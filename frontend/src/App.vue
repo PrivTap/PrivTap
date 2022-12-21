@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import {storeToRefs} from "pinia";
-import {watch} from "vue";
-import {RouterView, useRouter} from "vue-router";
-import {useAuthStore} from "./stores/auth_store";
+import { storeToRefs } from "pinia";
+import { watch } from "vue";
+import { RouterView, useRouter } from "vue-router";
+import { useAuthStore } from "./stores/auth_store";
 import NavBar from "./components/NavBar.vue";
 import RoutingPath from "./router/routing_path";
 import GoTopButton from "./components/GoTopButton.vue"
@@ -22,10 +22,10 @@ watch(userStore.isAutheticated, (val) => {
 </script>
 
 <template>
-  <v-app >
-    <NavBar class="flex bg-[#232323]/90"/>
+  <v-app>
+    <NavBar class="flex bg-[#232323]/90" />
     <RouterView class="min-h-screen bg-[#232323]/90">
     </RouterView>
-    <GoTopButton class="fixed bottom-20 right-20"/>
+    <GoTopButton class="fixed bottom-20 right-20" />
   </v-app>
 </template>

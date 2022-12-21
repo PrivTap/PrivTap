@@ -10,6 +10,8 @@ export default class ServiceModel {
   tokenPath?: string;
   clientId?: string;
   clientSecret?: string;
+  triggerNotificationServer?: string;
+  apiKey?: string;
 
   constructor(
     serviceId: string,
@@ -21,15 +23,19 @@ export default class ServiceModel {
     tokenPath?: string,
     clientId?: string,
     clientSecret?: string,
+    triggerNotificationServer?: string,
+    apiKey?: string
   ) {
     this._id = serviceId;
     this.name = name;
     this.description = description;
     this.creator = creator;
     this.baseUrl = baseUrl;
-    this.authPath=authPath;
-    this.tokenPath=tokenPath;
+    this.authPath = authPath;
+    this.tokenPath = tokenPath;
     this.clientId = clientId;
     this.clientSecret = clientSecret;
+    this.triggerNotificationServer = triggerNotificationServer;
+    this.apiKey = apiKey;
   }
 }
