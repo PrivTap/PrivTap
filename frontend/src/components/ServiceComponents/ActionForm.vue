@@ -9,22 +9,12 @@
         <v-textarea :rules="form.descriptionRule" v-model="form.description" label="Description" required></v-textarea>
         <v-text-field v-model="form.endpoint" :rules="form.endpointRule" label="Endpoint" required></v-text-field>
         <v-label class="mb-2 mt-4">Choose Permissions</v-label>
-        <!-- <v-chip-group v-model="selectedPermissions" column multiple selected-class="text-success">
-            <v-chip v-for="choosablePerm in choosablePermissions" :key="choosablePerm._id" filter
-                variant="outlined">
-                {{ choosablePerm.name }}
-            </v-chip>
-            <v-chip v-for="choosablePerm in choosablePermissions" :key="choosablePerm._id" filter
-                variant="outlined">
-                {{ choosablePerm.name }}
-            </v-chip>
-        </v-chip-group> -->
-          <v-row align-content="start" no-gutters class="-translate-x-3 h-14">
-            <v-col cols="2" align-self="start" v-for="choosablePerm in choosablePermissions.perm" :key="choosablePerm._id">
-              <v-checkbox v-model="choosablePerm.associated" :label="choosablePerm.name"
-                color="success"></v-checkbox>
-            </v-col>
-          </v-row>
+        <v-row align-content="start" no-gutters class="-translate-x-3 h-14">
+          <v-col cols="2" align-self="start" v-for="choosablePerm in choosablePermissions.perm"
+            :key="choosablePerm._id">
+            <v-checkbox v-model="choosablePerm.associated" :label="choosablePerm.name" color="success"></v-checkbox>
+          </v-col>
+        </v-row>
         <v-divider class="my-5"></v-divider>
       </v-form>
     </v-card-text>
@@ -102,7 +92,7 @@ const form = reactive({
 });
 
 async function onClose() {
-    props.onCancel();
+  props.onCancel();
 }
 
 async function validate() {

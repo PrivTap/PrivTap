@@ -8,15 +8,12 @@
           <p class="text-lg font-medium text-white/60"> {{ operation.description }} </p>
           <v-label class="pt-4 pb-2">Permissions</v-label>
           <div>
-            <div v-if="!operation.permissions.length "> No permission
+            <div v-if="!operation.permissions.length"> No permission
               required
             </div>
-            <v-chip v-for="permission in operation.permissions" :key="permission._id"
-                    class="mr-2" variant="outlined">
-              {{ permission.name }}
-            </v-chip>
+            <PermissionChip v-for="permission in operation.permissions" :permissionModel="permission" />
             <v-btn class="ma-2" variant="outlined" color="text-blue-100"
-                   @click="chooseThisOperation(operation._id, operation.name)">
+              @click="chooseThisOperation(operation._id, operation.name)">
               choose
             </v-btn>
           </div>
@@ -27,7 +24,7 @@
       <div v-if="!operations.length" class="justify-items-center">
         <p class="py-16">This service has not published any {{ props.operation }} or there aren't enough authorization.
           {{ !lookingForTriggers ? "Actions also maybe incompatible with the selected trigger" : "" }}</p>
-        <img :src=empty :alt="empty" class="max-w-xs max-h-xs mx-0 "/>
+        <img :src=empty :alt="empty" class="max-w-xs max-h-xs mx-0 " />
       </div>
     </div>
   </div>
@@ -38,12 +35,13 @@
 
 
 import empty from '@/assets/images/empty.svg';
-import {useRoute} from 'vue-router';
-import {computed, defineProps, inject, onMounted, ref} from 'vue';
+import { useRoute } from 'vue-router';
+import { computed, defineProps, inject, onMounted, ref } from 'vue';
 import user_trigger from "@/controllers/user_trigger";
 import user_action from "@/controllers/user_action";
 import type TriggerModel from '@/model/trigger_model';
 import type ActionModel from '@/model/action_model';
+import PermissionChip from './PermissionChip.vue';
 
 
 const operations = ref<TriggerModel[] | ActionModel[]>([]);
