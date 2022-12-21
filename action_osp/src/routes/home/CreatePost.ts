@@ -19,9 +19,6 @@ export default class CreatePostRoute extends Route {
         const authorization = await Authorization.findByToken(oauthToken);
         const dataFromTrigger = request.body as ITriggerData;
 
-        console.log("authorization=", authorization);
-        console.log("content=", dataFromTrigger);
-
         if (!authorization || !dataFromTrigger){
             console.log("Not auth or content");
             response.status(400).send();
