@@ -2,10 +2,10 @@ import { afterEach, beforeEach, describe, test } from "vitest";
 import { SinonStub } from "sinon";
 import * as sinon from "sinon";
 import { use, expect } from "chai";
-import manageRule from "../../src/controllers/manage_Rule";
 import RuleModel from "../../src/model/Rule_model";
 import axiosInstance from "../../src/helpers/axios_service";
 import sinonChai from "sinon-chai";
+import manageRule from "../../src/controllers/rules_controller";
 
 
 use(sinonChai);
@@ -21,7 +21,6 @@ describe("Manage Rule Test", () => {
   const testRuleModel: RuleModel = new RuleModel(
     "Test Rule id",
     "Test Rule name",
-    "userId",
     "triggerId",
     "actionId",
     true
@@ -40,12 +39,12 @@ describe("Manage Rule Test", () => {
   //TEST GetRules
   test("Should put in the ref all the Rules", async () => {
     getStub.resolves({ data: { data: [testRuleModel] } })
-    await manageRule.getAllRules(testRuleModel.userId);
+    await manageRule.getAllRules();
     expect(manageRule.getRef().value).to.be.eql([testRuleModel]);
   });
   test("Should put nothing in the ref value if the gets failed", async () => {
     getStub.resolves(null);
-    await manageRule.getAllRules(testRuleModel.userId);
+    await manageRule.getAllRules();
     expect(manageRule.getRef().value).to.be.eql([]);
   })
   //TEST CreateRules
