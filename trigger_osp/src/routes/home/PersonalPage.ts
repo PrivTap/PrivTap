@@ -12,7 +12,7 @@ export default class PersonalPageRoute extends Route {
         const userId = request.userId;
         let user = await User.findById(userId);
         // Dummy because the name is too long
-        const dummy_user = {username: "Lorenzo"};
+        const dummy_user = {username: user?.username ?? "Lorenzo"};
         const postList = await Post.findAllByUserId(userId)
         let formattedList: [{[id: string]: string }?] = [];
         postList.forEach(post => {
