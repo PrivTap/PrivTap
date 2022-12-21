@@ -1,7 +1,7 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
 import { checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
-import Action, { ActionOsp, IAction } from "../../model/Action";
+import Action, { IAction } from "../../model/Action";
 import Service from "../../model/Service";
 import { handleInsert, handleUpdate } from "../../helper/misc";
 import Permissions from "../../model/Permission";
@@ -51,8 +51,8 @@ export default class ManageActionsRoute extends Route {
             permissions
         }, true) as IAction;
         if (!action) return;
-        const associatedPermissions = await Permissions.getAllPermissionAndAddBooleanTag(serviceId, action.permissions);
-        const actionResult: ActionOsp = {
+        const associatedPermissions = await Permissions.getAllPermissionAndAddBooleanTag(serviceId, action.permissions as string[]);
+        const actionResult: Partial<IAction> = {
             name: action.name,
             _id: action._id,
             endpoint: action.endpoint,
@@ -102,8 +102,8 @@ export default class ManageActionsRoute extends Route {
             endpoint
         }, true) as IAction;
         if (!updatedAction) return;
-        const associatedPermissions = await Permissions.getAllPermissionAndAddBooleanTag(updatedAction.serviceId, updatedAction.permissions);
-        const triggerResult: ActionOsp = {
+        const associatedPermissions = await Permissions.getAllPermissionAndAddBooleanTag(updatedAction.serviceId, updatedAction.permissions as string[]) ;
+        const triggerResult: Partial<IAction> = {
             name: updatedAction.name,
             _id: updatedAction._id,
             endpoint: updatedAction.endpoint,

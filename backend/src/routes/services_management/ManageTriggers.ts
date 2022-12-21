@@ -1,7 +1,7 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
 import { badRequest, checkUndefinedParams, forbiddenUserError, success } from "../../helper/http";
-import Trigger, { ITrigger, TriggerOsp } from "../../model/Trigger";
+import Trigger, { ITrigger } from "../../model/Trigger";
 import Permissions from "../../model/Permission";
 import Service from "../../model/Service";
 import { handleInsert, handleUpdate } from "../../helper/misc";
@@ -52,7 +52,7 @@ export default class ManageTriggersRoute extends Route {
         }, true) as ITrigger;
         if (!insertedTrigger) return;
         const associatedPermissions = await Permissions.getAllPermissionAndAddBooleanTag(serviceId, insertedTrigger.permissions as string[]);
-        const triggerResult: TriggerOsp = {
+        const triggerResult: Partial<ITrigger> = {
             name: insertedTrigger.name,
             _id: insertedTrigger._id,
             resourceServer: insertedTrigger.resourceServer,
@@ -103,7 +103,7 @@ export default class ManageTriggersRoute extends Route {
         }, true) as ITrigger;
         if (!modifiedTrigger) return;
         const associatedPermissions = await Permissions.getAllPermissionAndAddBooleanTag(modifiedTrigger.serviceId, modifiedTrigger.permissions as string[]);
-        const triggerResult: TriggerOsp = {
+        const triggerResult: Partial<ITrigger> = {
             name: modifiedTrigger.name,
             _id: modifiedTrigger._id,
             resourceServer: modifiedTrigger.resourceServer,
