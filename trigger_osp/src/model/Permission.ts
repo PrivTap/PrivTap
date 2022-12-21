@@ -1,7 +1,7 @@
 import {model as mongooseModel, Schema, Types} from "mongoose";
 import {authorizationType, location, operation, postGranularity, userGranularity} from "../Granularity";
 import logger from "../helper/logger";
-import Post from "./Post";
+import Post, {IPost} from "./Post";
 
 export interface IPermission {
     _id: string;
@@ -191,7 +191,7 @@ class Permission {
     }
 
     // TODO: Implement
-    async retrieveData(userId: string, permissions: {[id:string]:string}[]): Promise<string>{
+    async retrieveData(userId: string, permissions: {[id:string]:string}[]): Promise<Partial<IPost>>{
         const posts = await Post.findAllByUserId(userId);
         posts.sort((a ,b) => {
             if (a.creationDate < b.creationDate){
@@ -202,7 +202,7 @@ class Permission {
             }
             return 0;
         })
-        return posts[0].content;
+        return posts[0]; //Return a partial IPost object for further Action data type filtering
     }
 
 }

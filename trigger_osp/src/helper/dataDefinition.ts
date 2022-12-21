@@ -40,17 +40,23 @@ export class TriggerData implements IDataDefinition {
 
     trigger_data: IEntryDefinition[];
 
-    constructor(data: unknown[], identifiers: string[]) {
+    constructor(data: unknown[], identifiers: string[], dataFilter: string[]) {
         //Automagically map each entry of the array to one of the supported types, skipping any type that is not supported
-        this.trigger_data = convertExternalEntryArray(data, identifiers);
+        this.trigger_data = convertExternalEntryArray(data, identifiers, dataFilter);
     }
 
 }
 
-function convertExternalEntryArray(externalEntryArray: unknown[], identifiers?: string[]): IEntryDefinition[] {
+function convertExternalEntryArray(externalEntryArray: unknown[], identifiers?: string[], dataFilter?: string[]): IEntryDefinition[] {
     let mappedEntries: (IEntryDefinition | null)[] = [];
     for (let index = 0; index < externalEntryArray.length; index++) {
-        mappedEntries.push(convertExternalEntry(externalEntryArray[index], identifiers ? identifiers[index] : undefined));
+        let shouldPush = true;
+        if (dataFilter && identifiers) {
+            shouldPush = dataFilter.filter((filterEntry) => filterEntry == identifiers[index]).length > 0;
+        }
+        if (shouldPush) {
+            mappedEntries.push(convertExternalEntry(externalEntryArray[index], identifiers ? identifiers[index] : undefined));
+        }
     }
     return mappedEntries.filter((entry) => entry != null) as IEntryDefinition[]
 }

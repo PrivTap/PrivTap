@@ -40,8 +40,7 @@ export default class AccessPostRoute extends Route {
          */
 
         //Format the received post data into the standard format
-        const formattedData = new TriggerData([data], ["post-text"]);
-
+        const formattedData = new TriggerData([data.content, data.creationDate], ["post-text", "creation-date"], ["post-text"]); //TODO: Change with actionDataFiletr when the PrivTap FE supports adding data definition objects to triggers and actions
         response.status(200).send(formattedData);
     }
 }
