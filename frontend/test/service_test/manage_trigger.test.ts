@@ -5,7 +5,7 @@ import { SinonStub } from "sinon";
 import * as sinon from "sinon";
 import { use, expect } from "chai";
 import axiosInstance from "../../src/helpers/axios_service";
-import sinonChai = require("sinon-chai");
+import sinonChai from "sinon-chai";
 import PermissionModel from "../../src/model/permission_model";
 
 use(sinonChai);
