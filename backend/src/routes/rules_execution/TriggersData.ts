@@ -27,6 +27,7 @@ export default class TriggersDataRoute extends Route {
         const triggerId = request.body.triggerId;
         const userId = request.body.userId;
         const api = request.body.apiKey;
+        const optionalEventDataParameters = request.body.eventDataParameters;
 
         if (checkUndefinedParams(response, triggerId, userId, api)) {
             return;
@@ -70,13 +71,16 @@ export default class TriggersDataRoute extends Route {
 
             let axiosResponse;
             try {
-                const queryParams = {
+                const queryParams: Record<string, unknown> = {
                     filter: dataDefinitionIDs(action.inputs),
                     authDetails: aggregateAuthorizationDetails
                 };
+                if (optionalEventDataParameters) {
+                    queryParams.eventDataParameters = optionalEventDataParameters;
+                }
                 axiosResponse = await getReqHttp(trigger?.resourceServer, oauthToken, queryParams);
                 dataToForwardToActionAPI = axiosResponse?.data;
-                if (!dataToForwardToActionAPI){
+                if (!dataToForwardToActionAPI) {
                     logger.debug("Axios response data not found");
                     internalServerError(response);
                     return;
