@@ -11,7 +11,7 @@ import Action from "../../model/Action";
 import logger from "../../helper/logger";
 import Authorization from "../../model/Authorization";
 import Service from "../../model/Service";
-import { dataDefinitionIDs } from "../../helper/dataDefinition";
+import { DataDefinition, dataDefinitionIDs } from "../../helper/dataDefinition";
 import Permission from "../../model/Permission";
 import { getReqHttp, postReqHttp } from "../../helper/misc";
 
@@ -72,7 +72,7 @@ export default class TriggersDataRoute extends Route {
             let axiosResponse;
             try {
                 const queryParams: Record<string, unknown> = {
-                    filter: dataDefinitionIDs(action.inputs),
+                    filter: dataDefinitionIDs(JSON.parse(action.inputs) as DataDefinition),
                     authDetails: aggregateAuthorizationDetails
                 };
                 if (optionalEventDataParameters) {

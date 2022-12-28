@@ -13,7 +13,7 @@ export interface IAction {
     description: string;
     serviceId: string;
     endpoint: string;
-    inputs: DataDefinition;
+    inputs: string;
     authorized?: boolean;
     permissions?: string[]| Partial<IPermission>[];
 }

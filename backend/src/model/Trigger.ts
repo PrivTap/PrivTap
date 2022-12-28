@@ -12,7 +12,7 @@ export interface ITrigger {
     name: string;
     description: string;
     serviceId: string;
-    outputs: DataDefinition;
+    outputs: string;
     permissions?: Types.Array<string> | Partial<IPermission>[];
     resourceServer?: string;
     authorized?: boolean;
