@@ -7,9 +7,6 @@ let triggers = ref<TriggerModel[]>([]);
 
 export interface IUserTrigger {
     getAllTriggers(serviceId: string): Promise<TriggerModel[]>;
-
-    getAuthorizedTriggers(serviceId: string): Promise<TriggerModel[]>;
-
 }
 
 
@@ -29,19 +26,6 @@ class User_trigger extends GenericController<TriggerModel[]> implements IUserTri
      */
     async getAllTriggers(serviceId: string, valueToReturn: boolean = false): Promise<TriggerModel[]> {
         const res = await super.get<TriggerModel[]>(path, {query: {serviceId}});
-        if (!valueToReturn)
-            triggers.value = triggers.value = res != null ? res : [];
-        return res != null ? res : [];
-    }
-
-    /**
-     * If value to return it's true, return the result of the request. When value to return it's false, the result of the request is stored inside the reference object.
-     * The result of the request is the list of all the triggers of the service that are authorized (All their permissions have been granted)
-     * @param serviceId the Id of the service to get the triggers
-     * @param valueToReturn if true return the result of the request. Default false
-     */
-    async getAuthorizedTriggers(serviceId: string, valueToReturn: boolean = false): Promise<TriggerModel[]> {
-        const res = await super.get<TriggerModel[]>(path, {query: {serviceId, authorized: true}});
         if (!valueToReturn)
             triggers.value = triggers.value = res != null ? res : [];
         return res != null ? res : [];

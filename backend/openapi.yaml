@@ -276,8 +276,7 @@ paths:
       tags:
         - Rules Management
       summary:  Gets a list of available triggers
-      description: Returns a list of triggers offered by a specific service. By default it returns all the triggers, with the authorized field set to true, it will return only the triggers that the user has authorized. (the ones that are needed to create a rule)
-
+      description: Returns a list of triggers offered by a specific service. By default it returns all the triggers with an addition fieldset "authorized". If it is set to true, the trigger is authorized by the user, otherwise it is not.
       operationId: triggers
       parameters:
         - name: serviceId
@@ -286,12 +285,7 @@ paths:
           schema:
             type: string
           required: true
-        - name: authorized
-          description: Filters the returned list including only the triggers authorized by the user
-          in: query
-          schema:
-            type: boolean
-          example: true
+
       responses:
         '200':
           description: successful operation
@@ -324,16 +318,16 @@ paths:
                         description:
                           type: string
                           example: SomePermissionDescription
-                  resourceServer:
-                    type: string
-                    example: someUrlToToGetAResource
+                  authorized:
+                    type: boolean
+                    example: true
 
   /actions:
     get:
       tags:
         - Rules Management
       summary: Gets a list of available actions
-      description: Returns a list of actions offered by a specific service. By default it returns all the actions, with the authorized field set to true, it will return only the triggers that the user has authorized. (the ones that are needed to create a rule)
+      description: Returns a list of actions offered by a specific service. By default it returns all the triggers with an addition fieldset "authorized". If it is set to true, the trigger is authorized by the user, otherwise it is not.
       operationId: actions
       parameters:
         - name: serviceId
@@ -388,9 +382,9 @@ paths:
                           _id:
                             type: string
                             example: SomePermissionId
-                    endpoint:
-                      type: string
-                      example: someUrlToPerformAction
+                    authorized:
+                      type: boolean
+                      example: true
 
   /service-authorization:
     get:

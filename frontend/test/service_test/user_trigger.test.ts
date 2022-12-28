@@ -4,9 +4,10 @@ import { SinonStub } from "sinon";
 import * as sinon from "sinon";
 import { use, expect } from "chai";
 import axiosInstance from "../../src/helpers/axios_service";
-import sinonChai = require("sinon-chai");
+import sinonChai from "sinon-chai";
 import PermissionModel from "../../src/model/permission_model";
-import UserTrigger from "../../src/controllers/user-trigger";
+import UserTrigger from "../../src/controllers/user_trigger";
+
 
 use(sinonChai);
 
@@ -27,9 +28,11 @@ describe("User Trigger Test", () => {
         "resourceServer"
     );
     const serviceId = "test Service id";
-    const config ={
-        query:undefined,
-        headers:undefined
+    let query: any;
+    let headers: any;
+    const config = {
+        query,
+        headers
     }
     beforeEach(() => {
         getStub = sandbox.stub(axiosInstance, "get");
@@ -40,8 +43,8 @@ describe("User Trigger Test", () => {
     afterEach(async () => {
         sandbox.restore();
         UserTrigger.getRef().value = [];
-        config.query=undefined;
-        config.headers=undefined;
+        config.query = undefined;
+        config.headers = undefined;
     })
 
     //TEST GetAllTriggers
@@ -49,7 +52,7 @@ describe("User Trigger Test", () => {
         getStub.resolves({ data: { data: [testTriggerModel] } })
         await UserTrigger.getAllTriggers(serviceId);
 
-        config.query= {serviceId:serviceId};
+        config.query = { serviceId: serviceId };
         expect(getStub).to.have.been.calledOnceWith("/triggers", { params: config?.query, headers: config?.headers });
         expect(UserTrigger.getRef().value).to.be.eql([testTriggerModel]);
     });
@@ -57,14 +60,14 @@ describe("User Trigger Test", () => {
         getStub.resolves(null);
         await UserTrigger.getAllTriggers(serviceId);
 
-        config.query= {serviceId:serviceId};
+        config.query = { serviceId: serviceId };
         expect(getStub).to.have.been.calledOnceWith("/triggers", { params: config?.query, headers: config?.headers });
         expect(UserTrigger.getRef().value).to.be.eql([]);
     })
     test("Should put nothing in the ref value if the gets success and valueToReturn is true", async () => {
         getStub.resolves({ data: { data: [testTriggerModel] } });
-        const res =await UserTrigger.getAllTriggers(serviceId, true);
-        config.query= {serviceId:serviceId};
+        const res = await UserTrigger.getAllTriggers(serviceId, true);
+        config.query = { serviceId: serviceId };
         expect(getStub).to.have.been.calledOnceWith("/triggers", { params: config?.query, headers: config?.headers });
         expect(UserTrigger.getRef().value).to.be.eql([]);
         expect(res).to.be.eql([testTriggerModel]);
@@ -73,22 +76,22 @@ describe("User Trigger Test", () => {
     //TEST GetAllAuthorizedTriggers
     test("Should put in the ref all the triggers", async () => {
         getStub.resolves({ data: { data: [testTriggerModel] } })
-        await UserTrigger.getAuthorizedTriggers(serviceId);
-        config.query= {serviceId:serviceId, authorized:true};
+        await UserTrigger.getAllTriggers(serviceId);
+        config.query = { serviceId: serviceId, authorized: true };
         expect(getStub).to.have.been.calledOnceWith("/triggers", { params: config?.query, headers: config?.headers });
         expect(UserTrigger.getRef().value).to.be.eql([testTriggerModel]);
     });
     test("Should put nothing in the ref value if the gets failed", async () => {
         getStub.resolves(null);
-        await UserTrigger.getAuthorizedTriggers(serviceId);
-        config.query= {serviceId:serviceId, authorized:true};
+        await UserTrigger.getAllTriggers(serviceId);
+        config.query = { serviceId: serviceId, authorized: true };
         expect(getStub).to.have.been.calledOnceWith("/triggers", { params: config?.query, headers: config?.headers });
         expect(UserTrigger.getRef().value).to.be.eql([]);
     })
     test("Should put nothing in the ref value if the gets success and valueToReturn is true", async () => {
         getStub.resolves({ data: { data: [testTriggerModel] } });
-        const res =await UserTrigger.getAuthorizedTriggers(serviceId, true);
-        config.query= {serviceId:serviceId, authorized:true};
+        const res = await UserTrigger.getAllTriggers(serviceId, true);
+        config.query = { serviceId: serviceId, authorized: true };
         expect(getStub).to.have.been.calledOnceWith("/triggers", { params: config?.query, headers: config?.headers });
         expect(UserTrigger.getRef().value).to.be.eql([]);
         expect(res).to.be.eql([testTriggerModel]);

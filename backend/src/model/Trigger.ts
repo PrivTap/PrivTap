@@ -5,7 +5,7 @@ import logger from "../helper/logger";
 import Permission, { IPermission } from "./Permission";
 import { DataDefinition } from "../helper/dataDefinition";
 import permission from "./Permission";
-import Authorization from "./Authorization";
+import { findAllOperationAddingAuthorizedTag } from "../helper/misc";
 
 export interface ITrigger {
     _id: string;
@@ -13,8 +13,9 @@ export interface ITrigger {
     description: string;
     serviceId: string;
     outputs: DataDefinition;
-    permissions?: Types.Array<string> | Types.Array<Partial<IPermission>>;
+    permissions?: Types.Array<string> | Partial<IPermission>[];
     resourceServer?: string;
+    authorized?: boolean;
     data?: Types.Array<string>; // TO DEFINE
 }
 
@@ -53,7 +54,7 @@ class Trigger extends Model<ITrigger> {
      * @param serviceId the id of the service
      * @param associated Default false. If true, it returns the triggers containing all the permissions of the service with a boolean field associated. "associated" is true if the permission is already associated to the trigger.
      */
-    async findAllForService(serviceId: string, associated = false): Promise<TriggerOsp[] | null> {
+    async findAllForService(serviceId: string, associated = false): Promise<Partial<ITrigger>[] | null> {
         let triggers: ITrigger[] | null;
         if (associated)
             //we don't populate the permissions, permissions is now an array of idPermission (string)
@@ -63,19 +64,19 @@ class Trigger extends Model<ITrigger> {
             triggers = await this.findAll({ serviceId }, "-serviceId", "permissions", "name description");
         if (triggers == null)
             return null;
-        const triggersResult = new Array<TriggerOsp>();
+        const triggersResult = new Array<Partial<ITrigger>>();
         for (const trigger of triggers) {
             if (trigger.permissions != undefined) {
                 let allPermAndAssociated;
                 if (associated)
-                    allPermAndAssociated = await Permission.getAllPermissionAndAddBooleanTag(serviceId, trigger.permissions as Types.Array<string>);
+                    allPermAndAssociated = await Permission.getAllPermissionAndAddBooleanTag(serviceId, trigger.permissions as string[]);
 
-                const triggerResult: TriggerOsp = {
+                const triggerResult: Partial<ITrigger> = {
                     name: trigger.name,
                     _id: trigger._id,
                     resourceServer: trigger.resourceServer,
                     description: trigger.description,
-                    permissions: associated ? (allPermAndAssociated ? allPermAndAssociated : []) : trigger.permissions as Types.Array<Partial<IPermission>>
+                    permissions: associated ? (allPermAndAssociated ? allPermAndAssociated : []) : trigger.permissions as Partial<IPermission>[]
                 };
                 triggersResult.push(triggerResult);
             }
@@ -83,26 +84,20 @@ class Trigger extends Model<ITrigger> {
         return triggersResult;
     }
 
+    /**
+     * Returns all the triggers of the following serviceId.The response object includes name, description,populated permission and authorized.
+     * A trigger is authorized if the grantedPermission of the user contains the permission of the trigger.
+     * @param userId the id of the user
+     * @param serviceId the id of the service
+     */
 
-    async findAllTriggerAuthorizedByUser(userId: string, serviceId: string): Promise<TriggerOsp[] | null> {
-        let grantedPermissionId = await Authorization.getGrantedPermissionsId(userId, serviceId);
-        if (grantedPermissionId == null)
-            grantedPermissionId = [];
-        let result;
+    async findAllTriggerAddingAuthorizedTag(userId: string, serviceId: string): Promise<Partial<ITrigger>[] | null> {
         try {
-            result = await this.model.aggregate()
-                .match({ serviceId: new mongoose.Types.ObjectId(serviceId) })
-                .match({
-                    $expr: {
-                        $setIsSubset: ["$permissions", grantedPermissionId]
-                    }
-                })
-                .project({ "outputs": 0, "data": 0, "serviceId": 0 }) as TriggerOsp[];
+            return await findAllOperationAddingAuthorizedTag(this.model, userId, serviceId) as Partial<ITrigger>[];
         } catch (e) {
             console.log(e);
             return null;
         }
-        return result;
     }
 
     /**
@@ -159,12 +154,4 @@ export interface triggerServiceNotificationServer {
     serviceId: string,
     triggerNotificationServer: string,
     triggerId: string
-}
-
-export interface TriggerOsp {
-    _id: string,
-    name: string,
-    description: string,
-    resourceServer?: string,
-    permissions?: Partial<IPermission>[]
 }

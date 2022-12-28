@@ -51,6 +51,4 @@ export class ShowPermissions extends GenericController<SimplePermissionModel[]> 
     }
 }
 
-export default new
-
-    ShowPermissions();
+export default new ShowPermissions();
