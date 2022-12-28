@@ -7,7 +7,6 @@
 </template>
 
 <script setup lang="ts">
-import type PermissionModel from '@/model/permission_model';
 
 const props = defineProps<{ permissionModel: Partial<{ _id: string, name: string, description: string }>, color?: string, appendIcon?: string }>();
 console.log(props.permissionModel);
