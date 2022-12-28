@@ -2,6 +2,7 @@ import {readdirSync, statSync} from "fs";
 import Permission, {IPermission} from "../model/Permission";
 import logger from "./logger";
 import Authorization from "../model/Authorization";
+import axios, {AxiosResponse} from "axios";
 
 /**
  * Gets all files recursively from a directory.
@@ -64,4 +65,19 @@ export async function rollBackAuthorization(userId: string): Promise<boolean>{
  */
 export function checkURL(url: string): boolean {
     return /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u00a1-\uffff][a-z0-9\u00a1-\uffff_-]{0,62})?[a-z0-9\u00a1-\uffff]\.)+(?:[a-z\u00a1-\uffff]{2,}\.?))(?::\d{2,5})?(?:[/?#]\S*)?$/i.test(url);
+}
+
+export async function getReqHttp(url: string, bearerHeader: string | null, parameters: object): Promise<AxiosResponse | null> {
+    const config = bearerHeader ? {
+        headers: { "Authorization": bearerHeader },
+        params: parameters
+    } : { params: parameters };
+    let res;
+    try {
+        res = await axios.get(url, config);
+        return res;
+    } catch (e) {
+        logger.error("Axios response status:", res ? res.status : "undefined");
+        return null;
+    }
 }
