@@ -39,7 +39,7 @@ import ModalComponent from '@/components/ModalComponent.vue';
 import type ActionModel from '@/model/action_model';
 import ActionForm from './ActionForm.vue';
 import manage_action from '@/controllers/manage_action';
-import PermissionChip from '../PermissionChip.vue';
+import PermissionChip from '../InformationChip.vue';
 const props = defineProps<{
     action: ActionModel;
     serviceId: string;

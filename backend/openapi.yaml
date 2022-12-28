@@ -166,9 +166,35 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Rule'
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: MyRule
+                  triggerId:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 5f9f5b9b9b9b9b9b9b9b9b9b
+                      name:
+                        type: string
+                        example: MyTrigger
+                      description:
+                        type: string
+                        example: MyTriggerDescription
+                  actionId:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 5f9f5b9b9b9b9b9b9b9b9b9b
+                      name:
+                        type: string
+                        example: MyAction
+                      description:
+                        type: string
+                        example: MyActionDescription
         '400':
           description: Bad request
         '500':

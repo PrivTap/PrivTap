@@ -25,11 +25,9 @@
 <script setup lang="ts">
 import { defineProps, ref } from 'vue';
 import type ActionModel from '@/model/action_model';
-
-import manage_action from '@/controllers/manage_action';
 import RoutingPath from "@/router/routing_path";
 import { useRouter } from "vue-router";
-import PermissionChip from './PermissionChip.vue';
+import PermissionChip from './InformationChip.vue';
 
 
 const router = useRouter();

@@ -38,7 +38,7 @@ import ModalComponent from '@/components/ModalComponent.vue';
 import type TriggerModel from '@/model/trigger_model';
 import TriggerForm from './TriggerForm.vue';
 import manage_trigger from '@/controllers/manage_trigger';
-import PermissionChip from '../PermissionChip.vue';
+import PermissionChip from '../InformationChip.vue';
 const props = defineProps<{
     trigger: TriggerModel;
     serviceId: string;

@@ -40,14 +40,6 @@ const router = createRouter({
       },
     },
     {
-      path: RoutingPath.UNAUTHORIZED_SERVICE_PAGE,
-      name: "unauthorizedservices",
-      component: () => import("../views/UnAuthorizedServicesView.vue"),
-      meta: {
-        requireAuth: true,
-      },
-    },
-    {
       path: `${RoutingPath.PUBLISH_SERVICE_PAGE}/:id?`,
       name: "publishservice",
       component: () => import("../views/PublishServiceView.vue"),

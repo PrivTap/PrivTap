@@ -30,8 +30,8 @@
           <tbody>
             <tr v-for="item in permission" :key="item.name" class="border-b p-12 h-20 align-top">
               <PermissionChip :permission-model="item"
-                :color="arrayAuthorized.find(p => p == item._id) ? 'success' : 'red'"
-                :append-icon="arrayAuthorized.find(p => p == item._id) ? 'mdi-check' : 'mdi-close'">
+                :color="arrayAuthorized.find(p => p === item._id) ? 'success' : 'red'"
+                :append-icon="arrayAuthorized.find(p => p === item._id) ? 'mdi-check' : 'mdi-close'">
               </PermissionChip>
               <td class="relative">
                 <v-switch v-model="arrayAuthorized" inset color="green" v-bind:value="item._id"
@@ -63,7 +63,7 @@ import showPermissions from "@/controllers/show-permission";
 import empty from '@/assets/images/empty1.svg';
 import router from "@/router/router";
 import RoutingPath from "@/router/routing_path";
-import PermissionChip from "@/components/PermissionChip.vue";
+import PermissionChip from "@/components/InformationChip.vue";
 
 const route = useRoute();
 

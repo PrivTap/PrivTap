@@ -49,7 +49,7 @@ export default class TriggersDataRoute extends Route {
             return;
         }
 
-        const action = await Action.findById(referencedRule!.actionId);
+        const action = await Action.findById(referencedRule!.actionId as string);
         if (!action?.endpoint) {
             internalServerError(response);
             return;

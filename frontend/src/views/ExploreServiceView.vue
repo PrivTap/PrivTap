@@ -96,7 +96,7 @@ import {useRoute} from 'vue-router';
 import type SimpleServiceModel from '@/model/simple_service_model';
 import UserTrigger from "@/controllers/user_trigger";
 import UserAction from "@/controllers/user_action";
-import PermissionChip from '@/components/PermissionChip.vue';
+import PermissionChip from '@/components/InformationChip.vue';
 import {useRouter} from "vue-router";
 import RoutingPath from "@/router/routing_path";
 
