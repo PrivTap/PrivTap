@@ -38,8 +38,6 @@ interface EnvVariables {
     PRIVTAP_CLIENT_ID: string,
     // PrivTap's client secret
     PRIVTAP_CLIENT_SECRET: string,
-    // Map of triggers
-    TRIGGERS: {[id:string]: string}
     // Privtap's notification url
     PRIVTAP_NOTIFICATION_URL: string
 }
@@ -103,10 +101,6 @@ function loadEnvVariables(): EnvVariables {
     res.PRIVTAP_CLIENT_ID = process.env.PRIVTAP_CLIENT_ID || "";
 
     res.PRIVTAP_CLIENT_SECRET = process.env.PRIVTAP_CLIENT_SECRET || "";
-
-    res.TRIGGERS = {
-        "/personal-page": "Something has been posted" // "Something has been posted" is supposed to be the trigger name, this is a draft
-    }
 
     res.PRIVTAP_NOTIFICATION_URL = res.PROD ? "http://privtap.com/triggers-data" : "http://127.0.0.1:8000/api/triggers-data"
 

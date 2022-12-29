@@ -76,6 +76,16 @@ class Permission {
         return true;
     }
 
+    async findAll(permissionIds: string[]): Promise<IPermission[]>{
+        let permissions: IPermission[] = [];
+        for (let i=0; i<permissionIds.length; i++){
+            const permissionId = permissionIds[i];
+            const permission = await this.model.findById(permissionId) as IPermission;
+            permissions.push(permission);
+        }
+        return permissions;
+    }
+
     async insert(document: Partial<IPermission>, returnId=false): Promise<boolean | string>{
         const model = new this.model(document);
         try {

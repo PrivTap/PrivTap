@@ -1,5 +1,6 @@
 import {model as mongooseModel, Schema, Types} from "mongoose";
 import logger from "../helper/logger";
+import Permission from "./Permission";
 
 export interface IAuthorization {
     _id: string;
@@ -25,7 +26,6 @@ const authorizationSchema = new Schema({
         type: String
     }
 });
-
 
 class Authorization {
     model = mongooseModel<IAuthorization>("authorization", authorizationSchema);
@@ -67,6 +67,39 @@ class Authorization {
 
     async findByToken(oauthToken: string): Promise<IAuthorization | null>{
         return this.model.findOne({ oauthToken });
+    }
+
+    async findByUserId(userId: string): Promise<IAuthorization | null>{
+        return this.model.findOne({ userId });
+    }
+
+    async isAuthorized(oauthToken: string, resourcesToRequest: {userGranularity: string[], postGranularity: string[]}): Promise<boolean>{
+        const authorization = await this.model.findOne({ oauthToken }) as IAuthorization;
+        if (!authorization)
+            return false;
+
+        const permissions = await Permission.findAll(authorization.permissionIds);
+        if (!permissions)
+            return false;
+
+        const userGranularityList = resourcesToRequest.userGranularity;
+        for (let i=0; i<userGranularityList.length; i++){
+            if(permissions.filter(permission => permission.userGranularity == userGranularityList[i]).length == 0)
+                return false;
+        }
+
+        const postGranularityList = resourcesToRequest.postGranularity;
+        for (let i=0; i<postGranularityList.length; i++){
+            if(permissions.filter(permission => permission.postGranularity == postGranularityList[i]).length == 0)
+                return false;
+        }
+
+        return true;
+    }
+
+    async retrieveData(oauthToken: string, resourcesToRequest: {userGranularity: string[], postGranularity: string[]}): Promise<object>{
+        const userGranularityList = resourcesToRequest.userGranularity;
+        return {};
     }
 }
 

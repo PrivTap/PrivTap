@@ -7,7 +7,6 @@ export interface INotification {
     foreignUserId: string;
     foreignTriggerId: string;
     triggerName: string;
-    //resourceEndPoint: string; // Maybe object?
 }
 
 const notificationSchema = new Schema({
@@ -27,13 +26,7 @@ const notificationSchema = new Schema({
     triggerName: {
         type: String,
         required: true,
-    },
-    /*
-    resourceEndPoint: {
-        type: String,
-        required: true,
     }
-     */
 });
 
 
