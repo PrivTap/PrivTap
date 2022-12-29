@@ -30,7 +30,7 @@ class User {
             // User already existing
             console.log("existing...");
             if (returnObject){
-                document._id = model._id;
+                document._id = user._id;
                 return document;
             }
             return true;
