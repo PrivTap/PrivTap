@@ -46,4 +46,30 @@ export default class NotifyRoute extends Route {
         response.status(200).send();
     }
 
+    protected async httpDelete(request: Request, response: Response): Promise<void> {
+        const bearer = request.headers.authorization as string;
+        const oauthToken = bearer.split(" ")[1];
+
+        console.log("headers =", request.headers);
+        console.log("body =", request.body);
+
+        console.log(oauthToken);
+
+        const authorization = await Authorization.findByToken(oauthToken);
+
+        if (!authorization){
+            logger.debug("not authorized");
+            response.status(401).send();
+            return;
+        }
+
+        const userId = authorization.userId;
+        if (!await Notification.delete(userId)) {
+            logger.debug("error inserting notification");
+            response.status(500).send();
+            return;
+        }
+
+        response.status(200).send();
+    }
 }
