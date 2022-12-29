@@ -1,5 +1,5 @@
 import Route from "../../Route";
-import { Request, Response } from "express";
+import {Request, Response} from "express";
 import {TriggerData} from "../../helper/dataDefinition";
 import {getReqHttp} from "../../helper/misc";
 
@@ -21,10 +21,10 @@ export default class Middleware extends Route {
             let queryParams = {};
             if (eventDataParameters) {
                 queryParams = {
-                    eventParams: eventDataParameters
+                    eventDataParameters
                 };
             }
-            axiosResponse = await getReqHttp(request.protocol + '://' + request.get("host") + "/resource-server-internal", bearer, queryParams);
+            axiosResponse = await getReqHttp(request.protocol + '://' + request.get("host") + "/resources", bearer, queryParams);
             resourceServerData = axiosResponse?.data;
             if (!resourceServerData) {
                 console.log("Axios response data not found - sending empty data...");
@@ -37,7 +37,7 @@ export default class Middleware extends Route {
         let retrievedDataIdentifiers: string[] = [];
         let retrievedDataArrayed: unknown[] = [];
 
-        const postData = resourceServerData.postData;
+        const postData = resourceServerData.postData[0]??"";
         if (postData.content) {
             retrievedDataArrayed.push(postData.content);
             retrievedDataIdentifiers.push("post-text");
@@ -47,7 +47,7 @@ export default class Middleware extends Route {
             retrievedDataIdentifiers.push("creation-date")
         }
 
-        const userData = resourceServerData.userData;
+        const userData = resourceServerData.userData[0]??"";
         if (userData.username) {
             retrievedDataArrayed.push(userData.username);
             retrievedDataIdentifiers.push("username");

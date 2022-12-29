@@ -5,14 +5,13 @@ import {postReqHttp} from "../../helper/misc";
 
 export default class CreatePostRoute extends Route {
     constructor() {
-        super("create-post", false);
+        super("middleware", false);
     }
 
     protected async httpPost(request: Request, response: Response): Promise<void> {
         const bearer = request.headers.authorization as string;
-        const dataFromTrigger = request.body as ITriggerData;
+        const dataFromTrigger = (request.body as ITriggerData | undefined) ?? {trigger_data: []};
         const convertedData = TriggerDataUtils.convertToInternalRepresentation(dataFromTrigger);
-
         if (!convertedData) {
             response.status(400);
             return;
@@ -21,7 +20,7 @@ export default class CreatePostRoute extends Route {
         //Receive the data from the trigger internal resource server endpoint
         let axiosResponse;
         try {
-            axiosResponse = await postReqHttp(request.protocol + '://' + request.get("host") + "/create-post-internal", bearer, convertedData);
+            axiosResponse = await postReqHttp(request.protocol + '://' + request.get("host") + "/create-post", bearer, convertedData);
             if (axiosResponse?.status != 200) {
                 console.log("error inserting post");
                 response.status(500).send();

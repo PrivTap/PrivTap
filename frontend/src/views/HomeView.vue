@@ -41,7 +41,7 @@
                 </li>
               </ul>
               <div class="text-white font-semibold text-xl space-x-16 pt-20">
-                <PrimaryButton text="Create your Rule" :onClick="() => router.push(RoutingPath.CREATE_RULE_PAGE)" />
+                <PrimaryButton text="Check your Rules" :onClick="() => router.push(RoutingPath.PERSONAL_PAGE)" />
 
                 <OutilinedButton text="Publish your Service"
                   :onClick="() => router.push(RoutingPath.PUBLISH_SERVICE_PAGE)" />
@@ -61,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from "../stores/auth_store";
+import { useAuthStore } from "@/stores/auth_store";
 import draw from "@/assets/images/draw.svg";
 import { useRouter } from "vue-router";
 import RoutingPath from "../router/routing_path";

@@ -12,7 +12,6 @@ import logger from "../../helper/logger";
 import Authorization from "../../model/Authorization";
 import Service from "../../model/Service";
 import { DataDefinition, dataDefinitionIDs } from "../../helper/dataDefinition";
-import Permission from "../../model/Permission";
 import { getReqHttp, postReqHttp } from "../../helper/misc";
 
 export default class TriggersDataRoute extends Route {
@@ -66,14 +65,11 @@ export default class TriggersDataRoute extends Route {
             }
 
             //TODO: RAR data MUST NOT be sent manually since it is already included in the token
-            const permissionIds: string[] = (trigger.permissions ?? []) as string[];
-            const aggregateAuthorizationDetails = await Permission.getAggregateAuthorizationDetails(permissionIds);
 
             let axiosResponse;
             try {
                 const queryParams: Record<string, unknown> = {
                     filter: dataDefinitionIDs(JSON.parse(action.inputs) as DataDefinition),
-                    authDetails: aggregateAuthorizationDetails
                 };
                 if (optionalEventDataParameters) {
                     queryParams.eventDataParameters = optionalEventDataParameters;

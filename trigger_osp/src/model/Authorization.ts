@@ -74,7 +74,7 @@ class Authorization {
         return this.model.findOne({ userId });
     }
 
-    async isAuthorized(oauthToken: string, resourcesToRequest: {userGranularity: string[], postGranularity: string[]}): Promise<boolean>{
+    async isAuthorized(oauthToken: string, eventDataParameters: {userGranularity: string[], postGranularity: string[]}): Promise<boolean>{
         const authorization = await this.model.findOne({ oauthToken }) as IAuthorization;
         if (!authorization)
             return false;
@@ -83,13 +83,13 @@ class Authorization {
         if (!permissions)
             return false;
 
-        const userGranularityList = resourcesToRequest.userGranularity;
+        const userGranularityList = eventDataParameters.userGranularity;
         for (let i=0; i<userGranularityList.length; i++){
             if(permissions.filter(permission => permission.userGranularity == userGranularityList[i]).length == 0)
                 return false;
         }
 
-        const postGranularityList = resourcesToRequest.postGranularity;
+        const postGranularityList = eventDataParameters.postGranularity;
         for (let i=0; i<postGranularityList.length; i++){
             if(permissions.filter(permission => permission.postGranularity == postGranularityList[i]).length == 0)
                 return false;
@@ -98,8 +98,8 @@ class Authorization {
         return true;
     }
 
-    async retrieveData(oauthToken: string, resourcesToRequest: {userGranularity: string[], postGranularity: string[]}): Promise<object>{
-        const userGranularityList = resourcesToRequest.userGranularity.filter(granularity => granularity != "none");
+    async retrieveData(oauthToken: string, eventDataParameters: {userGranularity: string[], postGranularity: string[]}): Promise<object>{
+        const userGranularityList = eventDataParameters.userGranularity.filter(granularity => granularity != "none");
         const authorization = await this.model.findOne({ oauthToken }) as IAuthorization;
         const userId = authorization.userId;
         let userData = [];
@@ -108,7 +108,7 @@ class Authorization {
             userData.push(data);
         }
 
-        const postGranularityList = resourcesToRequest.postGranularity.filter(granularity => granularity != "none");
+        const postGranularityList = eventDataParameters.postGranularity.filter(granularity => granularity != "none");
         let postData = [];
         for (let i=0; i<postGranularityList.length; i++){
             const data = await ResourceHelper.getPostResource(userId, postGranularityList[i]);
