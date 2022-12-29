@@ -12,8 +12,7 @@ export interface INotification {
 const notificationSchema = new Schema({
     userId: {
         type: Types.ObjectId,
-        required: true,
-        unique: true
+        required: true
     },
     foreignUserId: {
         type: String,
@@ -29,17 +28,19 @@ const notificationSchema = new Schema({
     }
 });
 
+// Build an unique index on tuple <userId, service> to prevent duplicates
+notificationSchema.index({userId: 1, serviceId: 1}, {unique: true});
 
 class Notification {
     model = mongooseModel<INotification>("notification", notificationSchema);
 
-    async insert(document: Partial<INotification>): Promise<boolean>{
+    async insert(document: Partial<INotification>): Promise<boolean> {
         const model = new this.model(document);
         try {
             await model.save();
             return true;
         } catch (e) {
-            if ((e as Error).name == "MongoServerError"){
+            if ((e as Error).name == "MongoServerError") {
                 logger.debug("The notification already exists");
                 return true;
             }
@@ -48,8 +49,8 @@ class Notification {
         }
     }
 
-    async update(update: Partial<INotification>, filter: Partial<INotification>): Promise<boolean>{
-        try{
+    async update(update: Partial<INotification>, filter: Partial<INotification>): Promise<boolean> {
+        try {
             this.model.findOneAndUpdate(filter, update);
             return true;
         } catch (e) {
@@ -58,9 +59,9 @@ class Notification {
         }
     }
 
-    async delete(userId: string): Promise<boolean>{
-        try{
-            this.model.deleteOne({userId});
+    async delete(userId: string, foreignTriggerId: string): Promise<boolean> {
+        try {
+            await this.model.deleteOne({userId, foreignTriggerId});
             return true;
         } catch (e) {
             console.log("Error deleting authorization", e);

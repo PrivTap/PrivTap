@@ -90,7 +90,7 @@ class Rule extends Model<IRule> {
                 .addFields({ triggerNotificationServer: "$service.triggerNotificationServer" })
                 .addFields({ serviceId: "$service._id" })
                 //remove all the field except the trigger Notification center
-                .project({ _id: 0, "triggerNotificationServer": 1, "triggerId": 1 }) as Partial<triggerServiceNotificationServer>[];
+                .project({ _id: 0, "triggerNotificationServer": 1, "triggerId": 1, "serviceId":1 }) as Partial<triggerServiceNotificationServer>[];
             //this way should return a list of documents and in each document there should be only the
             //triggerNotificationServer
             console.log(result);

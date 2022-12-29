@@ -1,8 +1,8 @@
 import Route from "../../Route";
-import { Request, Response } from "express";
-import { badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
+import {Request, Response} from "express";
+import {badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success} from "../../helper/http";
 import Rule from "../../model/Rule";
-import { deleteReqHttp, handleInsert, postReqHttp } from "../../helper/misc";
+import {deleteReqHttp, handleInsert, postReqHttp} from "../../helper/misc";
 import Authorization from "../../model/Authorization";
 import logger from "../../helper/logger";
 import Trigger from "../../model/Trigger";
@@ -60,7 +60,7 @@ export default class RulesRoute extends Route {
         }
 
         //TODO the response should go down after the control of the token
-        const ruleId = await handleInsert(response, Rule, { userId, name, triggerId, actionId });
+        const ruleId = await handleInsert(response, Rule, {userId, name, triggerId, actionId});
         if (!ruleId) return;
         success(response);
 
@@ -70,10 +70,14 @@ export default class RulesRoute extends Route {
         if (triggerService != null) {
             const token = triggerService.serviceId != undefined ? await Authorization.findToken(userId, triggerService.serviceId) : null;
             if (token != null) {
-                if (triggerService.triggerNotificationServer != undefined){
+                if (triggerService.triggerNotificationServer != undefined) {
                     //TODO should respond to the user that he can't create this rule because he didn't authorize the service (do this also for action)
                     //console.log("seding req");
-                    await postReqHttp(triggerService.triggerNotificationServer, token, { userId, triggerId, "triggerName": trigger.name });
+                    await postReqHttp(triggerService.triggerNotificationServer, token, {
+                        userId,
+                        triggerId,
+                        "triggerName": trigger.name
+                    });
                 }
             }
         } else
@@ -105,9 +109,9 @@ export default class RulesRoute extends Route {
             const token = triggerService.serviceId != undefined ? await Authorization.findToken(userId, triggerService.serviceId) : null;
             if (token != null) {
                 const triggerId = triggerService.triggerId;
-                const referencedRules = await Rule.findAll({ userId: userId, triggerId: triggerId });
+                const referencedRules = await Rule.findAll({userId: userId, triggerId: triggerId});
                 if (triggerService.triggerNotificationServer != undefined && referencedRules?.length == 0)
-                    await deleteReqHttp(triggerService.triggerNotificationServer, token, { userId, triggerId });
+                    await deleteReqHttp(triggerService.triggerNotificationServer, token, {userId, triggerId});
             } else {
                 //TODO do a generic error when a user doesn't have the token for a service?
             }

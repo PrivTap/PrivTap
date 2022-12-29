@@ -24,7 +24,7 @@ export default class NotifyRoute extends Route {
 
         const authorization = await Authorization.findByToken(oauthToken);
 
-        if (!authorization){
+        if (!authorization) {
             logger.debug("not authorized");
             response.status(401).send();
             return;
@@ -37,7 +37,7 @@ export default class NotifyRoute extends Route {
             foreignTriggerId,
             triggerName
         }
-        if (!await Notification.insert(doc)){
+        if (!await Notification.insert(doc)) {
             logger.debug("error inserting notification");
             response.status(500).send();
             return;
@@ -49,22 +49,22 @@ export default class NotifyRoute extends Route {
     protected async httpDelete(request: Request, response: Response): Promise<void> {
         const bearer = request.headers.authorization as string;
         const oauthToken = bearer.split(" ")[1];
-
+        const foreignTriggerId = request.query.triggerId as string;
         console.log("headers =", request.headers);
-        console.log("body =", request.body);
+        console.log("query =", request.query);
 
         console.log(oauthToken);
 
         const authorization = await Authorization.findByToken(oauthToken);
 
-        if (!authorization){
+        if (!authorization) {
             logger.debug("not authorized");
             response.status(401).send();
             return;
         }
 
         const userId = authorization.userId;
-        if (!await Notification.delete(userId)) {
+        if (!await Notification.delete(userId, foreignTriggerId)) {
             logger.debug("error inserting notification");
             response.status(500).send();
             return;
