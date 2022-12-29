@@ -5,6 +5,7 @@ import Trigger, { ITrigger } from "../../model/Trigger";
 import Permissions from "../../model/Permission";
 import Service from "../../model/Service";
 import { handleInsert, handleUpdate } from "../../helper/misc";
+import { transformStringInDataDef } from "../../helper/dataDefinition";
 
 
 export default class ManageTriggersRoute extends Route {
@@ -19,7 +20,6 @@ export default class ManageTriggersRoute extends Route {
 
         // Insert the trigger
         const services = await Trigger.findAllForService(serviceId, true);
-
         if (services) {
             success(response, services);
         } else {
@@ -33,22 +33,34 @@ export default class ManageTriggersRoute extends Route {
         const serviceId = request.body.serviceId;
         const permissions = request.body.permissions;
         const resourceServer = request.body.resourceServer;
+        const out = request.body.outputs;
+        if (checkUndefinedParams(response, name, description, serviceId, out)) return;
+        const service = await Service.find({ _id: serviceId, creator: request.userId });
 
-        if (checkUndefinedParams(response, name, description, serviceId)) return;
-
+        //check if the outputs is valid
+        const outputs = transformStringInDataDef(out);
+        if (outputs === null) {
+            badRequest(response, "The outputs is not in the valid format");
+            return;
+        }
         // Check that the user is the owner of the service
-        if (!await Service.isCreator(request.userId, serviceId)) {
+        if (!service) {
             forbiddenUserError(response, "You are not the owner of this service");
             return;
         }
-
+        //check if the service has a trigger notification server
+        if (!service.triggerNotificationServer) {
+            badRequest(response, "This service does not have a trigger notification server");
+            return;
+        }
         // Insert the trigger
         const insertedTrigger = await handleInsert(response, Trigger, {
             name,
             description,
             serviceId,
             permissions,
-            resourceServer
+            resourceServer,
+            outputs
         }, true) as ITrigger;
         if (!insertedTrigger) return;
         const associatedPermissions = await Permissions.getAllPermissionAndAddBooleanTag(serviceId, insertedTrigger.permissions as string[]);
@@ -57,7 +69,8 @@ export default class ManageTriggersRoute extends Route {
             _id: insertedTrigger._id,
             resourceServer: insertedTrigger.resourceServer,
             description: insertedTrigger.description,
-            permissions: associatedPermissions ? associatedPermissions : []
+            permissions: associatedPermissions ? associatedPermissions : [],
+            outputs: insertedTrigger.outputs
         };
 
         success(response, triggerResult);
@@ -78,6 +91,7 @@ export default class ManageTriggersRoute extends Route {
             success(response);
         } else {
             badRequest(response, "This trigger doesn't exists");
+            return;
         }
     }
 
@@ -87,7 +101,13 @@ export default class ManageTriggersRoute extends Route {
         const description = request.body.description;
         const permissions = request.body.permissions;
         const resourceServer = request.body.resourceServer;
-
+        const out = request.body.outputs;
+        //check if the outputs is valid
+        const outputs = transformStringInDataDef(out);
+        if (outputs === null) {
+            badRequest(response, "The outputs is not in the valid format");
+            return;
+        }
         if (checkUndefinedParams(response, triggerId)) return;
 
         if (!await Trigger.isCreator(request.userId, triggerId)) {
@@ -99,7 +119,8 @@ export default class ManageTriggersRoute extends Route {
             name,
             description,
             permissions,
-            resourceServer
+            resourceServer,
+            outputs
         }, true) as ITrigger;
         if (!modifiedTrigger) return;
         const associatedPermissions = await Permissions.getAllPermissionAndAddBooleanTag(modifiedTrigger.serviceId, modifiedTrigger.permissions as string[]);
@@ -108,7 +129,8 @@ export default class ManageTriggersRoute extends Route {
             _id: modifiedTrigger._id,
             resourceServer: modifiedTrigger.resourceServer,
             description: modifiedTrigger.description,
-            permissions: associatedPermissions ? associatedPermissions : []
+            permissions: associatedPermissions ? associatedPermissions : [],
+            outputs: modifiedTrigger.outputs
         };
 
         success(response, triggerResult);

@@ -48,17 +48,16 @@ export default class RulesRoute extends Route {
             return;
         }
 
-        /// TODO: Remember to uncomment this
-        // const isTriggerAuthorized = (await Authorization.findToken(userId, trigger.serviceId)) != null;
-        // let isActionAuthorized = isTriggerAuthorized;
-        // if (service.serviceId != trigger.serviceId) {
-        //     isActionAuthorized = (await Authorization.findToken(userId, service.serviceId) != null);
-        // }
+        const isTriggerAuthorized = (await Authorization.findToken(userId, trigger.serviceId)) != null;
+        let isActionAuthorized = isTriggerAuthorized;
+        if (service.serviceId != trigger.serviceId) {
+            isActionAuthorized = (await Authorization.findToken(userId, service.serviceId) != null);
+        }
 
-        // if (!isTriggerAuthorized || !isActionAuthorized) {
-        //     badRequest(response, "Trigger or Action not authorized");
-        //     return;
-        // }
+        if (!isTriggerAuthorized || !isActionAuthorized) {
+            badRequest(response, "Trigger or Action not authorized");
+            return;
+        }
 
         //TODO the response should go down after the control of the token
         const ruleId = await handleInsert(response, Rule, { userId, name, triggerId, actionId });

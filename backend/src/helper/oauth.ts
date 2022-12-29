@@ -31,7 +31,7 @@ export default class OAuth {
             badRequest(response);
             return null;
         }
-
+        //TODO: is this the right way to do it?
         const redirectUri = env.PROD ? "https://privtap.it/modifyauth/" + serviceId : "http://localhost:5173/modifyauth/" + serviceId;
 
         let authorizationUri = client.authorizeURL({

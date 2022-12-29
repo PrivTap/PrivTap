@@ -75,7 +75,8 @@ class Action extends Model<IAction> {
                     _id: action._id,
                     endpoint: action.endpoint,
                     description: action.description,
-                    permissions: associated ? (allPermAndAssociated ? allPermAndAssociated : []) : action.permissions as Types.Array<Partial<IPermission>>
+                    permissions: associated ? (allPermAndAssociated ? allPermAndAssociated : []) : action.permissions as Types.Array<Partial<IPermission>>,
+                    inputs: action.inputs
                 };
                 actionsResult.push(actionResult);
             }

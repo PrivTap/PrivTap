@@ -8,12 +8,14 @@ export default class ActionModel {
     permissions: Partial<PermissionModel>[];
     endpoint: string;
     authorized?: boolean;
+    inputs: string;
     constructor(
         actionId: string,
         name: string,
         description: string,
         permissions: Partial<PermissionModel>[],
         endpoint: string,
+        inputs: string,
         authorized?: boolean
     ) {
         this._id = actionId;
@@ -22,5 +24,6 @@ export default class ActionModel {
         this.permissions = permissions;
         this.endpoint = endpoint;
         this.authorized= authorized;
+        this.inputs = inputs;
     }
 }

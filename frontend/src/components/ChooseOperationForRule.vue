@@ -5,34 +5,35 @@
         'text-blue-500': !lookingForTriggers
       }"> {{ lookingForTriggers ? 'Trigger' : 'Action' }} </strong></h1>
     <div v-if="props.operation==='action'" class="text-center py-4">
-      If you can't find the <strong class="text-blue-500">action</strong> you want, it may be not compatible with your selected <strong class="text-green-500">trigger </strong>. Try to select another one!
+      If you can't find the <strong class="text-blue-500">action</strong> you want, it may be not compatible with your
+      selected <strong class="text-green-500">trigger </strong>. Try to select another one!
     </div>
     <div class="flex flex-col items-center justify-center place-self-center relative">
       <div class=" px-5 grid lg:grid-cols-2 xl:grid-cols-3 gap-10">
         <div v-for="operation in operations"
              v-bind:class="{ 'bg-blue-700/40': !operation.authorized, 'bg-blue-800': operation.authorized}"
              class=" rounded-lg py-8 px-6 shadow-lg">
-            <div v-bind:class="{'opacity-30': !operation.authorized}">
-              <p class="text-2xl font-medium"> {{ operation.name }} </p>
-              <p class="text-lg font-medium text-white/60"> {{ operation.description }} </p>
-              <v-label class="pt-4 pb-2">Permissions</v-label>
-              <div v-if="!operation.permissions.length"> No permission
-                required
-              </div>
-              <PermissionChip v-for="permission in operation.permissions" :permissionModel="permission"/>
-              <v-btn class="ma-2" variant="outlined" color="text-blue-100" v-bind:disabled="!operation.authorized"
-                     @click="chooseThisOperation(operation._id, operation.name)">
-                choose
-              </v-btn>
+          <div v-bind:class="{'opacity-30': !operation.authorized}">
+            <p class="text-2xl font-medium"> {{ operation.name }} </p>
+            <p class="text-lg font-medium text-white/60"> {{ operation.description }} </p>
+            <v-label class="pt-4 pb-2">Permissions</v-label>
+            <div v-if="!operation.permissions.length"> No permission
+              required
             </div>
-            <div v-if="!operation.authorized">
-              <div class="opacity-100 text-red-600">
-                Grant more permissions to our platform in order to use {{ operation.name }}
-              </div>
-              <v-btn class="ma-2" variant="outlined"
-                     @click="authorizeService()">
-                Authorize
-              </v-btn>
+            <PermissionChip v-for="permission in operation.permissions" :permissionModel="permission"/>
+            <v-btn class="ma-2" variant="outlined" color="text-blue-100" v-bind:disabled="!operation.authorized"
+                   @click="chooseThisOperation(operation._id, operation.name)">
+              choose
+            </v-btn>
+          </div>
+          <div v-if="!operation.authorized">
+            <div class="opacity-100 text-red-600">
+              Grant more permissions to our platform in order to use {{ operation.name }}
+            </div>
+            <v-btn class="ma-2" variant="outlined"
+                   @click="authorizeService()">
+              Authorize
+            </v-btn>
           </div>
           <div class="flex justify-start mt-5 space-x-5">
           </div>
@@ -72,13 +73,12 @@ const props = defineProps<{
 }>();
 const actions = user_action.getNewRef();
 const lookingForTriggers = ref(computed(() => props.operation === "trigger"));
-
+const getTriggerId = inject("getTriggerId") as ()=>string;
 onMounted(async () => {
   if (lookingForTriggers.value)
     operations.value = await user_trigger.getAllTriggers(props.serviceId, true);
   else
-    operations.value = await user_action.getAllActions(props.serviceId, true);
-  //TODO Put the compatible actions
+    operations.value = await user_action.getCompatibleActions(props.serviceId, getTriggerId(), true);
 });
 const setTriggerId = inject("setTriggerId") as (triggerId: string) => void;
 const setTriggerName = inject("setTriggerName") as (triggerName: string) => void;

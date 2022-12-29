@@ -8,12 +8,14 @@ export default class TriggerModel {
     permissions: Partial<PermissionModel>[];
     resourceServer: string;
     authorized?: boolean;
+    outputs: string;
 
     constructor(
         _id: string,
         name: string,
         description: string,
         permissions: Partial<PermissionModel>[],
+        outputs: string,
         resourceServer: string,
         authorized?: boolean,
     ) {
@@ -22,7 +24,8 @@ export default class TriggerModel {
         this.description = description;
         this.permissions = permissions;
         this.resourceServer = resourceServer;
-        this.authorized= authorized;
+        this.authorized = authorized;
+        this.outputs = outputs;
     }
 
 }

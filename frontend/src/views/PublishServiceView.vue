@@ -7,24 +7,27 @@
       <div class="min-w-[400px] w-2xl">
         <v-form ref="formRef" v-model="form.valid" lazy-validation class="space-y-4">
           <v-text-field variant="outlined" v-model="form.name" :rules="form.nameRule" label="Name"
-            required></v-text-field>
+                        required></v-text-field>
           <v-textarea variant="outlined" no-resize v-model="form.description" :rules="form.descriptionRule"
-            label="Description" required></v-textarea>
+                      label="Description" required></v-textarea>
           <v-text-field variant="outlined" :rules="form.baseUrlRule" v-model="form.baseUrl" label="Base Url"
-            hint="www.example.com" ></v-text-field>
+                        hint="www.example.com"></v-text-field>
           <v-text-field variant="outlined" v-model="form.authPath" label="Auth Path"
-                        hint="/auth" ></v-text-field>
+                        hint="/auth"></v-text-field>
           <v-text-field variant="outlined" v-model="form.tokenPath" label="Token Path"
-                        hint="/login/oauth/access_token" ></v-text-field>
+                        hint="/login/oauth/access_token"></v-text-field>
           <v-text-field variant="outlined" v-model="form.clientId" :rules="form.idRule" label="Client ID"
-            ></v-text-field>
+          ></v-text-field>
           <v-text-field variant="outlined" v-model="form.secret" :rules="form.secretRule" label="Client Secret"
-            ></v-text-field>
+          ></v-text-field>
+          <v-text-field variant="outlined" v-model="form.triggerNotificationServer"
+                        :rules="form.triggerNotificationServerRule" label="Trigger Notification Server"
+          ></v-text-field>
         </v-form>
 
       </div>
       <PrimaryButton @click="validate" class="mt-5 mb-5"
-        :text="route.params.id ? 'Edit API endpoint' : 'Create API endpoint'" />
+                     :text="route.params.id ? 'Edit Service' : 'Create Service'"/>
     </div>
 
   </div>
@@ -32,12 +35,12 @@
 >
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from "vue";
+import {onMounted, reactive, ref} from "vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
-import { useRoute } from "vue-router";
+import {useRoute} from "vue-router";
 import router from "@/router/router";
 import RoutingPath from "@/router/routing_path";
-import { isValidUrlRegex } from "@/helpers/validators";
+import {isValidUrlRegex} from "@/helpers/validators";
 import manage_service from "@/controllers/manage_service";
 
 const route = useRoute();
@@ -56,6 +59,7 @@ async function checkEdit() {
       form.tokenPath = serviceToEdit.tokenPath ?? '';
       form.clientId = serviceToEdit.clientId ?? '';
       form.secret = serviceToEdit.clientSecret ?? '';
+      form.triggerNotificationServer = serviceToEdit.triggerNotificationServer ?? '';
     }
   }
 }
@@ -77,9 +81,11 @@ const form = reactive({
   authPath: "",
   tokenPath: "",
   clientId: '',
-  idRule: [ (v: string) => !!v || 'Client Id is required'],
+  idRule: [(v: string) => !!v || 'Client Id is required'],
   secret: '',
   secretRule: [(v: string) => !!v || 'Client secret is required'],
+  triggerNotificationServer: "",
+  triggerNotificationServerRule: [/*(v: string) => isValidUrlRegex(v) || 'Url is not valid' Commented just because I couldn't test it with 127.0.0.1*/],
 });
 
 onMounted(async () => {
@@ -88,29 +94,31 @@ onMounted(async () => {
 
 async function validate() {
   isLoading.value = true;
-  const { valid } = await formRef.value.validate();
+  const {valid} = await formRef.value.validate();
   if (valid) {
     if (route.params.id) {
       const serviceId = route.params.id as string;
       await manage_service.updateService(
-        serviceId,
-        form.name,
-        form.description,
-        form.baseUrl,
-        form.authPath,
-        form.tokenPath,
-        form.clientId,
-        form.secret,
-      )
-    } else {
-      await manage_service.createService(
-        form.name,
-        form.description,
+          serviceId,
+          form.name,
+          form.description,
           form.baseUrl,
           form.authPath,
           form.tokenPath,
-        form.clientId,
-        form.secret,
+          form.clientId,
+          form.secret,
+          form.triggerNotificationServer
+      )
+    } else {
+      await manage_service.createService(
+          form.name,
+          form.description,
+          form.baseUrl,
+          form.authPath,
+          form.tokenPath,
+          form.clientId,
+          form.secret,
+          form.triggerNotificationServer
       );
     }
     isLoading.value = false;

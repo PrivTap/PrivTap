@@ -72,7 +72,7 @@ export class Permission extends Model<IPermission> {
      * @param permissions   The array of permissions id
      */
     async getAllPermissionAndAddBooleanTag(serviceId: string, permissions?: Array<string>): Promise<Partial<IPermission>[] | null> {
-        const allPermissions = await this.findByServiceId(serviceId, "name");
+        const allPermissions = await this.findByServiceId(serviceId);
         if (allPermissions == null)
             return null;
         return allPermissions.map((permission) => {

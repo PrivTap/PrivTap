@@ -8,7 +8,7 @@ let actions = ref<ActionModel[]>([]);
 export interface IManageAction {
     getAllActions(serviceId: string): Promise<void>;
 
-    createAction(name: string, description: string, serviceId: string, permissions: string[], endpoint: string): Promise<void>;
+    createAction(name: string, description: string, serviceId: string, permissions: string[], endpoint: string, inputs:string): Promise<void>;
 
     deleteAction(actionId: string): Promise<void>;
 
@@ -16,7 +16,7 @@ export interface IManageAction {
                  name: string,
                  description: string,
                  permissions: string[],
-                 endpoint: string): Promise<void>;
+                 endpoint: string, inputs:string): Promise<void>;
 }
 
 class ManageAction extends GenericController<ActionModel[]> implements IManageAction {
@@ -28,8 +28,6 @@ class ManageAction extends GenericController<ActionModel[]> implements IManageAc
         const res = await super.get<ActionModel[]>(path, {query: {serviceId: serviceId}});
         actions.value = !!res ? res : [] ;
     }
- 
-
 
     async createAction(
         name: string,
@@ -37,6 +35,7 @@ class ManageAction extends GenericController<ActionModel[]> implements IManageAc
         serviceId: string,
         permissions: string[],
         endpoint: string,
+        inputs: string
     ): Promise<void> {
         const body = {
             name: name,
@@ -44,6 +43,7 @@ class ManageAction extends GenericController<ActionModel[]> implements IManageAc
             serviceId: serviceId,
             permissions: permissions,
             endpoint: endpoint,
+            inputs
         };
         const res = await super.post<ActionModel>(path, {body: body, message: "Action created"});
         if (res != null)
@@ -57,6 +57,7 @@ class ManageAction extends GenericController<ActionModel[]> implements IManageAc
         description: string,
         permissions: string[],
         endpoint: string,
+        inputs: string
     ): Promise<void> {
         const body = {
             actionId: actionId,
@@ -64,6 +65,7 @@ class ManageAction extends GenericController<ActionModel[]> implements IManageAc
             description: description,
             permissions: permissions,
             endpoint: endpoint,
+            inputs
         }
         const res = await super.put<ActionModel>(path, {body: body, message: "Action updated"});
         if (res != null) {

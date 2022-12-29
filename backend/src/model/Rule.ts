@@ -1,8 +1,8 @@
 import mongoose, { Schema } from "mongoose";
 import Model from "../Model";
 import logger from "../helper/logger";
-import {ITrigger, triggerServiceNotificationServer} from "./Trigger";
-import {IAction} from "./Action";
+import { ITrigger, triggerServiceNotificationServer } from "./Trigger";
+import { IAction } from "./Action";
 
 export interface IRule {
     _id: string;

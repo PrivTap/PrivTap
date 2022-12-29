@@ -180,37 +180,42 @@ export function delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export async function findAllOperationAddingAuthorizedTag(model: mongoose.Model<IAction> | mongoose.Model<ITrigger>, userId: string, serviceId: string): Promise<Partial<IAction | ITrigger>[]> {
+export async function findAllOperationAddingAuthorizedTag(model: mongoose.Model<IAction> | mongoose.Model<ITrigger>, userId: string, serviceId: string): Promise<Partial<IAction | ITrigger>[] |null> {
     let grantedPermissionId = await Authorization.getGrantedPermissionsId(userId, serviceId);
     if (grantedPermissionId == null)
         grantedPermissionId = [];
-    return await model.aggregate([
-        { $match: { serviceId: new mongoose.Types.ObjectId(serviceId) } },
-        {
-            $addFields: {
-                authorized: {
-                    $cond: {
-                        if: {
-                            $setIsSubset: ["$permissions", grantedPermissionId]
-                        },
-                        then: true,
-                        else: false
+    try {
+        return await model.aggregate([
+            { $match: { serviceId: new mongoose.Types.ObjectId(serviceId) } },
+            {
+                $addFields: {
+                    authorized: {
+                        $cond: {
+                            if: {
+                                $setIsSubset: ["$permissions", grantedPermissionId]
+                            },
+                            then: true,
+                            else: false
+                        }
                     }
                 }
+            },
+            { $project: { "data": 0, "outputs": 0 } },
+            { $lookup: { from: "permissions", localField: "permissions", foreignField: "_id", as: "permissions" } },
+            {
+                $project: {
+                    "permissions._id": 1,
+                    "permissions.name": 1,
+                    "permissions.description": 1,
+                    "authorized": 1,
+                    _id: 1,
+                    name: 1,
+                    description: 1
+                }
             }
-        },
-        { $project: { "data": 0, "outputs": 0 } },
-        { $lookup: { from: "permissions", localField: "permissions", foreignField: "_id", as: "permissions" } },
-        {
-            $project: {
-                "permissions._id": 1,
-                "permissions.name": 1,
-                "permissions.description": 1,
-                "authorized": 1,
-                _id: 1,
-                name: 1,
-                description: 1
-            }
-        }
-    ]) as Partial<IAction>[];
+        ]) as Partial<IAction|ITrigger>[];
+    } catch (e) {
+        return null;
+
+    }
 }
