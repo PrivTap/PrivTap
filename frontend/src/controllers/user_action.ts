@@ -7,8 +7,6 @@ let actions = ref<ActionModel[]>([]);
 
 export interface IUserAction {
     getAllActions(serviceId: string): Promise<ActionModel[]>;
-    getAuthorizedActions(serviceId: string): Promise<ActionModel[]>;
-
 }
 
 
@@ -19,13 +17,6 @@ class User_action extends GenericController<ActionModel[]> implements IUserActio
 
     async getAllActions(serviceId: string, valueToReturn: boolean = false): Promise<ActionModel[]> {
         const res = await super.get<ActionModel[]>(path, {query: {serviceId}});
-        if (!valueToReturn)
-            actions.value = actions.value = res != null ? res : [];
-        return res != null ? res : [];
-    }
-
-    async getAuthorizedActions(serviceId: string, valueToReturn: boolean = false): Promise<ActionModel[]> {
-        const res = await super.get<ActionModel[]>(path, {query: {serviceId, authorized: true}});
         if (!valueToReturn)
             actions.value = actions.value = res != null ? res : [];
         return res != null ? res : [];

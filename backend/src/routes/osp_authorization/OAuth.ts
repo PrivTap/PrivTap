@@ -31,27 +31,25 @@ export default class OAuthRoute extends Route {
 
         const options = {
             code,
+            //TODO: is this done in the right way?
             redirect_uri: env.PROD ? "https://privtap.it/modifyauth/" + serviceId : "http://127.0.0.1:5173/modifyauth/" + serviceId
         };
 
         console.log(options);
-
+        if (! await State.delete(state._id)){
+            internalServerError(response);
+            return;
+        }
         const oAuthToken = await OAuth.retrieveToken(serviceId, options as AuthorizationTokenConfig);
         console.log(oAuthToken);
         if (!oAuthToken){
-            badRequest(response);
+            badRequest(response, "Problem while contacting this service. Avoid to use it");
             return;
         }
         // This should be an atomic transaction
         if (!await handleUpdate(response, Authorization, { userId:userId, serviceId:serviceId },{ userId, serviceId, oAuthToken, grantedPermissions: permissions }, false, true)){
             return;
         }
-
-        if (! await State.delete(state._id)){
-            internalServerError(response);
-            return;
-        }
-
         success(response);
     }
 }

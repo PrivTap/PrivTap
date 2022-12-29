@@ -34,6 +34,7 @@ const serviceSchema = new Schema({
     },
     baseUrl: {
         type: String,
+        required: true,
     },
     authPath: {
         type: String,

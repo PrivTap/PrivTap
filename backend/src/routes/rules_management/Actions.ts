@@ -23,11 +23,23 @@ export default class ActionsRoute extends Route {
             internalServerError(response);
             return;
         }
-
-        //TODO: Can we check compatibility on the DB?
+        console.log("triggerId:", triggerId);
+        let result = [];
+        //TODO: Can we check compatibility on the DB? (probably not :( )
         if (triggerId) {
-            data.filter((action) => RuleExecution.areActionTriggerCompatible(action._id ?? "", triggerId));
+            for (const action of data) {
+                if (await RuleExecution.areActionTriggerCompatible(action._id ?? "", triggerId))
+                    result.push(action);
+            }
+            /*let filterdata = data.filter(async function (action) {
+                const bool= await RuleExecution.areActionTriggerCompatible(action._id ?? "", triggerId);
+                console.log("bool:" ,bool)
+                return bool;
+            });*/
+            console.log("data:", result);
+        } else {
+            result = data;
         }
-        success(response, data);
+        success(response, result);
     }
 }

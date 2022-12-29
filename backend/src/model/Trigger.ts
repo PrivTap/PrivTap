@@ -33,8 +33,8 @@ const triggerSchema = new Schema({
         required: true
     },
     outputs: {
-        type: String
-        // required?
+        type: String,
+        required: true
     },
     permissions: [{ type: mongoose.Schema.Types.ObjectId, ref: "permission" }],
     resourceServer: {
@@ -76,7 +76,8 @@ class Trigger extends Model<ITrigger> {
                     _id: trigger._id,
                     resourceServer: trigger.resourceServer,
                     description: trigger.description,
-                    permissions: associated ? (allPermAndAssociated ? allPermAndAssociated : []) : trigger.permissions as Partial<IPermission>[]
+                    permissions: associated ? (allPermAndAssociated ? allPermAndAssociated : []) : trigger.permissions as Partial<IPermission>[],
+                    outputs: trigger.outputs,
                 };
                 triggersResult.push(triggerResult);
             }

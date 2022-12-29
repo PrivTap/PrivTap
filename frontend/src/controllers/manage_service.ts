@@ -14,7 +14,8 @@ export interface IManageService {
         tokenPath: string,
         clientId: string,
         clientSecret: string,
-        triggerUrl: string
+        triggerUrl: string,
+        triggerNotificationServer?:string
     ): Promise<void>;
 
     getServiceById(serviceId: string): Promise<ServiceModel | null>;
@@ -27,7 +28,8 @@ export interface IManageService {
                   tokenPath: string,
                   clientId: string,
                   clientSecret: string,
-                  triggerUrl: string
+                  triggerUrl: string,
+                  triggerNotificationServer?:string
     ): Promise<void>;
 
     deleteService(serviceId: string): Promise<void>;
@@ -58,6 +60,7 @@ class ManageService extends GenericController<ServiceModel[]> implements IManage
         tokenPath: string,
         clientId: string,
         clientSecret: string,
+        triggerNotificationServer?:string
     ): Promise<void> {
         const body = {
             "name": name,
@@ -67,6 +70,7 @@ class ManageService extends GenericController<ServiceModel[]> implements IManage
             "tokenPath": tokenPath,
             "clientId": clientId,
             "clientSecret": clientSecret,
+            triggerNotificationServer
         };
         const res = await super.post<ServiceModel>(path, {body: body, message: "Service created"});
         if (res != null)
@@ -82,6 +86,7 @@ class ManageService extends GenericController<ServiceModel[]> implements IManage
         tokenPath: string,
         clientId: string,
         clientSecret: string,
+        triggerNotificationServer?: string
     ): Promise<void> {
         const body = {
             "serviceId": serviceId,
@@ -92,6 +97,7 @@ class ManageService extends GenericController<ServiceModel[]> implements IManage
             "tokenPath": tokenPath,
             "clientId": clientId,
             "clientSecret": clientSecret,
+            triggerNotificationServer
         }
         const res = await super.put<ServiceModel>(path, {body: body, message: "Service updated"});
         if (res != null) {

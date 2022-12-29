@@ -6,9 +6,9 @@
         <v-label class="pt-4 pb-2">Selected Permissions </v-label>
         <div>
             <div v-if="!trigger.permissions.some(p => p.associated)"> No permission required </div>
-            <PermissionChip v-for="permission in trigger.permissions.filter(p => p.associated)"
+            <InformationChip v-for="permission in trigger.permissions.filter(p => p.associated)"
                 :permissionModel="permission">
-            </PermissionChip>
+            </InformationChip>
         </div>
 
         <div class="flex justify-start mt-5 space-x-5">
@@ -38,7 +38,7 @@ import ModalComponent from '@/components/ModalComponent.vue';
 import type TriggerModel from '@/model/trigger_model';
 import TriggerForm from './TriggerForm.vue';
 import manage_trigger from '@/controllers/manage_trigger';
-import PermissionChip from '../InformationChip.vue';
+import InformationChip from "@/components/InformationChip.vue";
 const props = defineProps<{
     trigger: TriggerModel;
     serviceId: string;

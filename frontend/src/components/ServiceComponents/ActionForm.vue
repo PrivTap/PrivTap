@@ -8,10 +8,12 @@
         <v-text-field v-model="form.name" :rules="form.nameRule" label="Name" required></v-text-field>
         <v-textarea :rules="form.descriptionRule" v-model="form.description" label="Description" required></v-textarea>
         <v-text-field v-model="form.endpoint" :rules="form.endpointRule" label="Endpoint" required></v-text-field>
+        <v-textarea required hint="Paste a valid Array JSON object" :rules="form.inputsRule"
+                    v-model="form.inputs" label="Inputs"></v-textarea>
         <v-label class="mb-2 mt-4">Choose Permissions</v-label>
         <v-row align-content="start" no-gutters class="-translate-x-3 h-14">
           <v-col cols="2" align-self="start" v-for="choosablePerm in choosablePermissions.perm"
-            :key="choosablePerm._id">
+                 :key="choosablePerm._id">
             <v-checkbox v-model="choosablePerm.associated" :label="choosablePerm.name" color="success"></v-checkbox>
           </v-col>
         </v-row>
@@ -29,34 +31,34 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive, ref } from 'vue'
+import {onMounted, reactive, ref} from 'vue'
 import ActionModel from '@/model/action_model';
-import { isValidUrlRegex } from '@/helpers/validators';
+import {isValidEntryDefinition, isValidUrlRegex} from '@/helpers/validators';
 import manage_action from '@/controllers/manage_action';
 import manage_permission from '@/controllers/manage_permission';
 import type PermissionModel from '@/model/permission_model';
 
 const props = defineProps(
-  {
-    serviceId: {
-      type: String,
-      required: true
-    },
-    onCancel: {
-      type: Function,
-      required: true
-    },
-    onEdit: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
-    action: {
-      type: ActionModel,
-      required: false,
-      default: null
+    {
+      serviceId: {
+        type: String,
+        required: true
+      },
+      onCancel: {
+        type: Function,
+        required: true
+      },
+      onEdit: {
+        type: Boolean,
+        required: false,
+        default: false
+      },
+      action: {
+        type: ActionModel,
+        required: false,
+        default: null
+      }
     }
-  }
 );
 
 const choosablePermissions = reactive<{ perm: Partial<PermissionModel>[] }>({
@@ -69,6 +71,7 @@ onMounted(async () => {
     form.name = action.name;
     form.description = action.description;
     form.endpoint = action.endpoint ?? '';
+    form.inputs = action.inputs ?? "[]";
     choosablePermissions.perm = JSON.parse(JSON.stringify(action.permissions));
   } else {
     await manage_permission.getAllPermissions(props.serviceId);
@@ -89,6 +92,8 @@ const form = reactive({
     (v: string) => !!v || 'Endpoint is required',
     (v: string) => isValidUrlRegex(v) || 'Endpoint is not valid'
   ],
+  inputs: '',
+  inputsRule: [(v: string) => isValidEntryDefinition(v)],
 });
 
 async function onClose() {
@@ -96,14 +101,14 @@ async function onClose() {
 }
 
 async function validate() {
-  const { valid } = await formRef.value.validate();
+  const {valid} = await formRef.value.validate();
   console.log(valid);
   if (valid) {
     const perm = choosablePermissions.perm.filter(p => p._id !== undefined && p.associated === true).map(p => p._id) as string[];
     if (props.onEdit) {
-      await manage_action.updateAction(props.action._id, form.name, form.description, perm, form.endpoint);
+      await manage_action.updateAction(props.action._id, form.name, form.description, perm, form.endpoint, form.inputs);
     } else {
-      await manage_action.createAction(form.name, form.description, props.serviceId, perm, form.endpoint);
+      await manage_action.createAction(form.name, form.description, props.serviceId, perm, form.endpoint, form.inputs);
     }
     onClose();
   }

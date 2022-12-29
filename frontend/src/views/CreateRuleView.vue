@@ -9,7 +9,7 @@
         </div>
         <div v-if="ruleCreation.triggerName !== ''">
           <v-chip class="ma-2" color="success" size="x-large" label text-color="white" closable
-            @click:close="ruleCreation.triggerName = ''">
+                  @click:close="ruleCreation.triggerName = ''">
             {{ ruleCreation.triggerName }}
           </v-chip>
         </div>
@@ -29,7 +29,7 @@
         </div>
         <div v-if="ruleCreation.actionName !== ''">
           <v-chip class="ma-2 " color="info" size="x-large" label text-color="white" closable
-            @click:close="ruleCreation.actionName = ''">
+                  @click:close="ruleCreation.actionName = ''">
             {{ ruleCreation.actionName }}
           </v-chip>
         </div>
@@ -41,10 +41,10 @@
       </div>
     </div>
     <div v-if="ruleCreation.triggerName !== '' && ruleCreation.actionName !== ''"
-      class="justify-items-center items-center content-center text-center pt-5 pb-20">
+         class="justify-items-center items-center content-center text-center pt-5 pb-20">
       <v-form ref="formRef" v-model="ruleCreation.valid" lazy-validation>
         <v-responsive class="mx-auto" max-width="344">
-          <v-text-field :rules="nameRule" v-model="ruleCreation.name" label="Rule Name" variant="underlined" />
+          <v-text-field :rules="nameRule" v-model="ruleCreation.name" label="Rule Name" variant="underlined"/>
         </v-responsive>
         <v-btn @click="createRule()" color="#3662E3" size="large">
           <v-icon>mdi-plus</v-icon>
@@ -54,16 +54,16 @@
     </div>
 
     <h2 v-if="ruleCreation.actionName === '' || ruleCreation.triggerName === ''"
-      class="text-3xl text-blue-100 font-medium text-center py-5 justify-center">Choose from which service you want to
+        class="text-3xl text-blue-100 font-medium text-center py-5 justify-center">Choose from which service you want to
       take the <strong v-bind:class="{
         'text-green-700': lookingForTriggers,
         'text-blue-500': !lookingForTriggers
-      }"> {{ lookingForTriggers ? 'Trigger' : 'Action' }} </strong> </h2>
+      }"> {{ lookingForTriggers ? 'Trigger' : 'Action' }} </strong></h2>
 
     <div ref="scrollTarget" class="text-center flex flex-col justify-center items-center content-center pb-10">
       <div class=" px-5 grid lg:grid-cols-2 xl:grid-cols-3 gap-10">
         <ServiceCardRule v-for="item in services" :operation="lookingForTriggers ? 'trigger' : 'action'"
-          :key="componentKey" :service="item" :authorization="authorized" />
+                         :key="componentKey" :service="item" :authorization="authorized"/>
       </div>
     </div>
   </div>
@@ -75,8 +75,8 @@
 
 
 import ruleModel from "@/controllers/rules_controller"
-import { onMounted, ref, provide, watch, reactive } from "vue";
-import { useRoute } from 'vue-router';
+import {onMounted, ref, provide, watch, reactive} from "vue";
+import {useRoute} from 'vue-router';
 import ServiceCardRule from '@/components/ServiceCardRule.vue';
 import showServices from "@/controllers/show_services";
 import router from "@/router/router";
@@ -101,7 +101,7 @@ const ruleCreation = reactive({
 })
 
 async function createRule() {
-  const { valid } = await formRef.value.validate();
+  const {valid} = await formRef.value.validate();
   if (!valid) return;
   await ruleModel.createRule(ruleCreation.name, ruleCreation.triggerId, ruleCreation.actionId);
   await router.push(RoutingPath.PERSONAL_PAGE);
@@ -114,7 +114,7 @@ function onChipTap() {
   })
 }
 
-provide("ruleCreation", ruleCreation.triggerId);
+provide("getTriggerId", () => ruleCreation.triggerId);
 provide("setTriggerId", (id: string) => {
   ruleCreation.triggerId = id;
 });
@@ -137,13 +137,13 @@ watch(ruleCreation, (value) => {
 });
 
 const props = defineProps(
-  {
-    rule: {
-      type: RuleModel,
-      required: false,
-      default: null
-    },
-  }
+    {
+      rule: {
+        type: RuleModel,
+        required: false,
+        default: null
+      },
+    }
 );
 
 

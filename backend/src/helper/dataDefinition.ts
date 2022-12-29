@@ -1,5 +1,6 @@
 import { DataType, isAggregate } from "./dataType";
 
+
 /**
  * The interface of a data model definition for the trigger output and action input
  */
@@ -23,7 +24,9 @@ interface EntryDefinition {
  */
 export function checkCompatibility(trigger: DataDefinition, action: DataDefinition): boolean {
     let isCompatible = true;
-
+    if (!trigger || !action) {
+        return false;
+    }
     for (let i = 0; i < action.trigger_data.length; i++) {
         const entry = action.trigger_data[i];
         //Find a corresponding entry in the trigger definition
@@ -71,4 +74,18 @@ function checkEntryCompatibility(triggerEntry: EntryDefinition, actionEntry: Ent
  */
 export function dataDefinitionIDs(definition: DataDefinition): string[] {
     return definition ? definition.trigger_data.map((entry) => (entry.identifier ?? "")) : [];
+}
+
+/**
+ * Check if the string is a valid dataDefinition and return the object stringify to be used in the database
+ * @param dataDefinition the string to check
+ */
+export function transformStringInDataDef(dataDefinition: string): string | null {
+    try {
+        const array = JSON.parse(dataDefinition) as EntryDefinition[];
+        if (!array) return null;
+        return JSON.stringify({ "trigger_data": array });
+    } catch (err) {
+        return null;
+    }
 }
