@@ -105,7 +105,8 @@ export default class RulesRoute extends Route {
             const token = triggerService.serviceId != undefined ? await Authorization.findToken(userId, triggerService.serviceId) : null;
             if (token != null) {
                 const triggerId = triggerService.triggerId;
-                if (triggerService.triggerNotificationServer != undefined)
+                const referencedRules = await Rule.findAll({ userId: userId, triggerId: triggerId });
+                if (triggerService.triggerNotificationServer != undefined && referencedRules?.length == 0)
                     await deleteReqHttp(triggerService.triggerNotificationServer, token, { userId, triggerId });
             } else {
                 //TODO do a generic error when a user doesn't have the token for a service?
