@@ -22,7 +22,7 @@ export default class LoginRoute extends Route {
             response.status(400).send("Invalid oAuthAuthorization");
             return
         }
-        const redirectUrl = await OAuthClient.gerRedirectUrl(client, stateValue, oAuthState);
+        const redirectUrl = await OAuthClient.getRedirectUrl(client, stateValue, oAuthState);
         console.log(redirectUrl);
         response.redirect(redirectUrl);
     }

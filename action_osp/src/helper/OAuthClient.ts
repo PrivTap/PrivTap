@@ -15,7 +15,7 @@ export default class OAuthClient {
         });
     }
 
-    static async gerRedirectUrl(client: BaseClient, stateValue: string, oauthAuthorization?: oAuthAuthorization): Promise<string> {
+    static async getRedirectUrl(client: BaseClient, stateValue: string, oauthAuthorization?: oAuthAuthorization): Promise<string> {
         const code_verifier = generators.codeVerifier();
         const code_challenge = generators.codeChallenge(code_verifier);
 

@@ -1,6 +1,6 @@
 import {BaseClient, generators, Issuer} from 'openid-client';
 import env from "./env";
-import State from "../model/State";
+import State, {oAuthAuthorization} from "../model/State";
 import logger from "./logger";
 
 export default class OAuthClient {
@@ -15,7 +15,7 @@ export default class OAuthClient {
         });
     }
 
-    static async gerRedirectUrl(client: BaseClient, stateValue: string): Promise<string> {
+    static async getRedirectUrl(client: BaseClient, stateValue: string, oauthAuthorization?: oAuthAuthorization): Promise<string> {
         const code_verifier = generators.codeVerifier();
         const code_challenge = generators.codeChallenge(code_verifier);
 
@@ -27,8 +27,8 @@ export default class OAuthClient {
         });
 
         try {
-            await State.insert({stateValue, code_verifier})
-        } catch (e){
+            await State.insert({stateValue, code_verifier, oauthAuthorization: oauthAuthorization})
+        } catch (e) {
             logger.error("Error inserting state.", e);
         }
 
