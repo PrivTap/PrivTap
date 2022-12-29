@@ -31,12 +31,12 @@ export default abstract class NotificationService {
             return;
         for (let i=0; i<notifications.length; i++){
             const notification = notifications[i];
-            const resourceToRequest = JSON.stringify({
+            const eventDataParameters = JSON.stringify({
                 "userGranularity": userGranularity,
                 "postGranularity": postGranularity
             });
-            console.log("sending resourcedToRequest =", resourceToRequest);
-            const data = { "triggerId": notification.foreignTriggerId, "userId": notification.foreignUserId, apiKey, resourceToRequest};
+            console.log("sending resourcedToRequest =", eventDataParameters);
+            const data = { "triggerId": notification.foreignTriggerId, "userId": notification.foreignUserId, apiKey, eventDataParameters: eventDataParameters};
             try{
                 console.log("posting to", env.PRIVTAP_NOTIFICATION_URL);
                 // Do NOT await this request

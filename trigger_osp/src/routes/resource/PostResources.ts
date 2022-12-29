@@ -12,22 +12,22 @@ export default class PostResources extends Route {
         const bearer = request.headers.authorization as string;
         const oauthToken = bearer.split(" ")[1];
 
-        let resourcesToRequest = JSON.parse(request.query.resourceToRequest as string);
-        if (typeof resourcesToRequest == "string")
-            resourcesToRequest = JSON.parse(resourcesToRequest) as {userGranularity: string[], postGranularity: string[]};
+        let eventDataParameters = JSON.parse(request.query.eventDataParameters as string);
+        if (typeof eventDataParameters == "string")
+            eventDataParameters = JSON.parse(eventDataParameters) as {userGranularity: string[], postGranularity: string[]};
         else
-            resourcesToRequest = resourcesToRequest as {userGranularity: string[], postGranularity: string[]};
-        if (!resourcesToRequest || !oauthToken){
+            eventDataParameters = eventDataParameters as {userGranularity: string[], postGranularity: string[]};
+        if (!eventDataParameters || !oauthToken){
             response.status(400).send();
             return;
         }
 
-        if (!await Authorization.isAuthorized(oauthToken, resourcesToRequest)){
+        if (!await Authorization.isAuthorized(oauthToken, eventDataParameters)){
             response.status(401).send();
             return;
         }
 
-        const data = await Authorization.retrieveData(oauthToken, resourcesToRequest);
+        const data = await Authorization.retrieveData(oauthToken, eventDataParameters);
 
         response.status(200).send(data);
     }

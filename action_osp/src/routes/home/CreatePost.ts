@@ -8,7 +8,7 @@ import Authorization from "../../model/Authorization";
 
 export default class CreatePostRoute extends Route {
     constructor() {
-        super("create-post-internal", false);
+        super("create-post", false);
     }
 
     protected async httpPost(request: Request, response: Response): Promise<void> {

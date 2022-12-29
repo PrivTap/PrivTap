@@ -6,7 +6,7 @@ export default class ResourceHelper {
     private static triggers: {[id:string]: {[id:string]: string | string[]} } = {
         "/personal-page": {
             trigger: "Something has been posted",
-            postGranularity: ["last"],
+            postGranularity: ["content"],
             userGranularity: ["none"]
         }
     }

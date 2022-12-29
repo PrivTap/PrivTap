@@ -52,7 +52,7 @@ class Rule extends Model<IRule> {
      * @param userId the id of the user
      */
     async findAllForUser(userId: string): Promise<IRule[] | null> {
-        return await this.findAll({ userId: userId }, "name triggerId actionId isAuthorized",  "triggerId actionId",  "name description" );
+        return await this.findAll({ userId: userId }, "name triggerId actionId isAuthorized",  "triggerId actionId",  "_id name description" );
     }
 
     /**

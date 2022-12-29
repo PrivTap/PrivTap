@@ -1,0 +1,73 @@
+html {
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    overflow: hidden;
+}
+.rectangle {
+    padding: 10px;
+    color: #000000;
+    background-color: rgb(255, 255, 255);
+    border-radius:7px;
+    text-align:center;
+    vertical-align:middle;
+    justify-content:center;
+    align-items: center;
+    box-shadow: 0 10px 20px 10px rgba(0, 0, 0, 0.2);
+    overflow: auto;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+hr.solid {
+    border-top: 3px solid #bbb;
+}
+
+a{
+    background-color: #00b916;
+    color: #fff;
+    font-family: Georgia, serif;
+    font-size: 18px;
+    font-weight: 800;
+    font-style: normal;
+    text-decoration: none;
+    padding: 14px 15px;
+    border: 0px solid #000;
+    border-radius: 10px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0px 0px 10px 2px rgba(77.2906494140625,77.2906494140625,77.2906494140625,0.5);
+}
+
+a span{
+    margin-right: 15px;
+    display: block;
+    width: 29px;
+    height: 29px;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.accept:hover{
+    background-color: #3c8d3d;
+}
+.refuse:hover{
+    background-color: #c15353;
+}
+.accept{
+    transform: translate(-100%, 0%);
+    background-color: #00b916;
+    background-image: url("../accept.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+.refuse{
+    transform: translate(100%, 0%);
+    background-color: #da0000;
+    background-image: url("../refuse.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+}

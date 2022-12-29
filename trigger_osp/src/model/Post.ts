@@ -41,7 +41,7 @@ class Post {
     }
 
     async findLastByUserId(userId: string): Promise<IPost>{
-        const posts = await this.model.find({ userId }).sort("creationDate");
+        const posts = await this.model.find({ userId }).sort({ creationDate: "descending" });
         return posts[0];
     }
 
