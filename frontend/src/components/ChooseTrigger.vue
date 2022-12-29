@@ -25,13 +25,10 @@
 
 <script setup lang="ts">
 import { defineProps, ref } from 'vue';
-import ModalComponent from '@/components/ModalComponent.vue';
 import type TriggerModel from '@/model/trigger_model';
-import TriggerForm from './ServiceComponents/TriggerForm.vue';
-import manage_trigger from '@/controllers/manage_trigger';
 import RoutingPath from "@/router/routing_path";
 import { useRouter } from "vue-router";
-import PermissionChip from './PermissionChip.vue';
+import PermissionChip from './InformationChip.vue';
 
 
 const router = useRouter();

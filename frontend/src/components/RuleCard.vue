@@ -5,21 +5,15 @@
 
         <v-label  class="pt-4 pb-2"> Trigger  </v-label>
         <div>
-            <v-chip
-                class="mr-2">
-                {{rule.triggerId }}
-            </v-chip>
+            <PermissionChip :permission-model="{_id: rule.triggerId._id,name:rule.triggerId.name, description:rule.triggerId.description}"/>
         </div>
 
             <v-label  class="pt-4 pb-2"> Action </v-label>
 
 
 
-         <div> 
-            <v-chip
-                class="mr-2">
-                {{rule.actionId }}
-            </v-chip>
+         <div>
+           <PermissionChip :permission-model="{_id: rule.actionId._id,name:rule.actionId.name, description:rule.actionId.description}"/>
 
 
         </div>
@@ -51,15 +45,11 @@
 
 <script setup lang="ts">
 import { defineProps, ref } from 'vue';
-import rules_controller from '@/controllers/rules_controller'; 
-import RoutingPath from "@/router/routing_path";
+import rules_controller from '@/controllers/rules_controller';
 import {useRouter} from "vue-router";
 import type RuleModel from '@/model/rule_model';
 import ModalComponent from './ModalComponent.vue';
- 
- 
- 
-
+import PermissionChip from './InformationChip.vue';
 const showModal = ref(false);
 
 const router = useRouter();

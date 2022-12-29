@@ -11,7 +11,7 @@ import Action from "../../model/Action";
 import logger from "../../helper/logger";
 import Authorization from "../../model/Authorization";
 import Service from "../../model/Service";
-import { dataDefinitionIDs } from "../../helper/dataDefinition";
+import { DataDefinition, dataDefinitionIDs } from "../../helper/dataDefinition";
 import Permission from "../../model/Permission";
 import { getReqHttp, postReqHttp } from "../../helper/misc";
 
@@ -27,6 +27,7 @@ export default class TriggersDataRoute extends Route {
         const triggerId = request.body.triggerId;
         const userId = request.body.userId;
         const api = request.body.apiKey;
+        const optionalEventDataParameters = request.body.eventDataParameters;
 
         if (checkUndefinedParams(response, triggerId, userId, api)) {
             return;
@@ -48,7 +49,7 @@ export default class TriggersDataRoute extends Route {
             return;
         }
 
-        const action = await Action.findById(referencedRule!.actionId);
+        const action = await Action.findById(referencedRule!.actionId as string);
         if (!action?.endpoint) {
             internalServerError(response);
             return;
@@ -70,13 +71,16 @@ export default class TriggersDataRoute extends Route {
 
             let axiosResponse;
             try {
-                const queryParams = {
-                    filter: dataDefinitionIDs(action.inputs),
+                const queryParams: Record<string, unknown> = {
+                    filter: dataDefinitionIDs(JSON.parse(action.inputs) as DataDefinition),
                     authDetails: aggregateAuthorizationDetails
                 };
+                if (optionalEventDataParameters) {
+                    queryParams.eventDataParameters = optionalEventDataParameters;
+                }
                 axiosResponse = await getReqHttp(trigger?.resourceServer, oauthToken, queryParams);
                 dataToForwardToActionAPI = axiosResponse?.data;
-                if (!dataToForwardToActionAPI){
+                if (!dataToForwardToActionAPI) {
                     logger.debug("Axios response data not found");
                     internalServerError(response);
                     return;

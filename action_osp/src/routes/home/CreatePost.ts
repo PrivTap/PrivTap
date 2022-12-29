@@ -5,19 +5,17 @@ import {Configuration, OpenAIApi} from "openai";
 
 import env from "../../helper/env";
 import Authorization from "../../model/Authorization";
-import {ITriggerData, TriggerDataUtils} from "../../helper/dataDefinition";
-import {DataType} from "../../helper/dataType";
 
 export default class CreatePostRoute extends Route {
     constructor() {
-        super("create-post", false);
+        super("create-post-internal", false);
     }
 
     protected async httpPost(request: Request, response: Response): Promise<void> {
         const bearer = request.headers.authorization as string;
         const oauthToken = bearer.split(" ")[1];
         const authorization = await Authorization.findByToken(oauthToken);
-        const dataFromTrigger = request.body as ITriggerData;
+        const dataFromTrigger = request.body;
 
         if (!authorization || !dataFromTrigger){
             console.log("Not auth or content");
@@ -26,7 +24,7 @@ export default class CreatePostRoute extends Route {
         }
         const userId = authorization.userId;
 
-        const postText = TriggerDataUtils.extractEntry(dataFromTrigger, "post-text", DataType.Text)?.data as string;
+        const postText = dataFromTrigger.text as string;
         if (!postText){
             console.log("Wrongly formatted data from trigger");
             response.status(400).send();

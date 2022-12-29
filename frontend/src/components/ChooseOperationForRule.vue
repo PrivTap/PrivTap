@@ -59,7 +59,7 @@ import user_trigger from "@/controllers/user_trigger";
 import user_action from "@/controllers/user_action";
 import type TriggerModel from '@/model/trigger_model';
 import type ActionModel from '@/model/action_model';
-import PermissionChip from './PermissionChip.vue';
+import PermissionChip from './InformationChip.vue';
 import {useRouter} from "vue-router";
 import RoutingPath from "@/router/routing_path";
 

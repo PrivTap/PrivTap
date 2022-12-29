@@ -2,6 +2,7 @@ import {readdirSync, statSync} from "fs";
 import Permission, {IPermission} from "../model/Permission";
 import logger from "./logger";
 import Authorization from "../model/Authorization";
+import axios, {AxiosResponse} from "axios";
 
 /**
  * Gets all files recursively from a directory.
@@ -52,4 +53,22 @@ export async function rollBackAuthorization(userId: string): Promise<boolean>{
     }
     return await Authorization.delete(userId);
 
+}
+
+/**
+ * Make a post http request to a specific url
+ * @param url the url of the request
+ * @param token use this if you want to put an auth token
+ * @param body the object containing the field and the value of the query string
+ */
+export async function postReqHttp(url: string, token: string | null, body: object): Promise<AxiosResponse | null> {
+    const config = token ? { headers: { "Authorization": token } } : undefined;
+    let res;
+    try {
+        res = await axios.post(url, body, config);
+        return res;
+    } catch (e) {
+        logger.error("Axios response status:", res ? res.status : "undefined");
+        return null;
+    }
 }

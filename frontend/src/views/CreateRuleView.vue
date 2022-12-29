@@ -48,7 +48,7 @@
         </v-responsive>
         <v-btn @click="createRule()" color="#3662E3" size="large">
           <v-icon>mdi-plus</v-icon>
-          Crate Rule
+          Create Rule
         </v-btn>
       </v-form>
     </div>
@@ -103,8 +103,8 @@ const ruleCreation = reactive({
 async function createRule() {
   const { valid } = await formRef.value.validate();
   if (!valid) return;
-  ruleModel.createRule(ruleCreation.name, ruleCreation.triggerId, ruleCreation.actionId);
-  router.push(RoutingPath.PERSONAL_PAGE);
+  await ruleModel.createRule(ruleCreation.name, ruleCreation.triggerId, ruleCreation.actionId);
+  await router.push(RoutingPath.PERSONAL_PAGE);
 }
 
 function onChipTap() {

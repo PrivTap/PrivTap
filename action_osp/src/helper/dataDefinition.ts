@@ -28,4 +28,17 @@ export class TriggerDataUtils {
         });
     }
 
+    public static convertToInternalRepresentation(dataFromTrigger: ITriggerData): object | null {
+        const postText = TriggerDataUtils.extractEntry(dataFromTrigger, "post-text", DataType.Text)?.data as string;
+
+        if (!postText) {
+            console.log("Wrongly formatted data from trigger");
+            return null;
+        }
+
+        return {
+            text: postText
+        };
+    }
+
 }

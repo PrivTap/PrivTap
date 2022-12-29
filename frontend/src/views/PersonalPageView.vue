@@ -26,7 +26,7 @@
   </div>
 
   <div class="flex flex-col justify-center items-center content-center">
-    <PrimaryButton :onClick="() => router.push(RoutingPath. CREATE_RULE_PAGE)" text="Create New Rule"
+    <PrimaryButton :onClick="() => router.push(RoutingPath.CREATE_RULE_PAGE)" text="Create New Rule"
       class="min-w-fit" />
   </div>
 

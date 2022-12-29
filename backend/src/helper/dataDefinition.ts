@@ -46,7 +46,7 @@ export function checkCompatibility(trigger: DataDefinition, action: DataDefiniti
 
 /**
  * Checks whether two data definition entries are compatible, recursively if needed for aggregate types
- * @param triggerEntry An entry in teh trigger data definition object
+ * @param triggerEntry An entry in the trigger data definition object
  * @param actionEntry An entry in the action data definition object
  * @param isTopLevel Whether the call is performed for entries at the top level (therefore requiring the existence of identifiers)
  */

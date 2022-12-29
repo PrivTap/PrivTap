@@ -1,14 +1,15 @@
 import mongoose, { Schema } from "mongoose";
 import Model from "../Model";
 import logger from "../helper/logger";
-import { triggerServiceNotificationServer } from "./Trigger";
+import {ITrigger, triggerServiceNotificationServer} from "./Trigger";
+import {IAction} from "./Action";
 
 export interface IRule {
     _id: string;
     name: string,
     userId: string;
-    triggerId: string;
-    actionId: string;
+    triggerId: string| Partial<ITrigger>;
+    actionId: string | Partial<IAction>;
     isAuthorized: boolean;
 }
 
@@ -23,10 +24,12 @@ const ruleSchema = new Schema({
     },
     triggerId: {
         type: Schema.Types.ObjectId,
+        ref: "trigger",
         required: true
     },
     actionId: {
         type: Schema.Types.ObjectId,
+        ref: "action",
         required: true
     },
     isAuthorized: {
@@ -45,11 +48,11 @@ class Rule extends Model<IRule> {
     }
 
     /**
-     * Finds all rules created by a user.
+     * Finds all rules created by a user and populates the trigger and action.
      * @param userId the id of the user
      */
     async findAllForUser(userId: string): Promise<IRule[] | null> {
-        return await this.findAll({ userId: userId });
+        return await this.findAll({ userId: userId }, "name triggerId actionId isAuthorized",  "triggerId actionId",  "name description" );
     }
 
     /**

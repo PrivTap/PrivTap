@@ -22,6 +22,6 @@ export default class RuleExecution {
             return true;
         }
         //Parse the two JSON strings and compare
-        return checkCompatibility(trigger.outputs, action.inputs);
+        return checkCompatibility(JSON.parse(trigger.outputs), JSON.parse(action.inputs));
     }
 }
