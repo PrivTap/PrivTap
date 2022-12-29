@@ -8,15 +8,18 @@
     <img src="public/box.png" class="resize_box"/>
 </div>
 <div class="center_button">
+    <h1 style="color: white;"> Action OSP </h1>
     <div class="col s12 m6 offset-m3 center-align">
-        <a class="oauth-container btn darken-4 white black-text" href=<%=url%>> style="text-transform:none">
-            <div class="left">
-                <img width="20px" style="margin-top:7px; margin-right:8px" alt="Google sign-in"
-                     src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png" />
-            </div>
-            Continue with Google
-        </a>
+        <div class="row google-button">
+            <img width="20px" alt="Google sign-in"
+                 src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png" />
+            <a href="/google-auth" style="text-transform:none">
+                Continue with Google
+            </a>
+        </div>
+
     </div>
+    <img style="width: 300px; padding-top: 20px;" src="public/svg/undraw_monster.svg" alt="monster">
 </div>
 
 
@@ -41,6 +44,14 @@
         top: 50%;
         left: 51%;
         transform: translate(-50%, -50%);
+    }
+    .google-button {
+        display: flex;
+        align-items: center;
+        background-color: white;
+        border-radius: 10px;
+        padding: 10px;
+        justify-content: center;
     }
     .center_button {
         position: absolute;
