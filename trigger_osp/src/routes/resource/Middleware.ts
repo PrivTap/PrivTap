@@ -36,14 +36,27 @@ export default class Middleware extends Route {
         //Format the received post data into the standard format
         let retrievedDataIdentifiers: string[] = [];
         let retrievedDataArrayed: unknown[] = [];
-        if (resourceServerData.content) {
-            retrievedDataArrayed.push(resourceServerData.content);
+
+        const postData = resourceServerData.postData;
+        if (postData.content) {
+            retrievedDataArrayed.push(postData.content);
             retrievedDataIdentifiers.push("post-text");
         }
-        if (resourceServerData.creationDate) {
-            retrievedDataArrayed.push(resourceServerData.creationDate);
+        if (postData.creationDate) {
+            retrievedDataArrayed.push(postData.creationDate);
             retrievedDataIdentifiers.push("creation-date")
         }
+
+        const userData = resourceServerData.userData;
+        if (userData.username) {
+            retrievedDataArrayed.push(userData.username);
+            retrievedDataIdentifiers.push("username");
+        }
+        if (userData.email) {
+            retrievedDataArrayed.push(userData.email);
+            retrievedDataIdentifiers.push("email")
+        }
+
         const formattedData = new TriggerData(retrievedDataArrayed, retrievedDataIdentifiers, actionDataFilter); //TODO: Change with actionDataFiletr when the PrivTap FE supports adding data definition objects to triggers and actions
         response.status(200).send(formattedData);
     }
