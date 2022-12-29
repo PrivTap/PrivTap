@@ -5,16 +5,14 @@
 
     <v-label class="pt-4 pb-2"> Trigger</v-label>
     <div>
-      <PermissionChip :permission-model="trigger"/>
+      <PermissionChip :permission-model="{_id:trigger._id, description: trigger.description, name:trigger.name}"/>
     </div>
 
     <v-label class="pt-4 pb-2"> Action</v-label>
 
 
     <div>
-      <PermissionChip :permission-model="action"/>
-
-
+      <PermissionChip :permission-model="{_id:action._id, description: action.description, name:action.name}"/>
     </div>
 
     <div class="flex justify-center">
@@ -43,12 +41,14 @@
 
 
 <script setup lang="ts">
-import {defineProps, onMounted, ref} from 'vue';
+import {defineProps, ref} from 'vue';
 import rules_controller from '@/controllers/rules_controller';
 import {useRouter} from "vue-router";
 import type RuleModel from '@/model/rule_model';
 import ModalComponent from './ModalComponent.vue';
 import PermissionChip from './InformationChip.vue';
+import type TriggerModel from "@/model/trigger_model";
+import type ActionModel from "@/model/action_model";
 
 const showModal = ref(false);
 
@@ -59,8 +59,8 @@ const props = defineProps<{
   rule: RuleModel;
 
 }>();
-const trigger = props.rule.triggerId;
-const action = props.rule.actionId;
+const trigger = props.rule.triggerId as Partial<TriggerModel>;
+const action = props.rule.actionId as Partial<ActionModel>;
 
 function onModalClose(res: boolean | null) {
   showModal.value = false;
@@ -68,11 +68,6 @@ function onModalClose(res: boolean | null) {
     rules_controller.deleteRule(props.rule._id);
   }
 }
-
-onMounted(() => {
-  console.log("trigger:", trigger);3
-  console.log("action:", action);
-});
 
 
 </script>
