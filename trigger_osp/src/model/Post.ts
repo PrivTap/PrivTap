@@ -40,6 +40,11 @@ class Post {
         return this.model.find({ userId });
     }
 
+    async findLastByUserId(userId: string): Promise<IPost>{
+        const posts = await this.model.find({ userId }).sort("creationDate");
+        return posts[0];
+    }
+
     async isCreator(userId: string, postId: string): Promise<boolean>{
         const posts = await this.model.find({ userId });
         return posts.some(post => post._id == postId);

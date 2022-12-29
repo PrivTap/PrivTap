@@ -3,7 +3,6 @@ import env from "./env";
 import Notifcation from "../model/Notification";
 import axios from "axios";
 import logger from "./logger";
-import Authorization from "../model/Authorization";
 import ResourceHelper from "./resourceHelper";
 
 export default abstract class NotificationService {
@@ -36,7 +35,7 @@ export default abstract class NotificationService {
                 "userGranularity": userGranularity,
                 "postGranularity": postGranularity
             });
-            console.log("resourceToRequest =", resourceToRequest);
+            console.log("sending resourcedToRequest =", resourceToRequest);
             const data = { "triggerId": notification.foreignTriggerId, "userId": notification.foreignUserId, apiKey, resourceToRequest};
             try{
                 console.log("posting to", env.PRIVTAP_NOTIFICATION_URL);

@@ -1,6 +1,7 @@
 import {model as mongooseModel, Schema, Types} from "mongoose";
 import logger from "../helper/logger";
 import Permission from "./Permission";
+import ResourceHelper from "../helper/resourceHelper";
 
 export interface IAuthorization {
     _id: string;
@@ -98,8 +99,23 @@ class Authorization {
     }
 
     async retrieveData(oauthToken: string, resourcesToRequest: {userGranularity: string[], postGranularity: string[]}): Promise<object>{
-        const userGranularityList = resourcesToRequest.userGranularity;
-        return {};
+        const userGranularityList = resourcesToRequest.userGranularity.filter(granularity => granularity != "none");
+        const authorization = await this.model.findOne({ oauthToken }) as IAuthorization;
+        const userId = authorization.userId;
+        let userData = [];
+        for (let i=0; i<userGranularityList.length; i++){
+            const data = await ResourceHelper.getUserResource(userId, userGranularityList[i]);
+            userData.push(data);
+        }
+
+        const postGranularityList = resourcesToRequest.postGranularity.filter(granularity => granularity != "none");
+        let postData = [];
+        for (let i=0; i<postGranularityList.length; i++){
+            const data = await ResourceHelper.getPostResource(userId, postGranularityList[i]);
+            postData.push(data);
+        }
+
+        return {"userData": userData, "postData": postData};
     }
 }
 

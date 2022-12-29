@@ -3,9 +3,9 @@ import { Request, Response } from "express";
 import {TriggerData} from "../../helper/dataDefinition";
 import {getReqHttp} from "../../helper/misc";
 
-export default class AccessPostRoute extends Route {
+export default class Middleware extends Route {
     constructor() {
-        super("resources", false, false);
+        super("middleware", false, false);
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {

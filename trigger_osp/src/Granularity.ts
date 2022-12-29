@@ -16,16 +16,14 @@ export enum location {
 
 export enum postGranularity {
     none = "None",
-    last = "Only the last post",
-    next = "Only the next shared posts",
-    all_previous = "All the previously shared posts",
-    all_next = "All the posts published from now",
-    all = "All the previously shared post and all posts shared from now"
+    content = "Only the last post content",
+    date = "Only the last post date",
+    all = "Everything regarding the last post"
 }
 
 export enum userGranularity {
     none = "None",
     username = "Only the username",
     email = "Only the email",
-    all = "Both username and email"
+    all = "Everything regarding your profile"
 }
