@@ -14,20 +14,24 @@ export default class LoginRoute extends Route {
         const client = await OAuthClient.buildClient();
         const params = client.callbackParams(request);
         const stateValue = params.state;
-        if (!stateValue){
+        if (!stateValue) {
             response.status(400).send();
             return;
         }
         const state = await State.findByStateValue(stateValue);
-        if(!state){
+        if (!state) {
             response.status(400).send();
             return;
         }
+        const oauthAuthorization = state.oauthAuthorization;
         const code_verifier = state.code_verifier;
-        const tokenSet = await client.callback('http://127.0.0.1:8001/callback', params, { code_verifier, state: params.state });
+        const tokenSet = await client.callback('http://127.0.0.1:8001/callback', params, {
+            code_verifier,
+            state: params.state
+        });
         const tokenClaims = tokenSet.claims();
 
-        if (!tokenClaims.name || !tokenClaims.email){
+        if (!tokenClaims.name || !tokenClaims.email) {
             response.status(500).send();
             return;
         }
@@ -35,19 +39,28 @@ export default class LoginRoute extends Route {
         const userData = {username: tokenClaims.name, email: tokenClaims.email} as IUser;
 
         const successfulDelete = await State.deleteByStateValue(stateValue);
-        if (!successfulDelete){
+        if (!successfulDelete) {
             response.status(500).send();
             return;
         }
 
         const user = await User.insert(userData, true) as IUser;
-        if (!user){
+        if (!user) {
             response.status(500).send();
             return;
         }
 
-        if (!Authentication.setAuthenticationCookie(response, user)){
+        if (!Authentication.setAuthenticationCookie(response, user)) {
             response.status(500).send();
+            return;
+        }
+        if (state.oauthAuthorization) {
+            let url: string = "http://127.0.0.1:8001/authorize?";
+            url += "redirect_uri=" + oauthAuthorization.redirectUri;
+            url += "&client_id=" + oauthAuthorization.clientId;
+            url += "&state=" + oauthAuthorization.state;
+            url += "&authorization_details=" + oauthAuthorization.authorization_details;
+            response.redirect(url)
             return;
         }
 

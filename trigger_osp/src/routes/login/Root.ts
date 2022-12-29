@@ -12,7 +12,7 @@ export default class LoginRoute extends Route {
             Authentication.checkJWT(request);
             response.redirect("/personal-page");
         } catch (e) {
-            response.render("login");
+            response.render("login", {url:"/google-auth"});
         }
     }
 }

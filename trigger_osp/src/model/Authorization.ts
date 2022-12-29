@@ -31,13 +31,13 @@ const authorizationSchema = new Schema({
 class Authorization {
     model = mongooseModel<IAuthorization>("authorization", authorizationSchema);
 
-    async insert(document: Partial<IAuthorization>): Promise<boolean>{
+    async insert(document: Partial<IAuthorization>): Promise<boolean> {
         const model = new this.model(document);
         try {
             await model.save();
             return true;
         } catch (e) {
-            if ((e as Error).name == "MongoServerError"){
+            if ((e as Error).name == "MongoServerError") {
                 logger.debug("The Authorization already exists");
                 return true;
             }
@@ -46,18 +46,17 @@ class Authorization {
         }
     }
 
-    async update(update: Partial<IAuthorization>, filter: Partial<IAuthorization>): Promise<boolean>{
-        try{
-            await this.model.updateOne(filter, update);
-            return true;
+    async update(update: Partial<IAuthorization>, filter: Partial<IAuthorization>, upsert: boolean = false): Promise<IAuthorization | null> {
+        try {
+            return await this.model.findOneAndUpdate(filter, update, {upsert: upsert, new: true});
         } catch (e) {
             console.log("Error updating authorization", e);
-            return false;
+            return null;
         }
     }
 
-    async delete(userId: string): Promise<boolean>{
-        try{
+    async delete(userId: string): Promise<boolean> {
+        try {
             this.model.deleteOne({userId});
             return true;
         } catch (e) {
@@ -66,8 +65,8 @@ class Authorization {
         }
     }
 
-    async findByToken(oauthToken: string): Promise<IAuthorization | null>{
-        return this.model.findOne({ oauthToken });
+    async findByToken(oauthToken: string): Promise<IAuthorization | null> {
+        return this.model.findOne({oauthToken});
     }
 
     async findByUserId(userId: string): Promise<IAuthorization | null>{
