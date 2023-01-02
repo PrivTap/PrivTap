@@ -34,22 +34,21 @@ export default class ManageTriggersRoute extends Route {
         const permissions = request.body.permissions;
         const resourceServer = request.body.resourceServer;
         const out = request.body.outputs;
+        const service= await Service.findById(serviceId);
         if (checkUndefinedParams(response, name, description, serviceId, out)) return;
-        const service = await Service.find({ _id: serviceId, creator: request.userId });
 
-        //check if the outputs is valid
-        const outputs = transformStringInDataDef(out);
-        if (outputs === null) {
-            badRequest(response, "The outputs is not in the valid format");
-            return;
-        }
         // Check that the user is the owner of the service
-        if (!service) {
+        if (!await Service.isCreator(request.userId, serviceId)) {
             forbiddenUserError(response, "You are not the owner of this service");
             return;
         }
+        const outputs = transformStringInDataDef(out);
+        if (outputs === null) {
+            badRequest(response, "Inputs are not in the valid format");
+            return;
+        }
         //check if the service has a trigger notification server
-        if (!service.triggerNotificationServer) {
+        if (service!==null && !service.triggerNotificationServer) {
             badRequest(response, "This service does not have a trigger notification server");
             return;
         }

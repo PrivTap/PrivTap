@@ -1,14 +1,13 @@
-import { expect, request, use } from "chai";
-import { createSandbox, SinonStub } from "sinon";
+import {expect, request, use} from "chai";
+import {createSandbox, SinonStub} from "sinon";
 import app from "../../src/app";
-import { beforeEach } from "mocha";
-import Rule, { IRule } from "../../src/model/Rule";
-import Trigger, { ITrigger } from "../../src/model/Trigger";
-import Action, { IAction } from "../../src/model/Action";
+import {beforeEach} from "mocha";
+import Rule, {IRule} from "../../src/model/Rule";
+import Trigger, {ITrigger} from "../../src/model/Trigger";
+import Action, {IAction} from "../../src/model/Action";
 import Service from "../../src/model/Service";
 import OAuth from "../../src/helper/oauth";
 import axios from "axios";
-import { DataType } from "../../src/helper/dataType";
 import chaiHttp = require("chai-http");
 import sinonChai = require("sinon-chai");
 
@@ -36,14 +35,7 @@ describe("/triggers-data endpoint", () => {
         _id: "0380b79b38dda0d2f6be3746",
         name: "Sample Trigger",
         description: "Trigger 1 desc",
-        outputs: {
-            trigger_data: [
-                {
-                    type: DataType.Text,
-                    identifier: "title"
-                }
-            ]
-        },
+        outputs: "{trigger_data: [{type: DataType.Text,identifier: 'title'}]}",
         serviceId: "8380b79b38dda0d2f6be3746",
         resourceServer: "https://www.sample.trigger/endpoint/triggerDataEndpoint"
     };
@@ -53,30 +45,7 @@ describe("/triggers-data endpoint", () => {
         name: "Sample Action",
         description: "Trigger 2 desc",
         endpoint: "https://www.sample.action/endpoint/actionEndpoint",
-        inputs: {
-            trigger_data: [
-                {
-                    type: DataType.Text,
-                    identifier: "title"
-                }
-            ]
-        },
-        serviceId: "9380b79b38dda0d2f6be3746",
-    };
-
-    const incompatibleExampleAction: IAction = {
-        _id: "1380b79b38dda0d2f6be3746",
-        name: "Sample Action",
-        description: "Trigger 2 desc",
-        endpoint: "https://www.sample.action/endpoint/actionEndpoint",
-        inputs: {
-            trigger_data: [
-                {
-                    type: DataType.Image,
-                    identifier: "image"
-                }
-            ]
-        },
+        inputs: "{trigger_data: [{type: DataType.Text,identifier: 'title'}]}",
         serviceId: "9380b79b38dda0d2f6be3746",
     };
 
@@ -111,7 +80,7 @@ describe("/triggers-data endpoint", () => {
     });
 
     beforeEach(() => {
-        ruleFindStub = sandbox.stub(Rule, "find").resolves(mockRule);
+        ruleFindStub = sandbox.stub(Rule, "findAll").resolves([mockRule]);
         triggerFindStub = sandbox.stub(Trigger, "findById").resolves(exampleTrigger);
         actionFindStub = sandbox.stub(Action, "findById").resolves(exampleAction);
         serviceAPIKeyValidatorStub = sandbox.stub(Service, "isValidAPIKey").resolves(true);

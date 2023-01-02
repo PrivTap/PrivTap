@@ -95,7 +95,6 @@ export default class ManageActionsRoute extends Route {
         const description = request.body.description;
         const permissions = request.body.permissions;
         const endpoint = request.body.endpoint;
-
         if (checkUndefinedParams(response, actionId)) return;
 
         if (!await Action.isCreator(request.userId, actionId)) {

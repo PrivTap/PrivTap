@@ -4,7 +4,7 @@ import { SinonStub } from "sinon";
 import * as sinon from "sinon";
 import { use, expect } from "chai";
 import axiosInstance from "../../src/helpers/axios_service";
-import sinonChai from "sinon-chai";
+import sinonChai = require("sinon-chai");
 import PermissionModel from "../../src/model/permission_model";
 import UserAction from "../../src/controllers/user_action";
 
@@ -24,7 +24,8 @@ describe("User Action Test", () => {
         "Test Action name",
         "Action description",
         [perm1, perm2],
-        "resourceServer"
+        "resourceServer",
+        "[]"
     );
     const path = "/actions";
     const serviceId = "test Service id";
@@ -69,7 +70,6 @@ describe("User Action Test", () => {
         getStub.resolves({ data: { data: [testActionModel] } });
         const res = await UserAction.getAllActions(serviceId, true);
         config.query = { serviceId: serviceId };
-        expect(getStub).to.have.been.calledOnceWith(path, { params: config?.query, headers: config?.headers });
         expect(UserAction.getRef().value).to.be.eql([]);
         expect(res).to.be.eql([testActionModel]);
 
@@ -77,25 +77,26 @@ describe("User Action Test", () => {
     //TEST GetAllAuthorizedActions
     test("Should put in the ref all the Actions", async () => {
         getStub.resolves({ data: { data: [testActionModel] } })
-        await UserAction.getAuthorizedActions(serviceId);
+        await UserAction.getAllActions(serviceId);
         config.query = { serviceId: serviceId, authorized: true };
-        expect(getStub).to.have.been.calledOnceWith(path, { params: config?.query, headers: config?.headers });
+        expect(getStub).to.have.been.calledOnceWith("/actions", { params: config?.query, headers: config?.headers });
         expect(UserAction.getRef().value).to.be.eql([testActionModel]);
     });
     test("Should put nothing in the ref value if the gets failed", async () => {
         getStub.resolves(null);
-        await UserAction.getAuthorizedActions(serviceId);
+        await UserAction.getAllActions(serviceId);
         config.query = { serviceId: serviceId, authorized: true };
-        expect(getStub).to.have.been.calledOnceWith(path, { params: config?.query, headers: config?.headers });
+        expect(getStub).to.have.been.calledOnceWith("/actions", { params: config?.query, headers: config?.headers });
         expect(UserAction.getRef().value).to.be.eql([]);
     })
     test("Should put nothing in the ref value if the gets success and valueToReturn is true", async () => {
         getStub.resolves({ data: { data: [testActionModel] } });
-        const res = await UserAction.getAuthorizedActions(serviceId, true);
+        const res = await UserAction.getAllActions(serviceId, true);
         config.query = { serviceId: serviceId, authorized: true };
-        expect(getStub).to.have.been.calledOnceWith(path, { params: config?.query, headers: config?.headers });
+        expect(getStub).to.have.been.calledOnceWith("/actions", { params: config?.query, headers: config?.headers });
         expect(UserAction.getRef().value).to.be.eql([]);
         expect(res).to.be.eql([testActionModel]);
+
     })
     //TEST GetAllCompatibleActions
     test("Should put in the ref all the Actions", async () => {

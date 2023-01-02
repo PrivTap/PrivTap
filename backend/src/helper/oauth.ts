@@ -49,7 +49,6 @@ export default class OAuth {
         return authorizationUri + "&authorization_details=" + encodeURI(authorizationUriStringify);
     }
 
-    // TODO: Specify the token path in the Service model
     private static async buildClient(serviceId: string): Promise<AuthorizationCode | null>{
         const service = await Service.findById(serviceId);
         if (!service) {

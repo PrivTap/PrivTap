@@ -4,7 +4,7 @@ import { SinonStub } from "sinon";
 import * as sinon from "sinon";
 import { use, expect } from "chai";
 import axiosInstance from "../../src/helpers/axios_service";
-import sinonChai from "sinon-chai";
+import sinonChai = require("sinon-chai");
 import PermissionModel from "../../src/model/permission_model";
 import UserTrigger from "../../src/controllers/user_trigger";
 
@@ -25,7 +25,8 @@ describe("User Trigger Test", () => {
         "Test Trigger name",
         "Trigger description",
         [perm1, perm2],
-        "resourceServer"
+        "[]",
+        "resourceServer",
     );
     const serviceId = "test Service id";
     let query: any;
