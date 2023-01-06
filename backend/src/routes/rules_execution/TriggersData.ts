@@ -15,7 +15,6 @@ import { DataDefinition, dataDefinitionIDs } from "../../helper/dataDefinition";
 import { getReqHttp, postReqHttp } from "../../helper/misc";
 
 export default class TriggersDataRoute extends Route {
-    // TODO: figure out how to restrict this to only authorized services
 
     constructor() {
         super("triggers-data", false, false);
@@ -64,8 +63,6 @@ export default class TriggersDataRoute extends Route {
                     forbiddenUserError(response, "Trigger not authorized");
                     return;
                 }
-
-                //TODO: RAR data MUST NOT be sent manually since it is already included in the token
 
                 let axiosResponse;
                 try {
