@@ -26,7 +26,6 @@ export default class ManageActionsRoute extends Route {
         }
 
         let permissions;
-
         if (await Service.isCreator(userId, serviceId)) {
             permissions = await Permission.findByServiceId(serviceId);
         } else {
@@ -55,11 +54,17 @@ export default class ManageActionsRoute extends Route {
             return;
         }
 
-        if (!await Service.isCreator(userId, serviceId)) {
+        const service = await Service.find({ _id: serviceId, creator: userId });
+
+        if (service===null) {
             forbiddenUserError(response, "You don't have enough privileges to modify this service");
             return;
         }
 
+        //OSP can't create permissions without adding the auth path, token path, baseUrl, clientId and clientSecret
+        if( service.authPath===null || service.tokenPath===null || service.baseUrl===null || service.clientId===null|| service.clientSecret===null){
+            badRequest(response, "You can't create a permission without adding the auth path, token path, baseUrl, clientId and clientSecret.");
+        }
         const permission = await handleInsert(response, Permission, {
             name,
             description,
@@ -84,7 +89,6 @@ export default class ManageActionsRoute extends Route {
             badRequest(response, "This service doesn't exists");
             return;
         }
-
         if (!await Service.isCreator(userId, serviceId)) {
             forbiddenUserError(response, "You don't have enough privileges to modify this service");
             return;

@@ -6,7 +6,7 @@ import app from "../../src/app";
 import User from "../../src/model/User";
 import Mailer from "../../src/helper/mailer";
 import { ModelSaveError } from "../../src/Model";
-import Logger from "../../src/helper/logger";
+
 import { beforeEach } from "mocha";
 
 use(chaiHttp);

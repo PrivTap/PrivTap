@@ -1,6 +1,6 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
-import { checkUndefinedParams, success } from "../../helper/http";
+import { badRequest, checkUndefinedParams, internalServerError, success } from "../../helper/http";
 import Authorization from "../../model/Authorization";
 
 export default class PermissionAuthorized extends Route {
@@ -15,6 +15,10 @@ export default class PermissionAuthorized extends Route {
             return;
         }
         const permissionsAuthorized = await Authorization.findAllPermissionsAddingAuthorizationTag(serviceId, userId);
+        if(permissionsAuthorized===null){
+            internalServerError(response);
+            return ;
+        }
         success(response, permissionsAuthorized);
     }
 }

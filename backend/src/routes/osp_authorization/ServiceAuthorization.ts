@@ -11,14 +11,7 @@ export default class ServiceAuthorizationRoute extends Route {
     constructor() {
         super("service-authorization");
     }
-
-    protected async httpGet(request: Request, response: Response): Promise<void> {
-        success(response, {}, "Not implemented");
-    }
-
     protected async httpPost(request: Request, response: Response): Promise<void> {
-        //const userId = request.userId;
-        // Dummy userId
         const userId = request.userId;
         const serviceId = request.body.serviceId;
         const permissionIds = request.body.permissionId as string[];
@@ -38,12 +31,9 @@ export default class ServiceAuthorizationRoute extends Route {
             return;
         }
 
-        console.log(authorizationUri);
+        console.log("authorization uri =", authorizationUri);
 
         success(response, { "redirectUri": authorizationUri });
     }
 
-    protected async httpDelete(request: Request, response: Response): Promise<void> {
-        success(response, {}, "Not implemented");
-    }
 }

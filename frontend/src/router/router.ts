@@ -1,4 +1,4 @@
-import { useAuthStore } from "@/stores/auth_store";
+import auth_controller from "@/controllers/authorization_controller";
 import { createRouter, createWebHistory } from "vue-router";
 import RoutingPath from "./routing_path";
 
@@ -35,14 +35,6 @@ const router = createRouter({
       path: RoutingPath.SERVICES_PAGE,
       name: "services",
       component: () => import("../views/ServicesView.vue"),
-      meta: {
-        requireAuth: true,
-      },
-    },
-    {
-      path: RoutingPath.UNAUTHORIZED_SERVICE_PAGE,
-      name: "unauthorizedservices",
-      component: () => import("../views/UnAuthorizedServicesView.vue"),
       meta: {
         requireAuth: true,
       },
@@ -97,11 +89,29 @@ const router = createRouter({
         requireAuth: true,
       },
     },
-
     {
       path: `${RoutingPath.SERVICE_ACTION_PAGE}/:id?`,
       name: "serviceaction",
       component: () => import("../views/OspManageActionView.vue"),
+      meta: {
+        requireAuth: true,
+      },
+    },
+    {
+      path: `${RoutingPath.EXPLORE_SERVICE_PAGE}/:service`,
+      name: "exploreservice",
+      component: () => import("../views/ExploreServiceView.vue"),
+      props: true,
+      meta: {
+        requireAuth: true,
+      },
+    },
+
+    {
+      path: `${RoutingPath.CREATE_RULE_PAGE}/:id?`,
+      name: "createrule",
+      component: () => import("../views/CreateRuleView.vue"),
+      props: true,
       meta: {
         requireAuth: true,
       },
@@ -116,12 +126,13 @@ const router = createRouter({
 
 /// Router guard to check if user is authenticated
 router.beforeEach((to, from, next) => {
-  const authStore = useAuthStore();
+
   if (to.query.activate) {
-    authStore.activate(to.query.activate as string);
+    auth_controller.activate(to.query.activate as string);
   }
 
-  const isAutheticated: boolean = authStore.isAutheticated;
+  let isAutheticated = auth_controller.isAuthenticated.value;
+  console.log("isAutheticatedGuard", isAutheticated);
   if (to.meta.requireAuth && !isAutheticated) return next("/auth");
   if (to.name === "auth" && isAutheticated) return next("/home");
   return next();

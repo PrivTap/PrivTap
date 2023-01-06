@@ -2,7 +2,7 @@
 
   <v-fab-transition origin="top right">
     <button v-show="show" class=" rounded-full px-4 py-4
-                       bg-blue-500 text-white font-normal text-white hover:bg-blue-700"
+                       bg-blue-500 text-white font-normal hover:bg-blue-700"
             @click="toTop">
       <v-icon>mdi-chevron-up</v-icon>
     </button>

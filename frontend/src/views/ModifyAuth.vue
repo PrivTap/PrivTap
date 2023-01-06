@@ -2,15 +2,15 @@
   <div>
     <h1 class="text-5xl text-blue-100 font-medium text-center py-5">Authorization Granted to {{ serviceName }}</h1>
     <div class="flex py-10 justify-center">
-      <span class="text-2xl"> Decide which data you want <strong
-          class="text-blue-500">PrivTap</strong> to have access.<br>
+      <span class="text-2xl"> Decide which data you want <strong class="text-blue-500">PrivTap</strong> to have
+        access.<br>
         Modifying authorizations will require you to connect with {{ serviceName }}<br>
         <strong class="text-red-500">Watch out!</strong> Revoking permission will cause some rule to not work</span>
     </div>
     <div v-if="permission.length">
       <div class="text-right relative right-1/3">
         <button :disabled="!authorizationChanged" @click="oAuthAuthorization"
-                class=" rounded-lg bg-blue-800 py-5 px-10 hover:bg-blue-900 disabled:opacity-70 shadow-lg text-xl text-white  ">
+          class=" rounded-lg bg-blue-800 py-5 px-10 hover:bg-blue-900 disabled:opacity-70 shadow-lg text-xl text-white  ">
           Authorize
         </button>
       </div>
@@ -18,29 +18,26 @@
         <img :src="radial" class="w-1/2">
         <table class="w-1/3 absolute top-20 table-fixed bg-transparent border-spacing-y-2">
           <thead class="border-b-md">
-          <tr>
-            <th class="text-left">
-              <span class="text-3xl font-medium">Name</span>
-            </th>
-            <th class="text-right text-blue-400 ">
-              <span class="text-3xl font-medium">Authorized</span>
-            </th>
-          </tr>
+            <tr>
+              <th class="text-left">
+                <span class="text-3xl font-medium">Permission</span>
+              </th>
+              <th class="text-right text-blue-400 ">
+                <span class="text-3xl font-medium">Authorized</span>
+              </th>
+            </tr>
           </thead>
           <tbody>
-          <tr
-              v-for="item in permission"
-              :key="item.name"
-              class="border-b p-12 h-20 align-top"
-          >
-            <td class="text-left"><span class="text-xl  font-weight-medium">{{ item.name }}</span></td>
-            <td class="relative">
-              <v-switch v-model="arrayAuthorized" inset color="green" v-bind:value="item._id"
-                        class="absolute top-0 right-0"
-                        density="comfortable" flat @change="onSwitch"
-              ></v-switch>
-            </td>
-          </tr>
+            <tr v-for="item in permission" :key="item.name" class="border-b p-12 h-20 align-top">
+              <PermissionChip :permission-model="item"
+                :color="arrayAuthorized.find(p => p === item._id) ? 'success' : 'red'"
+                :append-icon="arrayAuthorized.find(p => p === item._id) ? 'mdi-check' : 'mdi-close'">
+              </PermissionChip>
+              <td class="relative">
+                <v-switch v-model="arrayAuthorized" inset color="green" v-bind:value="item._id"
+                  class="absolute top-0 right-0" density="comfortable" flat @change="onSwitch"></v-switch>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -59,13 +56,14 @@
 
 <script setup lang="ts">
 
-import {onMounted, ref} from "vue";
-import {useRoute} from "vue-router";
+import { onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
 import radial from "@/assets/images/radial.svg"
-import showPermissions from "@/services/show-permission";
+import showPermissions from "@/controllers/show-permission";
 import empty from '@/assets/images/empty1.svg';
 import router from "@/router/router";
 import RoutingPath from "@/router/routing_path";
+import PermissionChip from "@/components/InformationChip.vue";
 
 const route = useRoute();
 

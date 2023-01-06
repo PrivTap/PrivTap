@@ -6,6 +6,7 @@ import OAuth from "../../helper/oauth";
 import { AuthorizationTokenConfig } from "simple-oauth2";
 import { handleUpdate } from "../../helper/misc";
 import Authorization from "../../model/Authorization";
+import env from "../../helper/env";
 
 export default class OAuthRoute extends Route {
     constructor() {
@@ -16,42 +17,39 @@ export default class OAuthRoute extends Route {
         const userId = request.userId;
         const { code } = request.query;
         const stateValue = request.query.state as string;
-        const options = {
-            code,
-        };
-
         const state = await State.findByValue(stateValue);
         if (!state){
             badRequest(response);
             return;
         }
-
         if (state.userId != userId){
             badRequest(response);
             return;
         }
-
         const serviceId = state.serviceId;
         const permissions = state.permissionId;
-        console.log(request.query);
-        const oAuthToken = await OAuth.retrieveToken(serviceId, options as AuthorizationTokenConfig);
-        console.log(oAuthToken);
-        if (!oAuthToken){
-            badRequest(response);
-            return;
-        }
 
-        // This should be an atomic transaction
+        const options = {
+            code,
+            //TODO: is this done in the right way?
+            redirect_uri: env.PROD ? "https://privtap.it/modifyauth/" + serviceId : "http://127.0.0.1:5173/modifyauth/" + serviceId
+        };
 
-        if (!await handleUpdate(response, Authorization, { userId:userId, serviceId:serviceId },{ userId,serviceId, oAuthToken, grantedPermissions: permissions }, false, true)){
-            return;
-        }
-
+        console.log(options);
         if (! await State.delete(state._id)){
             internalServerError(response);
             return;
         }
-
+        const oAuthToken = await OAuth.retrieveToken(serviceId, options as AuthorizationTokenConfig);
+        console.log(oAuthToken);
+        if (!oAuthToken){
+            badRequest(response, "Problem while contacting this service. Avoid to use it");
+            return;
+        }
+        // This should be an atomic transaction
+        if (!await handleUpdate(response, Authorization, { userId:userId, serviceId:serviceId },{ userId, serviceId, oAuthToken, grantedPermissions: permissions }, false, true)){
+            return;
+        }
         success(response);
     }
 }

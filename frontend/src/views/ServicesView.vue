@@ -61,7 +61,8 @@
         </div>
         <div v-if="services?.length" class="py-10">
           <div class=" px-10 grid  lg:grid-cols-2 xl:grid-cols-3 gap-10">
-            <SimpleServiceCard v-for="item in services" :key="componentKey" :service="item" :authorization="authorized"/>
+            <SimpleServiceCard v-for="item in services" :key="componentKey" :service="item"
+                               :authorization="authorized"/>
           </div>
         </div>
       </div>
@@ -76,23 +77,23 @@
 <script setup lang="ts">
 import {useRouter} from "vue-router";
 import SimpleServiceCard from "@/components/SimpleServiceCard.vue";
-import  {onMounted, ref} from "vue";
+import {onMounted, ref} from "vue";
 import empty from '@/assets/images/empty1.svg';
 import radial from '@/assets/images/radial.svg';
 import logo from '@/assets/images/logo_dark.svg';
-import showServices from "@/services/show-services";
+import showServices from "@/controllers/show_services";
 import type SimpleServiceModel from "@/model/simple_service_model";
 
 const router = useRouter();
 const isLoading = ref(true);
 const authorized = ref(false);
-let services = showServices.getRef();
+const services = showServices.getRef();
 let serviceAuthorized: SimpleServiceModel[] | null = null;
 let serviceUnauthorized: SimpleServiceModel[] | null = null;
 
 
 onMounted(async () => {
-  services = await showServices.getAllServices();
+  await showServices.getAllServices();
   serviceUnauthorized = services.value;
   isLoading.value = false;
 });
@@ -103,9 +104,8 @@ async function switchAuthorization() {
   if (authorized.value) {
     if (serviceAuthorized == null) {
       isLoading.value = true;
-      services = await showServices.getAuthorizedServices();
+      await showServices.getAuthorizedServices();
       serviceAuthorized = services.value;
-      console.log(serviceAuthorized)
       isLoading.value = false;
     }
     services.value = serviceAuthorized;
@@ -113,13 +113,14 @@ async function switchAuthorization() {
   } else {
     if (serviceUnauthorized == null) {
       isLoading.value = true;
-      services = await showServices.getAllServices();
+      await showServices.getAllServices();
       serviceUnauthorized = services.value;
       isLoading.value = false;
     }
     services.value = serviceUnauthorized;
   }
 }
+
 const componentKey = ref(0);
 
 

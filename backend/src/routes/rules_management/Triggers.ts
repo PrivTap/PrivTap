@@ -1,7 +1,7 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
-import { internalServerError, success } from "../../helper/http";
-import Authorization, { ServiceTriggers } from "../../model/Authorization";
+import { checkUndefinedParams, internalServerError, success } from "../../helper/http";
+import Trigger from "../../model/Trigger";
 
 export default class TriggersRoute extends Route {
     constructor() {
@@ -11,16 +11,16 @@ export default class TriggersRoute extends Route {
     protected async httpGet(request: Request, response: Response): Promise<void> {
         // TODO: If we have time implement search https://www.mongodb.com/docs/atlas/atlas-search/query-syntax/#mongodb-pipeline-pipe.-search
         // const searchQuery = request.query.search;
-
-        let data: ServiceTriggers[]  = [];
-
-        const authorizedServices = await Authorization.findAllServicesAuthorizedByUserWithTriggers(request.userId);
-        if (!authorizedServices) {
+        const serviceId = request.query.serviceId as string;
+        const userId = request.userId;
+        if (checkUndefinedParams(response, serviceId))
+            return;
+        const data = await Trigger.findAllTriggerAddingAuthorizedTag(userId, serviceId);
+        if (data == null) {
             internalServerError(response);
             return;
         }
 
-        data = authorizedServices;
         success(response, data);
     }
 }

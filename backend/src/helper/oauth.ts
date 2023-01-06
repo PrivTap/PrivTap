@@ -31,13 +31,8 @@ export default class OAuth {
             badRequest(response);
             return null;
         }
-
-        let redirectUri;
-        if (env.PROD) {
-            redirectUri = "https://privtap.it/modifyauth/" + serviceId;
-        } else {
-            redirectUri = "http://127.0.0.1:5173/modifyauth/" + serviceId;
-        }
+        //TODO: is this the right way to do it?
+        const redirectUri = env.PROD ? "https://privtap.it/modifyauth/" + serviceId : "http://localhost:5173/modifyauth/" + serviceId;
 
         let authorizationUri = client.authorizeURL({
             redirect_uri: redirectUri,
@@ -49,38 +44,25 @@ export default class OAuth {
         return authorizationUri;
     }
 
-
-    private static splitURL(authURL: string): { tokenHost: string, authorizePath: string } {
-        const splitURL = authURL.split(/^(.*\/\/[a-z.-]*)/);
-        return { tokenHost: splitURL[1], authorizePath: splitURL[2] };
-    }
-
-
     private static appendAuthDetails(authorizationUri: string, authorization_details: object): string {
         const authorizationUriStringify = JSON.stringify(authorization_details);
-        console.log(authorizationUriStringify);
-        return authorizationUri + "&" + encodeURI(authorizationUriStringify);
+        return authorizationUri + "&authorization_details=" + encodeURI(authorizationUriStringify);
     }
 
-    // TODO: Specify the token path in the Service model
-    private static async buildClient(serviceId: string, tokenPath = "/login/oauth/access_token"): Promise<AuthorizationCode | null>{
+    private static async buildClient(serviceId: string): Promise<AuthorizationCode | null>{
         const service = await Service.findById(serviceId);
         if (!service) {
             return null;
         }
-        const path = OAuth.splitURL(service.authServer);
         const config = {
             client: {
                 id: service.clientId,
                 secret: service.clientSecret,
             },
             auth: {
-                tokenHost: path.tokenHost,
-                authorizePath: path.authorizePath,
-                // This is the resource server, has to be modified
-                // TODO: Service needs a little refactor
-                // This token path is a separate url which can differ from the auth path
-                tokenPath: tokenPath
+                tokenHost: service.baseUrl,
+                authorizePath: service.authPath,
+                tokenPath: service.tokenPath
             }
         };
         return new AuthorizationCode(config);
@@ -92,7 +74,7 @@ export default class OAuth {
             return null;
         }
         try {
-            const accessToken = await client.getToken(authConfig);
+            const accessToken = await client.getToken(authConfig, { json: true });
             return accessToken.token.access_token;
         } catch (e) {
             console.error("Access Token Error");
