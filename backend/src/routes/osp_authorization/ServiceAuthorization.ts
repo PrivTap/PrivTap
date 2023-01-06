@@ -36,7 +36,4 @@ export default class ServiceAuthorizationRoute extends Route {
         success(response, { "redirectUri": authorizationUri });
     }
 
-    protected async httpDelete(request: Request, response: Response): Promise<void> {
-        success(response, {}, "Not implemented");
-    }
 }
