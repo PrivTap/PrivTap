@@ -6,7 +6,7 @@
     <div class="absolute z-50">
       <div class="text-center text-white h-full w-full">
         <p class="font-semibold text-4xl">
-          Hello, {{ authStore.user?.username }} 👋
+          Hello, {{ auth_controller.getRef().value?.username }} 👋
         </p>
         <p class="text-stone-400">Welcome back and start new automation</p>
       </div>
@@ -61,13 +61,12 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from "@/stores/auth_store";
 import draw from "@/assets/images/draw.svg";
 import { useRouter } from "vue-router";
 import RoutingPath from "../router/routing_path";
 import OutilinedButton from "../components/OutlinedButton.vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
-const authStore = useAuthStore();
+import auth_controller from "@/controllers/authorization_controller";
 const router = useRouter();
 </script>
 
