@@ -40,7 +40,7 @@ describe("Data Definition helper module", () => {
     const incompatibleActionDefinition: DataDefinition = {
         trigger_data: [
             {
-                identifier: "title",
+                identifier: "title-post",
                 type: DataType.Text
             }
         ]
@@ -55,6 +55,6 @@ describe("Data Definition helper module", () => {
     });
 
     it("should correctly extract data definition IDs", function () {
-        expect(dataDefinitionIDs(incompatibleActionDefinition)).to.be.eql(["title", "image"]);
+        expect(dataDefinitionIDs(compatibleActionDefinition)).to.be.eql(["title", "date"]);
     });
 });
