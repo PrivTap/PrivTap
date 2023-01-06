@@ -15,7 +15,6 @@ import { DataDefinition, dataDefinitionIDs } from "../../helper/dataDefinition";
 import { getReqHttp, postReqHttp } from "../../helper/misc";
 
 export default class TriggersDataRoute extends Route {
-    // TODO: figure out how to restrict this to only authorized services
 
     constructor() {
         super("triggers-data", false, false);
@@ -59,18 +58,17 @@ export default class TriggersDataRoute extends Route {
 
             //Get the data from the resourceServer (if needed)
             let dataToForwardToActionAPI: object | null = null;
+            const actionRequiredIDs = dataDefinitionIDs(JSON.parse(action.inputs) as DataDefinition);
             if (trigger?.resourceServer) {
                 if (!oauthToken) {
                     forbiddenUserError(response, "Trigger not authorized");
                     return;
                 }
 
-                //TODO: RAR data MUST NOT be sent manually since it is already included in the token
-
                 let axiosResponse;
                 try {
                     const queryParams: Record<string, unknown> = {
-                        filter: dataDefinitionIDs(JSON.parse(action.inputs) as DataDefinition),
+                        filter: actionRequiredIDs,
                     };
                     if (optionalEventDataParameters) {
                         queryParams.eventDataParameters = optionalEventDataParameters;
@@ -84,6 +82,7 @@ export default class TriggersDataRoute extends Route {
                     }
                 } catch (e){
                     logger.debug("Axios response status =", axiosResponse?.status);
+                    return;
                 }
             }
 
@@ -94,6 +93,12 @@ export default class TriggersDataRoute extends Route {
 
             if (!actionEndpoint) {
                 internalServerError(response);
+                return;
+            }
+            //Check that the data sent to action is compatible with the action data format (i.e. contains all the data required by it)
+            const triggerDataIDs = dataDefinitionIDs(dataToForwardToActionAPI as DataDefinition);
+            if (!triggerDataIDs || actionRequiredIDs.filter((actionID) => !triggerDataIDs.find((triggerID) => actionID == triggerID)).length > 0) {
+                console.log("Trigger Sending Less Data than what the Action requires! Rule execution skipped...");
                 return;
             }
 

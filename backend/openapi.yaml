@@ -47,6 +47,8 @@ tags:
     description: Endpoints for authorizing services on behalf of users
   - name: Rules Execution
     description: Endpoints for executing trigger-action rules defined by users
+  - name: Middleware
+    description: Endpoint not belonging to our platform but needed in order to integrate with it (Protocol Translator).
 security:
   - auth: []
 paths:
@@ -660,17 +662,62 @@ paths:
       tags:
         - Rules Execution
       summary: The OSP sends data to activate a registered trigger
-      description: The OSP sends data to activate a registered trigger (TODO)
+      description: The OSP sends data to activate a registered trigger. It MUST send the triggerId and the userId received with the notification, the api key and an optional parameter that it will get back for the resource server. If needed, the platform will make a request to the previously defined resource server in order to ask data using the format defined in the middleware endpoint.
       operationId: post-triggers-data
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Trigger'
+              type: object
+              properties:
+                triggerId:
+                  type: string
+                  example: 637e6c0e2677ffe654ea9672
+                userId:
+                  type: string
+                  example : 637e6c0e2677ffe654ea9672
+                apiKey:
+                  type: string
+                  example: 637e6c0e2677ffe654ea9672
+                optionalEventDataParameters:
+                  type: string
+                  example: "{ 'data' : 'some data' }"
+              required:
+                - triggerId
+                - userId
+                - apiKey
       responses:
         '200':
           description: successful operation
+  /middleware:
+    get:
+      tags:
+        - Middleware
+      summary: The endPoint of the OSP trigger that will be used to communicate with privTap platform.
+      description:  qualcosa
+      operationId: get-middleware
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            example: "Bearer tokenExample"
+        - in: query
+          name: filter
+          schema:
+            type: array
+            items:
+              type: string
+            example: [identifier1,identifier2]
+      responses:
+        '200':
+          description: ciao
+    post:
+      tags:
+        - Middleware
+      summary:
+
   /oauth:
     get:
       tags:
@@ -1375,6 +1422,29 @@ components:
         - name
         - description
         - _id
+
+    EntryDefinition:
+      properties:
+        identifier:
+          type: string
+          example: nameOfAFieldIdentifier
+        type:
+          type: string
+          example: ciao
+        data:
+          $ref: '#/components/schemas/EntryDefinition'
+      example:
+        identifier: nameOfAFieldIdentifier
+        type: aggregate/array
+        data : [{'type': 'string', 'data': 'exampleString'}]
+    DataDefinition:
+      properties:
+        trigger_data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntryDefinition'
+      required:
+        - trigger_data
 
     Permission:
       properties:

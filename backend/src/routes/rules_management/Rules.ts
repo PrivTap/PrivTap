@@ -40,18 +40,18 @@ export default class RulesRoute extends Route {
 
         //To check if trigger and action are authorized we check if the parent services are authorized
         const trigger = await Trigger.findById(triggerId);
-        const service = await Action.findById(actionId);
+        const action = await Action.findById(actionId);
 
         //This verifies that Trigger and Action actually exist
-        if (!trigger || !service) {
+        if (!trigger || !action) {
             badRequest(response, "Trigger or Action not found");
             return;
         }
 
         const isTriggerAuthorized = (await Authorization.findToken(userId, trigger.serviceId)) != null;
         let isActionAuthorized = isTriggerAuthorized;
-        if (service.serviceId != trigger.serviceId) {
-            isActionAuthorized = (await Authorization.findToken(userId, service.serviceId) != null);
+        if (action.serviceId != trigger.serviceId) {
+            isActionAuthorized = (await Authorization.findToken(userId, action.serviceId) != null);
         }
 
         if (!isTriggerAuthorized || !isActionAuthorized) {
@@ -96,7 +96,6 @@ export default class RulesRoute extends Route {
             return;
         }
         const triggerService = await Rule.getTriggerServiceNotificationServer(ruleId);
-
         //deleting the rule
         if (!await Rule.delete(ruleId)) {
             internalServerError(response);

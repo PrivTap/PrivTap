@@ -42,10 +42,6 @@ describe("Data Definition helper module", () => {
             {
                 identifier: "title",
                 type: DataType.Text
-            },
-            {
-                identifier: "image",
-                type: DataType.Image
             }
         ]
     };
