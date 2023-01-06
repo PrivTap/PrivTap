@@ -25,6 +25,7 @@ describe("Manage Action Test", () => {
     "Action description",
     [perm1],
     "endpoint",
+    "input",
   );
   const serviceId = "serviceId";
   beforeEach(() => {
@@ -53,13 +54,13 @@ describe("Manage Action Test", () => {
   test("Should put the created Action in the ref array", async () => {
     postStub.resolves({ data: { data: testActionModel } })
     await manageAction.createAction(testActionModel.name, testActionModel.description,
-      serviceId, [perm1._id], testActionModel.endpoint!)
+      serviceId, [perm1._id], testActionModel.endpoint!, testActionModel.inputs)
     expect(manageAction.getRef().value).to.be.eql([testActionModel]);
   });
   test("Should put nothing in the ref value if the gets failed", async () => {
     postStub.resolves(null);
     await manageAction.createAction(testActionModel.name, testActionModel.description,
-      serviceId, [perm1._id], testActionModel.endpoint!)
+      serviceId, [perm1._id], testActionModel.endpoint!, testActionModel.inputs)
     expect(manageAction.getRef().value).to.be.eql([]);
   })
 
@@ -71,11 +72,12 @@ describe("Manage Action Test", () => {
       "Test Action name changed",
       "Action description changed",
       [perm1, perm2],
-      "endpoint"
+      "endpoint",
+      "input"
     )
     putStub.resolves({ data: { data: updatedAction } });
     await manageAction.updateAction(updatedAction._id, updatedAction.name, updatedAction.description,
-      [perm1._id, perm2._id], updatedAction.endpoint!)
+      [perm1._id, perm2._id], updatedAction.endpoint!, updatedAction.inputs)
     expect(manageAction.getRef().value).to.be.eql([updatedAction]);
   })
   test("Should not change the updated Action in the ref array if it fails", async () => {
@@ -85,11 +87,12 @@ describe("Manage Action Test", () => {
       "Test Action name changed",
       "Action description changed",
       [perm1, perm2],
-      "endpoint"
+      "endpoint",
+      "input"
     )
     putStub.resolves(null);
     await manageAction.updateAction(updatedAction._id, updatedAction.name, updatedAction.description,
-      [perm1._id, perm2._id], updatedAction.endpoint!)
+      [perm1._id, perm2._id], updatedAction.endpoint!, updatedAction.inputs)
     expect(manageAction.getRef().value).to.be.eql([testActionModel]);
 
   })

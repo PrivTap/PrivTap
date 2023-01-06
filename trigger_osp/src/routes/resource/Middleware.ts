@@ -2,6 +2,7 @@ import Route from "../../Route";
 import {Request, Response} from "express";
 import {TriggerData} from "../../helper/dataDefinition";
 import {getReqHttp} from "../../helper/misc";
+import {IPost} from "../../model/Post";
 
 export default class Middleware extends Route {
     constructor() {
@@ -28,9 +29,13 @@ export default class Middleware extends Route {
             resourceServerData = axiosResponse?.data;
             if (!resourceServerData) {
                 console.log("Axios response data not found - sending empty data...");
+                response.status(200).send(new TriggerData([], [], []));
+                return;
             }
         } catch (e) {
             console.log("Axios response status =", axiosResponse?.status, "Error:", e);
+            response.status(200).send(new TriggerData([], [], []));
+            return;
         }
 
         //Format the received post data into the standard format
