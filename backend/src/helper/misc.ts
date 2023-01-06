@@ -3,6 +3,11 @@ import Model, { ModelSaveError } from "../Model";
 import { badRequest, internalServerError } from "./http";
 import { Response } from "express";
 import axios, { AxiosResponse } from "axios";
+import logger from "./logger";
+import mongoose from "mongoose";
+import { IAction } from "../model/Action";
+import { ITrigger } from "../model/Trigger";
+import Authorization from "../model/Authorization";
 
 
 /**
@@ -98,9 +103,8 @@ export async function handleUpdate<T>(response: Response, model: Model<T>, filte
         let updateResult;
         if (returnObject)
             // The whole object
-            updateResult = await model.updateWithFilterAndReturn(filter, update,upsert);
+            updateResult = await model.updateWithFilterAndReturn(filter, update, upsert);
         else
-            // true if no error occurred. false otherwise
             updateResult = await model.updateWithFilter(filter, update, upsert);
         if (!updateResult) {
             badRequest(response, "An object with this id does not exist");
@@ -110,6 +114,7 @@ export async function handleUpdate<T>(response: Response, model: Model<T>, filte
             return updateResult as T;
         return updateResult;
     } catch (e) {
+        console.log(e);
         if (e instanceof ModelSaveError) {
             badRequest(response, e.message);
         } else {
@@ -120,33 +125,104 @@ export async function handleUpdate<T>(response: Response, model: Model<T>, filte
     return false;
 }
 
-
 /**
  * Make a get http request to a specific url
  * @param url the url of the request
  * @param token use this if you want to put an auth token
- * @param queryString the object containing the field and the value of the query string
+ * @param parameters
  */
-export async function getHttp(url: string, token?: string, queryString?: object): Promise<AxiosResponse> {
-    const config = {};
-    if (token != undefined)
-        Object.assign(config, { headers: { "Authorization": `Bearer ${token}` } });
-    if (queryString != undefined)
-        Object.assign(config, { params: queryString });
-    return await axios.get(url, config);
+export async function getReqHttp(url: string, token: string | null, parameters: object): Promise<AxiosResponse | null> {
+    const config = token ? {
+        headers: { "Authorization": `Bearer ${token}` },
+        params: parameters
+    } : { params: parameters };
+    let res;
+    try {
+        res = await axios.get(url, config);
+        return res;
+    } catch (e) {
+        logger.error("Axios response status:", res != undefined ? res.status : "undefined");
+        return null;
+    }
+}
+
+/**
+ * Make a post http request to a specific url
+ * @param url the url of the request
+ * @param token use this if you want to put an auth token
+ * @param body the object containing the field and the value of the query string
+ */
+export async function postReqHttp(url: string, token: string | null, body: object): Promise<AxiosResponse | null> {
+    const config = token ? { headers: { "Authorization": `Bearer ${token}` } } : undefined;
+    let res;
+    try {
+        res = await axios.post(url, body, config);
+        return res;
+    } catch (e) {
+        logger.error("Axios response status:", res != undefined ? res.status : "undefined");
+        return null;
+    }
 }
 
 /**
  * Make a delete http request to a specific url
  * @param url the url of the request
  * @param token use this if you want to put an auth token
- * @param body the object containing the field and the value of the query string
+ * @param query the object containing the field and the value of the query string
  */
-export async function deleteHttp(url: string, token?: string, body?: object): Promise<AxiosResponse> {
-    const config = {};
-    if (token != undefined)
-        Object.assign(config, { headers: { "Authorization": `Bearer ${token}` } });
-    if (body != undefined)
-        Object.assign(config, { data: body });
-    return await axios.delete(url, config);
+export async function deleteReqHttp(url: string, token: string, query: object): Promise<AxiosResponse | null> {
+    let res;
+    try {
+        const config = { headers: { "Authorization": `Bearer ${token}` }, params: query };
+        // TODO: manage body
+        res = await axios.delete(url, config);
+        return res;
+    } catch (e) {
+        logger.error("Axios response status:", res != undefined ? res.status : "undefined");
+        return null;
+    }
+}
+
+export async function findAllOperationAddingAuthorizedTag(model: mongoose.Model<IAction> | mongoose.Model<ITrigger>, userId: string, serviceId: string): Promise<Partial<IAction | ITrigger>[] | null> {
+    let grantedPermissionId = await Authorization.getGrantedPermissionsId(userId, serviceId);
+    if (grantedPermissionId == null)
+        grantedPermissionId = [];
+    try {
+        return await model.aggregate([
+            { $match: { serviceId: new mongoose.Types.ObjectId(serviceId) } },
+            {
+                $addFields: {
+                    authorized: {
+                        $cond: {
+                            if: {
+                                $setIsSubset: ["$permissions", grantedPermissionId]
+                            },
+                            then: true,
+                            else: false
+                        }
+                    }
+                }
+            },
+            { $project: { "data": 0, "outputs": 0 } },
+            { $lookup: { from: "permissions", localField: "permissions", foreignField: "_id", as: "permissions" } },
+            {
+                $project: {
+                    "permissions._id": 1,
+                    "permissions.name": 1,
+                    "permissions.description": 1,
+                    "authorized": 1,
+                    _id: 1,
+                    name: 1,
+                    description: 1
+                }
+            }
+        ]) as Partial<IAction | ITrigger>[];
+    } catch (e) {
+        return null;
+
+    }
+}
+
+export function checkActionDataFormat(actionRequiredIDs: string[], triggerDataIDs: string[]): boolean {
+    return actionRequiredIDs.filter((actionID) => !triggerDataIDs.find((triggerID) => actionID == triggerID)).length > 0;
 }

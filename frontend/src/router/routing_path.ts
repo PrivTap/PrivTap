@@ -12,4 +12,8 @@ export default class RoutingPath {
   static readonly SERVICE_PERMISSION_PAGE = "/servicepermission";
   static readonly SERVICE_TRIGGER_PAGE = "/servicetrigger";
   static readonly SERVICE_ACTION_PAGE = "/serviceaction";
+  static readonly EXPLORE_SERVICE_PAGE = "/exploreservice";
+  static readonly CREATE_RULE_PAGE = "/createrule";
+  static readonly CHOOSE_TRIGGER_FOR_RULE = "/choosetriggerforrule";
+  
 }

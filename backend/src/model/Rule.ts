@@ -1,14 +1,15 @@
 import mongoose, { Schema } from "mongoose";
 import Model from "../Model";
 import logger from "../helper/logger";
-import { triggerServiceNotificationServer } from "./Trigger";
+import { ITrigger, triggerServiceNotificationServer } from "./Trigger";
+import { IAction } from "./Action";
 
 export interface IRule {
     _id: string;
     name: string,
     userId: string;
-    triggerId: string;
-    actionId: string;
+    triggerId: string| Partial<ITrigger>;
+    actionId: string | Partial<IAction>;
     isAuthorized: boolean;
 }
 
@@ -23,16 +24,18 @@ const ruleSchema = new Schema({
     },
     triggerId: {
         type: Schema.Types.ObjectId,
+        ref: "trigger",
         required: true
     },
     actionId: {
         type: Schema.Types.ObjectId,
+        ref: "action",
         required: true
     },
     isAuthorized: {
         type: Boolean,
         required: true,
-        default: false
+        default: true
     }
 });
 // Build an unique index on tuple <userId, triggerId, actionId> to prevent duplicates
@@ -45,11 +48,11 @@ class Rule extends Model<IRule> {
     }
 
     /**
-     * Finds all rules created by a user.
+     * Finds all rules created by a user and populates the trigger and action.
      * @param userId the id of the user
      */
     async findAllForUser(userId: string): Promise<IRule[] | null> {
-        return await this.findAll({ userId: userId });
+        return await this.findAll({ userId: userId }, "name triggerId actionId isAuthorized",  "triggerId actionId",  "_id name description" );
     }
 
     /**
@@ -87,7 +90,7 @@ class Rule extends Model<IRule> {
                 .addFields({ triggerNotificationServer: "$service.triggerNotificationServer" })
                 .addFields({ serviceId: "$service._id" })
                 //remove all the field except the trigger Notification center
-                .project({ _id: 0, "triggerNotificationServer": 1, "triggerId": 1 }) as Partial<triggerServiceNotificationServer>[];
+                .project({ _id: 0, "triggerNotificationServer": 1, "triggerId": 1, "serviceId":1 }) as Partial<triggerServiceNotificationServer>[];
             //this way should return a list of documents and in each document there should be only the
             //triggerNotificationServer
             console.log(result);

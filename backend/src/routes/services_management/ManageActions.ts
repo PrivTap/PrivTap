@@ -1,9 +1,12 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
-import { checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
+import { badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
 import Action, { IAction } from "../../model/Action";
 import Service from "../../model/Service";
 import { handleInsert, handleUpdate } from "../../helper/misc";
+import Permissions from "../../model/Permission";
+import { transformStringInDataDef } from "../../helper/dataDefinition";
+
 
 export default class ManageActionsRoute extends Route {
     constructor() {
@@ -15,15 +18,13 @@ export default class ManageActionsRoute extends Route {
 
         if (checkUndefinedParams(response, serviceId)) return;
 
-        let actions: Partial<IAction>[] = [];
-
-        const services = await Action.findAllForService(serviceId);
-        if (!services){
+        const actions = await Action.findAllForService(serviceId, true);
+        console.log(actions);
+        if (!actions) {
             internalServerError(response);
             return;
         }
 
-        actions = services;
         success(response, actions);
     }
 
@@ -33,20 +34,41 @@ export default class ManageActionsRoute extends Route {
         const serviceId = request.body.serviceId;
         const permissions = request.body.permissions;
         const endpoint = request.body.endpoint;
-
-        if (checkUndefinedParams(response, name, description, serviceId, endpoint)) return;
+        const inp = request.body.inputs;
+        if (checkUndefinedParams(response, name, description, serviceId, endpoint, inp)) return;
 
         // Check that the user is the owner of the service
         if (!await Service.isCreator(request.userId, serviceId)) {
             forbiddenUserError(response, "You are not the owner of this service");
             return;
         }
+        const inputs = transformStringInDataDef(inp);
+        if (inputs === null) {
+            badRequest(response, "Inputs are not in the valid format");
+            return;
+        }
 
         // Insert the action
-        const action = await handleInsert(response, Action, { name, description, serviceId, endpoint, permissions }, true) as IAction;
+        const action = await handleInsert(response, Action, {
+            name,
+            description,
+            serviceId,
+            endpoint,
+            permissions,
+            inputs
+        }, true) as IAction;
         if (!action) return;
+        const associatedPermissions = await Permissions.getAllPermissionAndAddBooleanTag(serviceId, action.permissions as string[]);
+        const actionResult: Partial<IAction> = {
+            name: action.name,
+            _id: action._id,
+            endpoint: action.endpoint,
+            description: action.description,
+            permissions: associatedPermissions ? associatedPermissions : [],
+            inputs: action.inputs
+        };
 
-        success(response, action);
+        success(response, actionResult);
     }
 
     protected async httpDelete(request: Request, response: Response): Promise<void> {
@@ -73,17 +95,36 @@ export default class ManageActionsRoute extends Route {
         const description = request.body.description;
         const permissions = request.body.permissions;
         const endpoint = request.body.endpoint;
-
         if (checkUndefinedParams(response, actionId)) return;
 
         if (!await Action.isCreator(request.userId, actionId)) {
             forbiddenUserError(response, "You are not the owner of this action");
             return;
         }
+        const inputs = transformStringInDataDef(request.body.inputs);
+        if (inputs === null) {
+            badRequest(response, "Inputs are not in the valid format");
+            return;
+        }
 
-        const queriedAction = await handleUpdate(response, Action, { "_id": actionId }, { name, description, permissions, endpoint }, true) as IAction;
-        if(!queriedAction) return;
+        const updatedAction = await handleUpdate(response, Action, { "_id": actionId }, {
+            name,
+            description,
+            permissions,
+            endpoint,
+            inputs
+        }, true) as IAction;
+        if (!updatedAction) return;
+        const associatedPermissions = await Permissions.getAllPermissionAndAddBooleanTag(updatedAction.serviceId, updatedAction.permissions as string[]);
+        const triggerResult: Partial<IAction> = {
+            name: updatedAction.name,
+            _id: updatedAction._id,
+            endpoint: updatedAction.endpoint,
+            description: updatedAction.description,
+            permissions: associatedPermissions ? associatedPermissions : [],
+            inputs: updatedAction.inputs
+        };
 
-        success(response, queriedAction);
+        success(response, triggerResult);
     }
 }

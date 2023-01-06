@@ -47,6 +47,8 @@ tags:
     description: Endpoints for authorizing services on behalf of users
   - name: Rules Execution
     description: Endpoints for executing trigger-action rules defined by users
+  - name: Middleware
+    description: Endpoint not belonging to our platform but needed in order to integrate with it (Protocol Translator).
 security:
   - auth: []
 paths:
@@ -166,9 +168,35 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Rule'
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: MyRule
+                  triggerId:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 5f9f5b9b9b9b9b9b9b9b9b9b
+                      name:
+                        type: string
+                        example: MyTrigger
+                      description:
+                        type: string
+                        example: MyTriggerDescription
+                  actionId:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 5f9f5b9b9b9b9b9b9b9b9b9b
+                      name:
+                        type: string
+                        example: MyAction
+                      description:
+                        type: string
+                        example: MyActionDescription
         '400':
           description: Bad request
         '500':
@@ -276,76 +304,115 @@ paths:
       tags:
         - Rules Management
       summary:  Gets a list of available triggers
-      description: Returns a list of triggers offered by services that the user has authorized. The triggers will be grouped by the service that is providing them. The results can be filtered with a search query.
+      description: Returns a list of triggers offered by a specific service. By default it returns all the triggers with an addition fieldset "authorized". If it is set to true, the trigger is authorized by the user, otherwise it is not.
       operationId: triggers
       parameters:
-        - name: search
-          description: Search query that will restrict the result to only triggers whose name or description matches it (NOT YET IMPLEMENTED)
+        - name: serviceId
+          description: The id of the service
           in: query
           schema:
             type: string
+          required: true
+
       responses:
         '200':
-          description: The request was successful
+          description: successful operation
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    serviceName:
-                      type: string
-                      example: SensorService
-                    serviceId:
-                      type: string
-                      example: 025ccd4951hld089ba219okl
-                    triggers:
-                      type: array
-                      items:
-                        $ref: '#/components/schemas/Trigger'
-        '400':
-          description: Bad request
-        '500':
-          description: Internal server error
+                properties:
+                  _id:
+                    type: string
+                    example: 637e6c0e2677ffe654ea9672
+                  name:
+                    type: string
+                    example: SomeTriggerName
+                  description:
+                    type: string
+                    example: SomeTriggerDescription
+                  serviceId:
+                    type: string
+                    example: 637e6c0e2677ffe654ea9672
+                  permissions:
+                    type: array
+                    items:
+                      properties:
+                        name:
+                          type: string
+                          example: SomePermissionName
+                        _id:
+                          type: string
+                          example: SomePermissionId
+                        description:
+                          type: string
+                          example: SomePermissionDescription
+                  authorized:
+                    type: boolean
+                    example: true
 
   /actions:
     get:
       tags:
         - Rules Management
       summary: Gets a list of available actions
-      description: Returns a list of actions offered by services that the user has authorized. The actions will be grouped by the service that is providing them. The results can be filtered with a search query.
+      description: Returns a list of actions offered by a specific service. By default it returns all the triggers with an addition fieldset "authorized". If it is set to true, the trigger is authorized by the user, otherwise it is not.
       operationId: actions
       parameters:
-        - name: search
-          description: Search query that will restrict the result to only actions whose name or description matches it (NOT YET IMPLEMENTED)
+        - name: serviceId
+          description: The id of the service
           in: query
           schema:
             type: string
+          required: true
+        - name: authorized
+          description: Filters the returned list including only the actions authorized by the user
+          in: query
+          schema:
+            type: boolean
+          example: true
+        - name: compatible
+          description: Filters the returned list including only the actions authorized by the user
+          in: query
+          schema:
+            type: boolean
+          example: true
       responses:
         '200':
-          description: The request was successful
+          description: successful operation
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  type: object
                   properties:
-                    serviceName:
+                    _id:
                       type: string
-                      example: NotificationService
+                      example: 637e6c0e2677ffe654ea9672
+                    name:
+                      type: string
+                      example: SomeActionName
+                    description:
+                      type: string
+                      example: SomeActionDescription
                     serviceId:
                       type: string
-                      example: 025ccd4951hld089ba219okl
-                    actions:
+                      example: 637e6c0e2677ffe654ea9672
+                    permissions:
                       type: array
                       items:
-                        $ref: '#/components/schemas/Action'
-        '400':
-          description: Bad request
-        '500':
-          description: Internal server error
+                        properties:
+                          name:
+                            type: string
+                            example: SomePermissionName
+                          description:
+                            type: string
+                            example: SomePermissionDescription
+                          _id:
+                            type: string
+                            example: SomePermissionId
+                    authorized:
+                      type: boolean
+                      example: true
 
   /service-authorization:
     get:
@@ -481,9 +548,15 @@ paths:
                 description:
                   type: string
                   example: This service allows the interaction with Dropbox's APIs
-                authServer:
+                baseUrl:
                   type: string
                   example: http://www.dropboxauth.com
+                authPath:
+                  type: string
+                  example: /login/auth
+                tokenPath:
+                  type: string
+                  example: /login/access_token
                 clientId:
                   type: string
                   example: very_secret_id
@@ -496,9 +569,14 @@ paths:
               required:
                 - name
                 - description
+                - baseUrl
       responses:
         '200':
           description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
         '400':
           description: Error while creating a service
         '500':
@@ -543,16 +621,22 @@ paths:
               properties:
                 serviceId :
                   type : string
-                  example : 637ccd4951cdf089ba2123be
+                  example : 637e6c0e2677ffe654ea9672
                 description:
                   type: string
-                  example: Some very nice new service description
+                  example: This service allow you to interact with your dropbox account!
                 name:
                   type: string
-                  example: someNewServiceName
-                authServer:
+                  example: Dropbox
+                baseUrl:
                   type: string
-                  example: someNewAuthorizationServerUrl
+                  example: http://www.dropbox_auth_server.com"
+                authPath:
+                  type: string
+                  example: /login/auth
+                tokenPath:
+                  type: string
+                  example: /login/access_token
                 clientId:
                   type: string
                   example: someNewSecretClientId
@@ -567,6 +651,10 @@ paths:
       responses:
         '200':
           description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
         '400':
           description: Error while creating a service
   /triggers-data:
@@ -574,17 +662,62 @@ paths:
       tags:
         - Rules Execution
       summary: The OSP sends data to activate a registered trigger
-      description: The OSP sends data to activate a registered trigger (TODO)
+      description: The OSP sends data to activate a registered trigger. It MUST send the triggerId and the userId received with the notification, the api key and an optional parameter that it will get back for the resource server. If needed, the platform will make a request to the previously defined resource server in order to ask data using the format defined in the middleware endpoint.
       operationId: post-triggers-data
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Trigger'
+              type: object
+              properties:
+                triggerId:
+                  type: string
+                  example: 637e6c0e2677ffe654ea9672
+                userId:
+                  type: string
+                  example : 637e6c0e2677ffe654ea9672
+                apiKey:
+                  type: string
+                  example: 637e6c0e2677ffe654ea9672
+                optionalEventDataParameters:
+                  type: string
+                  example: "{ 'data' : 'some data' }"
+              required:
+                - triggerId
+                - userId
+                - apiKey
       responses:
         '200':
           description: successful operation
+  /middleware:
+    get:
+      tags:
+        - Middleware
+      summary: The endPoint of the OSP trigger that will be used to communicate with privTap platform.
+      description:  qualcosa
+      operationId: get-middleware
+      parameters:
+        - in: header
+          name: Authorization
+          schema:
+            type: string
+            example: "Bearer tokenExample"
+        - in: query
+          name: filter
+          schema:
+            type: array
+            items:
+              type: string
+            example: [identifier1,identifier2]
+      responses:
+        '200':
+          description: ciao
+    post:
+      tags:
+        - Middleware
+      summary:
+
   /oauth:
     get:
       tags:
@@ -629,9 +762,38 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Trigger'
+                properties:
+                  _id:
+                    type: string
+                    example: 637e6c0e2677ffe654ea9672
+                  name:
+                    type: string
+                    example: SomeTriggerName
+                  description:
+                    type: string
+                    example: SomeTriggerDescription
+                  serviceId:
+                    type: string
+                    example: 637e6c0e2677ffe654ea9672
+                  permissions:
+                    type: array
+                    items:
+                      properties:
+                        name:
+                          type: string
+                          example: SomePermissionName
+                        _id:
+                          type: string
+                          example: SomePermissionId
+                        description:
+                          type: string
+                          example: SomePermissionDescription
+                        associated:
+                          type: boolean
+                          example: true
+                  resourceServer:
+                    type: string
+                    example: someUrlToToGetAResource
     post:
       tags:
         - Services Management
@@ -668,6 +830,41 @@ paths:
       responses:
         '200':
           description: successful operation
+          content:
+            application/json:
+              schema:
+                properties:
+                  _id:
+                    type: string
+                    example: 637e6c0e2677ffe654ea9672
+                  name:
+                    type: string
+                    example: SomeTriggerName
+                  description:
+                    type: string
+                    example: SomeTriggerDescription
+                  serviceId:
+                    type: string
+                    example: 637e6c0e2677ffe654ea9672
+                  permissions:
+                    type: array
+                    items:
+                      properties:
+                        name:
+                          type: string
+                          example: SomePermissionName
+                        _id:
+                          type: string
+                          example: SomePermissionId
+                        description:
+                          type: string
+                          example: SomePermissionDescription
+                        associated:
+                          type: boolean
+                          example: true
+                  resourceServer:
+                    type: string
+                    example: someUrlToToGetAResource
     delete:
       tags:
         - Services Management
@@ -723,6 +920,41 @@ paths:
       responses:
         '200':
           description: successful operation
+          content:
+            application/json:
+              schema:
+                properties:
+                  _id:
+                    type: string
+                    example: 637e6c0e2677ffe654ea9672
+                  name:
+                    type: string
+                    example: SomeTriggerName
+                  description:
+                    type: string
+                    example: SomeTriggerDescription
+                  serviceId:
+                    type: string
+                    example: 637e6c0e2677ffe654ea9672
+                  permissions:
+                    type: array
+                    items:
+                      properties:
+                        name:
+                          type: string
+                          example: SomePermissionName
+                        description:
+                          type: string
+                          example: SomePermissionDescription
+                        _id:
+                          type: string
+                          example: SomePermissionId
+                        associated:
+                          type: boolean
+                          example: true
+                  resourceServer:
+                    type: string
+                    example: someUrlToToGetAResource
 
   /manage-actions:
     get:
@@ -746,7 +978,38 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Action'
+                  properties:
+                    _id:
+                      type: string
+                      example: 637e6c0e2677ffe654ea9672
+                    name:
+                      type: string
+                      example: SomeActionName
+                    description:
+                      type: string
+                      example: SomeActionDescription
+                    serviceId:
+                      type: string
+                      example: 637e6c0e2677ffe654ea9672
+                    permissions:
+                      type: array
+                      items:
+                        properties:
+                          name:
+                            type: string
+                            example: SomePermissionName
+                          description:
+                            type: string
+                            example: SomePermissionDescription
+                          _id:
+                            type: string
+                            example: SomePermissionId
+                          associated:
+                            type: boolean
+                            example: true
+                    endpoint:
+                      type: string
+                      example: someUrlToPerformAction
     post:
       tags:
         - Services Management
@@ -785,6 +1048,41 @@ paths:
       responses:
         '200':
           description: successful operation
+          content:
+            application/json:
+              schema:
+                properties:
+                  _id:
+                    type: string
+                    example: 637e6c0e2677ffe654ea9672
+                  name:
+                    type: string
+                    example: SomeActionName
+                  description:
+                    type: string
+                    example: SomeActionDescription
+                  serviceId:
+                    type: string
+                    example: 637e6c0e2677ffe654ea9672
+                  permissions:
+                    type: array
+                    items:
+                      properties:
+                        name:
+                          type: string
+                          example: SomePermissionName
+                        description:
+                          type: string
+                          example: SomePermissionDescription
+                        _id:
+                          type: string
+                          example: SomePermissionId
+                        associated:
+                          type: boolean
+                          example: true
+                  endpoint:
+                    type: string
+                    example: someUrlToPerformAction
     delete:
       tags:
         - Services Management
@@ -805,6 +1103,7 @@ paths:
       responses:
         '200':
           description: successful operation
+
 
     put:
       tags:
@@ -840,7 +1139,41 @@ paths:
       responses:
         '200':
           description: successful operation
-
+          content:
+            application/json:
+              schema:
+                properties:
+                  _id:
+                    type: string
+                    example: 637e6c0e2677ffe654ea9672
+                  name:
+                    type: string
+                    example: SomeActionName
+                  description:
+                    type: string
+                    example: SomeActionDescription
+                  serviceId:
+                    type: string
+                    example: 637e6c0e2677ffe654ea9672
+                  permissions:
+                    type: array
+                    items:
+                      properties:
+                        name:
+                          type: string
+                          example: SomePermissionName
+                        _id:
+                          type: string
+                          example: SomePermissionId
+                        description:
+                          type: string
+                          example: SomePermissionDescription
+                        associated:
+                          type: boolean
+                          example: true
+                  endpoint:
+                    type: string
+                    example: someUrlToPerformAction
   /permissions:
     get:
       tags:
@@ -1067,9 +1400,15 @@ components:
         creator:
           type: string
           example: 632e69a12677ffe654ea9672
-        authServer:
+        baseUrl:
           type: string
           example: http://www.dropbox_auth_server.com
+        authPath:
+          type: string
+          example: /login/auth
+        tokenPath:
+          type: string
+          example: /login/access_token
         clientId:
           type: string
           example: very_secret_id
@@ -1083,6 +1422,29 @@ components:
         - name
         - description
         - _id
+
+    EntryDefinition:
+      properties:
+        identifier:
+          type: string
+          example: nameOfAFieldIdentifier
+        type:
+          type: string
+          example: ciao
+        data:
+          $ref: '#/components/schemas/EntryDefinition'
+      example:
+        identifier: nameOfAFieldIdentifier
+        type: aggregate/array
+        data : [{'type': 'string', 'data': 'exampleString'}]
+    DataDefinition:
+      properties:
+        trigger_data:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntryDefinition'
+      required:
+        - trigger_data
 
     Permission:
       properties:

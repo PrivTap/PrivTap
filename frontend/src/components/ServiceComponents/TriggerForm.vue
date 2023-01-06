@@ -1,135 +1,125 @@
 <template>
-    <v-card>
-        <v-card-title>
-            <h2 class="text-h5"> {{ props.onEdit ? 'Edit' : 'Create' }} Trigger </h2>
-        </v-card-title>
-        <v-card-text>
-            <v-form ref="formRef" v-model="form.valid" lazy-validation>
-                <v-text-field v-model="form.name" :rules="form.nameRule" label="Name" required></v-text-field>
-                <v-textarea :rules="form.descriptionRule" v-model="form.description" label="Description"
+  <v-card>
+    <v-card-title>
+      <h2 class="text-h5"> {{ props.onEdit ? 'Edit' : 'Create' }} Trigger </h2>
+    </v-card-title>
+
+    <v-card-text>
+      <v-form ref="formRef" v-model="form.valid" lazy-validation>
+        <v-text-field v-model="form.name" :rules="form.nameRule" label="Name" required></v-text-field>
+        <v-textarea :rules="form.descriptionRule" v-model="form.description" label="Description"
                     required></v-textarea>
-                    <v-text-field v-model="form.resourceServer" :rules="form.resourceServerRule" label="ResourceServer"
-                    required></v-text-field>
-                    <v-label class="mb-2 mt-4">Choose Permissions</v-label>
-
-                    <v-input :rules="permissionRule" v-model="selectedPermissions" :readonly="true">
-                    <v-row align-content="start" no-gutters class="-translate-x-3 h-14"
-                        >
-                        <v-col cols="2" align-self="start" v-for="choosablePerm in choosablePermissions" :key="choosablePerm._id">
-                            <v-checkbox v-model="selectedPermissions" :label="choosablePerm.name" :value="choosablePerm"
-                                color="success"></v-checkbox>
-                        </v-col>
-                    </v-row>
-                </v-input>
-                <v-divider class="my-5"></v-divider>
-            </v-form>
-        </v-card-text>
-        <v-row class="px-8 space-x-6">
-            <v-btn color="info" text @click="validate"> {{ props.onEdit ? 'Edit' : 'Create' }}</v-btn>
-            <v-btn color="red" variant="outlined" text @click="resetValidation">Reset</v-btn>
-            <v-spacer></v-spacer>
-            <v-btn color="error" variant="text" text @click="props.onCancel()">Cancel</v-btn>
+        <v-text-field v-model="form.resourceServer" :rules="form.resourceServerRule" label="ResourceServer"
+                      required></v-text-field>
+        <v-textarea required hint="Paste a valid Array JSON object" :rules="form.outputsRule"
+                    v-model="form.outputs" label="Outputs"></v-textarea>
+        <v-label class="mb-2 mt-4">Choose Permissions</v-label>
+        <v-row align-content="start" no-gutters class="-translate-x-3 h-14"
+        >
+          <v-col cols="2" align-self="start" v-for="choosablePerm in choosablePermissions.perm"
+                 :key="choosablePerm._id">
+            <v-checkbox v-model="choosablePerm.associated" :label="choosablePerm.name"
+                        color="success"></v-checkbox>
+          </v-col>
         </v-row>
-    </v-card>
+        <v-divider class="my-5"></v-divider>
+      </v-form>
+    </v-card-text>
+    <v-row class="px-8 space-x-6">
+      <v-btn color="info" text @click="validate"> {{ props.onEdit ? 'Edit' : 'Create' }}</v-btn>
+      <v-btn color="red" variant="outlined" text @click="resetValidation">Reset</v-btn>
+      <v-spacer></v-spacer>
+      <v-btn color="error" variant="text" text @click="onClose()">Cancel</v-btn>
+    </v-row>
+    <v-card-actions></v-card-actions>
+  </v-card>
 </template>
-  
-
-
-
 <script lang="ts" setup>
-import { onMounted, reactive, ref } from 'vue'
+import {onMounted, reactive, ref} from 'vue'
 import TriggerModel from '@/model/trigger_model';
-import {ManageTrigger} from '@/services/manage_trigger'; //MOZDA OVOOOOOOOOOOOOOOOOOOOOOOOOOO
-import { isValidUrlRegex } from '@/helpers/validators';
+import {isValidEntryDefinition, isValidUrlRegex} from '@/helpers/validators';
+import manage_permission from '@/controllers/manage_permission';
+import manage_trigger from '@/controllers/manage_trigger';
 import type PermissionModel from '@/model/permission_model';
-import ManagePermission from '@/services/manage_permission';
-// import { trigger } from '@vue/reactivity';
-
 
 const props = defineProps(
     {
-        serviceId: {
-            type: String,
-            required: true
-        },
-        onCancel: {
-            type: Function,
-            required: true
-        },
-        onEdit: {
-            type: Boolean,
-            required: false,
-            default: false
-        },
-        trigger: {
-            type: TriggerModel,
-            required: false,
-            default: null
-        },
+      serviceId: {
+        type: String,
+        required: true
+      },
+      onCancel: {
+        type: Function,
+        required: true
+      },
+      onEdit: {
+        type: Boolean,
+        required: false,
+        default: false
+      },
+      trigger: {
+        type: TriggerModel,
+        required: false,
+        default: null
+      },
     }
 );
 
 onMounted(async () => {
-    choosablePermissions.value = await ManagePermission.getInstance.getPermissions(props.serviceId);
-    if (props.onEdit && props.trigger) {
-        const trigger = props.trigger;
-        form.name = trigger.name;
-        form.description = trigger.description;
-        form.resourceServer = trigger.resourceServer ?? '';
-        _getSelectedPermissions(trigger);
-    }
+  if (props.onEdit && props.trigger) {
+    const trigger = props.trigger;
+    form.name = trigger.name;
+    form.description = trigger.description;
+    form.resourceServer = trigger.resourceServer ?? '';
+    form.outputs= trigger.outputs?? "[]";
+    choosablePermissions.perm = JSON.parse(JSON.stringify(trigger.permissions));
+  } else {
+    await manage_permission.getAllPermissions(props.serviceId);
+    choosablePermissions.perm = manage_permission.getRef().value;
+  }
 });
 
-let choosablePermissions = ref<PermissionModel[]>([]);
-const selectedPermissions = ref<PermissionModel[]>([]);
-
-function _getSelectedPermissions(trigger: TriggerModel) {
-    for (const permId of trigger.permissions) {
-        const permIndex = choosablePermissions.value.findIndex(p => p._id === permId);
-        if (permIndex >= -1) {
-            selectedPermissions.value.push(choosablePermissions.value[permIndex]);
-        }
-    }
-}
-
-const permissionRule = ref([
-    (v: string[]) => (v.length !== 0) || 'Permission is required',
-]);
+const choosablePermissions = reactive<{ perm: Partial<PermissionModel>[] }>({
+  perm: []
+})
 
 /// Form part
 const formRef = ref();
 const form = reactive({
-    valid: true,
-    name: '',
-    nameRule: [(v: string) => !!v || 'Name is required'],
-    description: '',
-    descriptionRule: [(v: string) => !!v || 'Description is required'],
-    resourceServer: '',
-    resourceServerRule: [
-        (v: string) => !!v || 'Resource Server is required',
-        (v: string) => isValidUrlRegex(v) || 'Resource Server is not valid'
-    ],
+  valid: true,
+  name: '',
+  nameRule: [(v: string) => !!v || 'Name is required'],
+  description: '',
+  descriptionRule: [(v: string) => !!v || 'Description is required'],
+  resourceServer: '',
+  resourceServerRule: [
+    (v: string) => !!v || 'Resource Server is required',
+    (v: string) => isValidUrlRegex(v) || 'Resource Server is not valid'
+  ],
+  outputs: '',
+  outputsRule: [(v: string) => isValidEntryDefinition(v)],
 });
 
-const manageTrigger = ManageTrigger.getInstance;
+async function onClose() {
+  props.onCancel();
+}
+
 async function validate() {
-    const { valid } = await formRef.value.validate();
-    console.log(valid);
-    if (valid) {
-        const permissionIds = selectedPermissions.value.map(p => p._id);
-        if (props.onEdit) {
-            await manageTrigger.updateTrigger(props.trigger._id, form.name, form.description, permissionIds, form.resourceServer);
-            console.log(permissionIds);
-            console.log(form.name);
-        } else {
-            await manageTrigger.createTrigger(form.name, form.description, props.serviceId, permissionIds, form.resourceServer);
-        }
-        props.onCancel(); 
+  const {valid} = await formRef.value.validate();
+  console.log(valid);
+  if (valid) {
+    const perm = choosablePermissions.perm.filter(p => p._id !== undefined && p.associated === true).map(p => p._id) as string[];
+    if (props.onEdit) {
+      await manage_trigger.updateTrigger(props.trigger._id, form.name, form.description, perm, form.resourceServer, form.outputs);
+    } else {
+      await manage_trigger.createTrigger(form.name, form.description, props.serviceId, perm, form.resourceServer, form.outputs);
     }
+    onClose();
+  }
 }
 
 function resetValidation() {
-    formRef.value.resetValidation()
+  formRef.value.resetValidation()
 }
 
 </script>

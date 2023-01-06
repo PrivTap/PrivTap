@@ -6,6 +6,9 @@ export interface IService {
     name: string;
     description: string;
     creator: string;
+    baseUrl: string;
+    authPath: string;
+    tokenPath: string;
     authServer: string;
     clientId: string;
     clientSecret: string;
@@ -29,7 +32,14 @@ const serviceSchema = new Schema({
         type: Schema.Types.ObjectId,
         required: true,
     },
-    authServer: {
+    baseUrl: {
+        type: String,
+        required: true,
+    },
+    authPath: {
+        type: String,
+    },
+    tokenPath:{
         type: String,
     },
     clientId: {
@@ -70,7 +80,7 @@ class Service extends Model<IService> {
      * @param apiKey the api key to check
      */
     async isValidAPIKey(serviceId: string, apiKey: string): Promise<boolean> {
-        const service = await this.findById(serviceId, "-_id apiKey");
+        const service = await this.findById(serviceId, "apiKey");
         // TODO: do we need a timing safe compare here?
         return service?.apiKey == apiKey;
     }

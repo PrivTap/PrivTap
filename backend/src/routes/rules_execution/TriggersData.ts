@@ -1,77 +1,124 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
-import { checkUndefinedParams, forbiddenUserError, internalServerError } from "../../helper/http";
+import {
+    checkUndefinedParams,
+    forbiddenUserError,
+    internalServerError,
+} from "../../helper/http";
 import Rule from "../../model/Rule";
 import Trigger from "../../model/Trigger";
-import axios from "axios";
-import { replaceResourceURLs } from "../../helper/misc";
 import Action from "../../model/Action";
 import logger from "../../helper/logger";
+import Authorization from "../../model/Authorization";
+import Service from "../../model/Service";
+import { DataDefinition, dataDefinitionIDs } from "../../helper/dataDefinition";
+import { checkActionDataFormat, getReqHttp, postReqHttp } from "../../helper/misc";
 
 export default class TriggersDataRoute extends Route {
-    // TODO: figure out how to restrict this to only authorized services
 
     constructor() {
-        super("triggers-data");
+        super("triggers-data", false, false);
     }
 
     protected async httpPost(request: Request, response: Response): Promise<void> {
         //We received an event notification from the OSP
-
         const triggerId = request.body.triggerId;
         const userId = request.body.userId;
         const api = request.body.apiKey;
-        const dataFetchInfo = request.body.dataFetchInfo;
+        const optionalEventDataParameters = request.body.eventDataParameters;
 
         if (checkUndefinedParams(response, triggerId, userId, api)) {
             return;
         }
 
-        //TODO: Verify that the API key is bound to the service owning the trigger
-
         //Check that the user with the specified ID owns the service
-        const referencedRule = await Rule.find({ userId: userId, triggerId: triggerId });
-        const triggerData = await Trigger.findById(triggerId);
-        if (!triggerData || !referencedRule) {
+        const referencedRules = await Rule.findAll({ userId: userId, triggerId: triggerId });
+        const trigger = await Trigger.findById(triggerId);
+
+        if (!trigger || !referencedRules) {
             forbiddenUserError(response, "You are not the owner of this rule");
-        }
-
-        //TODO: Get the OAuth token for the trigger
-        const oauthToken = "ASampleToken";
-
-        //Get the data from the resourceServer (if needed)
-        let dataToForwardToActionAPI: object | null = null;
-        if (triggerData?.resourceServer) {
-            const response = await axios.get(triggerData?.resourceServer ?? "", {
-                headers: {
-                    Authorization: "Bearer " + oauthToken
-                },
-                params: dataFetchInfo
-            });
-            //Now we replace all URLs
-            dataToForwardToActionAPI = response.data;
-            if (dataToForwardToActionAPI) {
-                replaceResourceURLs(dataToForwardToActionAPI);
-            } else {
-                dataToForwardToActionAPI = null;
-            }
-        }
-
-        //Forward the data to the Action API endpoint
-        const actionEndpoint = (await Action.findById(referencedRule!.actionId, "endpoint"))?.endpoint;
-        if (!actionEndpoint) {
-            internalServerError(response);
             return;
         }
 
-        //TODO: Do we need to show some kind of rule execution error??
-        const actionResponse = await axios.post(actionEndpoint, dataToForwardToActionAPI, {
-            headers: {
-                Authorization: "Bearer " + oauthToken
+        for (const referencedRule of referencedRules) {
+            //Verify that the API key is bound to the service owning the trigger
+            const isValidAPIKey = await Service.isValidAPIKey(trigger.serviceId, api);
+            if (!isValidAPIKey) {
+                forbiddenUserError(response, "Invalid key");
+                return;
             }
-        });
-        if (actionResponse.status.toString() != "200") {
-            logger.error("Could not execute rule with id " + referencedRule?._id + " with error " + actionResponse.status.toString());
+
+            const action = await Action.findById(referencedRule.actionId as string);
+            if (!action?.endpoint) {
+                internalServerError(response);
+                return;
+            }
+
+            //Get the OAuth token for the trigger
+            let oauthToken = await Authorization.findToken(userId, trigger.serviceId);
+
+            //Get the data from the resourceServer (if needed)
+            let dataToForwardToActionAPI: object | null = null;
+            const parsed = JSON.parse(action.inputs) as DataDefinition;
+            const actionRequiredIDs = dataDefinitionIDs(parsed);
+            if (trigger?.resourceServer) {
+                if (!oauthToken) {
+                    forbiddenUserError(response, "Trigger not authorized");
+                    return;
+                }
+
+                let axiosResponse;
+                try {
+                    const queryParams: Record<string, unknown> = {
+                        filter: actionRequiredIDs,
+                    };
+                    if (optionalEventDataParameters) {
+                        queryParams.eventDataParameters = optionalEventDataParameters;
+                    }
+                    axiosResponse = await getReqHttp(trigger?.resourceServer, oauthToken, queryParams);
+                    dataToForwardToActionAPI = axiosResponse?.data;
+                    if (!dataToForwardToActionAPI) {
+                        logger.debug("Axios response data not found");
+                        internalServerError(response);
+                        return;
+                    }
+                } catch (e){
+                    logger.debug("Axios response status =", axiosResponse?.status);
+                    return;
+                }
+            }
+
+            //Forward the data to the Action API endpoint
+            const actionEndpoint = action.endpoint;
+            oauthToken = await Authorization.findToken(userId, action.serviceId);
+
+            if (!actionEndpoint || !oauthToken) {
+                internalServerError(response);
+                return;
+            }
+            //Check that the data sent to action is compatible with the action data format (i.e. contains all the data required by it)
+            const triggerDataIDs = dataDefinitionIDs(dataToForwardToActionAPI as DataDefinition);
+
+            if (!triggerDataIDs || checkActionDataFormat(actionRequiredIDs, triggerDataIDs)) {
+                console.log("Trigger Sending Less Data than what the Action requires! Rule execution skipped...");
+                internalServerError(response);
+                return;
+            }
+
+            // TODO: Do we need to show some kind of rule execution error??
+            let actionResponse;
+            try {
+                actionResponse = await postReqHttp(actionEndpoint, oauthToken, dataToForwardToActionAPI ?? {});
+            } catch (e) {
+                logger.debug("Could not execute rule with id " + referencedRule?._id + " with error " + actionResponse?.status);
+            }
+            if (actionResponse?.status.toString() != "200") {
+                logger.error("Could not execute rule with id " + referencedRule?._id + " with error " + actionResponse?.status.toString());
+                internalServerError(response);
+                return;
+            }
         }
+
+        response.status(200).send();
     }
 }

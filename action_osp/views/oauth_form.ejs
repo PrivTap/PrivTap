@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Authorization</title>
+</head>
+<body>
+<div class="rectangle">
+    <div style="align-content: center">
+        <p style="font-weight: bold; font-size: 1.5vw">You're authorizing the following:</p>
+        <ul>
+            <% for (var i=0; i<fieldData.authorizationTypes.length; i++) { %>
+            <li style="text-align: left; font-size: 1.2vw"><%- fieldData.authorizationTypes[i] %></li>
+            <% } %>
+        </ul>
+        <hr class="solid">
+        <p style="font-weight: bold; font-size: 1.5vw">Access to your account data:</p>
+        <ul>
+            <% for (var i=0; i<fieldData.userGranularities.length; i++) { %>
+                <li style="text-align: left; font-size: 1.2vw"><%- fieldData.userGranularities[i] %></li>
+            <% } %>
+        </ul>
+        <hr class="solid">
+        <p style="font-weight: bold; font-size: 1.5vw">Access to your posts:</p>
+        <ul>
+            <% for (var i=0; i<fieldData.postGranularities.length; i++) { %>
+                <li style="text-align: left; font-size: 1.2vw"><%- fieldData.postGranularities[i] %></li>
+            <% } %>
+        </ul>
+        <hr class="solid">
+        <a class="accept" onclick="submitChoice('accept')" role="button">Accept</a>
+        <a class="refuse" onclick="submitChoice('refuse')" role="button">Refuse</a>
+    </div>
+</div>
+<link rel="stylesheet" href="../public/css/main.css">
+<link rel="stylesheet" href="../public/css/oauthForm.css">
+</body>
+
+<script>
+    function submitChoice(status) {
+        const state = '<%= state %>'
+        const redirectUri = '<%= redirectUri %>';
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://127.0.0.1:8002/authorize");
+        xhr.setRequestHeader("Accept", "application/json");
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                const data = JSON.parse(xhr.responseText);
+                const redirectUri = data.redirectUri;
+                let redirect = new XMLHttpRequest();
+                redirect.open("GET", redirectUri);
+                redirect.send();
+                window.location = redirectUri;
+            }};
+
+        let data = `{ "status": "${status}" , "state":` + JSON.stringify(state) + `, "redirectUri": "${redirectUri}" }`;
+        xhr.send(data);
+    }
+</script>
+</html>

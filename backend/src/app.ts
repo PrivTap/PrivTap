@@ -45,7 +45,6 @@ class BackendApp {
     readonly baseURL: string;
     // Connection string for a MongoDB database instance
     readonly dbString: string;
-
     // Express application server
     readonly express: Express;
 

@@ -1,7 +1,8 @@
 import Route from "../../Route";
 import { Request, Response } from "express";
-import { internalServerError, success } from "../../helper/http";
-import Authorization, { ServiceActions } from "../../model/Authorization";
+import { checkUndefinedParams, internalServerError, success } from "../../helper/http";
+import Action from "../../model/Action";
+import RuleExecution from "../../helper/rule_execution";
 
 export default class ActionsRoute extends Route {
     constructor() {
@@ -12,17 +13,33 @@ export default class ActionsRoute extends Route {
         // TODO: If we have time implement search https://www.mongodb.com/docs/atlas/atlas-search/query-syntax/#mongodb-pipeline-pipe.-search
         // const searchQuery = request.query.search;
 
-        let data: ServiceActions[]  = [];
-
-        // TODO: query only compatible actions
-        // const triggerId = request.query.triggerId;
-        const authorizedServices = await Authorization.findAllServicesAuthorizedByUserWithActions(request.userId);
-        if (!authorizedServices) {
+        const serviceId = request.query.serviceId as string;
+        const userId = request.userId;
+        const triggerId = request.query.triggerId as string;
+        if (checkUndefinedParams(response, serviceId))
+            return;
+        const data = await Action.findAllActionAddingAuthorizedTag(userId, serviceId);
+        if (data == null) {
             internalServerError(response);
             return;
         }
-
-        data = authorizedServices;
-        success(response, data);
+        console.log("triggerId:", triggerId);
+        let result = [];
+        //TODO: Can we check compatibility on the DB? (probably not :( )
+        if (triggerId) {
+            for (const action of data) {
+                if (await RuleExecution.areActionTriggerCompatible(action._id ?? "", triggerId))
+                    result.push(action);
+            }
+            /*let filterdata = data.filter(async function (action) {
+                const bool= await RuleExecution.areActionTriggerCompatible(action._id ?? "", triggerId);
+                console.log("bool:" ,bool)
+                return bool;
+            });*/
+            console.log("data:", result);
+        } else {
+            result = data;
+        }
+        success(response, result);
     }
 }

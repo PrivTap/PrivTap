@@ -4,7 +4,7 @@ import logger from "../helper/logger";
 import { IAction } from "./Action";
 import { ITrigger } from "./Trigger";
 import { IService } from "./Service";
-import { permissionAuthorized } from "./Permission";
+import { PermissionAuthorized } from "./Permission";
 
 export interface IAuthorization {
     _id: string;
@@ -32,7 +32,7 @@ const authorizationSchema = new Schema({
 });
 
 // Build an unique index on tuple <userId, service> to prevent duplicates
-authorizationSchema.index({ userId: 1, service: 1 }, { unique: true });
+authorizationSchema.index({ userId: 1, serviceId: 1 }, { unique: true });
 
 export type ServiceActions = { serviceName: string, serviceId: string, actions: Partial<IAction>[] }
 export type ServiceTriggers = { serviceName: string, serviceId: string, triggers: Partial<ITrigger>[] }
@@ -55,23 +55,27 @@ class Authorization extends Model<IAuthorization> {
         }
 
         // Build the aggregation query
-        return this.model.aggregate()
-            // Filter only authorizations given by the user
-            .match({ userId: new Types.ObjectId(userId) })
-            // Keep only the field containing the service id
-            .project({ _id: 0, serviceId: 1 })
-            // Join with services collection on the local service id field (left outer join)
-            .lookup({ from: "services", localField: "serviceId", foreignField: "_id", as: "service" })
-            // Deconstruct the array created by the join to have one document for authorized service
-            .unwind("service")
-            // Set the serviceId and serviceName fields taking data from the service field
-            .addFields({ serviceId: "$service._id", serviceName: "$service.name" })
-            // Delete the service field, as it is no longer needed
-            .project({ serviceId: 0 })
-            // Join with the operation (triggers or actions) collection on the serviceId field (left outer join)
-            .lookup({ from: operation, localField: "serviceId", foreignField: "serviceId", as: operation })
-            // Keep only the necessary fields for each operation
-            .project(operationProjection);
+        try {
+            return this.model.aggregate()
+                // Filter only authorizations given by the user
+                .match({ userId: new Types.ObjectId(userId) })
+                // Keep only the field containing the service id
+                .project({ _id: 0, serviceId: 1 })
+                // Join with services collection on the local service id field (left outer join)
+                .lookup({ from: "services", localField: "serviceId", foreignField: "_id", as: "service" })
+                // Deconstruct the array created by the join to have one document for authorized service
+                .unwind("service")
+                // Set the serviceId and serviceName fields taking data from the service field
+                .addFields({ serviceId: "$service._id", serviceName: "$service.name" })
+                // Delete the service field, as it is no longer needed
+                .project({ serviceId: 0 })
+                // Join with the operation (triggers or actions) collection on the serviceId field (left outer join)
+                .lookup({ from: operation, localField: "serviceId", foreignField: "serviceId", as: operation })
+                // Keep only the necessary fields for each operation
+                .project(operationProjection);
+        } catch (e) {
+            return null;
+        }
     }
 
     /**
@@ -79,20 +83,24 @@ class Authorization extends Model<IAuthorization> {
      * @param userId
      */
     async findAllAuthorizedServices(userId: string) {
-        return await this.model.aggregate()
-            .match({ userId: new Types.ObjectId(userId) })
-            //keep only the serviceId
-            .project({ _id: 0, "serviceId": 1 })
-            //left outer join with collection service
-            .lookup({ from: "services", localField: "serviceId", foreignField: "_id", as: "service" })
-            .unwind({ path: "$service" })
-            .addFields({ _id: "$service._id", name: "$service.name", description: "$service.description" })
-            //remove all the field except the relevant service data
-            .project({
-                "_id": 1,
-                "name": 1,
-                "description": 1
-            }) as Partial<IService>[];
+        try {
+            return await this.model.aggregate()
+                .match({ userId: new Types.ObjectId(userId) })
+                //keep only the serviceId
+                .project({ _id: 0, "serviceId": 1 })
+                //left outer join with collection service
+                .lookup({ from: "services", localField: "serviceId", foreignField: "_id", as: "service" })
+                .unwind({ path: "$service" })
+                .addFields({ _id: "$service._id", name: "$service.name", description: "$service.description" })
+                //remove all the field except the relevant service data
+                .project({
+                    "_id": 1,
+                    "name": 1,
+                    "description": 1
+                }) as Partial<IService>[];
+        }catch (e) {
+            return null;
+        }
         //return await this.findAll({ userId }, "serviceId", "service", "name description");
     }
 
@@ -100,77 +108,66 @@ class Authorization extends Model<IAuthorization> {
      * Returns all the permission of a service and also the one granted by a user with an extra field
      */
     async findAllPermissionsAddingAuthorizationTag(serviceId: string, userId: string) {
-        console.log("user", userId, "\nservice", serviceId, "\n");
-        const collection = this.model.aggregate()
-            .match(({
-                userId: new Types.ObjectId(userId),
-                serviceId: new Types.ObjectId(serviceId)
-            }))
-            .project({ _id: 0, "grantedPermissions": 1 })
-            .unwind({ path: "$grantedPermissions" })
-            .lookup({
-                from: "permissions",
-                localField: "grantedPermissions",
-                foreignField: "_id",
-                as: "authPermissions"
-            })
-            .unwind({ path: "$authPermissions" })
-            .addFields({
-                _id: "$authPermissions._id",
-                name: "$authPermissions.name",
-                description: "$authPermissions.description",
-                authorized: true
-            }).project({ _id: 1, "name": 1, "description": 1, "authorized": 1 });
-        console.log(await collection);
-        const IDCollection: string[] = [];
-        (await collection).forEach((p) => {
-            IDCollection.push(p._id);
-        });
-        console.log(IDCollection);
-        return await collection.unionWith({
-            coll: "permissions", pipeline: [
-                {
-                    $match: {
-                        serviceId: new Types.ObjectId(serviceId),
-                        _id: { $nin: IDCollection }
+        try {
+            const collection = this.model.aggregate()
+                .match(({
+                    userId: new Types.ObjectId(userId),
+                    serviceId: new Types.ObjectId(serviceId)
+                }))
+                .project({ _id: 0, "grantedPermissions": 1 })
+                .unwind({ path: "$grantedPermissions" })
+                .lookup({
+                    from: "permissions",
+                    localField: "grantedPermissions",
+                    foreignField: "_id",
+                    as: "authPermissions"
+                })
+                .unwind({ path: "$authPermissions" })
+                .addFields({
+                    _id: "$authPermissions._id",
+                    name: "$authPermissions.name",
+                    description: "$authPermissions.description",
+                    authorized: true
+                }).project({ _id: 1, "name": 1, "description": 1, "authorized": 1 });
+            const IDCollection: string[] = [];
+            (await collection).forEach((p) => {
+                IDCollection.push(p._id);
+            });
+            return await collection.unionWith({
+                coll: "permissions", pipeline: [
+                    {
+                        $match: {
+                            serviceId: new Types.ObjectId(serviceId),
+                            _id: { $nin: IDCollection }
+                        }
+                    },
+                    {
+                        $addFields: {
+                            authorized: false
+                        }
+                    },
+                    {
+                        $project: { _id: 1, "name": 1, "description": 1, "authorized": 1 }
                     }
-                },
-                {
-                    $addFields: {
-                        authorized: false
-                    }
-                },
-                {
-                    $project: { _id: 1, "name": 1, "description": 1, "authorized": 1 }
-                }
-            ]
-        }) as Partial<permissionAuthorized>[];
+                ]
+            }) as Partial<PermissionAuthorized>[];
+        } catch (e) {
+            return null;
+        }
     }
 
-    /**
-     * Finds all the services that have been authorized by a user and all the actions associated.
-     * @param userId the id of the user
-     */
-    async findAllServicesAuthorizedByUserWithActions(userId: string): Promise<ServiceActions[] | null> {
+    async getGrantedPermissionsId(userId: string, serviceId: string) {
+        let result;
         try {
-            return await this.servicesAuthorizedByWith(userId, "actions");
+            const temp = await this.model.aggregate()
+                .match({ userId: new Types.ObjectId(userId), serviceId: new Types.ObjectId(serviceId) })
+                .project({ _id: 0, "grantedPermissions": 1 }) as Partial<IAuthorization>[];
+            result = temp[0].grantedPermissions;
+            return result;
         } catch (e) {
-            logger.error("Unexpected error while finding services authorized by a user with actions\n", e);
+            return null;
         }
-        return null;
-    }
 
-    /**
-     * Finds all the services that have been authorized by a user and all the triggers associated.
-     * @param userId the id of the user
-     */
-    async findAllServicesAuthorizedByUserWithTriggers(userId: string): Promise<ServiceTriggers[] | null> {
-        try {
-            return await this.servicesAuthorizedByWith(userId, "triggers");
-        } catch (e) {
-            logger.error("Unexpected error while finding services authorized by a user with triggers\n", e);
-        }
-        return null;
     }
 
     /**

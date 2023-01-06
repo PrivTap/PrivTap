@@ -65,6 +65,38 @@ export class Permission extends Model<IPermission> {
         return await this.find({ _id: permissionId, serviceId }) != null;
     }
 
+    /**
+     * Return all the permissions , adding to all of them a boolean field: associated. It checks if the id of the permission is into the array of permissionsId (parameters).
+     * If it is then the field associated is true, otherwise it is false.
+     * @param serviceId The service id
+     * @param permissions   The array of permissions id
+     */
+    async getAllPermissionAndAddBooleanTag(serviceId: string, permissions?: Array<string>): Promise<Partial<IPermission>[] | null> {
+        const allPermissions = await this.findByServiceId(serviceId);
+        if (allPermissions == null)
+            return null;
+        return allPermissions.map((permission) => {
+            return {
+                _id: permission._id,
+                name: permission.name,
+                description: permission.description,
+                associated: permissions == undefined ? false :permissions.includes(permission._id)
+            };
+        });
+    }
+
+    async getAggregateAuthorizationDetails(permissionIds: string[]): Promise<object[]> {
+        const aggregate: object[] = [];
+        for (let i=0; i<permissionIds.length; i++){
+            const permission = await this.model.findById(permissionIds[i]) as IPermission;
+            if (permission){
+                aggregate.push(permission.authorization_details);
+            }
+        }
+        return aggregate;
+    }
+
+
     /*async findAllPermission(serviceId: string, userId: string) {
         const result = await this.model.aggregate()
             .match({serviceId: new Types.ObjectId(serviceId)})
@@ -107,7 +139,7 @@ export class Permission extends Model<IPermission> {
 
 export default new Permission();
 
-export class permissionAuthorized {
+export class PermissionAuthorized {
     _id: string;
     name: string;
     description: string;

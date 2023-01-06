@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Personal page</title>
+</head>
+<body>
+<div class="split left">
+    <div class="containerForm ">
+        <div class="rectangle">
+
+            <form id="textForm" method="POST" enctype="multipart/form-data">
+                <div>
+                    <input type="text" id="content" name="content"
+                           placeholder="Insert An Image Description" required>
+                </div>
+            </form>
+
+            <a class="my-button" onclick="submitText()" role="button">Post!</a>
+        </div>
+    </div>
+</div>
+<div class="split right">
+    <div class="containerPost">
+
+        <% posts.forEach(function(post){ %>
+            <div class="post">
+                <a class="delete" id="<%= post._id %>" onclick="deletePost(this)" role="button">🗑</a>
+                <p> <%= post.creationDate %></p>
+                <p> <%= post.content %></p>
+                <img src="<%= post.img %>" alt="image">
+            </div>
+        <% }); %>
+
+    </div>
+</div>
+
+<link rel="stylesheet" href="../public/css/main.css">
+<link rel="stylesheet" href="../public/css/homePage.css">
+</body>
+<script>
+    function submitText() {
+        const content = document.getElementById("content");
+        if (content.value.length!==0) {
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST", "http://127.0.0.1:8002/personal-page");
+            xhr.setRequestHeader("Accept", "application/json");
+            xhr.setRequestHeader("Content-Type", "application/json");
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        document.location.reload();
+                    }
+                }
+            };
+
+            console.log(JSON.stringify(content));
+            let data = `{ "content":` + JSON.stringify(content.value) + `}`;
+            content.value = "";
+            document.getElementsByClassName("my-button").disabled = true;
+            xhr.send(data);
+        }
+    }
+
+    function deletePost(caller) {
+        const postId = caller.id;
+        let xhr = new XMLHttpRequest();
+        xhr.open("DELETE", "http://127.0.0.1:8002/personal-page");
+        xhr.setRequestHeader("Accept", "application/json");
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    document.location.reload();
+                }
+            }
+        };
+        let data = `{ "postId":` + JSON.stringify(postId) + `}`;
+        xhr.send(data);
+    }
+</script>
+
+</html>
