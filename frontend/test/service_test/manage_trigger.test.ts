@@ -24,7 +24,8 @@ describe("Manage Trigger Test", () => {
         "Test Trigger name",
         "Trigger description",
         [perm1, perm2],
-        "resourceServer"
+        "output",
+        "resourceServer",
     );
     const serviceId = "test Service id";
     beforeEach(() => {
@@ -53,13 +54,13 @@ describe("Manage Trigger Test", () => {
     test("Should put the created trigger in the ref array", async () => {
         postStub.resolves({ data: { data: testTriggerModel } })
         await manageTrigger.createTrigger(testTriggerModel.name, testTriggerModel.description,
-            serviceId, [perm1._id, perm2._id], testTriggerModel.resourceServer)
+            serviceId, [perm1._id, perm2._id], testTriggerModel.resourceServer, testTriggerModel.outputs)
         expect(manageTrigger.getRef().value).to.be.eql([testTriggerModel]);
     });
     test("Should put nothing in the ref value if the gets failed", async () => {
         postStub.resolves(null);
         await manageTrigger.createTrigger(testTriggerModel.name, testTriggerModel.description,
-            serviceId, [perm1._id, perm2._id], testTriggerModel.resourceServer)
+            serviceId, [perm1._id, perm2._id], testTriggerModel.resourceServer, testTriggerModel.outputs)
         expect(manageTrigger.getRef().value).to.be.eql([]);
     })
 
@@ -70,11 +71,12 @@ describe("Manage Trigger Test", () => {
             "Test Trigger name changed",
             "Trigger description changed",
             [perm1, perm2],
+            "output",
             "resourceServer"
         )
         putStub.resolves({ data: { data: updatedTrigger } });
         await manageTrigger.updateTrigger(updatedTrigger._id, updatedTrigger.name, updatedTrigger.description,
-            [perm1._id, perm2._id], "updatedTrigger.resourceServer")
+            [perm1._id, perm2._id], "updatedTrigger.resourceServer", updatedTrigger.outputs)
         expect(manageTrigger.getRef().value).to.be.eql([updatedTrigger]);
     })
 
@@ -85,11 +87,12 @@ describe("Manage Trigger Test", () => {
             "Test Trigger name changed",
             "Trigger description changed",
             [perm1, perm2],
+            "outputs",
             "resourceServer"
         )
         putStub.resolves(null);
         await manageTrigger.updateTrigger(updatedTrigger._id, updatedTrigger.name, updatedTrigger.description,
-            [perm1._id, perm2._id], "updatedTrigger.resourceServer")
+            [perm1._id, perm2._id], "updatedTrigger.resourceServer", updatedTrigger.outputs)
         expect(manageTrigger.getRef().value).to.be.eql([testTriggerModel]);
 
     })

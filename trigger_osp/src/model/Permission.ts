@@ -81,7 +81,9 @@ class Permission {
         for (let i=0; i<permissionIds.length; i++){
             const permissionId = permissionIds[i];
             const permission = await this.model.findById(permissionId) as IPermission;
-            permissions.push(permission);
+            if (permission) {
+                permissions.push(permission);
+            }
         }
         return permissions;
     }
