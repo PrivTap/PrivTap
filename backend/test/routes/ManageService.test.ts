@@ -46,7 +46,7 @@ describe("/manageService endpoint", () => {
             "userId": "UserID",
             "active": true
         });
-        insertNewServiceStub = sandbox.stub(Model.prototype, "insert");
+        insertNewServiceStub = sandbox.stub(Model.prototype, "insertAndReturn");
         findServicesCreatedByUserStub = sandbox.stub(Service, "findAllCreatedByUser");
         findServiceCreatedByUserStub = sandbox.stub(Service, "findById");
         deleteServiceStub = sandbox.stub(Service, "delete");

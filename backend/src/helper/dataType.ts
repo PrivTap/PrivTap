@@ -4,8 +4,6 @@
  */
 export enum DataType {
     Text = "text",
-    Image = "image/url",
-    URL = "other/url",
     Date = "date",
     DateTime = "datetime",
     Number = "number",
