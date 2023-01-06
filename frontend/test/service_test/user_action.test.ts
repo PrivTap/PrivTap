@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, test } from "vitest";
-import ActionModel from "../../src/model/Action_model";
+import ActionModel from "../../src/model/action_model";
 import { SinonStub } from "sinon";
 import * as sinon from "sinon";
 import { use, expect } from "chai";

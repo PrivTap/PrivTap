@@ -3,7 +3,7 @@ import { SinonStub } from "sinon";
 import * as sinon from "sinon";
 import { use, expect } from "chai";
 import axiosInstance from "../../src/helpers/axios_service";
-import manageService from "../../src/controllers/manage_Service";
+import manageService from "../../src/controllers/manage_service";
 import ServiceModel from "../../src/model/Service_model";
 import sinonChai from "sinon-chai";
 
