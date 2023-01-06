@@ -4,7 +4,7 @@ import * as sinon from "sinon";
 import { use, expect } from "chai";
 import axiosInstance from "../../src/helpers/axios_service";
 import manageService from "../../src/controllers/manage_service";
-import ServiceModel from "../../src/model/Service_model";
+import ServiceModel from "../../src/model/service_model";
 import sinonChai from "sinon-chai";
 
 use(sinonChai);
