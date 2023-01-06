@@ -6,10 +6,12 @@ import Rule, {IRule} from "../../src/model/Rule";
 import Trigger, {ITrigger} from "../../src/model/Trigger";
 import Action, {IAction} from "../../src/model/Action";
 import Service from "../../src/model/Service";
-import OAuth from "../../src/helper/oauth";
-import axios from "axios";
+import {AxiosResponse} from "axios";
 import chaiHttp = require("chai-http");
 import sinonChai = require("sinon-chai");
+import Authorization from "../../src/model/Authorization";
+import * as misc from "../../src/helper/misc";
+import {checkActionDataFormat} from "../../src/helper/misc";
 
 use(chaiHttp);
 use(sinonChai);
@@ -26,16 +28,17 @@ describe("/triggers-data endpoint", () => {
     let triggerFindStub: SinonStub;
     let actionFindStub: SinonStub;
     let serviceAPIKeyValidatorStub: SinonStub;
-    let oauthTokenFinderStub: SinonStub;
-    let triggerDataGetStub: SinonStub;
-    let actionPostStub: SinonStub;
+    let findTokenStub: SinonStub;
+    let axiosGetStub: SinonStub;
+    let checkActionDataFormatStub: SinonStub;
+    let axiosPostStub: SinonStub;
 
     // MOCK DATA
     const exampleTrigger: ITrigger = {
         _id: "0380b79b38dda0d2f6be3746",
         name: "Sample Trigger",
         description: "Trigger 1 desc",
-        outputs: "{trigger_data: [{type: DataType.Text,identifier: 'title'}]}",
+        outputs: "{\"trigger_data\": [{\"type\": \"text\", \"identifier\": \"title\"}]}",
         serviceId: "8380b79b38dda0d2f6be3746",
         resourceServer: "https://www.sample.trigger/endpoint/triggerDataEndpoint"
     };
@@ -45,7 +48,7 @@ describe("/triggers-data endpoint", () => {
         name: "Sample Action",
         description: "Trigger 2 desc",
         endpoint: "https://www.sample.action/endpoint/actionEndpoint",
-        inputs: "{trigger_data: [{type: DataType.Text,identifier: 'title'}]}",
+        inputs: "{\"trigger_data\": [{\"type\": \"text\", \"identifier\": \"title\"}]}",
         serviceId: "9380b79b38dda0d2f6be3746",
     };
 
@@ -56,6 +59,12 @@ describe("/triggers-data endpoint", () => {
         triggerId: "0380b79b38dda0d2f6be3746",
         actionId: "1380b79b38dda0d2f6be3746",
         isAuthorized: true
+    };
+
+    const data = {
+        triggerId: "0380b79b38dda0d2f6be3747",
+        userId: "AUserID",
+        apiKey: "AnAPIKey"
     };
 
     const exampleTriggerDataResponse = {
@@ -71,6 +80,7 @@ describe("/triggers-data endpoint", () => {
         }
     };
 
+
     before(() => {
         requester = request(app.express).keepOpen();
     });
@@ -84,11 +94,10 @@ describe("/triggers-data endpoint", () => {
         triggerFindStub = sandbox.stub(Trigger, "findById").resolves(exampleTrigger);
         actionFindStub = sandbox.stub(Action, "findById").resolves(exampleAction);
         serviceAPIKeyValidatorStub = sandbox.stub(Service, "isValidAPIKey").resolves(true);
-        oauthTokenFinderStub = sandbox.stub(OAuth, "retrieveToken").resolves("ASampleOAuthTokenString");
-        triggerDataGetStub = sandbox.stub(axios, "get").resolves(exampleTriggerDataResponse);
-        actionPostStub = sandbox.stub(axios, "post").resolves({
-            status: 200
-        });
+        findTokenStub = sandbox.stub(Authorization, "findToken").resolves("ASampleOAuthTokenString");
+        axiosGetStub = sandbox.stub(misc, "getReqHttp").resolves(exampleTriggerDataResponse as AxiosResponse);
+        checkActionDataFormatStub = sandbox.stub(misc, "checkActionDataFormat").returns(false);
+        axiosPostStub = sandbox.stub(misc, "postReqHttp").resolves({status: 200} as AxiosResponse);
     });
 
     afterEach(() => {
@@ -96,94 +105,74 @@ describe("/triggers-data endpoint", () => {
     });
 
     describe("POST /", () => {
-
         it("should fail if one or more parameters are missing", async () => {
-            let res = await requester.post(endpoint);
-            expect(res).to.have.status(400);
-
-            res = await requester.post(endpoint).send({
-                triggerId: "ATriggerId",
-                userId: "AUserId"
-            });
-            expect(res).to.have.status(400);
-
-            res = await requester.post(endpoint).send({
-                triggerId: "ATriggerId",
-                apiKey: "AnAPIKey"
-            });
-            expect(res).to.have.status(400);
-
-            res = await requester.post(endpoint).send({
-                userId: "AUserId",
-                apiKey: "AnAPIKey"
-            });
+            const res = await requester.post(endpoint);
             expect(res).to.have.status(400);
         });
 
         it("should fail if the trigger does not exist", async () => {
-            triggerFindStub.restore();
-            triggerFindStub = sandbox.stub(Trigger, "findById").resolves(null);
+            triggerFindStub.resolves(null);
 
-            const res = await requester.post(endpoint).send({
-                triggerId: "0380b79b38dda0d2f6be3747",
-                userId: "AUserID",
-                apiKey: "AnAPIKey"
-            });
+            const res = await requester.post(endpoint).send(data);
             expect(res).to.have.status(403);
         });
 
-        it("should fail if the user does not own the rule", async () => {
-            const res = await requester.post(endpoint).send({
-                triggerId: "0380b79b38dda0d2f6be3746",
-                userId: "ASecondUserID",
-                apiKey: "AnAPIKey"
-            });
+        it("should fail if the rule does not exist", async () => {
+            ruleFindStub.resolves(null);
+
+            const res = await requester.post(endpoint).send(data);
             expect(res).to.have.status(403);
         });
 
         it("should fail if the API Key is invalid", async () => {
-            serviceAPIKeyValidatorStub.restore();
-            serviceAPIKeyValidatorStub = sandbox.stub(Service, "isValidAPIKey").resolves(false);
+            serviceAPIKeyValidatorStub.resolves(false);
 
-            const res = await requester.post(endpoint).send({
-                triggerId: "0380b79b38dda0d2f6be3746",
-                userId: "AUserID",
-                apiKey: "AnAPIKey"
-            });
+            const res = await requester.post(endpoint).send(data);
             expect(res).to.have.status(403);
         });
 
         it("should fail if the rule references an Action that does not exist", async () => {
-            actionFindStub.restore();
-            actionFindStub = sandbox.stub(Action, "findById").resolves(null);
+            actionFindStub.resolves(null);
 
-            const res = await requester.post(endpoint).send({
-                triggerId: "0380b79b38dda0d2f6be3746",
-                userId: "ASecondUserID",
-                apiKey: "AnAPIKey"
-            });
+            const res = await requester.post(endpoint).send(data);
             expect(res).to.have.status(500);
         });
 
-        it("should fail if the trigger has a resource server but no OAuth token", async () => {
-            oauthTokenFinderStub.restore();
-            oauthTokenFinderStub = sandbox.stub(OAuth, "retrieveToken").resolves(null);
+        it("should fail if the trigger has a resource server but no Trigger OAuth token", async () => {
+            findTokenStub.resolves(null);
 
-            const res = await requester.post(endpoint).send({
-                triggerId: "0380b79b38dda0d2f6be3746",
-                userId: "AUserID",
-                apiKey: "AnAPIKey"
-            });
+            const res = await requester.post(endpoint).send(data);
             expect(res).to.have.status(403);
         });
 
+        it("should fail if the axios GET response is different from 200", async () => {
+            axiosGetStub.resolves({status: 400} as AxiosResponse);
+            const res = await requester.post(endpoint).send(data);
+            expect(res).to.have.status(500);
+        });
+
+        it("should fail if there is not an Action OAuth token ", async () => {
+            findTokenStub.onCall(0).resolves("ASampleOAuthTokenString");
+            findTokenStub.resolves(null);
+            const res = await requester.post(endpoint).send(data);
+            expect(res).to.have.status(500);
+        });
+
+        it("should fail if the data sent to the action platform is not compatible", async () => {
+            checkActionDataFormatStub.returns(true);
+            const res = await requester.post(endpoint).send(data);
+            expect(res).to.have.status(500);
+        });
+
+        it("should fail if the axios POST response is different from 200", async () => {
+            axiosPostStub.resolves({status: 400} as AxiosResponse)
+            const res = await requester.post(endpoint).send(data);
+            expect(res).to.have.status(500);
+        });
+
         it("should succeed with correct parameters and authorization", async () => {
-            const res = await requester.post(endpoint).send({
-                triggerId: "0380b79b38dda0d2f6be3746",
-                userId: "AUserID",
-                apiKey: "AnAPIKey"
-            });
-            expect(res).to.have.status(403);
+            const res = await requester.post(endpoint).send(data);
+            expect(res).to.have.status(200);
         });
 
     });

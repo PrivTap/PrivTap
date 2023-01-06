@@ -12,7 +12,7 @@ import logger from "../../helper/logger";
 import Authorization from "../../model/Authorization";
 import Service from "../../model/Service";
 import { DataDefinition, dataDefinitionIDs } from "../../helper/dataDefinition";
-import { getReqHttp, postReqHttp } from "../../helper/misc";
+import {checkActionDataFormat, getReqHttp, postReqHttp} from "../../helper/misc";
 
 export default class TriggersDataRoute extends Route {
 
@@ -53,12 +53,14 @@ export default class TriggersDataRoute extends Route {
                 internalServerError(response);
                 return;
             }
+
             //Get the OAuth token for the trigger
             let oauthToken = await Authorization.findToken(userId, trigger.serviceId);
 
             //Get the data from the resourceServer (if needed)
             let dataToForwardToActionAPI: object | null = null;
-            const actionRequiredIDs = dataDefinitionIDs(JSON.parse(action.inputs) as DataDefinition);
+            const parsed = JSON.parse(action.inputs) as DataDefinition;
+            const actionRequiredIDs = dataDefinitionIDs(parsed);
             if (trigger?.resourceServer) {
                 if (!oauthToken) {
                     forbiddenUserError(response, "Trigger not authorized");
@@ -87,18 +89,19 @@ export default class TriggersDataRoute extends Route {
             }
 
             //Forward the data to the Action API endpoint
-
             const actionEndpoint = action.endpoint;
             oauthToken = await Authorization.findToken(userId, action.serviceId);
 
-            if (!actionEndpoint) {
+            if (!actionEndpoint || !oauthToken) {
                 internalServerError(response);
                 return;
             }
             //Check that the data sent to action is compatible with the action data format (i.e. contains all the data required by it)
             const triggerDataIDs = dataDefinitionIDs(dataToForwardToActionAPI as DataDefinition);
-            if (!triggerDataIDs || actionRequiredIDs.filter((actionID) => !triggerDataIDs.find((triggerID) => actionID == triggerID)).length > 0) {
+
+            if (!triggerDataIDs || checkActionDataFormat(actionRequiredIDs, triggerDataIDs)) {
                 console.log("Trigger Sending Less Data than what the Action requires! Rule execution skipped...");
+                internalServerError(response);
                 return;
             }
 
@@ -109,9 +112,10 @@ export default class TriggersDataRoute extends Route {
             } catch (e) {
                 logger.debug("Could not execute rule with id " + referencedRule?._id + " with error " + actionResponse?.status);
             }
-
             if (actionResponse?.status.toString() != "200") {
                 logger.error("Could not execute rule with id " + referencedRule?._id + " with error " + actionResponse?.status.toString());
+                internalServerError(response);
+                return;
             }
         }
 

@@ -54,6 +54,7 @@ export default class LoginRoute extends Route {
             response.status(500).send();
             return;
         }
+
         if (state.oauthAuthorization) {
             let url: string = "http://127.0.0.1:8001/authorize?";
             url += "redirect_uri=" + oauthAuthorization.redirectUri;

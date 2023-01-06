@@ -193,16 +193,6 @@ class Permission {
         }
     }
 
-    // TODO: Implement
-    async authorized(userId: string, permissions: {[id:string]:string}[]): Promise<boolean>{
-        /*
-        const authorizedPermissions = await this.model.find({ userId, authorized: true});
-        const idk = permissions as Partial<IPermission>;
-         */
-        return true;
-    }
-
-    // TODO: Implement
     async retrieveData(userId: string, permissions: {[id:string]:string}[]): Promise<Partial<IPost>>{
         const posts = await Post.findAllByUserId(userId);
         posts.sort((a ,b) => {

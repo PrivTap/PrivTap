@@ -171,32 +171,6 @@ class Authorization extends Model<IAuthorization> {
     }
 
     /**
-     * Finds all the services that have been authorized by a user and all the actions associated.
-     * @param userId the id of the user
-     */
-    async findAllServicesAuthorizedByUserWithActions(userId: string): Promise<ServiceActions[] | null> {
-        try {
-            return await this.servicesAuthorizedByWith(userId, "actions");
-        } catch (e) {
-            logger.error("Unexpected error while finding services authorized by a user with actions\n", e);
-        }
-        return null;
-    }
-
-    /**
-     * Finds all the services that have been authorized by a user and all the triggers associated.
-     * @param userId the id of the user
-     */
-    async findAllServicesAuthorizedByUserWithTriggers(userId: string): Promise<ServiceTriggers[] | null> {
-        try {
-            return await this.servicesAuthorizedByWith(userId, "triggers");
-        } catch (e) {
-            logger.error("Unexpected error while finding services authorized by a user with triggers\n", e);
-        }
-        return null;
-    }
-
-    /**
      * Finds the authorizations given by a user.
      * @param userId the id of the user
      */

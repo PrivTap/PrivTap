@@ -133,9 +133,9 @@ export async function handleUpdate<T>(response: Response, model: Model<T>, filte
  */
 export async function getReqHttp(url: string, token: string | null, parameters: object): Promise<AxiosResponse | null> {
     const config = token ? {
-        headers: {"Authorization": `Bearer ${token}`},
+        headers: { "Authorization": `Bearer ${token}` },
         params: parameters
-    } : {params: parameters};
+    } : { params: parameters };
     let res;
     try {
         res = await axios.get(url, config);
@@ -221,4 +221,8 @@ export async function findAllOperationAddingAuthorizedTag(model: mongoose.Model<
         return null;
 
     }
+}
+
+export function checkActionDataFormat(actionRequiredIDs: string[], triggerDataIDs: string[]): boolean {
+    return actionRequiredIDs.filter((actionID) => !triggerDataIDs.find((triggerID) => actionID == triggerID)).length > 0;
 }
