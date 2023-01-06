@@ -1,18 +1,16 @@
-import {expect, request, use} from "chai";
-import {createSandbox, SinonStub} from "sinon";
+import { expect, request, use } from "chai";
+import { createSandbox, SinonStub } from "sinon";
 import app from "../../src/app";
-import {beforeEach} from "mocha";
-import Rule, {IRule} from "../../src/model/Rule";
-import Trigger, {ITrigger} from "../../src/model/Trigger";
-import Action, {IAction} from "../../src/model/Action";
+import { beforeEach } from "mocha";
+import Rule, { IRule } from "../../src/model/Rule";
+import Trigger, { ITrigger } from "../../src/model/Trigger";
+import Action, { IAction } from "../../src/model/Action";
 import Service from "../../src/model/Service";
-import {AxiosResponse} from "axios";
+import { AxiosResponse } from "axios";
 import chaiHttp = require("chai-http");
 import sinonChai = require("sinon-chai");
 import Authorization from "../../src/model/Authorization";
 import * as misc from "../../src/helper/misc";
-import {checkActionDataFormat} from "../../src/helper/misc";
-
 use(chaiHttp);
 use(sinonChai);
 
@@ -97,7 +95,7 @@ describe("/triggers-data endpoint", () => {
         findTokenStub = sandbox.stub(Authorization, "findToken").resolves("ASampleOAuthTokenString");
         axiosGetStub = sandbox.stub(misc, "getReqHttp").resolves(exampleTriggerDataResponse as AxiosResponse);
         checkActionDataFormatStub = sandbox.stub(misc, "checkActionDataFormat").returns(false);
-        axiosPostStub = sandbox.stub(misc, "postReqHttp").resolves({status: 200} as AxiosResponse);
+        axiosPostStub = sandbox.stub(misc, "postReqHttp").resolves({ status: 200 } as AxiosResponse);
     });
 
     afterEach(() => {
@@ -146,7 +144,7 @@ describe("/triggers-data endpoint", () => {
         });
 
         it("should fail if the axios GET response is different from 200", async () => {
-            axiosGetStub.resolves({status: 400} as AxiosResponse);
+            axiosGetStub.resolves({ status: 400 } as AxiosResponse);
             const res = await requester.post(endpoint).send(data);
             expect(res).to.have.status(500);
         });
@@ -165,7 +163,7 @@ describe("/triggers-data endpoint", () => {
         });
 
         it("should fail if the axios POST response is different from 200", async () => {
-            axiosPostStub.resolves({status: 400} as AxiosResponse)
+            axiosPostStub.resolves({ status: 400 } as AxiosResponse);
             const res = await requester.post(endpoint).send(data);
             expect(res).to.have.status(500);
         });

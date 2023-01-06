@@ -3,7 +3,6 @@ import Service from "./Service";
 import Model from "../Model";
 import Permission, { IPermission } from "./Permission";
 import mongoose from "mongoose";
-import { DataDefinition } from "../helper/dataDefinition";
 import { findAllOperationAddingAuthorizedTag } from "../helper/misc";
 
 

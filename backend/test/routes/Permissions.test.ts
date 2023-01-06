@@ -1,11 +1,11 @@
-import {use, expect, request} from "chai";
+import { use, expect, request } from "chai";
 import chaiHttp = require("chai-http");
-import {createSandbox, SinonStub} from "sinon";
+import { createSandbox, SinonStub } from "sinon";
 import sinonChai = require("sinon-chai");
 import app from "../../src/app";
-import Authentication, {AuthError} from "../../src/helper/authentication";
-import Permission, {IPermission} from "../../src/model/Permission";
-import Service, {IService} from "../../src/model/Service";
+import Authentication, { AuthError } from "../../src/helper/authentication";
+import Permission, { IPermission } from "../../src/model/Permission";
+import Service, { IService } from "../../src/model/Service";
 
 use(chaiHttp);
 use(sinonChai);
@@ -28,7 +28,7 @@ describe("/permissions endpoint", () => {
         clientSecret: "exampleClientSecret",
         triggerNotificationServer: "https://example.com/trigger",
         apiKey: "example"
-    }
+    };
     const examplePermission = {
         permissionId: "aa7f16b9d579d489c7d8ec65",
         name: "permissionName",
@@ -37,7 +37,7 @@ describe("/permissions endpoint", () => {
         authorization_details: {}
     };
 
-    const exampleDeleteRequest = {serviceId: exampleServiceId, permissionId: "6a71f6b9d579d489c7d8ec65"};
+    const exampleDeleteRequest = { serviceId: exampleServiceId, permissionId: "6a71f6b9d579d489c7d8ec65" };
 
     let requester: ChaiHttp.Agent;
     let checkJWTStub: SinonStub;
@@ -62,7 +62,7 @@ describe("/permissions endpoint", () => {
             userId: "someUserId",
             active: true
         });
-        findServiceStub = sandbox.stub(Service, "find")
+        findServiceStub = sandbox.stub(Service, "find");
         findByIdStub = sandbox.stub(Service, "findById").resolves({} as IService);
         isCreatorStub = sandbox.stub(Service, "isCreator").resolves(true);
         insertAndReturnStub = sandbox.stub(Permission, "insertAndReturn").resolves({} as IPermission);
@@ -82,13 +82,13 @@ describe("/permissions endpoint", () => {
                 userId: "someUserId",
                 active: false
             });
-            const res = await requester.get("/permissions").query({serviceId: exampleServiceId});
+            const res = await requester.get("/permissions").query({ serviceId: exampleServiceId });
             expect(res).to.have.status(403);
         });
 
         it("should fail if the user doesn't have valid jwt", async () => {
             checkJWTStub.throws(new AuthError());
-            const res = await requester.get("/permissions").query({serviceId: exampleServiceId});
+            const res = await requester.get("/permissions").query({ serviceId: exampleServiceId });
             expect(res).to.have.status(401);
         });
 
@@ -99,18 +99,18 @@ describe("/permissions endpoint", () => {
 
         it("should fail if the serviceId is not present in the database", async () => {
             findByIdStub.resolves(null);
-            const res = await requester.get("/permissions").query({serviceId: exampleServiceId});
+            const res = await requester.get("/permissions").query({ serviceId: exampleServiceId });
             expect(res).to.have.status(400);
         });
 
         it("should fail if an internal error occurs", async () => {
             findByServiceIdStub.resolves(null);
-            const res = await requester.get("/permissions").query({serviceId: exampleServiceId});
+            const res = await requester.get("/permissions").query({ serviceId: exampleServiceId });
             expect(res).to.have.status(500);
         });
 
         it("should succeed if the serviceId is present in the database and the user is the rightful, correctly authenticated, owner", async () => {
-            const res = await requester.get("/permissions").query({serviceId: exampleServiceId});
+            const res = await requester.get("/permissions").query({ serviceId: exampleServiceId });
             expect(res).to.have.status(200);
         });
 
@@ -144,25 +144,25 @@ describe("/permissions endpoint", () => {
         });
 
         it("should fail if the user didn't create the specified service", async () => {
-            findServiceStub.resolves(null)
+            findServiceStub.resolves(null);
             const res = await requester.post("/permissions").send(examplePermission);
             expect(res).to.have.status(403);
         });
         it("should fail if there is no path for auth", async () => {
-            findServiceStub.resolves({authPath: null})
+            findServiceStub.resolves({ authPath: null });
             const res = await requester.post("/permissions").send(examplePermission);
             expect(res).to.have.status(400);
-        })
+        });
         it("should fail if an internal error occurs", async () => {
             insertAndReturnStub.resolves(null);
-            findServiceStub.resolves(exampleService)
+            findServiceStub.resolves(exampleService);
             const res = await requester.post("/permissions").send(examplePermission);
             expect(res).to.have.status(500);
         });
 
         it("should succeed if an internal error occurs", async () => {
             insertAndReturnStub.resolves(true);
-            findServiceStub.resolves(exampleService)
+            findServiceStub.resolves(exampleService);
             const res = await requester.post("/permissions").send(examplePermission);
             expect(res).to.have.status(200);
         });
@@ -189,7 +189,7 @@ describe("/permissions endpoint", () => {
             expect(res).to.have.status(400);
         });
         it("should fail if there is no service", async () => {
-            findByIdStub.resolves(null)
+            findByIdStub.resolves(null);
             const res = await requester.post("/permissions").send(examplePermission);
             expect(res).to.have.status(400);
         });
@@ -228,7 +228,7 @@ describe("/permissions endpoint", () => {
             expect(res).to.have.status(403);
         });
         it("should fail if there is no service", async () => {
-            findByIdStub.resolves(null)
+            findByIdStub.resolves(null);
             const res = await requester.post("/permissions").send(examplePermission);
             expect(res).to.have.status(400);
         });

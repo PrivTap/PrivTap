@@ -1,12 +1,12 @@
-import {readdirSync, statSync} from "fs";
-import Model, {ModelSaveError} from "../Model";
-import {badRequest, internalServerError} from "./http";
-import {Response} from "express";
-import axios, {AxiosResponse} from "axios";
+import { readdirSync, statSync } from "fs";
+import Model, { ModelSaveError } from "../Model";
+import { badRequest, internalServerError } from "./http";
+import { Response } from "express";
+import axios, { AxiosResponse } from "axios";
 import logger from "./logger";
 import mongoose from "mongoose";
-import {IAction} from "../model/Action";
-import {ITrigger} from "../model/Trigger";
+import { IAction } from "../model/Action";
+import { ITrigger } from "../model/Trigger";
 import Authorization from "../model/Authorization";
 
 
@@ -153,7 +153,7 @@ export async function getReqHttp(url: string, token: string | null, parameters: 
  * @param body the object containing the field and the value of the query string
  */
 export async function postReqHttp(url: string, token: string | null, body: object): Promise<AxiosResponse | null> {
-    const config = token ? {headers: {"Authorization": `Bearer ${token}`}} : undefined;
+    const config = token ? { headers: { "Authorization": `Bearer ${token}` } } : undefined;
     let res;
     try {
         res = await axios.post(url, body, config);
@@ -173,7 +173,7 @@ export async function postReqHttp(url: string, token: string | null, body: objec
 export async function deleteReqHttp(url: string, token: string, query: object): Promise<AxiosResponse | null> {
     let res;
     try {
-        const config = {headers: {"Authorization": `Bearer ${token}`}, params: query};
+        const config = { headers: { "Authorization": `Bearer ${token}` }, params: query };
         // TODO: manage body
         res = await axios.delete(url, config);
         return res;
@@ -189,7 +189,7 @@ export async function findAllOperationAddingAuthorizedTag(model: mongoose.Model<
         grantedPermissionId = [];
     try {
         return await model.aggregate([
-            {$match: {serviceId: new mongoose.Types.ObjectId(serviceId)}},
+            { $match: { serviceId: new mongoose.Types.ObjectId(serviceId) } },
             {
                 $addFields: {
                     authorized: {
@@ -203,8 +203,8 @@ export async function findAllOperationAddingAuthorizedTag(model: mongoose.Model<
                     }
                 }
             },
-            {$project: {"data": 0, "outputs": 0}},
-            {$lookup: {from: "permissions", localField: "permissions", foreignField: "_id", as: "permissions"}},
+            { $project: { "data": 0, "outputs": 0 } },
+            { $lookup: { from: "permissions", localField: "permissions", foreignField: "_id", as: "permissions" } },
             {
                 $project: {
                     "permissions._id": 1,

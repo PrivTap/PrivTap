@@ -1,6 +1,6 @@
-import {use, expect, request} from "chai";
+import { use, expect, request } from "chai";
 import chaiHttp = require("chai-http");
-import {createSandbox, SinonStub} from "sinon";
+import { createSandbox, SinonStub } from "sinon";
 import sinonChai = require("sinon-chai");
 import app from "../../src/app";
 import Authentication from "../../src/helper/authentication";
@@ -39,17 +39,17 @@ describe("/Permission authorized endpoint", () => {
 
     describe("GET /", () => {
         it("should fail with no params", async () => {
-            const res = await requester.get("/permission-authorized")
+            const res = await requester.get("/permission-authorized");
             expect(res).to.have.status(400);
         });
         it("should succeed", async () => {
-            findStub.resolves(true)
-            const res = await requester.get("/permission-authorized").query({serviceId});
+            findStub.resolves(true);
+            const res = await requester.get("/permission-authorized").query({ serviceId });
             expect(res).to.have.status(200);
         });
         it("should give internal server error if the find fail", async () => {
-            findStub.resolves(null)
-            const res = await requester.get("/permission-authorized").query({serviceId});
+            findStub.resolves(null);
+            const res = await requester.get("/permission-authorized").query({ serviceId });
             expect(res).to.have.status(500);
         });
     });

@@ -12,7 +12,7 @@ import logger from "../../helper/logger";
 import Authorization from "../../model/Authorization";
 import Service from "../../model/Service";
 import { DataDefinition, dataDefinitionIDs } from "../../helper/dataDefinition";
-import {checkActionDataFormat, getReqHttp, postReqHttp} from "../../helper/misc";
+import { checkActionDataFormat, getReqHttp, postReqHttp } from "../../helper/misc";
 
 export default class TriggersDataRoute extends Route {
 

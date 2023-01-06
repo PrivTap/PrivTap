@@ -1,17 +1,16 @@
-import {use, expect, request} from "chai";
+import { use, expect, request } from "chai";
 import chaiHttp = require("chai-http");
-import {createSandbox, SinonStub} from "sinon";
+import { createSandbox, SinonStub } from "sinon";
 import sinonChai = require("sinon-chai");
 import app from "../../src/app";
-import Authentication, {AuthError} from "../../src/helper/authentication";
+import Authentication, { AuthError } from "../../src/helper/authentication";
 import Trigger from "../../src/model/Trigger";
 import mongoose from "mongoose";
 import Model from "../../src/Model";
 import Service from "../../src/model/Service";
-import {beforeEach} from "mocha";
+import { beforeEach } from "mocha";
 import * as dataDefinition from "../../src/helper/dataDefinition";
-import {transformStringInDataDef} from "../../src/helper/dataDefinition";
-import Permissions from "../../src/model/Permission"
+import Permissions from "../../src/model/Permission";
 
 use(chaiHttp);
 use(sinonChai);
@@ -49,7 +48,7 @@ describe("/manage-triggers endpoint", () => {
         });
         findTriggersStub = sandbox.stub(Trigger, "findAllForService");
         findAllStub = sandbox.stub(mongoose.Model, "find");
-        findIdServiceStub= sandbox.stub(Model.prototype, "findById").resolves({triggerNotificationServer: true});
+        findIdServiceStub= sandbox.stub(Model.prototype, "findById").resolves({ triggerNotificationServer: true });
         isCreator = sandbox.stub(Trigger, "isCreator").resolves(true);
         isServiceCreator = sandbox.stub(Service, "isCreator");
         saveStub = sandbox.stub(Model.prototype, "insertAndReturn");
@@ -58,7 +57,7 @@ describe("/manage-triggers endpoint", () => {
         getAllPermissionAndAddBooleanTagStub = sandbox.stub(Permissions, "getAllPermissionAndAddBooleanTag").resolves([{
             name: "test",
             description: "test",
-        }])
+        }]);
         updateStub =sandbox.stub(Model.prototype, "updateWithFilterAndReturn");
     });
 

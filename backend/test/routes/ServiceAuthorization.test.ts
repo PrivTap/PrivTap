@@ -1,6 +1,6 @@
-import {use, expect, request} from "chai";
+import { use, expect, request } from "chai";
 import chaiHttp = require("chai-http");
-import {createSandbox, SinonStub} from "sinon";
+import { createSandbox, SinonStub } from "sinon";
 import sinonChai = require("sinon-chai");
 import app from "../../src/app";
 import Authentication from "../../src/helper/authentication";
@@ -29,7 +29,7 @@ describe("/ServiceAuthorization endpoint", () => {
         serviceId: "567f16b9d579d489c7d8ec65",
         value: "someStateValue",
         permissionId: Array<string>()
-    }
+    };
 
     let requester: ChaiHttp.Agent;
     let checkJWTStub: SinonStub;
@@ -59,17 +59,17 @@ describe("/ServiceAuthorization endpoint", () => {
 
     describe("POST /", () => {
         it("should fail with no params", async () => {
-            const res = await requester.post("/service-authorization")
+            const res = await requester.post("/service-authorization");
             expect(res).to.have.status(400);
         });
         it("should fail if the authUri fails", async () => {
             authUri.resolves(null);
-            const res = await requester.post("/service-authorization").send({serviceId, permissionId});
+            const res = await requester.post("/service-authorization").send({ serviceId, permissionId });
             expect(res).to.have.status(400);
         });
         it("should succeed", async () => {
             insertStub.resolves(exampleState);
-            const res = await requester.post("/service-authorization").send({serviceId, permissionId});
+            const res = await requester.post("/service-authorization").send({ serviceId, permissionId });
             expect(res).to.have.status(200);
             expect(authUri).to.have.been.calledOnce;
         });

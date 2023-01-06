@@ -1,6 +1,6 @@
-import {use, expect, request} from "chai";
+import { use, expect, request } from "chai";
 import chaiHttp = require("chai-http");
-import {createSandbox, SinonStub} from "sinon";
+import { createSandbox, SinonStub } from "sinon";
 import sinonChai = require("sinon-chai");
 import app from "../../src/app";
 import Authentication from "../../src/helper/authentication";
@@ -20,7 +20,7 @@ describe("/OAUTH endpoint", () => {
         serviceId: "567f16b9d579d489c7d8ec65",
         value : "someStateValue",
         permissionId: Array<string>()
-    }
+    };
 
     let requester: ChaiHttp.Agent;
     let checkJWTStub: SinonStub;
@@ -53,28 +53,28 @@ describe("/OAUTH endpoint", () => {
 
     describe("GET /", () => {
         it("should fail if there is no state in db", async () => {
-            findByValueStub.resolves(null)
-            const res = await requester.get("/oauth").query({code: 123, state: 123});
+            findByValueStub.resolves(null);
+            const res = await requester.get("/oauth").query({ code: 123, state: 123 });
             expect(res).to.have.status(400);
         });
         it("should fail if the user id of the state is different from the jwt userId", async () => {
-            findByValueStub.resolves(null)
-            const res = await requester.get("/oauth").query({code: 123, state: 123});
+            findByValueStub.resolves(null);
+            const res = await requester.get("/oauth").query({ code: 123, state: 123 });
             expect(res).to.have.status(400);
         });
 
         it("should fail if there is no token", async () => {
-            findByValueStub.resolves(exampleState)
+            findByValueStub.resolves(exampleState);
             deleteStub.resolves(true);
             tokenStub.resolves(null);
-            const res = await requester.get("/oauth").query({code: 123, state: 123});
+            const res = await requester.get("/oauth").query({ code: 123, state: 123 });
             expect(res).to.have.status(400);
         });
         it("should succeed", async () => {
-            findByValueStub.resolves(exampleState)
+            findByValueStub.resolves(exampleState);
             deleteStub.resolves(true);
             tokenStub.resolves(true);
-            const res = await requester.get("/oauth").query({code: 123, state: 123});
+            const res = await requester.get("/oauth").query({ code: 123, state: 123 });
             expect(findByValueStub).to.have.been.calledOnce;
             expect(res).to.have.status(200);
         });

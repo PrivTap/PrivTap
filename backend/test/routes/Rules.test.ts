@@ -1,14 +1,13 @@
-import {use, expect, request} from "chai";
+import { use, expect, request } from "chai";
 import chaiHttp = require("chai-http");
-import {createSandbox, SinonStub} from "sinon";
+import { createSandbox, SinonStub } from "sinon";
 import sinonChai = require("sinon-chai");
 import app from "../../src/app";
-import Authentication, {AuthError} from "../../src/helper/authentication";
+import Authentication, { AuthError } from "../../src/helper/authentication";
 import Rule from "../../src/model/Rule";
-import {beforeEach} from "mocha";
+import { beforeEach } from "mocha";
 import Trigger from "../../src/model/Trigger";
 import Authorization from "../../src/model/Authorization";
-import {postReqHttp} from "../../src/helper/misc";
 import RuleExecution from "../../src/helper/rule_execution";
 import * as misc from "../../src/helper/misc";
 import Action from "../../src/model/Action";
@@ -46,17 +45,17 @@ describe("/rules endpoint", () => {
     const exampleTriggerService = {
         "serviceId": "serviceId",
         "triggerNotificationServer": "triggerNotificationServer"
-    }
+    };
     const exampleTrigger = {
         "name": "triggerName",
         "serviceId": "serviceId",
         "userId": "userId"
-    }
+    };
     const exampleAction = {
         "name": "triggerName",
         "serviceId": "serviceId1",
         "userId": "userId"
-    }
+    };
 
     before(() => {
         requester = request(app.express).keepOpen();
@@ -135,7 +134,7 @@ describe("/rules endpoint", () => {
         });
         it("should fail if the trigger doesn't exist", async () => {
             findByIdTriggerStub.resolves(null);
-            areActionTriggerCompatibleStub.resolves(true)
+            areActionTriggerCompatibleStub.resolves(true);
             const res = await requester.post("/rules").send(exampleRule);
             expect(res).to.have.status(400);
         });
@@ -205,7 +204,7 @@ describe("/rules endpoint", () => {
             deleteStub.resolves(true);
             findTokenStub.resolves(true);
             getRuleNotificationServerStub.resolves(exampleTriggerService);
-            findAllRuleStub.resolves([])
+            findAllRuleStub.resolves([]);
             const res = await requester.delete("/rules").send(exampleRule);
             expect(isCreatorStub).to.have.been.calledOnce;
             expect(res).to.have.status(200);
