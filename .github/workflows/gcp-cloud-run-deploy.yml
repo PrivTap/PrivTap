@@ -30,9 +30,23 @@ jobs:
         with:
           credentials_json: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_PRIVTAP_368209 }}'
       
-      - id: 'deploy'
+      - id: 'deploy backend'
         uses: 'google-github-actions/deploy-cloudrun@v0'
         with:
           service: 'privtap-backend'
           region: europe-west8
           source: ./backend
+          
+      - id: 'deploy dummy OSP for actions'
+        uses: 'google-github-actions/deploy-cloudrun@v0'
+        with:
+          service: 'privtap-action-osp'
+          region: europe-west8
+          source: ./action_osp
+          
+      - id: 'deploy dummy OSP for triggers'
+        uses: 'google-github-actions/deploy-cloudrun@v0'
+        with:
+          service: 'privtap-trigger-osp'
+          region: europe-west8
+          source: ./trigger_osp
