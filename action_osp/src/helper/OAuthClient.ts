@@ -10,7 +10,7 @@ export default class OAuthClient {
             client_id: env.CLIENT_ID,
             client_secret: env.CLIENT_SECRET,
             // TODO: check url for deployment
-            redirect_uris: ['http://127.0.0.1:8002/callback'],
+            redirect_uris: [env.DEPLOYMENT_URL + '/callback'],
             response_types: ['code'],
         });
     }
