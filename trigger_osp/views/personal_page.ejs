@@ -15,7 +15,7 @@
     </div>
     <div class="textarea_position">
         <label>
-            <form action="http://127.0.0.1:8001/personal-page" method="post" id="textForm">
+            <form action="/personal-page" method="post" id="textForm">
                 <textarea id="text_area" placeholder="Start sharing your thoughts!" cols="50" rows="15"></textarea>
             </form>
         </label>
@@ -51,7 +51,7 @@
     function submitText() {
         const content = document.getElementById("text_area").value;
         let xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://127.0.0.1:8001/personal-page");
+        xhr.open("POST", "/personal-page");
         xhr.setRequestHeader("Accept", "application/json");
         xhr.setRequestHeader("Content-Type", "application/json");
 
@@ -72,7 +72,7 @@
     function deletePost(caller){
         const postId = caller.id;
         let xhr = new XMLHttpRequest();
-        xhr.open("DELETE", "http://127.0.0.1:8001/personal-page");
+        xhr.open("DELETE", "/personal-page");
         xhr.setRequestHeader("Accept", "application/json");
         xhr.setRequestHeader("Content-Type", "application/json");
 
