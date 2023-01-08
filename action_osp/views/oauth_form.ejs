@@ -41,7 +41,7 @@
         const state = '<%= state %>'
         const redirectUri = '<%= redirectUri %>';
         let xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://127.0.0.1:8002/authorize");
+        xhr.open("POST", "/authorize");
         xhr.setRequestHeader("Accept", "application/json");
         xhr.setRequestHeader("Content-Type", "application/json");
 
