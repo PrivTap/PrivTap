@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, test } from "vitest";
 import { SinonStub } from "sinon";
 import * as sinon from "sinon";
 import { use, expect } from "chai";
-import RuleModel from "../../src/model/Rule_model";
+import RuleModel from "../../src/model/rule_model";
 import axiosInstance from "../../src/helpers/axios_service";
 import sinonChai from "sinon-chai";
 import manageRule from "../../src/controllers/rules_controller";
