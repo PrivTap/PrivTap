@@ -3,8 +3,8 @@ import { SinonStub } from "sinon";
 import * as sinon from "sinon";
 import { use, expect } from "chai";
 import axiosInstance from "../../src/helpers/axios_service";
-import managePermission from "../../src/controllers/manage_Permission";
-import PermissionModel from "../../src/model/Permission_model";
+import managePermission from "../../src/controllers/manage_permission";
+import PermissionModel from "../../src/model/permission_model";
 import sinonChai from "sinon-chai";
 
 

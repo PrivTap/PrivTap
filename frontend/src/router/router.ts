@@ -1,4 +1,4 @@
-import { useAuthStore } from "@/stores/auth_store";
+import auth_controller from "@/controllers/authorization_controller";
 import { createRouter, createWebHistory } from "vue-router";
 import RoutingPath from "./routing_path";
 
@@ -106,7 +106,7 @@ const router = createRouter({
         requireAuth: true,
       },
     },
-  
+
     {
       path: `${RoutingPath.CREATE_RULE_PAGE}/:id?`,
       name: "createrule",
@@ -126,12 +126,13 @@ const router = createRouter({
 
 /// Router guard to check if user is authenticated
 router.beforeEach((to, from, next) => {
-  const authStore = useAuthStore();
+
   if (to.query.activate) {
-    authStore.activate(to.query.activate as string);
+    auth_controller.activate(to.query.activate as string);
   }
 
-  const isAutheticated: boolean = authStore.isAutheticated;
+  let isAutheticated = auth_controller.isAuthenticated.value;
+  console.log("isAutheticatedGuard", isAutheticated);
   if (to.meta.requireAuth && !isAutheticated) return next("/auth");
   if (to.name === "auth" && isAutheticated) return next("/home");
   return next();

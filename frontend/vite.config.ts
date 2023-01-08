@@ -18,10 +18,10 @@ export default defineConfig({
     environment: "jsdom",
     root: "src/",
     watch: false,
-    
-    coverage:{
+
+    coverage: {
       reportsDirectory: "coverage",
-      reporter:['text', 'json', 'html'],
+      reporter: ['text', 'json', 'html'],
     }
   }
 });

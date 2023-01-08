@@ -1,6 +1,6 @@
 
 <template>
-  <nav v-if="authStore.isAutheticated" class="flex justify-between pt-5 pl-6">
+  <nav v-if="isAuth" class="flex justify-between pt-5 pl-6">
     <img class="h-24" :src="logo" @click="router.push(RoutingPath.HOME)" />
     <div class="flex pr-10 space-x-5 text-center items-center">
       <button
@@ -17,7 +17,9 @@
         <template v-slot:activator="{ props }">
           <v-btn icon v-bind="props">
             <v-avatar color="#3562E2" size="large">
-              <span class="text-h5 text-white">{{ authStore.user?.username.slice(0, 2).toUpperCase() }}</span>
+              <span class="text-h5 text-white">{{
+                user?.username.slice(0, 2).toUpperCase()
+              }}</span>
             </v-avatar>
           </v-btn>
         </template>
@@ -25,26 +27,24 @@
           <v-card-text>
             <div class="mx-auto text-center">
               <v-avatar color="#3562E2">
-                <span class="text-h6 text-white">{{ authStore.user?.username.slice(0, 2).toUpperCase() }}</span>
+                <span class="text-h6 text-white">{{
+                  user?.username.slice(0, 2).toUpperCase()
+                }}</span>
               </v-avatar>
-              <h3 class="mt-3">{{ authStore.user?.username }}</h3>
+              <h3 class="mt-3">{{ auth_controller.getRef().value?.username }}</h3>
               <p class="text-caption opacity-70">
-                {{ authStore.user?.email }}
+                {{ user?.email }}
               </p>
-              <v-divider class="mt-3" ></v-divider>
+              <v-divider class="mt-3"></v-divider>
               <v-btn rounded variant="plain" @click="router.push(RoutingPath.PERSONAL_PAGE)">
                 My Rules
               </v-btn>
-              <!-- <v-divider></v-divider>
-              <v-btn rounded variant="plain">
-                Edit Account
-              </v-btn> -->
               <v-divider></v-divider>
               <v-btn rounded variant="plain" @click="router.push(RoutingPath.OSP_PERSONAL_PAGE)">
                 OSP Page
               </v-btn>
               <v-divider></v-divider>
-              <v-btn class="mt-3" rounded variant="text" color="red" @click="authStore.logout(false)">
+              <v-btn class="mt-3" rounded variant="text" color="red" @click="auth_controller.logout()">
                 Disconnect
               </v-btn>
             </div>
@@ -57,11 +57,24 @@
 
 <script setup lang="ts">
 import logo from '@/assets/images/logo_dark.svg';
-import { useAuthStore } from "@/stores/auth_store";
 import { useRouter } from 'vue-router';
 import RoutingPath from '@/router/routing_path';
+import auth_controller from '@/controllers/authorization_controller';
+import { onMounted, ref, watch } from 'vue';
 
-const authStore = useAuthStore();
 const router = useRouter();
+let user = auth_controller.getRef();
+let isAuth = ref(false);
+
+onMounted(() => {
+  isAuth.value = auth_controller.isAuthenticated.value;
+  console.log("isAuth", isAuth);
+});
+
+watch(user, (val) => {
+  isAuth.value = auth_controller.isAuthenticated.value;
+  console.log("isAuth", isAuth);
+});
+
 
 </script>
