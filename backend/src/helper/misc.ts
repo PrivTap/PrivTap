@@ -79,7 +79,7 @@ export async function handleInsert<T>(response: Response, model: Model<T>, docum
             return insertResult as T;
         return insertResult;
     } catch (e) {
-        console.log(e);
+        logger.debug(e);
         if (e instanceof ModelSaveError) {
             badRequest(response, e.message);
         } else {
@@ -114,7 +114,7 @@ export async function handleUpdate<T>(response: Response, model: Model<T>, filte
             return updateResult as T;
         return updateResult;
     } catch (e) {
-        console.log(e);
+        logger.debug(e);
         if (e instanceof ModelSaveError) {
             badRequest(response, e.message);
         } else {

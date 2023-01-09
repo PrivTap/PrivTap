@@ -4,6 +4,7 @@ import Permission, { IPermission } from "../model/Permission";
 import { badRequest } from "./http";
 import Service from "../model/Service";
 import env from "../helper/env";
+import logger from "./logger";
 
 export default class OAuth {
     static async newAuthorizationUri(response: Response, serviceId: string, permissionIds: string[] | string, state: string): Promise<string | null> {
@@ -77,8 +78,7 @@ export default class OAuth {
             const accessToken = await client.getToken(authConfig, { json: true });
             return accessToken.token.access_token;
         } catch (e) {
-            console.error("Access Token Error");
-            console.log(e);
+            logger.debug(e);
         }
         return null;
     }

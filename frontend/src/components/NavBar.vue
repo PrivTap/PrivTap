@@ -68,12 +68,10 @@ let isAuth = ref(false);
 
 onMounted(() => {
   isAuth.value = auth_controller.isAuthenticated.value;
-  console.log("isAuth", isAuth);
 });
 
 watch(user, (val) => {
   isAuth.value = auth_controller.isAuthenticated.value;
-  console.log("isAuth", isAuth);
 });
 
 

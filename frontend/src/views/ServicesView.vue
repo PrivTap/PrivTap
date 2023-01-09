@@ -100,7 +100,6 @@ onMounted(async () => {
 
 //this function is called after the user switch from authorized to unauthorized or viceversa-> it's called after the value change. Also it caches the services
 async function switchAuthorization() {
-  console.log(authorized.value);
   if (authorized.value) {
     if (serviceAuthorized == null) {
       isLoading.value = true;

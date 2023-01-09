@@ -17,10 +17,10 @@ export default class NotifyRoute extends Route {
         const triggerName = request.body.triggerName;
         const oauthToken = bearer.split(" ")[1];
 
-        console.log("headers =", request.headers);
-        console.log("body =", request.body);
+        logger.debug("headers =", request.headers);
+        logger.debug("body =", request.body);
 
-        console.log(oauthToken);
+        logger.debug(oauthToken);
 
         const authorization = await Authorization.findByToken(oauthToken);
 
@@ -50,10 +50,10 @@ export default class NotifyRoute extends Route {
         const bearer = request.headers.authorization as string;
         const oauthToken = bearer.split(" ")[1];
         const foreignTriggerId = request.query.triggerId as string;
-        console.log("headers =", request.headers);
-        console.log("query =", request.query);
+        logger.debug("headers =", request.headers);
+        logger.debug("query =", request.query);
 
-        console.log(oauthToken);
+        logger.debug(oauthToken);
 
         const authorization = await Authorization.findByToken(oauthToken);
 

@@ -11,14 +11,12 @@ import auth_controller from "./controllers/authorization_controller";
 const router = useRouter();
 
 const user = localStorage.getItem("user");
-console.log("user", user);
 if (user) {
   auth_controller.setUser(JSON.parse(user));
 }
 // Always watch if the user is logged in
 // if not, redirect to login
 watch(auth_controller.getRef(), (val) => {
-  console.log("isAutheticated", val);
   if (!val) return router.replace(RoutingPath.AUTH);
 });
 </script>

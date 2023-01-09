@@ -6,6 +6,7 @@ import Permissions from "../../model/Permission";
 import Service from "../../model/Service";
 import {handleInsert, handleUpdate} from "../../helper/misc";
 import {transformStringInDataDef} from "../../helper/dataDefinition";
+import logger from "../../helper/logger";
 
 
 export default class ManageTriggersRoute extends Route {
@@ -20,7 +21,7 @@ export default class ManageTriggersRoute extends Route {
 
         // Insert the trigger
         const triggers = await Trigger.findAllForService(serviceId, true);
-        console.log(triggers);
+        logger.debug(triggers);
         if (!triggers) {
             internalServerError(response);
             return;

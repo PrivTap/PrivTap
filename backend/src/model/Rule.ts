@@ -93,7 +93,7 @@ class Rule extends Model<IRule> {
                 .project({ _id: 0, "triggerNotificationServer": 1, "triggerId": 1, "serviceId":1 }) as Partial<triggerServiceNotificationServer>[];
             //this way should return a list of documents and in each document there should be only the
             //triggerNotificationServer
-            console.log(result);
+            logger.debug(result);
             if (result.length > 1) {
                 logger.debug("Should only have one element here");
             }

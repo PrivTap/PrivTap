@@ -7,6 +7,7 @@ import { AuthorizationTokenConfig } from "simple-oauth2";
 import { handleUpdate } from "../../helper/misc";
 import Authorization from "../../model/Authorization";
 import env from "../../helper/env";
+import logger from "../../helper/logger";
 
 export default class OAuthRoute extends Route {
     constructor() {
@@ -35,13 +36,13 @@ export default class OAuthRoute extends Route {
             redirect_uri: env.PROD ? "https://privtap.it/modifyauth/" + serviceId : "http://127.0.0.1:5173/modifyauth/" + serviceId
         };
 
-        console.log(options);
+        logger.debug(options);
         if (! await State.delete(state._id)){
             internalServerError(response);
             return;
         }
         const oAuthToken = await OAuth.retrieveToken(serviceId, options as AuthorizationTokenConfig);
-        console.log(oAuthToken);
+        logger.debug(oAuthToken);
         if (!oAuthToken){
             badRequest(response, "Problem while contacting this service. Avoid to use it");
             return;

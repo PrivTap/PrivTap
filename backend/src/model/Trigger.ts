@@ -96,7 +96,7 @@ class Trigger extends Model<ITrigger> {
         try {
             return await findAllOperationAddingAuthorizedTag(this.model, userId, serviceId) as Partial<ITrigger>[];
         } catch (e) {
-            console.log(e);
+            logger.debug(e);
             return null;
         }
     }

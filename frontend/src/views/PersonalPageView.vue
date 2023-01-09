@@ -80,13 +80,8 @@ async function onClose() {
 
 onMounted(async() => {
   await rules_controller.getAllRules();
-
-
   isLoading.value = true;
   isLoading.value = false;
-
-  console.log(inject("setTriggerId"));
-  console.log(inject("triggerId"));
 })
 
 </script>

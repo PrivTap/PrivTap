@@ -131,10 +131,9 @@ router.beforeEach((to, from, next) => {
     auth_controller.activate(to.query.activate as string);
   }
 
-  let isAutheticated = auth_controller.isAuthenticated.value;
-  console.log("isAutheticatedGuard", isAutheticated);
-  if (to.meta.requireAuth && !isAutheticated) return next("/auth");
-  if (to.name === "auth" && isAutheticated) return next("/home");
+  let isAuthenticated = auth_controller.isAuthenticated.value;
+  if (to.meta.requireAuth && !isAuthenticated) return next("/auth");
+  if (to.name === "auth" && isAuthenticated) return next("/home");
   return next();
 });
 

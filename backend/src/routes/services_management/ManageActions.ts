@@ -6,6 +6,7 @@ import Service from "../../model/Service";
 import {handleInsert, handleUpdate} from "../../helper/misc";
 import Permissions from "../../model/Permission";
 import {transformStringInDataDef} from "../../helper/dataDefinition";
+import logger from "../../helper/logger";
 
 
 export default class ManageActionsRoute extends Route {
@@ -19,7 +20,7 @@ export default class ManageActionsRoute extends Route {
         if (checkUndefinedParams(response, serviceId)) return;
 
         const actions = await Action.findAllForService(serviceId, true);
-        console.log(actions);
+        logger.debug(actions);
         if (!actions) {
             internalServerError(response);
             return;

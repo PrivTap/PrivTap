@@ -57,7 +57,6 @@ const props = defineProps(
 onMounted(() => {
     if (props.onEdit && props.permission) {
         const perm = props.permission;
-        console.log(perm);
         form.name = perm.name;
         form.description = perm.description;
         form.authorization_details = JSON.stringify(perm.authorization_details);
@@ -111,7 +110,6 @@ const form = reactive({
 
 async function validate() {
     const { valid } = await formRef.value.validate();
-    console.log(valid);
     if (valid) {
         const object = JSON.parse(form.authorization_details);
         if (props.onEdit) {

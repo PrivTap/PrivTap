@@ -35,7 +35,6 @@ export class ShowPermissions extends GenericController<SimplePermissionModel[]> 
         }
         const res = await axiosInstance.post(path, body);
         const redirectUri = res.data.data.redirectUri;
-        console.log(redirectUri);
         //TODO put here something to check before the redirectUri
         /*const res1 = await axiosInstance.get(path);
         if (res1.status != 404 && res.status != 500)*/

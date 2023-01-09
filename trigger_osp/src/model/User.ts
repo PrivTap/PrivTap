@@ -28,7 +28,7 @@ class User {
         const user = await this.model.findOne(document);
         if (user != null){
             // User already existing
-            console.log("existing...");
+            logger.debug("existing...");
             if (returnObject){
                 document._id = user._id;
                 return document;

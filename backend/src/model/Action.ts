@@ -4,6 +4,7 @@ import Model from "../Model";
 import Permission, { IPermission } from "./Permission";
 import mongoose from "mongoose";
 import { findAllOperationAddingAuthorizedTag } from "../helper/misc";
+import logger from "../helper/logger";
 
 
 export interface IAction {
@@ -104,7 +105,7 @@ class Action extends Model<IAction> {
         try {
             return await findAllOperationAddingAuthorizedTag(this.model, userId, serviceId) as Partial<IAction>[];
         } catch (e) {
-            console.log(e);
+            logger.debug(e);
             return null;
         }
     }
