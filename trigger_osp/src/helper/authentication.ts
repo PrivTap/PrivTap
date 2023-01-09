@@ -114,7 +114,7 @@ export default abstract class Authentication {
             secure: true,
             // If we are in a development environment we set SameSite=none to ensure that the cookie will be
             // set on the frontend even if it is running on a different port
-            sameSite: env.PROD ? "strict" : "lax"
+            sameSite: "lax"
         };
 
         // Set the cookie header

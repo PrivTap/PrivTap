@@ -102,7 +102,7 @@ function loadEnvVariables(): EnvVariables {
 
     res.PRIVTAP_CLIENT_SECRET = process.env.PRIVTAP_CLIENT_SECRET || "";
 
-    res.PRIVTAP_NOTIFICATION_URL = res.PROD ? "http://privtap.com/triggers-data" : "http://127.0.0.1:8000/api/triggers-data"
+    res.PRIVTAP_NOTIFICATION_URL = res.PROD ? "https://privtap.it/api/triggers-data" : "http://127.0.0.1:8000/api/triggers-data"
 
     return res as unknown as EnvVariables;
 }
