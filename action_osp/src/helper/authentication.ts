@@ -39,7 +39,7 @@ export default abstract class Authentication {
     static checkJWT(request: Request): { userId: string } {
         const secret = env.JWT_SECRET;
 
-        const cookieJWT: string | undefined = request.cookies?.__sessionAction;
+        const cookieJWT: string | undefined = request.cookies?.__session;
         if (!cookieJWT) {
             logger.debug("__sessionAction cookie is undefined, headers are: ", request.headers);
             throw new Error("JWT Cookie is undefined");
@@ -118,7 +118,7 @@ export default abstract class Authentication {
         };
 
         // Set the cookie header
-        response.cookie("__sessionAction", jwt, cookieOptions);
+        response.cookie("__session", jwt, cookieOptions);
         console.log("Headers set correctly");
         return true;
     }
