@@ -78,6 +78,7 @@ export default class TriggersDataRoute extends Route {
                     }
                     axiosResponse = await getReqHttp(trigger?.resourceServer, oauthToken, queryParams);
                     dataToForwardToActionAPI = axiosResponse?.data;
+                    logger.debug("Data received by trigger =", dataToForwardToActionAPI);
                     if (!dataToForwardToActionAPI) {
                         logger.debug("Axios response data not found");
                         internalServerError(response);
