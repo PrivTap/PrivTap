@@ -1,11 +1,11 @@
 import Route from "../../Route";
-import { Request, Response } from "express";
-import { badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
-import Action, { IAction } from "../../model/Action";
+import {Request, Response} from "express";
+import {badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success} from "../../helper/http";
+import Action, {IAction} from "../../model/Action";
 import Service from "../../model/Service";
-import { handleInsert, handleUpdate } from "../../helper/misc";
+import {handleInsert, handleUpdate} from "../../helper/misc";
 import Permissions from "../../model/Permission";
-import { transformStringInDataDef } from "../../helper/dataDefinition";
+import {transformStringInDataDef} from "../../helper/dataDefinition";
 
 
 export default class ManageActionsRoute extends Route {
@@ -24,7 +24,18 @@ export default class ManageActionsRoute extends Route {
             internalServerError(response);
             return;
         }
-
+        let inputsAction;
+        for (const action of actions) {
+            try {
+                if (action.inputs !== undefined) {
+                    inputsAction = (JSON.parse(action.inputs)).trigger_data;
+                }
+            } catch (e) {
+                inputsAction = [];
+            }
+            inputsAction = JSON.stringify(inputsAction);
+            action.inputs=inputsAction;
+        }
         success(response, actions);
     }
 
@@ -59,13 +70,20 @@ export default class ManageActionsRoute extends Route {
         }, true) as IAction;
         if (!action) return;
         const associatedPermissions = await Permissions.getAllPermissionAndAddBooleanTag(serviceId, action.permissions as string[]);
+        let inputsAction;
+        try {
+            inputsAction = (JSON.parse(action.inputs)).trigger_data;
+        } catch (e) {
+            inputsAction = [];
+        }
+        inputsAction = JSON.stringify(inputsAction);
         const actionResult: Partial<IAction> = {
             name: action.name,
             _id: action._id,
             endpoint: action.endpoint,
             description: action.description,
             permissions: associatedPermissions ? associatedPermissions : [],
-            inputs: action.inputs
+            inputs: inputsAction
         };
 
         success(response, actionResult);
@@ -107,7 +125,7 @@ export default class ManageActionsRoute extends Route {
             return;
         }
 
-        const updatedAction = await handleUpdate(response, Action, { "_id": actionId }, {
+        const updatedAction = await handleUpdate(response, Action, {"_id": actionId}, {
             name,
             description,
             permissions,
@@ -115,6 +133,13 @@ export default class ManageActionsRoute extends Route {
             inputs
         }, true) as IAction;
         if (!updatedAction) return;
+        let inputsAction;
+        try {
+            inputsAction = (JSON.parse(updatedAction.inputs)).trigger_data;
+        } catch (e) {
+            inputsAction = [];
+        }
+        inputsAction = JSON.stringify(inputsAction);
         const associatedPermissions = await Permissions.getAllPermissionAndAddBooleanTag(updatedAction.serviceId, updatedAction.permissions as string[]);
         const triggerResult: Partial<IAction> = {
             name: updatedAction.name,
@@ -122,7 +147,7 @@ export default class ManageActionsRoute extends Route {
             endpoint: updatedAction.endpoint,
             description: updatedAction.description,
             permissions: associatedPermissions ? associatedPermissions : [],
-            inputs: updatedAction.inputs
+            inputs: inputsAction
         };
 
         success(response, triggerResult);
