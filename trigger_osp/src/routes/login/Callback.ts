@@ -4,6 +4,7 @@ import OAuthClient from "../../helper/OAuthClient";
 import State from "../../model/State";
 import User, {IUser} from "../../model/User";
 import Authentication from "../../helper/authentication";
+import env from "../../helper/env";
 
 export default class LoginRoute extends Route {
     constructor() {
@@ -25,7 +26,7 @@ export default class LoginRoute extends Route {
         }
         const oauthAuthorization = state.oauthAuthorization;
         const code_verifier = state.code_verifier;
-        const tokenSet = await client.callback('http://127.0.0.1:8001/callback', params, {
+        const tokenSet = await client.callback(env.DEPLOYMENT_URL + '/callback', params, {
             code_verifier,
             state: params.state
         });
@@ -56,7 +57,7 @@ export default class LoginRoute extends Route {
         }
 
         if (state.oauthAuthorization) {
-            let url: string = "http://127.0.0.1:8001/authorize?";
+            let url: string = env.DEPLOYMENT_URL + "/authorize?";
             url += "redirect_uri=" + oauthAuthorization.redirectUri;
             url += "&client_id=" + oauthAuthorization.clientId;
             url += "&state=" + oauthAuthorization.state;
@@ -65,7 +66,8 @@ export default class LoginRoute extends Route {
             return;
         }
 
-        response.redirect("http://127.0.0.1:8001/personal-page")
+        let redirectUri = env.DEPLOYMENT_URL + "/personal-page";
+        response.redirect(redirectUri)
 
     }
 }

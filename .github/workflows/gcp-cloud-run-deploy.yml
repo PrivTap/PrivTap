@@ -25,14 +25,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
       
-      - id: 'auth'
+      - name: Auth
         uses: 'google-github-actions/auth@v0'
         with:
           credentials_json: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_PRIVTAP_368209 }}'
       
-      - id: 'deploy'
+      - name: Deploy backend
         uses: 'google-github-actions/deploy-cloudrun@v0'
         with:
           service: 'privtap-backend'
           region: europe-west8
           source: ./backend
+          
+      - name: Deploy dummy OSP for actions
+        uses: 'google-github-actions/deploy-cloudrun@v0'
+        with:
+          service: 'privtap-action-osp'
+          region: europe-west8
+          source: ./action_osp
+          
+      - name: Deploy dummy OSP for triggers
+        uses: 'google-github-actions/deploy-cloudrun@v0'
+        with:
+          service: 'privtap-trigger-osp'
+          region: europe-west8
+          source: ./trigger_osp

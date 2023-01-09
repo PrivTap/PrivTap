@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "lint": "eslint **/*.ts --fix",
+    "build":  "npx tsc",
     "run": "npx tsc && node dist/app.js",
     "test": "mocha --require ts-node/register --require test/prepare.ts 'test/**/*.ts'",
     "coverage": "nyc --reporter=html npm test"
@@ -18,7 +19,7 @@
     "openid-client": "^5.3.1",
     "tracer": "^1.1.6",
     "bcrypt": "^5.0.0",
-    "jsonwebtoken": "^8.5.1"
+    "jsonwebtoken": "^9.0.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
