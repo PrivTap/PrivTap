@@ -189,6 +189,20 @@ class Authorization extends Model<IAuthorization> {
         return null;
     }
 
+    /**
+     * Deletes all authorizations linked to a service
+     * @param serviceId The service ID that owns the authorization
+     */
+    async deleteAll(serviceId: string): Promise<boolean> {
+        try {
+            const res = await this.model.deleteMany({ serviceId: serviceId });
+            return res.deletedCount > 0;
+        } catch (e) {
+            logger.error(`Unexpected error while deleting ${this.name}\n`, e);
+        }
+        return false;
+    }
+
 }
 
 export default new Authorization();

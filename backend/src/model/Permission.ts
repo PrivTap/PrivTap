@@ -1,5 +1,6 @@
 import { Schema, Types } from "mongoose";
 import Model from "../Model";
+import logger from "../helper/logger";
 
 export interface IPermission {
     _id: string;
@@ -96,6 +97,19 @@ export class Permission extends Model<IPermission> {
         return aggregate;
     }
 
+    /**
+     * Deletes all permissions linked to a service
+     * @param serviceId The service ID that owns the permission
+     */
+    async deleteAll(serviceId: string): Promise<boolean> {
+        try {
+            const res = await this.model.deleteMany({ serviceId: serviceId });
+            return res.deletedCount > 0;
+        } catch (e) {
+            logger.error(`Unexpected error while deleting ${this.name}\n`, e);
+        }
+        return false;
+    }
 
     /*async findAllPermission(serviceId: string, userId: string) {
         const result = await this.model.aggregate()

@@ -1,5 +1,11 @@
 import { Schema } from "mongoose";
 import Model from "../Model";
+import Trigger from "./Trigger";
+import Action from "./Action";
+import trigger from "./Trigger";
+import logger from "../helper/logger";
+import Authorization from "./Authorization";
+import Permission from "./Permission";
 
 export interface IService {
     _id: string;
@@ -63,6 +69,35 @@ const serviceSchema = new Schema({
 class Service extends Model<IService> {
 
     constructor() {
+        serviceSchema.post("deleteOne", async (doc) => {
+            //Propagate deletion to all triggers/actions
+            try {
+                const triggers = (await Trigger.findAllForService(doc._id)) ?? [];
+                const actions = (await Action.findAllForService(doc._id)) ?? [];
+                await Authorization.deleteAll(doc._id);
+                await Permission.deleteAll(doc._id);
+                for (const trigger of triggers) {
+                    if (trigger._id) {
+                        try {
+                            await Trigger.delete(trigger._id);
+                        } catch (error) {
+                            logger.log(error);
+                        }
+                    }
+                }
+                for (const action of actions) {
+                    if (action._id) {
+                        try {
+                            await Action.delete(action._id);
+                        } catch (error) {
+                            logger.log(error);
+                        }
+                    }
+                }
+            } catch (error) {
+                logger.log(error);
+            }
+        });
         super("service", serviceSchema);
     }
 

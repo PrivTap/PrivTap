@@ -4,6 +4,8 @@ import Model from "../Model";
 import Permission, { IPermission } from "./Permission";
 import mongoose from "mongoose";
 import { findAllOperationAddingAuthorizedTag } from "../helper/misc";
+import Rule from "./Rule";
+import logger from "../helper/logger";
 
 
 export interface IAction {
@@ -44,6 +46,23 @@ const actionSchema = new Schema({
 class Action extends Model<IAction> {
 
     constructor() {
+        actionSchema.post("deleteOne", async (doc) => {
+            //Propagate deletion to all rules
+            try {
+                const rules = (await Rule.findAll({ actionId: doc._id })) ?? [];
+                for (const rule of rules) {
+                    if (rule._id) {
+                        try {
+                            await Rule.delete(rule._id);
+                        } catch (error) {
+                            logger.log(error);
+                        }
+                    }
+                }
+            } catch (error) {
+                logger.log(error);
+            }
+        });
         super("action", actionSchema);
     }
 
