@@ -1,5 +1,11 @@
 import { expect } from "chai";
-import { checkCompatibility, DataDefinition, dataDefinitionIDs } from "../../src/helper/dataDefinition";
+import {
+    checkCompatibility,
+    DataDefinition,
+    dataDefinitionIDs,
+    EntryDefinition,
+    transformStringInDataDef
+} from "../../src/helper/dataDefinition";
 import { DataType } from "../../src/helper/dataType";
 
 describe("Data Definition helper module", () => {
@@ -56,5 +62,10 @@ describe("Data Definition helper module", () => {
 
     it("should correctly extract data definition IDs", function () {
         expect(dataDefinitionIDs(compatibleActionDefinition)).to.be.eql(["title", "date"]);
+    });
+
+    it("should correctly reject poorly encoded data definition entries", function () {
+        const wrongEntry = "[{'identifier': 'something', 'type': 'RANDOM'}]";
+        expect(transformStringInDataDef(wrongEntry)).to.be.null;
     });
 });
