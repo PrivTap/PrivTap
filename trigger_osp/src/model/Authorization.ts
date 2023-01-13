@@ -41,7 +41,7 @@ class Authorization {
                 logger.debug("The Authorization already exists");
                 return true;
             }
-            console.log("Error inserting authorization", e);
+            logger.debug("Error inserting authorization", e);
             return false;
         }
     }
@@ -50,7 +50,7 @@ class Authorization {
         try {
             return await this.model.findOneAndUpdate(filter, update, {upsert: upsert, new: true});
         } catch (e) {
-            console.log("Error updating authorization", e);
+            logger.debug("Error updating authorization", e);
             return null;
         }
     }
@@ -60,7 +60,7 @@ class Authorization {
             this.model.deleteOne({userId});
             return true;
         } catch (e) {
-            console.log("Error deleting authorization", e);
+            logger.debug("Error deleting authorization", e);
             return false;
         }
     }

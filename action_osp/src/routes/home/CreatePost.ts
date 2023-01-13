@@ -5,6 +5,7 @@ import {Configuration, OpenAIApi} from "openai";
 
 import env from "../../helper/env";
 import Authorization from "../../model/Authorization";
+import logger from "../../helper/logger";
 
 export default class CreatePostRoute extends Route {
     constructor() {
@@ -18,7 +19,7 @@ export default class CreatePostRoute extends Route {
         const dataFromTrigger = request.body;
 
         if (!authorization || !dataFromTrigger){
-            console.log("Not auth or content");
+            logger.debug("Not auth or content");
             response.status(400).send();
             return;
         }
@@ -26,7 +27,7 @@ export default class CreatePostRoute extends Route {
 
         const postText = dataFromTrigger.text as string;
         if (!postText){
-            console.log("Wrongly formatted data from trigger");
+            logger.debug("Wrongly formatted data from trigger");
             response.status(400).send();
             return;
         }
@@ -45,7 +46,7 @@ export default class CreatePostRoute extends Route {
                 response_format: "url"
             }, {timeout: 10000});
         } catch (e) {
-            console.log(e);
+            logger.debug(e);
         }
         const post: Partial<IPost> = {
             content: postText,
@@ -53,7 +54,7 @@ export default class CreatePostRoute extends Route {
             img: dataImg?.data.data[0].url
         }
         if (!await Post.insert(post)) {
-            console.log("error inserting post");
+            logger.debug("error inserting post");
             response.status(500).send();
             return;
         }

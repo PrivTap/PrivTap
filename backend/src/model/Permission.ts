@@ -147,7 +147,7 @@ export class Permission extends Model<IPermission> {
                 localField: "name",
                 foreignField: "name"
             }).unwind({path: "$permissions"})
-        console.log(result)
+        logger.debug(result)
     }*/
 }
 

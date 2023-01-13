@@ -2,7 +2,7 @@ import Route from "../../Route";
 import {Request, Response} from "express";
 import {TriggerData} from "../../helper/dataDefinition";
 import {getReqHttp} from "../../helper/misc";
-import {IPost} from "../../model/Post";
+import logger from "../../helper/logger";
 
 export default class Middleware extends Route {
     constructor() {
@@ -10,7 +10,7 @@ export default class Middleware extends Route {
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
-        console.log("middleware called");
+        logger.debug("middleware called");
         const bearer = request.headers.authorization as string;
         const eventDataParameters = request.query.eventDataParameters;
         const actionDataFilter: string[] = (request.query.filter as string[] | null) ?? []; //Used to filter retrieved data with only what was requested by the action
@@ -28,12 +28,12 @@ export default class Middleware extends Route {
             axiosResponse = await getReqHttp(request.protocol + '://' + request.get("host") + "/resources", bearer, queryParams);
             resourceServerData = axiosResponse?.data;
             if (!resourceServerData) {
-                console.log("Axios response data not found - sending empty data...");
+                logger.debug("Axios response data not found - sending empty data...");
                 response.status(200).send(new TriggerData([], [], []));
                 return;
             }
         } catch (e) {
-            console.log("Axios response status =", axiosResponse?.status, "Error:", e);
+            logger.debug("Axios response status =", axiosResponse?.status, "Error:", e);
             response.status(200).send(new TriggerData([], [], []));
             return;
         }

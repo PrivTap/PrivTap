@@ -72,7 +72,7 @@ export default class RulesRoute extends Route {
             if (token != null) {
                 if (triggerService.triggerNotificationServer != undefined) {
                     //TODO should respond to the user that he can't create this rule because he didn't authorize the service (do this also for action)
-                    //console.log("seding req");
+                    //logger.debug("seding req");
                     await postReqHttp(triggerService.triggerNotificationServer, token, {
                         userId,
                         triggerId,

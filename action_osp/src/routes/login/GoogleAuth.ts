@@ -4,6 +4,7 @@ import OAuthClient from "../../helper/OAuthClient";
 import env from "../../helper/env";
 import crypto from "bcrypt";
 import {oAuthAuthorization} from "../../model/State";
+import logger from "../../helper/logger";
 
 export default class LoginRoute extends Route {
     constructor() {
@@ -23,7 +24,7 @@ export default class LoginRoute extends Route {
             return
         }
         const redirectUrl = await OAuthClient.getRedirectUrl(client, stateValue, oAuthState);
-        console.log(redirectUrl);
+        logger.debug(redirectUrl);
         response.redirect(redirectUrl);
     }
 

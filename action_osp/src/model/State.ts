@@ -1,4 +1,5 @@
 import { model as mongooseModel, Schema } from "mongoose";
+import logger from "../helper/logger";
 
 export class oAuthAuthorization {
     clientId: String
@@ -49,7 +50,7 @@ class State {
             await model.save();
             return true;
         } catch (e) {
-            console.log("Error inserting state");
+            logger.debug("Error inserting state");
         }
         return false;
     }

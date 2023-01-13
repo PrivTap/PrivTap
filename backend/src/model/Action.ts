@@ -123,7 +123,7 @@ class Action extends Model<IAction> {
         try {
             return await findAllOperationAddingAuthorizedTag(this.model, userId, serviceId) as Partial<IAction>[];
         } catch (e) {
-            console.log(e);
+            logger.debug(e);
             return null;
         }
     }

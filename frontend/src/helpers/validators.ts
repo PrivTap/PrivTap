@@ -45,7 +45,6 @@ export function isAggregate(dataType: DataType): boolean {
 export function isValidEntryDefinition(dataDefinition: string): boolean | string {
     const msg = "Must be a valid JSON array (or empty), containing objects with the following properties: identifier (string), type (string), content (object)"
     try {
-        console.log("here");
         return !!(JSON.parse(dataDefinition) as EntryDefinition[]) ? true : msg;
     } catch (err) {
         return msg;

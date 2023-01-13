@@ -39,4 +39,8 @@ RUN npm ci --omit=dev
 # Copy compiled Javascript and run
 COPY --from=0 /usr/src/app/dist .
 
+# Copy static files
+COPY public ./public
+COPY views ./views
+
 CMD ["node","app.js"]

@@ -6,6 +6,7 @@ import crypto from "bcrypt";
 import env from "../../helper/env";
 import { handleInsert } from "../../helper/misc";
 import State from "../../model/State";
+import logger from "../../helper/logger";
 
 export default class ServiceAuthorizationRoute extends Route {
     constructor() {
@@ -31,7 +32,7 @@ export default class ServiceAuthorizationRoute extends Route {
             return;
         }
 
-        console.log("authorization uri =", authorizationUri);
+        logger.debug("authorization uri =", authorizationUri);
 
         success(response, { "redirectUri": authorizationUri });
     }

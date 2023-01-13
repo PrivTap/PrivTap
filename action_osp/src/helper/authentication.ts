@@ -39,7 +39,7 @@ export default abstract class Authentication {
     static checkJWT(request: Request): { userId: string } {
         const secret = env.JWT_SECRET;
 
-        const cookieJWT: string | undefined = request.cookies?.__sessionAction;
+        const cookieJWT: string | undefined = request.cookies?.__session;
         if (!cookieJWT) {
             logger.debug("__sessionAction cookie is undefined, headers are: ", request.headers);
             throw new Error("JWT Cookie is undefined");
@@ -93,7 +93,7 @@ export default abstract class Authentication {
         // Create a JWT token for the user
         const jwt = Authentication.createJWT(user);
         if (!jwt){
-            console.log("Not jwt")
+            logger.debug("Not jwt")
             return false;
         }
 
@@ -114,12 +114,12 @@ export default abstract class Authentication {
             secure: true,
             // If we are in a development environment we set SameSite=none to ensure that the cookie will be
             // set on the frontend even if it is running on a different port
-            sameSite: env.PROD ? "strict" : "none"
+            sameSite: "lax"
         };
 
         // Set the cookie header
-        response.cookie("__sessionAction", jwt, cookieOptions);
-        console.log("Headers set correctly");
+        response.cookie("__session", jwt, cookieOptions);
+        logger.debug("Headers set correctly");
         return true;
     }
 

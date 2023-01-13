@@ -1,11 +1,12 @@
 import Route from "../../Route";
-import { Request, Response } from "express";
-import { badRequest, checkUndefinedParams, forbiddenUserError, success } from "../../helper/http";
-import Trigger, { ITrigger } from "../../model/Trigger";
+import {Request, Response} from "express";
+import {badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success} from "../../helper/http";
+import Trigger, {ITrigger} from "../../model/Trigger";
 import Permissions from "../../model/Permission";
 import Service from "../../model/Service";
-import { handleInsert, handleUpdate } from "../../helper/misc";
-import { transformStringInDataDef } from "../../helper/dataDefinition";
+import {handleInsert, handleUpdate} from "../../helper/misc";
+import {transformStringInDataDef} from "../../helper/dataDefinition";
+import logger from "../../helper/logger";
 
 
 export default class ManageTriggersRoute extends Route {
@@ -19,12 +20,25 @@ export default class ManageTriggersRoute extends Route {
         if (checkUndefinedParams(response, serviceId)) return;
 
         // Insert the trigger
-        const services = await Trigger.findAllForService(serviceId, true);
-        if (services) {
-            success(response, services);
-        } else {
-            success(response, []);
+        const triggers = await Trigger.findAllForService(serviceId, true);
+        logger.debug(triggers);
+        if (!triggers) {
+            internalServerError(response);
+            return;
         }
+        let outputstrigger;
+        for (const trigger of triggers) {
+            try {
+                if (trigger.outputs !== undefined) {
+                    outputstrigger = (JSON.parse(trigger.outputs)).trigger_data;
+                }
+            } catch (e) {
+                outputstrigger = [];
+            }
+            outputstrigger = JSON.stringify(outputstrigger);
+            trigger.outputs=outputstrigger;
+        }
+        success(response, triggers);
     }
 
     protected async httpPost(request: Request, response: Response): Promise<void> {
@@ -34,7 +48,7 @@ export default class ManageTriggersRoute extends Route {
         const permissions = request.body.permissions;
         const resourceServer = request.body.resourceServer;
         const out = request.body.outputs;
-        const service= await Service.findById(serviceId);
+        const service = await Service.findById(serviceId);
         if (checkUndefinedParams(response, name, description, serviceId, out)) return;
 
         // Check that the user is the owner of the service
@@ -44,11 +58,11 @@ export default class ManageTriggersRoute extends Route {
         }
         const outputs = transformStringInDataDef(out);
         if (outputs === null) {
-            badRequest(response, "Inputs are not in the valid format");
+            badRequest(response, "outputs are not in the valid format");
             return;
         }
         //check if the service has a trigger notification server
-        if (service!==null && !service.triggerNotificationServer) {
+        if (service !== null && !service.triggerNotificationServer) {
             badRequest(response, "This service does not have a trigger notification server");
             return;
         }
@@ -63,13 +77,20 @@ export default class ManageTriggersRoute extends Route {
         }, true) as ITrigger;
         if (!insertedTrigger) return;
         const associatedPermissions = await Permissions.getAllPermissionAndAddBooleanTag(serviceId, insertedTrigger.permissions as string[]);
+        let outputsTrigger;
+        try {
+            outputsTrigger = (JSON.parse(insertedTrigger.outputs)).trigger_data;
+        } catch (e) {
+            outputsTrigger = [];
+        }
+        outputsTrigger = JSON.stringify(outputsTrigger);
         const triggerResult: Partial<ITrigger> = {
             name: insertedTrigger.name,
             _id: insertedTrigger._id,
             resourceServer: insertedTrigger.resourceServer,
             description: insertedTrigger.description,
             permissions: associatedPermissions ? associatedPermissions : [],
-            outputs: insertedTrigger.outputs
+            outputs: outputsTrigger
         };
 
         success(response, triggerResult);
@@ -80,7 +101,7 @@ export default class ManageTriggersRoute extends Route {
 
         if (checkUndefinedParams(response, triggerId)) return;
 
-        // Check that the user is the owner of the action
+        // Check that the user is the owner of the Trigger
         if (!await Trigger.isCreator(request.userId, triggerId)) {
             forbiddenUserError(response, "You are not the owner of this trigger");
             return;
@@ -114,7 +135,7 @@ export default class ManageTriggersRoute extends Route {
             return;
         }
 
-        const modifiedTrigger = await handleUpdate(response, Trigger, { "_id": triggerId }, {
+        const modifiedTrigger = await handleUpdate(response, Trigger, {"_id": triggerId}, {
             name,
             description,
             permissions,
@@ -122,6 +143,13 @@ export default class ManageTriggersRoute extends Route {
             outputs
         }, true) as ITrigger;
         if (!modifiedTrigger) return;
+        let outputsTrigger;
+        try {
+            outputsTrigger = (JSON.parse(modifiedTrigger.outputs)).trigger_data;
+        } catch (e) {
+            outputsTrigger = [];
+        }
+        outputsTrigger = JSON.stringify(outputsTrigger);
         const associatedPermissions = await Permissions.getAllPermissionAndAddBooleanTag(modifiedTrigger.serviceId, modifiedTrigger.permissions as string[]);
         const triggerResult: Partial<ITrigger> = {
             name: modifiedTrigger.name,
@@ -129,7 +157,7 @@ export default class ManageTriggersRoute extends Route {
             resourceServer: modifiedTrigger.resourceServer,
             description: modifiedTrigger.description,
             permissions: associatedPermissions ? associatedPermissions : [],
-            outputs: modifiedTrigger.outputs
+            outputs: outputsTrigger
         };
 
         success(response, triggerResult);
