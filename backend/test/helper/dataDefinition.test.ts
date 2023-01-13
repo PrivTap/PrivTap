@@ -68,4 +68,9 @@ describe("Data Definition helper module", () => {
         const wrongEntry = "[{'identifier': 'something', 'type': 'RANDOM'}]";
         expect(transformStringInDataDef(wrongEntry)).to.be.null;
     });
+
+    it("should correctly reject poorly encoded data definition entries", function () {
+        const wrongEntry = "{trigger_data: [{'identifier': 'something', 'type': 'RANDOM'}]}";
+        expect(transformStringInDataDef(wrongEntry)).to.be.null;
+    });
 });

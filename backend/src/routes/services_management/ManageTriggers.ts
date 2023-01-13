@@ -1,11 +1,11 @@
 import Route from "../../Route";
-import {Request, Response} from "express";
-import {badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success} from "../../helper/http";
-import Trigger, {ITrigger} from "../../model/Trigger";
+import { Request, Response } from "express";
+import { badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
+import Trigger, { ITrigger } from "../../model/Trigger";
 import Permissions from "../../model/Permission";
 import Service from "../../model/Service";
-import {handleInsert, handleUpdate} from "../../helper/misc";
-import {transformStringInDataDef} from "../../helper/dataDefinition";
+import { handleInsert, handleUpdate } from "../../helper/misc";
+import { transformStringInDataDef } from "../../helper/dataDefinition";
 import logger from "../../helper/logger";
 
 
@@ -57,12 +57,12 @@ export default class ManageTriggersRoute extends Route {
             return;
         }
         const outputs = transformStringInDataDef(out);
-        if (outputs === null) {
+        if (!outputs) {
             badRequest(response, "outputs are not in the valid format");
             return;
         }
         //check if the service has a trigger notification server
-        if (service !== null && !service.triggerNotificationServer) {
+        if (service != null && !service.triggerNotificationServer) {
             badRequest(response, "This service does not have a trigger notification server");
             return;
         }
@@ -124,7 +124,7 @@ export default class ManageTriggersRoute extends Route {
         const out = request.body.outputs;
         //check if the outputs is valid
         const outputs = transformStringInDataDef(out);
-        if (outputs === null) {
+        if (!outputs) {
             badRequest(response, "The outputs is not in the valid format");
             return;
         }
@@ -135,7 +135,7 @@ export default class ManageTriggersRoute extends Route {
             return;
         }
 
-        const modifiedTrigger = await handleUpdate(response, Trigger, {"_id": triggerId}, {
+        const modifiedTrigger = await handleUpdate(response, Trigger, { "_id": triggerId }, {
             name,
             description,
             permissions,
