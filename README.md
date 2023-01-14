@@ -212,7 +212,7 @@ Thanks to all team members that have worked on this project:
 * [Alessandro Sassi](https://github.com/AleSassi)
 * [Emanuele Santoro](https://github.com/emanuelesantoro)
 * [Enna Basic](https://github.com/ennnnnna)
-* [Ivan Radonjic](https://github.com/Chaser222)
+* [Ivan Radonjic](https://github.com/chaser-22)
 * [Michele Benedetti](https://github.com/Michele-x98)
 * [Leonardo Panseri](https://github.com/leonardo-panseri)
 * [Lorenzo Vaccarini](https://github.com/Vaccarini-Lorenzo)
