@@ -47,8 +47,11 @@ tags:
     description: Endpoints for authorizing services on behalf of users
   - name: Rules Execution
     description: Endpoints for executing trigger-action rules defined by users
-  - name: Middleware
-    description: Endpoint not belonging to our platform but needed in order to integrate with it (Protocol Translator).
+  - name: Middleware Trigger
+    description: Endpoint not belonging to our platform but needed in order to integrate with it (Shim Application).
+  - name: Middleware Action
+    description: Endpoint not belonging to our platform but needed in order to integrate with it (Shim Application).
+
 security:
   - auth: []
 paths:
@@ -294,6 +297,9 @@ paths:
                     description:
                       type: string
                       example: This service allow you to interact with your dropbox account!
+                    baseUrl:
+                      type: string
+                      example: https://www.dropbox.com
         '400':
           description: Bad request
         '500':
@@ -498,6 +504,41 @@ paths:
           description: Bad request
         '500':
           description: Internal server error
+  /permission-authorized:
+    get:
+      tags:
+        - OSP Authorization
+      summary: The User requests the permission for a service
+      description: This endpoint returns the list of all the permission with a service and inside each permission there is a boolean to check if that permission is authorized or not
+      operationId: get-permission-authorized
+      parameters:
+        - in: query
+          name: serviceId
+          schema:
+            type: string
+            example: 637e6c0e2677ffe654ea9672
+          required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    _id:
+                      type: string
+                      example: 637e6c0e2677ffe654ea9672
+                    name:
+                      type: string
+                      example: SomePermissionName
+                    description:
+                      type: string
+                      example: SomePermissionDescription
+                    authorized:
+                      type: boolean
+                      example:  true
 
   /manage-services:
     get:
@@ -693,9 +734,9 @@ paths:
   /middleware:
     get:
       tags:
-        - Middleware
+        - Middleware Trigger
       summary: The endPoint of the OSP trigger that will be used to communicate with privTap platform.
-      description:  qualcosa
+      description:  This endpoint is NOT a part of our platform but instead it should be the endpoint before the trigger. This means that the request will be made by the platform and the response will be made by the middleware and not the viceversa. In particular if our platform needs to retrieve data from the resource server of the trigger services, it will communicate with it using the standard format. The purpose of this middleware is to translate from privtap format to your resource server format. This can be done using the "identifier" field present in our format that should be mapped to the field of your same name. A thing that should be respected is to only map identifier that are requested in the filter parameter and send only that data back.
       operationId: get-middleware
       parameters:
         - in: header
@@ -703,6 +744,7 @@ paths:
           schema:
             type: string
             example: "Bearer tokenExample"
+          description: here there is the oauth token that the platform will send to the resource server
         - in: query
           name: filter
           schema:
@@ -710,14 +752,35 @@ paths:
             items:
               type: string
             example: [identifier1,identifier2]
+          description: This is an array of identifier to the middleware to know which data to send back
+        - in: query
+          name: eventDataParameters
+          schema:
+            type: string
+            description: This parameter is the one that the OSP sent to the platform when the trigger is fired. Our platform will send it back to the middleware. You can put in this parameter the string that you want and it will be sent back to the OSP.
       responses:
         '200':
-          description: ciao
+          description: successful operation (the token is valid and it has enough permissions)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataDefinition'
+
     post:
       tags:
-        - Middleware
-      summary:
-
+        - Middleware Action
+      summary: The endPoint of the OSP action that will be used to communicate with privTap platform.
+      description: The endPoint of the OSP Action that will be used to communicate with privTap platform.
+      operationId: post-middleware
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataDefinition'
+      responses:
+        '200':
+          description: successful operation (the action has been executed)
   /oauth:
     get:
       tags:
@@ -794,11 +857,14 @@ paths:
                   resourceServer:
                     type: string
                     example: someUrlToToGetAResource
+                  outputs:
+                    type: string
+                    example: "[{\"identifier\":\"post-text\",\"type\":\"text\"}]"
     post:
       tags:
         - Services Management
-      summary: The OSP defines a new trigger service which has as implicit endpoint /trigger-data
-      description: The OSP defines a new trigger service which has as implicit endpoint /trigger-data (TODO)
+      summary: The OSP defines a new trigger which has as implicit endpoint /trigger-data
+      description: The OSP defines a new trigger which has as implicit endpoint /trigger-data (TODO)
       operationId: post-manage-triggers
       requestBody:
         required: true
@@ -823,6 +889,9 @@ paths:
                 resourceServer:
                   type: string
                   example: someUrlToGetAResource
+                outputs:
+                  type: string
+                  example: "[{\"identifier\":\"post-text\",\"type\":\"text\"}]"
               required:
                 - name
                 - description
@@ -865,6 +934,9 @@ paths:
                   resourceServer:
                     type: string
                     example: someUrlToToGetAResource
+                  outputs:
+                    type: string
+                    example: "[{\"identifier\":\"post-text\",\"type\":\"text\"}]"
     delete:
       tags:
         - Services Management
@@ -955,6 +1027,9 @@ paths:
                   resourceServer:
                     type: string
                     example: someUrlToToGetAResource
+                  outputs:
+                    type: string
+                    example: "[{\"identifier\":\"post-text\",\"type\":\"text\"}]"
 
   /manage-actions:
     get:
@@ -1010,11 +1085,14 @@ paths:
                     endpoint:
                       type: string
                       example: someUrlToPerformAction
+                    inputs:
+                      type: string
+                      example: "[{\"identifier\":\"post-text\",\"type\":\"text\"}]"
     post:
       tags:
         - Services Management
-      summary: The OSP defines a new action service
-      description: The OSP defines a new action service
+      summary: The OSP defines a new action
+      description: The OSP defines a new action
       operationId: post-manage-actions
       requestBody:
         required: true
@@ -1039,11 +1117,15 @@ paths:
                 endpoint:
                   type: string
                   example: someUrlToPerformAction
+                inputs:
+                  type: string
+                  example: "[{\"identifier\":\"post-text\",\"type\":\"text\"}]"
               required:
                 - name
                 - description
                 - serviceId
                 - endpoint
+                - inputs
 
       responses:
         '200':
@@ -1083,6 +1165,9 @@ paths:
                   endpoint:
                     type: string
                     example: someUrlToPerformAction
+                  inputs:
+                    type: string
+                    example: "[{\"identifier\":\"post-text\",\"type\":\"text\"}]"
     delete:
       tags:
         - Services Management
@@ -1134,6 +1219,9 @@ paths:
                 endpoint:
                   type: string
                   example: someUrlToPerformAction
+                inputs:
+                  type: string
+                  example: "[{\"identifier\":\"post-text\",\"type\":\"text\"}]"
               required:
                 - actionId
       responses:
@@ -1174,6 +1262,9 @@ paths:
                   endpoint:
                     type: string
                     example: someUrlToPerformAction
+                  inputs:
+                    type: string
+                    example: "[{\"identifier\":\"post-text\",\"type\":\"text\"}]"
   /permissions:
     get:
       tags:
