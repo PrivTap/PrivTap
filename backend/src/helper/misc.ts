@@ -8,6 +8,7 @@ import mongoose from "mongoose";
 import { IAction } from "../model/Action";
 import { ITrigger } from "../model/Trigger";
 import Authorization from "../model/Authorization";
+import Rule from "../model/Rule";
 
 
 /**
@@ -225,4 +226,22 @@ export async function findAllOperationAddingAuthorizedTag(model: mongoose.Model<
 
 export function checkActionDataFormat(actionRequiredIDs: string[], triggerDataIDs: string[]): boolean {
     return actionRequiredIDs.filter((actionID) => !triggerDataIDs.find((triggerID) => actionID == triggerID)).length > 0;
+}
+
+export async function deleteRule(id: string) {
+    //Propagate deletion to all rules
+    try {
+        const rules = (await Rule.findAll({ actionId: id })) ?? [];
+        for (const rule of rules) {
+            if (rule._id) {
+                try {
+                    await Rule.delete(rule._id);
+                } catch (error) {
+                    logger.log(error);
+                }
+            }
+        }
+    } catch (error) {
+        logger.log(error);
+    }
 }

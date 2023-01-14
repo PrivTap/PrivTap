@@ -3,11 +3,8 @@ import Service from "./Service";
 import Model from "../Model";
 import logger from "../helper/logger";
 import Permission, { IPermission } from "./Permission";
-import { DataDefinition } from "../helper/dataDefinition";
 import permission from "./Permission";
-import { findAllOperationAddingAuthorizedTag } from "../helper/misc";
-import Action from "./Action";
-import Rule from "./Rule";
+import { deleteRule, findAllOperationAddingAuthorizedTag } from "../helper/misc";
 
 export interface ITrigger {
     _id: string;
@@ -44,27 +41,19 @@ const triggerSchema = new Schema({
     },
     data: [String]
 });
+triggerSchema.pre("deleteOne", async function () {
+    //Propagate deletion to all rules
+    try {
+        const id = this.getFilter()["_id"];
+        await deleteRule(id);
+    } catch (error) {
+        logger.log(error);
+    }
+});
 
 class Trigger extends Model<ITrigger> {
 
     constructor() {
-        triggerSchema.post("deleteOne", async (doc) => {
-            //Propagate deletion to all rules
-            try {
-                const rules = (await Rule.findAll({ triggerId: doc._id })) ?? [];
-                for (const rule of rules) {
-                    if (rule._id) {
-                        try {
-                            await Rule.delete(rule._id);
-                        } catch (error) {
-                            logger.log(error);
-                        }
-                    }
-                }
-            } catch (error) {
-                logger.log(error);
-            }
-        });
         super("trigger", triggerSchema);
     }
 

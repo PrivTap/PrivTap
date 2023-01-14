@@ -1,6 +1,7 @@
 import { Schema, Types } from "mongoose";
 import Model from "../Model";
 import logger from "../helper/logger";
+import Authorization from "./Authorization";
 
 export interface IPermission {
     _id: string;
@@ -32,6 +33,15 @@ const permissionSchema = new Schema({
 export class Permission extends Model<IPermission> {
 
     constructor() {
+        permissionSchema.pre("deleteOne", async function () {
+            try {
+                const id = this.getFilter()["_id"];
+                const permission = await this.model.findById(id);
+                await Authorization.removePermission(id, permission.serviceId);
+            } catch (error) {
+                logger.log(error);
+            }
+        });
         super("permission", permissionSchema);
     }
 
@@ -81,16 +91,16 @@ export class Permission extends Model<IPermission> {
                 _id: permission._id,
                 name: permission.name,
                 description: permission.description,
-                associated: permissions == undefined ? false :permissions.includes(permission._id)
+                associated: permissions == undefined ? false : permissions.includes(permission._id)
             };
         });
     }
 
     async getAggregateAuthorizationDetails(permissionIds: string[]): Promise<object[]> {
         const aggregate: object[] = [];
-        for (let i=0; i<permissionIds.length; i++){
+        for (let i = 0; i < permissionIds.length; i++) {
             const permission = await this.model.findById(permissionIds[i]) as IPermission;
-            if (permission){
+            if (permission) {
                 aggregate.push(permission.authorization_details);
             }
         }
