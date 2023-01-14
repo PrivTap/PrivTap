@@ -8,7 +8,6 @@ export default function axiosCatch(error: any): void {
     if (err.response?.data) {
         /// Means that the user is more not logged in
         if (err.response.status === 401 && import.meta.env.PROD) {
-            console.log("401");
         }
         message = (err.response?.data as StandartRepsonse<Object>).message;
     }

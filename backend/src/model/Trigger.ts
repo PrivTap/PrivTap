@@ -3,9 +3,8 @@ import Service from "./Service";
 import Model from "../Model";
 import logger from "../helper/logger";
 import Permission, { IPermission } from "./Permission";
-import { DataDefinition } from "../helper/dataDefinition";
 import permission from "./Permission";
-import { findAllOperationAddingAuthorizedTag } from "../helper/misc";
+import { deleteRule, findAllOperationAddingAuthorizedTag } from "../helper/misc";
 
 export interface ITrigger {
     _id: string;
@@ -41,6 +40,15 @@ const triggerSchema = new Schema({
         type: String
     },
     data: [String]
+});
+triggerSchema.pre("deleteOne", async function () {
+    //Propagate deletion to all rules
+    try {
+        const id = this.getFilter()["_id"];
+        await deleteRule(id);
+    } catch (error) {
+        logger.log(error);
+    }
 });
 
 class Trigger extends Model<ITrigger> {
@@ -96,7 +104,7 @@ class Trigger extends Model<ITrigger> {
         try {
             return await findAllOperationAddingAuthorizedTag(this.model, userId, serviceId) as Partial<ITrigger>[];
         } catch (e) {
-            console.log(e);
+            logger.debug(e);
             return null;
         }
     }

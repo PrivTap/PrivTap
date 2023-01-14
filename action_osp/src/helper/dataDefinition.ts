@@ -1,4 +1,5 @@
 import {DataType} from "./dataType";
+import logger from "./logger";
 
 /**
  * The interface of a data model definition for the trigger output and action input
@@ -32,7 +33,7 @@ export class TriggerDataUtils {
         const postText = TriggerDataUtils.extractEntry(dataFromTrigger, "post-text", DataType.Text)?.data as string;
 
         if (!postText) {
-            console.log("Wrongly formatted data from trigger");
+            logger.debug("Wrongly formatted data from trigger");
             return null;
         }
 

@@ -17,3 +17,8 @@ export enum DataType {
 export function isAggregate(dataType: DataType): boolean {
     return dataType == DataType.Array;
 }
+
+export function isValidDataType(str: string): boolean {
+    const supported = [DataType.Text, DataType.Date, DataType.DateTime, DataType.Number, DataType.Array].map((s) => s.toString());
+    return supported.includes(str);
+}

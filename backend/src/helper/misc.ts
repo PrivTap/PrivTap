@@ -8,6 +8,7 @@ import mongoose from "mongoose";
 import { IAction } from "../model/Action";
 import { ITrigger } from "../model/Trigger";
 import Authorization from "../model/Authorization";
+import Rule from "../model/Rule";
 
 
 /**
@@ -79,7 +80,7 @@ export async function handleInsert<T>(response: Response, model: Model<T>, docum
             return insertResult as T;
         return insertResult;
     } catch (e) {
-        console.log(e);
+        logger.debug(e);
         if (e instanceof ModelSaveError) {
             badRequest(response, e.message);
         } else {
@@ -114,7 +115,7 @@ export async function handleUpdate<T>(response: Response, model: Model<T>, filte
             return updateResult as T;
         return updateResult;
     } catch (e) {
-        console.log(e);
+        logger.debug(e);
         if (e instanceof ModelSaveError) {
             badRequest(response, e.message);
         } else {
@@ -225,4 +226,22 @@ export async function findAllOperationAddingAuthorizedTag(model: mongoose.Model<
 
 export function checkActionDataFormat(actionRequiredIDs: string[], triggerDataIDs: string[]): boolean {
     return actionRequiredIDs.filter((actionID) => !triggerDataIDs.find((triggerID) => actionID == triggerID)).length > 0;
+}
+
+export async function deleteRule(id: string) {
+    //Propagate deletion to all rules
+    try {
+        const rules = (await Rule.findAll({ actionId: id })) ?? [];
+        for (const rule of rules) {
+            if (rule._id) {
+                try {
+                    await Rule.delete(rule._id);
+                } catch (error) {
+                    logger.log(error);
+                }
+            }
+        }
+    } catch (error) {
+        logger.log(error);
+    }
 }

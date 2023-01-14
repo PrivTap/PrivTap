@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express";
 import Authentication from "./helper/authentication";
 import NotificationService from "./helper/notificationService";
+import logger from "./helper/logger";
 
 /**
  * Superclass for all routes that takes care of all the boilerplate for HTTP methods registration and
@@ -26,7 +27,7 @@ export default class Route {
             this.router.use(Authentication.checkAuthentication);
 
         if (notify){
-            console.log("registering notify middleware to", endpointName);
+            logger.debug("registering notify middleware to", endpointName);
             this.router.use(NotificationService.checkNotification);
         }
 

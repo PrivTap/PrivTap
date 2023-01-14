@@ -44,7 +44,7 @@ class Notification {
                 logger.debug("The notification already exists");
                 return true;
             }
-            console.log("Error inserting notification", e);
+            logger.debug("Error inserting notification", e);
             return false;
         }
     }
@@ -54,7 +54,7 @@ class Notification {
             this.model.findOneAndUpdate(filter, update);
             return true;
         } catch (e) {
-            console.log("Error updating notification", e);
+            logger.debug("Error updating notification", e);
             return false;
         }
     }
@@ -64,7 +64,7 @@ class Notification {
             await this.model.deleteOne({userId, foreignTriggerId});
             return true;
         } catch (e) {
-            console.log("Error deleting authorization", e);
+            logger.debug("Error deleting authorization", e);
             return false;
         }
     }

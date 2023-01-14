@@ -1,4 +1,5 @@
 import {model as mongooseModel, Schema} from "mongoose";
+import logger from "../helper/logger";
 
 export interface IUser {
     _id: string;
@@ -28,7 +29,7 @@ class User {
         const user = await this.model.findOne(document);
         if (user != null) {
             // User already existing
-            console.log("existing...");
+            logger.debug("existing...");
             if (returnObject) {
                 document._id = user._id;
                 return document;
@@ -43,7 +44,7 @@ class User {
             }
             return true;
         } catch (e) {
-            console.log("error here")
+            logger.debug("error here")
         }
         return false;
     }

@@ -9,6 +9,5 @@
 <script setup lang="ts">
 
 const props = defineProps<{ permissionModel: Partial<{ _id: string, name: string, description: string }>, color?: string, appendIcon?: string }>();
-console.log(props.permissionModel);
 
 </script>

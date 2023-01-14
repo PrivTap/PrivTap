@@ -1,11 +1,12 @@
 import Route from "../../Route";
-import {Request, Response} from "express";
-import {badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success} from "../../helper/http";
-import Action, {IAction} from "../../model/Action";
+import { Request, Response } from "express";
+import { badRequest, checkUndefinedParams, forbiddenUserError, internalServerError, success } from "../../helper/http";
+import Action, { IAction } from "../../model/Action";
 import Service from "../../model/Service";
-import {handleInsert, handleUpdate} from "../../helper/misc";
+import { handleInsert, handleUpdate } from "../../helper/misc";
 import Permissions from "../../model/Permission";
-import {transformStringInDataDef} from "../../helper/dataDefinition";
+import { transformStringInDataDef } from "../../helper/dataDefinition";
+import logger from "../../helper/logger";
 
 
 export default class ManageActionsRoute extends Route {
@@ -19,7 +20,7 @@ export default class ManageActionsRoute extends Route {
         if (checkUndefinedParams(response, serviceId)) return;
 
         const actions = await Action.findAllForService(serviceId, true);
-        console.log(actions);
+        logger.debug(actions);
         if (!actions) {
             internalServerError(response);
             return;
@@ -54,7 +55,7 @@ export default class ManageActionsRoute extends Route {
             return;
         }
         const inputs = transformStringInDataDef(inp);
-        if (inputs === null) {
+        if (!inputs) {
             badRequest(response, "Inputs are not in the valid format");
             return;
         }
@@ -120,12 +121,12 @@ export default class ManageActionsRoute extends Route {
             return;
         }
         const inputs = transformStringInDataDef(request.body.inputs);
-        if (inputs === null) {
+        if (!inputs) {
             badRequest(response, "Inputs are not in the valid format");
             return;
         }
 
-        const updatedAction = await handleUpdate(response, Action, {"_id": actionId}, {
+        const updatedAction = await handleUpdate(response, Action, { "_id": actionId }, {
             name,
             description,
             permissions,

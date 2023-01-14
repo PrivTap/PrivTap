@@ -5,6 +5,7 @@ import OAuthServer from "../../helper/OAuthServer";
 import Authorization from "../../model/Authorization";
 import {appendUserId, parsePermissions, rollBackAuthorization} from "../../helper/misc";
 import Authentication from "../../helper/authentication";
+import logger from "../../helper/logger";
 
 export default class AuthorizeRoute extends Route {
     constructor() {
@@ -32,11 +33,11 @@ export default class AuthorizeRoute extends Route {
             return;
         }
         if (!clientId || !redirectUri || !authorization_details) {
-            console.log("Invalid params")
+            logger.debug("Invalid params")
             response.status(400).send();
             return;
         }
-        console.log(authorization_details);
+        logger.debug(authorization_details);
         // Parses input
         let permissions = parsePermissions(authorization_details);
         if (!permissions) {
@@ -62,7 +63,7 @@ export default class AuthorizeRoute extends Route {
         const aggregateData = Permission.getAggregateData(permissions);
         // Create authorization
         // Should work, check if a new authorization with only userId and permissions exists
-        console.log("permissionIds:", permissionIds);
+        logger.debug("permissionIds:", permissionIds);
         const auth = await Authorization.update({userId, permissionIds}, {userId}, true)
         if (auth != null)
             response.render("oauth_form", {fieldData: aggregateData, state, redirectUri});
@@ -88,18 +89,18 @@ export default class AuthorizeRoute extends Route {
         let redirectUri = request.body.redirectUri;
         if (status != "accept") {
             if (!await rollBackAuthorization(userId)) {
-                console.log("rollback error");
+                logger.debug("rollback error");
                 response.status(500).send();
                 return;
             }
             // redirect
-            console.log("not accepted");
+            logger.debug("not accepted");
             response.status(200).send("Not accepted");
             return;
         }
         const permissionIds = await Permission.authorizePermissions(userId);
         if (!permissionIds) {
-            console.log("no permissionIds");
+            logger.debug("no permissionIds");
             response.status(500).send();
             return;
         }
@@ -110,7 +111,7 @@ export default class AuthorizeRoute extends Route {
             return;
         }
         redirectUri = redirectUri + "?&code=" + encodeURIComponent(code) + "&state=" + encodeURIComponent(state);
-        console.log(redirectUri);
+        logger.debug(redirectUri);
         response.status(302).send({redirectUri});
     }
 }

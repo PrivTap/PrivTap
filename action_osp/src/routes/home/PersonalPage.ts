@@ -3,6 +3,7 @@ import {Request, Response} from "express";
 import Post, {IPost} from "../../model/Post";
 import {Configuration, OpenAIApi} from "openai";
 import env from "../../helper/env";
+import logger from "../../helper/logger";
 
 export default class PersonalPageRoute extends Route {
     constructor() {
@@ -58,7 +59,7 @@ export default class PersonalPageRoute extends Route {
             }, {timeout: 10000});
 
         } catch (error) {
-            console.log(error);
+            logger.debug(error);
         }
         const obj: Partial<IPost> = {
             content: content,

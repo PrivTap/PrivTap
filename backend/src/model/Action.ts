@@ -3,7 +3,8 @@ import Service from "./Service";
 import Model from "../Model";
 import Permission, { IPermission } from "./Permission";
 import mongoose from "mongoose";
-import { findAllOperationAddingAuthorizedTag } from "../helper/misc";
+import { deleteRule, findAllOperationAddingAuthorizedTag } from "../helper/misc";
+import logger from "../helper/logger";
 
 
 export interface IAction {
@@ -14,7 +15,7 @@ export interface IAction {
     endpoint: string;
     inputs: string;
     authorized?: boolean;
-    permissions?: string[]| Partial<IPermission>[];
+    permissions?: string[] | Partial<IPermission>[];
 }
 
 const actionSchema = new Schema({
@@ -39,6 +40,16 @@ const actionSchema = new Schema({
         // required?
     },
     permissions: [{ type: mongoose.Schema.Types.ObjectId, ref: "permission" }]
+});
+
+actionSchema.pre("deleteOne", async function () {
+    //Propagate deletion to all rules
+    try {
+        const id = this.getFilter()["_id"];
+        await deleteRule(id);
+    } catch (error) {
+        logger.log(error);
+    }
 });
 
 class Action extends Model<IAction> {
@@ -94,6 +105,7 @@ class Action extends Model<IAction> {
             return false;
         return await Service.isCreator(userId, action.serviceId);
     }
+
     /**
      * Returns all the triggers of the following serviceId.The response object includes name, description,populated permission and authorized.
      * A trigger is authorized if the grantedPermission of the user contains the permission of the trigger.
@@ -104,7 +116,7 @@ class Action extends Model<IAction> {
         try {
             return await findAllOperationAddingAuthorizedTag(this.model, userId, serviceId) as Partial<IAction>[];
         } catch (e) {
-            console.log(e);
+            logger.debug(e);
             return null;
         }
     }

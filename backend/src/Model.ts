@@ -81,7 +81,7 @@ export default class Model<T> {
      */
     async updateWithFilter(filter: FilterQuery<T>, documentUpdate: Partial<T>, upsert = false): Promise<boolean> {
         try {
-            console.log(documentUpdate);
+            logger.debug(documentUpdate);
             const updateResult = await this.model.updateOne(filter, documentUpdate, { upsert: upsert });
             return updateResult.upsertedId != null || updateResult.modifiedCount == 1;
         } catch (e) {

@@ -36,6 +36,7 @@ export default class TriggersDataRoute extends Route {
         const trigger = await Trigger.findById(triggerId);
 
         if (!trigger || !referencedRules) {
+            logger.debug("You are not the owner of this rule");
             forbiddenUserError(response, "You are not the owner of this rule");
             return;
         }
@@ -77,6 +78,7 @@ export default class TriggersDataRoute extends Route {
                     }
                     axiosResponse = await getReqHttp(trigger?.resourceServer, oauthToken, queryParams);
                     dataToForwardToActionAPI = axiosResponse?.data;
+                    logger.debug("Data received by trigger =", dataToForwardToActionAPI);
                     if (!dataToForwardToActionAPI) {
                         logger.debug("Axios response data not found");
                         internalServerError(response);
@@ -96,11 +98,12 @@ export default class TriggersDataRoute extends Route {
                 internalServerError(response);
                 return;
             }
+
             //Check that the data sent to action is compatible with the action data format (i.e. contains all the data required by it)
             const triggerDataIDs = dataDefinitionIDs(dataToForwardToActionAPI as DataDefinition);
 
             if (!triggerDataIDs || checkActionDataFormat(actionRequiredIDs, triggerDataIDs)) {
-                console.log("Trigger Sending Less Data than what the Action requires! Rule execution skipped...");
+                logger.debug("Trigger Sending Less Data than what the Action requires! Rule execution skipped...");
                 internalServerError(response);
                 return;
             }
