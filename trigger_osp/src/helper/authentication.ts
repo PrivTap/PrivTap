@@ -93,7 +93,7 @@ export default abstract class Authentication {
         // Create a JWT token for the user
         const jwt = Authentication.createJWT(user);
         if (!jwt){
-            console.log("Not jwt")
+            logger.debug("Not jwt")
             return false;
         }
 
@@ -119,7 +119,7 @@ export default abstract class Authentication {
 
         // Set the cookie header
         response.cookie("__session", jwt, cookieOptions);
-        console.log("Headers set correctly");
+        logger.debug("Headers set correctly");
         return true;
     }
 

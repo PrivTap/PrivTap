@@ -1,5 +1,6 @@
 import { Schema } from "mongoose";
 import Model from "../Model";
+import logger from "../helper/logger";
 
 export interface IState {
     _id: string;
@@ -40,7 +41,7 @@ class State extends Model<IState> {
     async findByValue(value: string): Promise<IState | null> {
         try{
             const res=await this.find({ value: value });
-            console.log(res);
+            logger.debug(res);
             return res;
         }catch (e) {
             return null;

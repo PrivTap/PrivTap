@@ -102,7 +102,6 @@ async function onClose() {
 
 async function validate() {
   const {valid} = await formRef.value.validate();
-  console.log(valid);
   if (valid) {
     const perm = choosablePermissions.perm.filter(p => p._id !== undefined && p.associated === true).map(p => p._id) as string[];
     if (props.onEdit) {

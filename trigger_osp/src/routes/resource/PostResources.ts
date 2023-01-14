@@ -1,6 +1,7 @@
 import Route from "../../Route";
 import {Request, Response} from "express";
 import Authorization from "../../model/Authorization";
+import logger from "../../helper/logger";
 
 export default class PostResources extends Route {
     constructor() {
@@ -8,7 +9,6 @@ export default class PostResources extends Route {
     }
 
     protected async httpGet(request: Request, response: Response): Promise<void> {
-        console.log("resource server called");
         const bearer = request.headers.authorization as string;
         const oauthToken = bearer.split(" ")[1];
 
@@ -29,6 +29,7 @@ export default class PostResources extends Route {
 
         const data = await Authorization.retrieveData(oauthToken, eventDataParameters);
 
+        logger.debug("Sending data =", data);
         response.status(200).send(data);
     }
 }

@@ -158,7 +158,6 @@ async function onSubmitted() {
   isLoading.value = true;
   if (showLogin.value) {
     const res = await auth_controller.login(username.value, password.value);
-    console.log(res);
     if (res) router.replace(RoutingPath.HOME);
   } else {
     await _signUp();

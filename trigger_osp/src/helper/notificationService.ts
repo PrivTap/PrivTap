@@ -14,7 +14,7 @@ export default abstract class NotificationService {
             return;
         }
         const endpoint = request.baseUrl;
-        console.log("Caught a post request:", endpoint);
+        logger.debug("Caught a post request:", endpoint);
         const triggerData = ResourceHelper.retrieveTriggerData(endpoint);
         const triggerName = triggerData.trigger;
         const postGranularity = triggerData.postGranularity;
@@ -35,12 +35,11 @@ export default abstract class NotificationService {
                 "userGranularity": userGranularity,
                 "postGranularity": postGranularity
             });
-            console.log("sending resourcedToRequest =", eventDataParameters);
             const data = { "triggerId": notification.foreignTriggerId, "userId": notification.foreignUserId, apiKey, eventDataParameters: eventDataParameters};
             try{
-                console.log("posting to", env.PRIVTAP_NOTIFICATION_URL);
+                logger.debug("posting to", env.PRIVTAP_NOTIFICATION_URL);
                 // Do NOT await this request
-                axios.post(env.PRIVTAP_NOTIFICATION_URL, data);
+                axios.post(env.PRIVTAP_NOTIFICATION_URL, data).catch(() => logger.debug("Error communicating with PrivTap triggerData endpoint"));
             } catch (e){
                 logger.debug("Axios response != 200");
             }

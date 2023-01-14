@@ -2,6 +2,7 @@ import Route from "../../Route";
 import {Request, Response} from "express";
 import {ITriggerData, TriggerDataUtils} from "../../helper/dataDefinition";
 import {postReqHttp} from "../../helper/misc";
+import logger from "../../helper/logger";
 
 export default class CreatePostRoute extends Route {
     constructor() {
@@ -22,12 +23,12 @@ export default class CreatePostRoute extends Route {
         try {
             axiosResponse = await postReqHttp(request.protocol + '://' + request.get("host") + "/create-post", bearer, convertedData);
             if (axiosResponse?.status != 200) {
-                console.log("error inserting post");
+                logger.debug("error inserting post");
                 response.status(500).send();
                 return;
             }
         } catch (e) {
-            console.log("Axios response status =", axiosResponse?.status, "Error:", e);
+            logger.debug("Axios response status =", axiosResponse?.status, "Error:", e);
             response.status(500).send();
             return;
         }

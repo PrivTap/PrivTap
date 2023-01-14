@@ -105,7 +105,7 @@ class Permission {
                 }
                 return true;
             }
-            console.log("Error inserting permission", e);
+            logger.debug("Error inserting permission", e);
         }
         return false;
     }

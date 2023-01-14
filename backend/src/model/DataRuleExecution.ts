@@ -49,7 +49,7 @@ class dataRuleExecution extends Model<IDataRuleExecution> {
             headers: { "Authorization": `Bearer ${token}` },
             responseType: "stream"
         });
-        console.log(await response.headers["Content-Type"]);
+        logger.debug(await response.headers["Content-Type"]);
         const writeStream = bucket.openUploadStream("file_" + Date.now(), { metadata: { type: response.headers["Content-Type"] } });
         //TODO see if it can be done with fetch
         try {

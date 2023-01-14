@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { checkUndefinedParams, internalServerError, success } from "../../helper/http";
 import Action from "../../model/Action";
 import RuleExecution from "../../helper/rule_execution";
+import logger from "../../helper/logger";
 
 export default class ActionsRoute extends Route {
     constructor() {
@@ -23,7 +24,7 @@ export default class ActionsRoute extends Route {
             internalServerError(response);
             return;
         }
-        console.log("triggerId:", triggerId);
+        logger.debug("triggerId:", triggerId);
         let result = [];
         //TODO: Can we check compatibility on the DB? (probably not :( )
         if (triggerId) {
@@ -33,10 +34,10 @@ export default class ActionsRoute extends Route {
             }
             /*let filterdata = data.filter(async function (action) {
                 const bool= await RuleExecution.areActionTriggerCompatible(action._id ?? "", triggerId);
-                console.log("bool:" ,bool)
+                logger.debug("bool:" ,bool)
                 return bool;
             });*/
-            console.log("data:", result);
+            logger.debug("data:", result);
         } else {
             result = data;
         }

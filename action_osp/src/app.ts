@@ -64,7 +64,7 @@ class OSP {
         app.use(cookieParser());
         app.set('view engine', 'ejs');
         app.use('/public', express.static('./public'));
-
+        app.enable('trust proxy');
         const storage = multer.diskStorage({
             destination: (req, file, cb) => {
                 cb(null, 'uploads')

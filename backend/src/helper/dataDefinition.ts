@@ -1,4 +1,4 @@
-import { DataType, isAggregate } from "./dataType";
+import { DataType, isAggregate, isValidDataType } from "./dataType";
 
 
 /**
@@ -11,7 +11,7 @@ export interface DataDefinition {
 /**
  * The internal interface object used to define entries in the data definition object
  */
-interface EntryDefinition {
+export interface EntryDefinition {
     identifier?: string, //Undefined only for subtypes
     type: DataType,
     content?: EntryDefinition //Defined ONLY for aggregate types
@@ -84,6 +84,11 @@ export function transformStringInDataDef(dataDefinition: string): string | null 
     try {
         const array = JSON.parse(dataDefinition) as EntryDefinition[];
         if (!array) return null;
+        for (const entry of array) {
+            if (!isValidDataType(entry.type)) {
+                return null;
+            }
+        }
         return JSON.stringify({ "trigger_data": array });
     } catch (err) {
         return null;

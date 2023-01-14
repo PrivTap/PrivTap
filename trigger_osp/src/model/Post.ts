@@ -1,4 +1,5 @@
 import { model as mongooseModel, Schema } from "mongoose";
+import logger from "../helper/logger";
 
 export interface IPost {
     _id: string;
@@ -31,7 +32,7 @@ class Post {
             await model.save();
             return true;
         } catch (e) {
-            console.log("Error inserting post");
+            logger.debug("Error inserting post");
         }
         return false;
     }
