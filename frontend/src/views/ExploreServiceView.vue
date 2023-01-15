@@ -2,20 +2,21 @@
   <div class="h-full">
     <div class="text-center pt-10 mt-5 bg-slate-900/60 shadow-md">
       <v-avatar color="#172540" style="height: 80px; width: 80px;">
-        <v-icon size="40px" color="info" icon="mdi-lan"></v-icon>
+        <v-icon size="40px" color="info" icon="mdi-open-in-new" @click="redirectToService"></v-icon>
       </v-avatar>
       <p class="text-h3 font-weight-medium text-white mt-10 mb-4"> {{ service.name }} </p>
       <p class="text-h6 font-weight-regular text-white/60"> {{ service.description }} </p>
       <!-- TODO Define where this button should redirect, otherwhise remove it -->
-      <v-btn variant="tonal" color="info" rounded size="x-large" class="my-10" @click="authorizeService"> AUTHORIZE </v-btn>
-            <v-tabs fixed-tabs v-model=" tabs
+      <v-btn variant="tonal" color="info" rounded size="x-large" class="my-10" @click="authorizeService"> AUTHORIZE
+      </v-btn>
+      <v-tabs fixed-tabs v-model=" tabs
       ">
-      <v-tab :value="1">
-        Trigger
-      </v-tab>
-      <v-tab :value="2">
-        Actions
-      </v-tab>
+        <v-tab :value="1">
+          Trigger
+        </v-tab>
+        <v-tab :value="2">
+          Actions
+        </v-tab>
       </v-tabs>
     </div>
     <v-window v-model="tabs">
@@ -93,7 +94,8 @@
 import {onMounted, ref} from 'vue';
 import empty from '@/assets/images/empty.svg';
 import {useRoute} from 'vue-router';
-import type SimpleServiceModel from '@/model/simple_service_model';
+import SimpleServiceModel from '@/model/simple_service_model';
+import show_services from "@/controllers/show_services";
 import UserTrigger from "@/controllers/user_trigger";
 import UserAction from "@/controllers/user_action";
 import PermissionChip from '@/components/InformationChip.vue';
@@ -102,26 +104,39 @@ import RoutingPath from "@/router/routing_path";
 
 const router = useRouter();
 const route = useRoute();
-const temp = route.params.service;
-let service = JSON.parse(temp as string) as SimpleServiceModel
-
+let serviceId = route.params.id as string;
+let service = ref({} as SimpleServiceModel);
 const tabs = ref(0);
+
+onMounted(async () => {
+  const value = await show_services.getServiceById(serviceId, true);
+  if (value === null) {
+    router.back();
+    return;
+  }
+  service.value = value;
+  listOfTrigger.value = await UserTrigger.getAllTriggers(serviceId, true);
+  listOfAction.value = await UserAction.getAllActions(serviceId, true);
+});
+
 // const service = new ServiceModel("id", "GitHub Integration", "Description of what that service offers..", "creator", "http://github.com", "authPath", "tokenPath", "clientId", "clientSecret");
+function redirectToService() {
+  if (service.value?.baseUrl != null) {
+    window.open(service.value.baseUrl, '_blank');
+  }
+}
 
 function authorizeService() {
   try {
     let url;
-    url = RoutingPath.MODIFY_AUTH_PAGE + "/" + service._id;
+    url = RoutingPath.MODIFY_AUTH_PAGE + "/" + service?.value._id;
     router.push(url);
   } catch (e) {
     router.push(RoutingPath.SERVICES_PAGE);
   }
 }
+
 let listOfTrigger = UserTrigger.getNewRef();
 let listOfAction = UserAction.getNewRef();
-onMounted(async () => {
 
-  listOfTrigger.value = await UserTrigger.getAllTriggers(service._id, true);
-  listOfAction.value = await UserAction.getAllActions(service._id, true);
-});
 </script>
