@@ -91,7 +91,7 @@ class Authorization extends Model<IAuthorization> {
                 //left outer join with collection service
                 .lookup({ from: "services", localField: "serviceId", foreignField: "_id", as: "service" })
                 .unwind({ path: "$service" })
-                .addFields({ _id: "$service._id", name: "$service.name", description: "$service.description" })
+                .addFields({ _id: "$service._id", name: "$service.name", description: "$service.description", baseUrl: "$service.baseUrl" })
                 //remove all the field except the relevant service data
                 .project({
                     "_id": 1,
