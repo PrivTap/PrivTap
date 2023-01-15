@@ -9,6 +9,8 @@ let services = ref<SimpleServiceModel[]>([]);
 export interface IShowServices {
     getAllServices(): Promise<SimpleServiceModel[]>;
 
+    getServiceById(id: string): Promise<SimpleServiceModel | null>;
+
     getAuthorizedServices(): Promise<SimpleServiceModel[]>;
 }
 
@@ -25,6 +27,20 @@ class Show_services extends GenericController<SimpleServiceModel[]> implements I
             services.value = res != null ? res : [];
         return res != null ? res : [];
     }
+
+    /**
+     * Return the service with the id passed as parameter
+     * @param serviceId the id of the service
+     * @param valueToReturn if true return the result of the request. Default false
+     */
+    async getServiceById(serviceId: string, valueToReturn: boolean = false): Promise<SimpleServiceModel | null> {
+        const res = await super.get<SimpleServiceModel>(path, {query: {serviceId: serviceId}});
+        if (!valueToReturn)
+            if (res != null)
+                services.value.push(res);
+        return res != null ? res : null;
+    }
+
     /**
      * If value to return it's true, return the result of the request. When value to return it's false, the result of the request is stored inside the reference object.
      * The result of the request is the list of all the triggers of the service that are authorized (All their permissions have been granted)
@@ -50,6 +66,7 @@ class Show_services extends GenericController<SimpleServiceModel[]> implements I
     getNewRef(): Ref.Ref<SimpleServiceModel[]> {
         return ref<SimpleServiceModel[]>([]);
     }
+
 }
 
 export default new Show_services();

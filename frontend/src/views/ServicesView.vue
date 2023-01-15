@@ -26,10 +26,12 @@
                 </svg>
               </div>
               <input
+                  v-model="search"
                   type="text"
                   id="simple-search"
                   class="px-64 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder="Search"
+                  @input="filterServices"
               >
             </div>
 
@@ -90,7 +92,7 @@ const authorized = ref(false);
 const services = showServices.getRef();
 let serviceAuthorized: SimpleServiceModel[] | null = null;
 let serviceUnauthorized: SimpleServiceModel[] | null = null;
-
+const search = ref('');
 
 onMounted(async () => {
   await showServices.getAllServices();
@@ -117,6 +119,14 @@ async function switchAuthorization() {
       isLoading.value = false;
     }
     services.value = serviceUnauthorized;
+  }
+}
+
+function filterServices() {
+  if (authorized.value) {
+    services.value = serviceAuthorized?.filter((service) => service.name.toLowerCase().includes(search.value.toLowerCase())) ?? [];
+  } else {
+    services.value = serviceUnauthorized?.filter((service) => service.name.toLowerCase().includes(search.value.toLowerCase())) ?? [];
   }
 }
 

@@ -10,7 +10,6 @@
                 :permissionModel="permission" />
             <v-btn class="ma-2" variant="outlined" color="text-blue-100"
                 @click="router.push(`${RoutingPath.CREATE_RULE_PAGE}/${props.action._id}`)">
-                nj
             </v-btn>
         </div>
 

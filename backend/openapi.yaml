@@ -269,7 +269,7 @@ paths:
       tags:
         - OSP Authorization
       summary: The user requests a list of OSP
-      description: Returns a list of all the OSP registered to the platform. If specified in the authorized query parameters, only the authorized OSPs will be returned
+      description: Returns a list of all the OSP registered to the platform. If specified in the authorized query parameters, only the authorized OSPs will be returned. If the serviceId is specified, only the information of that service will be returned.
       operationId: services
       parameters:
         - name: authorized
@@ -278,28 +278,49 @@ paths:
           schema:
             type: boolean
           example: true
+        - name : serviceId
+          description: Filters the returned list including only the OSP with the specified serviceId
+          in: query
+          schema:
+            type: string
+          example: 5f9f5b9b9b9b9b9b9b9b9b9b
       responses:
         '200':
           description: successful operation
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    _id:
-                      type: string
-                      example: exampleId
-                    name:
-                      type: string
-                      example: Dropbox
-                    description:
-                      type: string
-                      example: This service allow you to interact with your dropbox account!
-                    baseUrl:
-                      type: string
-                      example: https://www.dropbox.com
+                oneOf:
+                  - type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: exampleId
+                        name:
+                          type: string
+                          example: Dropbox
+                        description:
+                          type: string
+                          example: This service allow you to interact with your dropbox account!
+                        baseUrl:
+                          type: string
+                          example: https://www.dropbox.com
+                  - type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: exampleId
+                      name:
+                        type: string
+                        example: Dropbox
+                      description:
+                        type: string
+                        example: This service allow you to interact with your dropbox account!
+                      baseUrl:
+                        type: string
+                        example: https://www.dropbox.com
         '400':
           description: Bad request
         '500':
