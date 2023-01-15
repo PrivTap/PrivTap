@@ -94,7 +94,7 @@
 import {onMounted, ref} from 'vue';
 import empty from '@/assets/images/empty.svg';
 import {useRoute} from 'vue-router';
-import SimpleServiceModel from '@/model/simple_service_model';
+import type SimpleServiceModel from '@/model/simple_service_model';
 import show_services from "@/controllers/show_services";
 import UserTrigger from "@/controllers/user_trigger";
 import UserAction from "@/controllers/user_action";
