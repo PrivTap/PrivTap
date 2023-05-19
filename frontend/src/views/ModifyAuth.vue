@@ -7,7 +7,10 @@
         Modifying authorizations will require you to connect with {{ serviceName }}<br>
         <strong class="text-red-500">Watch out!</strong> Revoking permission will cause some rule to not work</span>
     </div>
-    <div v-if="permission.length">
+    <div v-if="isLoading" class="text-center">
+      <v-progress-circular indeterminate color="info"></v-progress-circular>
+    </div>
+    <div v-else-if="permission.length">
       <div class="text-right relative right-1/3">
         <button :disabled="!authorizationChanged" @click="oAuthAuthorization"
           class=" rounded-lg bg-blue-800 py-5 px-10 hover:bg-blue-900 disabled:opacity-70 shadow-lg text-xl text-white  ">
@@ -72,10 +75,11 @@ const serviceName = ref("service");
 const originalAuthorized: string[] = [];
 const arrayAuthorized = ref<string[]>([]);
 const authorizationChanged = ref(false);
-const isLoading = ref(true);
+const isLoading = ref(false);
 const serviceId = route.params.id as string
 
 onMounted(async () => {
+  isLoading.value = true;
   const code = route.query.code as string;
   const state = route.query.state as string;
   if (code != undefined && state != undefined) {
@@ -84,6 +88,7 @@ onMounted(async () => {
   }
 
   await savePermissions();
+  isLoading.value = false;
 })
 
 function onSwitch() {
@@ -93,7 +98,6 @@ function onSwitch() {
 async function savePermissions() {
   if (route.params.id) {
     permission = await showPermissions.getAllPermissions(serviceId);
-    isLoading.value = false;
   }
   permission.value?.forEach(function (p) {
     if (p.authorized) {

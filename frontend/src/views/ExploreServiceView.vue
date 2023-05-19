@@ -9,8 +9,8 @@
       <!-- TODO Define where this button should redirect, otherwhise remove it -->
       <v-btn variant="tonal" color="info" rounded size="x-large" class="my-10" @click="authorizeService"> AUTHORIZE
       </v-btn>
-      <v-tabs fixed-tabs v-model=" tabs
-      ">
+      <v-tabs fixed-tabs v-model="tabs
+        ">
         <v-tab :value="1">
           Trigger
         </v-tab>
@@ -22,8 +22,11 @@
     <v-window v-model="tabs">
       <v-window-item v-for="i in 2" :key="i" :value="i">
         <div v-if="i === 1" class="py-10 content-center flex items-center justify-center">
-          <div v-if="!listOfTrigger.length"
-               class="text-center flex flex-col justify-center items-center content-center ">
+          <div v-if="isLoading">
+            <v-progress-circular indeterminate color="info"></v-progress-circular>
+          </div>
+          <div v-else-if="!listOfTrigger.length"
+            class="text-center flex flex-col justify-center items-center content-center ">
             <h1 class="text-3xl text-blue-100 pt-8 font-medium">
               This service has no trigger yet
             </h1>
@@ -34,7 +37,7 @@
           </div>
           <div v-else class="mx-10 grid lg:grid-cols-2 xl:grid-cols-3 gap-10 content-center">
             <div v-for="trigger in listOfTrigger"
-                 class="rounded-lg py-8 px-8 shadow-lg bg-blue-900/60 hover:bg-blue-900 duration-500">
+              class="rounded-lg py-8 px-8 shadow-lg bg-blue-900/60 hover:bg-blue-900 duration-500">
               <v-card class="mx-auto" variant="text">
                 <v-card-title>
                   <p class="text-h4 font-weight-medium"> {{ trigger.name }} </p>
@@ -44,8 +47,7 @@
                 </v-card-subtitle>
                 <v-card-text>
                   <p class="text-h6 font-weight-regular"> Permission required: </p>
-                  <PermissionChip v-for="permission in trigger.permissions"
-                                  :permissionModel="permission">
+                  <PermissionChip v-for="permission in trigger.permissions" :permissionModel="permission">
                   </PermissionChip>
                 </v-card-text>
               </v-card>
@@ -53,8 +55,11 @@
           </div>
         </div>
         <div v-if="i === 2" class="py-10 content-center flex items-center justify-center">
-          <div v-if="!listOfAction.length"
-               class="text-center flex flex-col justify-center items-center content-center ">
+          <div v-if="isLoading">
+            <v-progress-circular indeterminate color="info"></v-progress-circular>
+          </div>
+          <div v-else-if="!listOfAction.length"
+            class="text-center flex flex-col justify-center items-center content-center ">
             <h1 class="text-3xl text-blue-100 pt-8 font-medium">
               This service has no action yet
             </h1>
@@ -65,7 +70,7 @@
           </div>
           <div class="mx-10 grid lg:grid-cols-2 xl:grid-cols-3 gap-10 content-center">
             <div v-for="action in listOfAction"
-                 class="rounded-lg py-8 px-8 shadow-lg bg-indigo-900/60 hover:bg-indigo-900 duration-500">
+              class="rounded-lg py-8 px-8 shadow-lg bg-indigo-900/60 hover:bg-indigo-900 duration-500">
               <v-card class="mx-auto" variant="text">
                 <v-card-title>
                   <p class="text-h4 font-weight-medium"> {{ action.name }} </p>
@@ -75,8 +80,7 @@
                 </v-card-subtitle>
                 <v-card-text>
                   <p class="text-h6 font-weight-regular"> Permission required: </p>
-                  <PermissionChip v-for="permission in action.permissions"
-                                  :permissionModel="permission">
+                  <PermissionChip v-for="permission in action.permissions" :permissionModel="permission">
                   </PermissionChip>
                 </v-card-text>
               </v-card>
@@ -91,15 +95,15 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref} from 'vue';
+import { onMounted, ref } from 'vue';
 import empty from '@/assets/images/empty.svg';
-import {useRoute} from 'vue-router';
+import { useRoute } from 'vue-router';
 import type SimpleServiceModel from '@/model/simple_service_model';
 import show_services from "@/controllers/show_services";
 import UserTrigger from "@/controllers/user_trigger";
 import UserAction from "@/controllers/user_action";
 import PermissionChip from '@/components/InformationChip.vue';
-import {useRouter} from "vue-router";
+import { useRouter } from "vue-router";
 import RoutingPath from "@/router/routing_path";
 
 const router = useRouter();
@@ -107,8 +111,10 @@ const route = useRoute();
 let serviceId = route.params.id as string;
 let service = ref({} as SimpleServiceModel);
 const tabs = ref(0);
+const isLoading = ref(false);
 
 onMounted(async () => {
+  isLoading.value = true;
   const value = await show_services.getServiceById(serviceId, true);
   if (value === null) {
     router.back();
@@ -117,6 +123,7 @@ onMounted(async () => {
   service.value = value;
   listOfTrigger.value = await UserTrigger.getAllTriggers(serviceId, true);
   listOfAction.value = await UserAction.getAllActions(serviceId, true);
+  isLoading.value = false;
 });
 
 // const service = new ServiceModel("id", "GitHub Integration", "Description of what that service offers..", "creator", "http://github.com", "authPath", "tokenPath", "clientId", "clientSecret");

@@ -11,7 +11,7 @@
         "source": "/api/**",
         "run": {
           "serviceId": "privtap-backend",
-          "region": "europe-west8"
+          "region": "australia-southeast2"
         }
       },
       {

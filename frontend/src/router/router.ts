@@ -1,5 +1,5 @@
 import auth_controller from "@/controllers/authorization_controller";
-import {createRouter, createWebHistory} from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 import RoutingPath from "./routing_path";
 
 const router = createRouter({
@@ -90,7 +90,7 @@ const router = createRouter({
             },
         },
         {
-            path: `${RoutingPath.SERVICE_ACTION_PAGE}`,
+            path: `${RoutingPath.SERVICE_ACTION_PAGE}/:id?`,
             name: "serviceaction",
             component: () => import("../views/OspManageActionView.vue"),
             meta: {
